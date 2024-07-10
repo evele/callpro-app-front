@@ -1,0 +1,25 @@
+# Fase de construcción
+FROM node:lts-alpine as build-stage
+
+# bind your app to the gateway IP
+ENV HOST=0.0.0.0
+
+WORKDIR /app
+
+# Instala pnpm
+RUN npm install -g pnpm
+
+# Copia 'package.json' y 'pnpm-lock.yaml' (si existe)
+# COPY package.json ./
+COPY package.json ./ pnpm-lock.yaml ./
+
+# Instala dependencias 
+# RUN pnpm store clean && pnpm install --production --network-timeout 1000000
+RUN pnpm store clean && pnpm install
+
+# Comando para copiar 'pnpm-lock.yaml' a un archivo temporal, descomentar para actualizar
+# RUN cp pnpm-lock.yaml /tmp/pnpm-lock.yaml
+
+# El comando para iniciar el servidor de desarrollo de Vue
+# Nota: Este comando solo se ejecuta en modo desarrollo
+CMD ["pnpm", "dev"]
