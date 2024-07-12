@@ -19,3 +19,7 @@ export const RESET_PASSWORD_URL = () => {
 export const LOAD_SETTINGS_DATA_URL = () => {
   return `${BASE_API_URL()}/settings/get_settings_data`
 }
+
+export const LOAD_CALLER_IDS_URL = () => {
+  return `${BASE_API_URL()}/caller_id/get_caller_ids`
+}
