@@ -16,7 +16,7 @@ export const useAuthStore = defineStore("AuthStore", {
     async login(credentials) {
       const { email, password } = credentials
       // const response = await fetchWrapper.post(LOGIN_URL, { email, password })
-      var response = await fetchWrapper.post(LOGIN_URL(), { email, password })
+      var response = await fetchWrapper.post(LOGIN_URL, { email, password })
 
       if (response.result == true) {
         // update pinia state
@@ -37,10 +37,10 @@ export const useAuthStore = defineStore("AuthStore", {
     },
     /*
     async sendRecoveryPass(email) {
-      return await fetchWrapper.post(RECOVERY_MAIL_URL(), { email })
+      return await fetchWrapper.post(RECOVERY_MAIL_URL, { email })
     },
     async resetPassword(password, passwordc, token) {
-      return await fetchWrapper.post(RESET_PASSWORD_URL(), { new: password, new_confirm: passwordc, token })
+      return await fetchWrapper.post(RESET_PASSWORD_URL, { new: password, new_confirm: passwordc, token })
     },*/
   },
 })
