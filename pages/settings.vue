@@ -1,6 +1,7 @@
 <template>
     <div>
         <p class="text-title">Settings page</p>
+        <button type="button" @click="load_settings">Load settings</button>
     </div>
 </template>
 
@@ -12,6 +13,10 @@
     onMounted(async() => {
         await settingsStore.loadSettingsData()
     })
+    
+    const load_settings = () => {
+        settingsStore.loadSettingsData()
+    }
 </script>
 
 <style scoped>

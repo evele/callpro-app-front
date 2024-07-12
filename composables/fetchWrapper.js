@@ -7,6 +7,7 @@ const setAuthHeader = () => {
   if (isLoggedIn) {
     return { Authorization: `Bearer ${user.token}` };
   }
+  return {};
 };
 
 const request = (method) => {
@@ -16,24 +17,20 @@ const request = (method) => {
       headers: setAuthHeader(),
       body: null,
     };
-    if (body) {
-      requestOptions.body = JSON.stringify(body); // Asegúrate de que el body esté en formato JSON TODO: check this que lo mandó GPT porque sí
-    }
-    
-    try {
-      const response = await $fetch(url, {
-        method: requestOptions.method,
-        headers: requestOptions.headers,
-        body: requestOptions.body,
-      });
 
+    if (body) {
+      requestOptions.headers['Content-Type'] = 'application/json';
+      requestOptions.body = JSON.stringify(body);
+    }
+
+    try {
+      const response = await $fetch(url, requestOptions);
       const { user, logout } = useAuthStore();
       if ([401, 403].includes(response.status) && user) {
         // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
         logout();
       }
-
-      return { data: response.data }
+      return response;
     } catch (error) {
       // Handle the request and response errors
       console.log("error", error);

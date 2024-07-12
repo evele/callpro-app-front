@@ -7,9 +7,8 @@ export const useAuthStore = defineStore("AuthStore", {
     }
   },
   getters: {
-    // computed prop of state
     isLoggedIn() {
-      return this.user?.id ? true : false // TODO: check if will use this or what..
+      return this.user?.id ? true : false 
       // return true // for develop
     },
   },
@@ -17,9 +16,7 @@ export const useAuthStore = defineStore("AuthStore", {
     async login(credentials) {
       const { email, password } = credentials
       // const response = await fetchWrapper.post(LOGIN_URL, { email, password })
-      var response = await fetchWrapper.post(LOGIN_URL, { email, password })
-
-      response = toRaw(response.data.value) // TODO: check if will use this or what
+      var response = await fetchWrapper.post(LOGIN_URL(), { email, password })
 
       if (response.result == true) {
         // update pinia state
@@ -27,8 +24,7 @@ export const useAuthStore = defineStore("AuthStore", {
         // store user details and jwt in local storage to keep user logged in between page refreshes
         localStorage.setItem("user", JSON.stringify(response.user))
         // redirect to previous url or default to home page
-        // this.$nuxt.$router.push({ name: "Dashboard" })
-        await navigateTo("/dashboard") // TODO: change this route
+        await navigateTo("/dashboard") 
       }
 
       return response
@@ -41,10 +37,10 @@ export const useAuthStore = defineStore("AuthStore", {
     },
     /*
     async sendRecoveryPass(email) {
-      return await fetchWrapper.post(RECOVERY_MAIL_URL, { email })
+      return await fetchWrapper.post(RECOVERY_MAIL_URL(), { email })
     },
     async resetPassword(password, passwordc, token) {
-      return await fetchWrapper.post(RESET_PASSWORD_URL, { new: password, new_confirm: passwordc, token })
+      return await fetchWrapper.post(RESET_PASSWORD_URL(), { new: password, new_confirm: passwordc, token })
     },*/
   },
 })

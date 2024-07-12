@@ -8,9 +8,7 @@ export const useSettingsStore = defineStore("SettingsStore", {
   },
   actions: {
     async loadSettingsData() {
-      const { data } = await fetchWrapper.get(LOAD_SETTINGS_DATA_URL)
-      const response = toRaw(data.value)
-      
+      const response = await fetchWrapper.get(LOAD_SETTINGS_DATA_URL())    
       if(response.result) {
         this.settings_data = response.data
       }
