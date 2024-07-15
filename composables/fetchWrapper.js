@@ -24,7 +24,7 @@ const request = (method) => {
     }
 
     try {
-      const response = await $fetch(url, requestOptions);
+      const response = await $fetch(`${BASE_API_URL()}${url}`, requestOptions);
       const { user, logout } = useAuthStore();
       if ([401, 403].includes(response.status) && user) {
         // auto logout if 401 Unauthorized or 403 Forbidden response returned from api

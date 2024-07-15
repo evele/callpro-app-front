@@ -16,7 +16,7 @@ export const useDidNumbersStore = defineStore("DidNumbersStore", {
         this.did_error = false;
         this.toll_free_error = false;
 
-        const response = await fetchWrapper.get(LOAD_DID_AND_TOLL_FREE_NUMBERS_URL())    
+        const response = await fetchWrapper.get(LOAD_DID_AND_TOLL_FREE_NUMBERS_URL)    
         if(response.result) {
             response.did_numbers
                 ? this.did_numbers = response.did_numbers
