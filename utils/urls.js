@@ -8,3 +8,6 @@ export const LOAD_CALLER_IDS_URL = "/caller_id/get_caller_ids"
 
 /* ----- Settings Store ----- */
 export const LOAD_SETTINGS_DATA_URL = "/settings/get_settings_data"
+
+/* ----- Audios Store ----- */
+export const LOAD_AUDIOS_URL = "/audios/get_audios"
