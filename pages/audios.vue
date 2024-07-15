@@ -20,8 +20,7 @@
     })
     
     const load_numbers = () => {
-        const show_all = { show_all_audios: show_older.value }
-        audiosStore.loadAudios(show_all)
+        audiosStore.loadAudios(show_older.value)   
     }
 </script>
 

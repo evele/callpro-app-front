@@ -4,15 +4,16 @@ export const useAudiosStore = defineStore("AudiosStore", {
   state: () => {
     return {
         audios: {},
-        older_audios: false
+        has_older_audios: false
     }
   },
   actions: {
-    async loadAudios(data) {
+    async loadAudios(show_all) {
+      const data = { show_all_audios: show_all }
       const response = await fetchWrapper.post(LOAD_AUDIOS_URL, data)    
       if(response.result) {
         this.audios = response.audios,
-        this.older_audios = response.older_audios
+        this.has_older_audios = response.has_older_audios
       }
     },
   },
