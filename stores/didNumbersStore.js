@@ -3,16 +3,16 @@ import { defineStore } from "pinia"
 export const useDidNumbersStore = defineStore("DidNumbersStore", {
   state: () => {
     return {
-        did_numbers: {},
-        toll_free_numbers: {},
+        did_numbers: [],
+        toll_free_numbers: [],
         did_error: false,
         toll_free_error: false,
     }
   },
   actions: {
     async loadDidAndTollFreeNumbers() {
-        this.did_numbers = {};
-        this.toll_free_numbers = {};
+        this.did_numbers = [];
+        this.toll_free_numbers = [];
         this.did_error = false;
         this.toll_free_error = false;
 
