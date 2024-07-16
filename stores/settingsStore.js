@@ -7,7 +7,7 @@ export const useSettingsStore = defineStore("SettingsStore", {
     }
   },
   actions: {
-    async loadSettingsData() {
+    async getSettingsData() {
       const response = await fetchWrapper.get(GET_SETTINGS_DATA_URL)    
       if(response.result) {
         this.settings_data = response.data

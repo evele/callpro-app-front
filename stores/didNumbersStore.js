@@ -10,7 +10,7 @@ export const useDidNumbersStore = defineStore("DidNumbersStore", {
     }
   },
   actions: {
-    async loadDidAndTollFreeNumbers() {
+    async getDidAndTollFreeNumbers() {
         this.did_numbers = [];
         this.toll_free_numbers = [];
         this.did_error = false;

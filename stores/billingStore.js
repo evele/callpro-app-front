@@ -8,13 +8,13 @@ export const useBillingStore = defineStore("BillingStore", {
     }
   },
   actions: {
-    async loadUserInvoicesData() {
+    async getUserInvoicesData() {
       const response = await fetchWrapper.get(GET_USER_INVOICES_DATA_URL)    
       if(response.result) {
         this.user_invoices = response.invoices
       }
     },
-    async loadInvoiceDataToPrint(invoice_id) {
+    async getInvoiceDataToPrint(invoice_id) {
       const data = { trx_id: invoice_id }
       const response = await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, data)
       if(response.result) {

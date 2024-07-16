@@ -7,7 +7,7 @@ export const useCallerIdStore = defineStore("CallerIdStore", {
     }
   },
   actions: {
-    async loadCallerIds() {
+    async getCallerIds() {
       const response = await fetchWrapper.get(GET_CALLER_IDS_URL)    
       if(response.result) {
         this.caller_ids = response.caller_ids

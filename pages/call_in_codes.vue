@@ -25,12 +25,12 @@
     const isLoading = ref(false)
 
     onMounted(async() => {
-        await callInCodesStore.loadUserCallInCodes()
+        await callInCodesStore.getUserCallInCodes()
     })
     
     const load_numbers = async () => {
         isLoading.value = true
-        await callInCodesStore.loadUserCallInCodes()
+        await callInCodesStore.getUserCallInCodes()
         isLoading.value = false
     }
 
