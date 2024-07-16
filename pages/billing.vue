@@ -17,15 +17,15 @@
     const billingStore = useBillingStore()
 
     onMounted(async() => {
-        await billingStore.loadUserInvoicesData()
+        await billingStore.getUserInvoicesData()
     })
     
     const load_data = () => {
-        billingStore.loadUserInvoicesData()
+        billingStore.getUserInvoicesData()
     }
 
     const fetchInvoiceData = (invoiceId) => {
-        billingStore.loadInvoiceDataToPrint(invoiceId)
+        billingStore.getInvoiceDataToPrint(invoiceId)
     }
 </script>
 
