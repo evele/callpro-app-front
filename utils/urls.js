@@ -17,3 +17,4 @@ export const LOAD_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and
 
 /* ----- Billing Store ----- */
 export const LOAD_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
+export const LOAD_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
