@@ -11,5 +11,10 @@ export const LOAD_SETTINGS_DATA_URL = "/settings/get_settings_data"
 
 /* ----- Audios Store ----- */
 export const LOAD_AUDIOS_URL = "/audios/get_audios"
+
 /* ----- Did Numbers Store ----- */
 export const LOAD_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_toll_free_numbers"
+
+/* ----- Billing Store ----- */
+export const LOAD_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
+export const LOAD_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
