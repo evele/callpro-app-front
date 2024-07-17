@@ -11,11 +11,11 @@
     const settingsStore = useSettingsStore()
 
     onMounted(async() => {
-        await settingsStore.loadSettingsData()
+        await settingsStore.getSettingsData()
     })
     
     const load_settings = () => {
-        settingsStore.loadSettingsData()
+        settingsStore.getSettingsData()
     }
 </script>
 

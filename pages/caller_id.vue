@@ -11,11 +11,11 @@
     const callerIdStore = useCallerIdStore()
 
     onMounted(async() => {
-        await callerIdStore.loadCallerIds()
+        await callerIdStore.getCallerIds()
     })
     
     const load_numbers = () => {
-        callerIdStore.loadCallerIds()
+        callerIdStore.getCallerIds()
     }
 </script>
 

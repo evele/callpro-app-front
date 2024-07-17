@@ -11,11 +11,11 @@
     const didNumbersStore = useDidNumbersStore()
 
     onMounted(async() => {
-        await didNumbersStore.loadDidAndTollFreeNumbers()
+        await didNumbersStore.getDidAndTollFreeNumbers()
     })
     
     const load_numbers = () => {
-        didNumbersStore.loadDidAndTollFreeNumbers()
+        didNumbersStore.getDidAndTollFreeNumbers()
     }
 </script>
 

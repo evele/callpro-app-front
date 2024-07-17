@@ -16,11 +16,11 @@
     const show_older = ref(false)
 
     onMounted(async() => {
-        await audiosStore.loadAudios()
+        await audiosStore.getAudios()
     })
     
     const load_numbers = () => {
-        audiosStore.loadAudios(show_older.value)   
+        audiosStore.getAudios(show_older.value)   
     }
 </script>
 

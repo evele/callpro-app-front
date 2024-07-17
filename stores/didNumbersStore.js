@@ -10,13 +10,13 @@ export const useDidNumbersStore = defineStore("DidNumbersStore", {
     }
   },
   actions: {
-    async loadDidAndTollFreeNumbers() {
+    async getDidAndTollFreeNumbers() {
         this.did_numbers = [];
         this.toll_free_numbers = [];
         this.did_error = false;
         this.toll_free_error = false;
 
-        const response = await fetchWrapper.get(LOAD_DID_AND_TOLL_FREE_NUMBERS_URL)    
+        const response = await fetchWrapper.get(GET_DID_AND_TOLL_FREE_NUMBERS_URL)    
         if(response.result) {
             response.did_numbers
                 ? this.did_numbers = response.did_numbers
