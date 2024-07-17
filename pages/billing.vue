@@ -5,7 +5,9 @@
         <ul>
             <li v-for="invoice in billingStore.user_invoices" :key="invoice.id" style="margin: 1rem 0;">
                 {{ invoice.id }}
-                <button type="button" @click="fetchInvoiceData(invoice.id)">Fetch invoice data</button>
+                <button type="button">
+                    <NuxtLink :to="{ name: 'print_invoice-id', params: { id: invoice.id } }" target=”_blank”>View Invoice</NuxtLink>
+                </button>
             </li>
         </ul>
     </div>
@@ -22,10 +24,6 @@
     
     const load_data = () => {
         billingStore.loadUserInvoicesData()
-    }
-
-    const fetchInvoiceData = (invoiceId) => {
-        billingStore.loadInvoiceDataToPrint(invoiceId)
     }
 </script>
 
