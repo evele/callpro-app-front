@@ -7,9 +7,8 @@ export const useAuthStore = defineStore("AuthStore", {
     }
   },
   getters: {
-    // computed prop of state
     isLoggedIn() {
-      return this.user?.id ? true : false // TODO: check if will use this or what..
+      return this.user?.id ? true : false 
       // return true // for develop
     },
   },
@@ -19,16 +18,13 @@ export const useAuthStore = defineStore("AuthStore", {
       // const response = await fetchWrapper.post(LOGIN_URL, { email, password })
       var response = await fetchWrapper.post(LOGIN_URL, { email, password })
 
-      response = toRaw(response.data.value) // TODO: check if will use this or what
-
       if (response.result == true) {
         // update pinia state
         this.user = response.user
         // store user details and jwt in local storage to keep user logged in between page refreshes
         localStorage.setItem("user", JSON.stringify(response.user))
         // redirect to previous url or default to home page
-        // this.$nuxt.$router.push({ name: "Dashboard" })
-        await navigateTo("/dashboard") // TODO: change this route
+        await navigateTo("/dashboard") 
       }
 
       return response

@@ -1,18 +1,14 @@
-import { useAuthStore } from "~/stores"
-import { hash } from "ohash"
+import { useAuthStore } from "~/stores";
 
 const setAuthHeader = () => {
   // return auth header with jwt if user is logged in and request is to the api url
-  const { user } = useAuthStore()
-  const isLoggedIn = !!user?.token
+  const { user } = useAuthStore();
+  const isLoggedIn = !!user?.token;
   if (isLoggedIn) {
-    return { Authorization: `Bearer ${user.token}` }
-   
-  } // TODO: check empty return
-  /* else {
-      return {}
-    } */
-}
+    return { Authorization: `Bearer ${user.token}` };
+  }
+  return {};
+};
 
 const request = (method) => {
   return async (url, body) => {
@@ -20,42 +16,32 @@ const request = (method) => {
       method,
       headers: setAuthHeader(),
       body: null,
-    }
+    };
+
     if (body) {
-      requestOptions.body = body
+      requestOptions.headers['Content-Type'] = 'application/json';
+      requestOptions.body = JSON.stringify(body);
     }
-    const { data, pending, error, refresh } = await useFetch(url, {
-      key: hash(["api-fetch", url, body]),
-      onRequest({ request, options }) {
-        // Set the request headers
-        options.method = requestOptions.method
-        options.headers = requestOptions.headers
-        options.body = requestOptions.body
-      },
-      onRequestError({ request, options, error }) {
-        // Handle the request errors
-        console.log("error", error)
-      },
-      onResponse({ request, response, options }) {
-        // Process the response data
-        const { user, logout } = useAuthStore()
-        if ([401, 403].includes(response.status) && user) {
-          // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
-          logout()
-        }
-      },
-      onResponseError({ request, response, options, status }) {
-        // Handle the response errors
-        console.log("response error", response.status)
-      },
-    })
-    return { data, pending, error, refresh }
-  }
-}
+
+    try {
+      const response = await $fetch(`${BASE_API_URL()}${url}`, requestOptions);
+      const { user, logout } = useAuthStore();
+      if ([401, 403].includes(response.status) && user) {
+        // auto logout if 401 Unauthorized or 403 Forbidden response returned from api
+        logout();
+      }
+      return response;
+    } catch (error) {
+      // Handle the request and response errors
+      console.log("error", error);
+      throw error; // Re-throw the error to handle it in the calling code
+    }
+  };
+};
 
 export const fetchWrapper = {
   get: request("GET"),
   post: request("POST"),
   put: request("PUT"),
   delete: request("DELETE"),
-}
+};
