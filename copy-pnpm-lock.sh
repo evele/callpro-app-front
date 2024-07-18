@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONTAINER_NAME=callpro_admin_front
+CONTAINER_NAME=callpro_app_front
 
 CONTAINER_YARN_LOCK_PATH=/tmp/pnpm-lock.yaml
 
