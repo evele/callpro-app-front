@@ -42,7 +42,7 @@
     onMounted(async() => {
         const invoice_id = route.params.id;
         isFetching.value = true
-        await billingStore.loadInvoiceDataToPrint(invoice_id)
+        await billingStore.getInvoiceDataToPrint(invoice_id)
         isFetching.value = false
     })
 </script>
