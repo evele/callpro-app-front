@@ -1,5 +1,5 @@
 # Fase de construcción
-FROM node:lts-alpine as build-stage
+FROM node:lts-alpine AS build-stage
 
 # bind your app to the gateway IP
 ENV HOST=0.0.0.0
