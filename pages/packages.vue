@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-title">Packages page</p>
-        <button type="button" @click="load_settings">Load steps</button>
+        <button type="button" @click="load_steps">Load steps</button>
     </div>
 </template>
 
