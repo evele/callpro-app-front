@@ -21,5 +21,8 @@ export const DELETE_CALL_IN_CODE_URL = "/call_in_codes/delete_user_call_in_code"
 /* ----- Did Numbers Store ----- */
 export const GET_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_toll_free_numbers"
 
+/* ----- Packages Store ----- */
+export const GET_PACKAGE_STEPS_URL = "/packages/get_package_steps_prices"
+
 /* ----- Settings Store ----- */
 export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
