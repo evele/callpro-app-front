@@ -20,6 +20,7 @@ export const DELETE_CALL_IN_CODE_URL = "/call_in_codes/delete_user_call_in_code"
 
 /* ----- Credit Cards Store ----- */
 export const GET_USER_CREDIT_CARDS_URL = "/credit_cards/get_user_credit_cards"
+export const ADD_USER_CREDIT_CARD_URL = "/credit_cards/add_user_credit_card"
 
 /* ----- Did Numbers Store ----- */
 export const GET_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_toll_free_numbers"

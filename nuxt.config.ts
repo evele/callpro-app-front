@@ -9,6 +9,12 @@ export default defineNuxtConfig({
     head: {
       title: "The Callpro App",
       meta: [{ name: "description", content: "The Callpro App Application" }],
+      script: [
+        { 
+          src: "https://cdn.cardknox.com/js/v1/encryptedfields.js", 
+          type: "text/javascript"
+        },
+      ]
     },
   },
   runtimeConfig: {
