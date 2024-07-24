@@ -32,9 +32,14 @@ const request = (method) => {
       }
       return response;
     } catch (error) {
-      // Handle the request and response errors
-      console.log("error", error);
-      throw error; // Re-throw the error to handle it in the calling code
+      const { logout } = useAuthStore();
+      if (error.response && error.response.status === 401) {
+        console.error('Unauthorized access - 401');
+        logout()
+      } else {
+        console.error('An error occurred:', error);
+        throw error; // Re-throw the error to handle it in the calling code
+      }
     }
   };
 };

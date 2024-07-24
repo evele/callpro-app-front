@@ -1,5 +1,7 @@
 /* ----- Audios Store ----- */
 export const GET_AUDIOS_URL = "/audios/get_audios"
+export const GET_AUDIO_URL = "/audios/get_audio"
+export const CONVERT_TEXT_TO_SPEECH_URL = "/audios/tts_convertion"
 
 /* ----- Auth Store ----- */
 export const LOGIN_URL = "/jwtauth/login"
@@ -24,6 +26,9 @@ export const ADD_USER_CREDIT_CARD_URL = "/credit_cards/add_user_credit_card"
 
 /* ----- Did Numbers Store ----- */
 export const GET_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_toll_free_numbers"
+
+/* ----- Packages Store ----- */
+export const GET_PACKAGE_STEPS_URL = "/packages/get_package_steps_prices"
 
 /* ----- Settings Store ----- */
 export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
