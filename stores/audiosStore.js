@@ -16,5 +16,13 @@ export const useAudiosStore = defineStore("AudiosStore", {
         this.has_older_audios = response.has_older_audios
       }
     },
-  },
+    async getAudio(dataToSend) {
+      const response = await fetchWrapper.post(GET_AUDIO_URL, dataToSend)
+      return response
+    },
+    async convertTextToSpeech(dataToSend) {
+      const response = await fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, dataToSend)
+      return response
+    },
+  }
 })

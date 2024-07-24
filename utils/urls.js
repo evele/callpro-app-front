@@ -1,5 +1,7 @@
 /* ----- Audios Store ----- */
 export const GET_AUDIOS_URL = "/audios/get_audios"
+export const GET_AUDIO_URL = "/audios/get_audio"
+export const CONVERT_TEXT_TO_SPEECH_URL = "/audios/tts_convertion"
 
 /* ----- Auth Store ----- */
 export const LOGIN_URL = "/jwtauth/login"
@@ -26,3 +28,7 @@ export const GET_PACKAGE_STEPS_URL = "/packages/get_package_steps_prices"
 
 /* ----- Settings Store ----- */
 export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
+
+/* ----- SMS Store ----- */
+export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"
+export const GET_CHAT_CONTACTS_URL = "/sms/get_chat_contacts"
