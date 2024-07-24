@@ -16,34 +16,41 @@
 
             <div>
                 <button type="button" @click="show_add_card_form">Add New Card</button>
-                <p v-if="isSavingCard" style="color: blue;">Saving card...</p>
                 <p v-if="showSuccess" style="color: green;">Success!</p>
                 <p v-if="showError" style="color: red;">Error!</p>
-                <div v-if="isAddingCard">
-                    <form class="add-card-form">
-                        <div>
-                            <label for="number" style="margin-right: 10px;">Number</label>
-                            <input v-model="cardNumber" id="number" type="text" placeholder="**** **** **** ****" class="form-input" />
-                        </div>
-                        
-                        <div>
-                            <label for="cc-name" style="margin-right: 10px;">Full Name</label>
-                            <input v-model="cardName" id="cc-name" type="text" placeholder="JOHN DOE" class="form-input" />
-                        </div>
 
-                        <div>
-                            <label for="expiry" style="margin-right: 10px;">MMYY</label>
-                            <input v-model="cardMMYY" id="expiry" type="text" placeholder="0119" class="form-input" />
-                        </div>
+                <form v-show="isAddingCard" id="payment-form" style="margin-top: 1rem;">
+                    <label for="card-number">Number</label>
+                    <br />
+                    <iframe id="test-iframe" data-ifields-id="card-number" data-ifields-placeholder="Card Number" src="https://cdn.cardknox.com/ifields/2.6.2006.0102/ifield.htm"></iframe>
+                    <input data-ifields-id="card-number-token" name="xCardNum" type="hidden"></input>
+                    <br />
 
-                        <div>
-                            <label for="cvv" style="margin-right: 10px;">CVC</label>
-                            <input v-model="cardCVC" id="cvv" type="text" placeholder="***" class="form-input" />
-                        </div>
-                        
-                        <button type="button" @click="confirm_add_card">Save Card</button>
-                    </form>
-                </div>
+                    <label for="name">Full Name</label>
+                    <br />
+                    <input id="name" name="name" placeholder="JOHN DOE" type="text" v-model="cardName">
+                    <br />
+
+                    <label for="expiry">MMYY</label>
+                    <br />
+                    <input id="expiry" name="expiry" placeholder="05 / 29" type="text" @input="formatExpiry"></input>
+                    <br />
+                    
+                    <label for="cvv">CVV</label>
+                    <br />
+                    <iframe data-ifields-id="cvv" data-ifields-placeholder="CVV" src="https://cdn.cardknox.com/ifields/2.6.2006.0102/ifield.htm"></iframe>
+                    <input data-ifields-id="cvv-token" name="xCVV" type="hidden"></input>
+                    <br />
+
+                    <button id="submit-btn" type="button" @click="confirm_add_card">
+                        {{ isSavingCard ? 'Saving...' : 'Save Card' }}
+                    </button>
+                    <br />
+                    <label id="transaction-status"></label>
+                    <br />
+                    <label data-ifields-id="card-data-error"></label>
+                    <br />
+                </form>
             </div>
         </div>
 
@@ -59,6 +66,17 @@
 
 <script setup>
     import { useBillingStore, useCreditCardsStore } from "@/stores"
+    import { useHead } from '#app';
+
+    useHead({
+        script: [
+            {
+                src: 'https://cdn.cardknox.com/ifields/2.6.2006.0102/ifields.min.js',
+                async: true,
+                defer: true,
+            },
+        ],
+    });
 
     const billingStore = useBillingStore()
     const creditCardsStore = useCreditCardsStore()
@@ -73,7 +91,15 @@
     const cardNumber = ref('')
     const cardName = ref('')
     const cardMMYY = ref('')
-    const cardCVC = ref('')
+
+    const defaultStyle = {
+        border: '1px solid black',
+        'font-size': '14px',
+        padding: '3px',
+        width: '350px',
+        height: '30px',
+        borderRadius: '5px'
+    };
 
     onMounted(async() => {
         Promise.all([
@@ -82,6 +108,17 @@
         ])
         isLoading.value = false
     })
+
+    const formatExpiry = (event) => {
+      let input = event.target.value.replace(/\D/g, '');
+
+      if (input.length >= 3) {
+        input = input.substring(0, 2) + ' / ' + input.substring(2, 4);
+      }
+
+      event.target.value = input;
+      cardMMYY.value = input;
+    };
     
     const load_invoices = () => {
         billingStore.getUserInvoicesData()
@@ -93,39 +130,65 @@
         isLoading.value = false
     }
 
-    const show_add_card_form = async () => {
+    const show_add_card_form = () => {
         isAddingCard.value = true
+        setIfieldStyle('card-number', defaultStyle);
+        setIfieldStyle('cvv', defaultStyle);
+        enableAutoFormatting();
+
+        addIfieldCallback('input', function(data) {
+            if (data.ifieldValueChanged) {
+                console.log(data.cardNumberIsValid);
+                console.log(data.cardNumberFormattedLength);
+            }
+        });
     }
 
-    const confirm_add_card = async () => {
-        const dataToSend = {
-            cc_number: cardNumber.value,
-            cc_name: cardName.value,
-            expiry: cardMMYY.value,
-            cvv: cardCVC.value
-        }
-        console.log(dataToSend)
-
+    const confirm_add_card = () => {
         isSavingCard.value = true
-        const res = await creditCardsStore.addUserCreditCard(dataToSend)
-        isSavingCard.value = false
+        setAccount("ifields_callprodev933101e0b7514aeda1729ac6e43", "callpro-software", "0.1.2")
 
-        console.log(res)
-        if(res.result) {
-            isAddingCard.value = false
-            showSuccess.value = true
-            setTimeout(() => {
-                showSuccess.value = false
-            }, 3000)
-            reset_form()
-            load_cards()
-        } else {
-            showError.value = true
-            setTimeout(() => {
-                showError.value = false
-            }, 3000)
-            console.log(res)
-        }
+        // acá se manda la data a la API y vuelve encriptada
+        getTokens(async function() {
+                // los inputs escondidos se autocompletan con los valores encriptados
+                const enc_card_number = document.querySelector("[data-ifields-id='card-number-token']").value;
+                const enc_card_cvv = document.querySelector("[data-ifields-id='cvv-token']").value;
+
+                const dataToSend = {
+                    cc_number: '',
+                    cc_name: cardName.value,
+                    expiry: cardMMYY.value,
+                    enc_card_number,
+                    cvv: '286'
+                }
+
+                const res = await creditCardsStore.addUserCreditCard(dataToSend)
+                console.log(res)
+                isSavingCard.value = false
+
+                // if(res.result) {
+                //     isAddingCard.value = false
+                //     showSuccess.value = true
+                //     setTimeout(() => {
+                //         showSuccess.value = false
+                //     }, 3000)
+                //     reset_form()
+                //     load_cards()
+                // } else {
+                //     showError.value = true
+                //     setTimeout(() => {
+                //         showError.value = false
+                //     }, 3000)
+                //     console.log(res)
+                // }
+            },
+            function() {
+                // en caso de fallar cae acá
+                console.log('falló')
+                return
+            },
+            30000
+        );
     }
 
     const reset_form = () => {
@@ -151,5 +214,46 @@
         flex-direction: column;
         gap: 1rem;
         padding: 1rem;
+    }
+    iframe {
+        border: 0 solid black;
+        width: 600px;
+        height: 45px;
+        padding: 0px;
+        margin-bottom: 5px;
+    }
+
+    input {
+        border: 1px solid black;
+        border-radius: 5px;
+        font-size: 14px;
+        padding: 3px;
+        width: 350px;
+        height: 30px;
+        margin-bottom: 15px;
+    }
+
+    #card-data-error {
+        color: red;
+    }
+
+    #submit-btn {
+        background-color: #3f143e;
+        color: #FFF;
+        width: 357px;
+        padding: 10px 0;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    #submit-btn:hover {
+        background-color: #533752;
+        cursor: pointer;
+    }
+
+    .results {
+        background-color: #e8e8e8;
+        padding: 20px;
+        width: 360px;
     }
 </style>
