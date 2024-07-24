@@ -4,7 +4,7 @@ export default defineNuxtConfig({
     port: 3001,
   },
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
   app: {
     head: {
       title: "The Callpro App",
