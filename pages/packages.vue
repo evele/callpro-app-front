@@ -12,6 +12,7 @@
 
     onMounted(async() => {
         await packagesStore.getPackagesSteps()
+        await packagesStore.getMonthlyGroupsPlans()
     })
     
     const load_settings = () => {
