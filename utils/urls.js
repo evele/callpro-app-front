@@ -1,5 +1,7 @@
 /* ----- Audios Store ----- */
 export const GET_AUDIOS_URL = "/audios/get_audios"
+export const GET_AUDIO_URL = "/audios/get_audio"
+export const CONVERT_TEXT_TO_SPEECH_URL = "/audios/tts_convertion"
 
 /* ----- Auth Store ----- */
 export const LOGIN_URL = "/jwtauth/login"
