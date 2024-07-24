@@ -71,7 +71,8 @@
     useHead({
         script: [
             {
-                src: 'https://cdn.cardknox.com/ifields/2.6.2006.0102/ifields.min.js',
+                // src: 'https://cdn.cardknox.com/ifields/2.6.2006.0102/ifields.min.js',
+                src: 'https://cdn.cardknox.com/js/v1/encryptedfields.js',
                 async: true,
                 defer: true,
             },
@@ -91,6 +92,7 @@
     const cardNumber = ref('')
     const cardName = ref('')
     const cardMMYY = ref('')
+    const xCardNum = ref(null)
 
     const defaultStyle = {
         border: '1px solid black',
