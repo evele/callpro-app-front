@@ -1,52 +1,38 @@
 <template>
-    <div :key="renderKey">
+    <div>
         <p class="text-title">Billing test page</p>
         <div>
             <button type="button" @click="show_add_card_form">Add New Card</button>
-            <p>{{ script_loaded_message }}</p>
             <p v-if="showSuccess" style="color: green;">Success!</p>
             <p v-if="showError" style="color: red;">Error!</p>
             <br />
             <br />
             <br />
 
-            <div class="js-card-container hidden-xs push-50"></div>
             <form class='js-card-form' data-encryptedfields="encrypted-form">
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="form-material">
-                            <label for="number">Number</label>
-                            <input class="form-control" id="number" type="text" placeholder="**** **** **** ****">
-                            <input class="form-control hidden" id="enc-number" type="text" data-encryptedfields="cc" placeholder="**** **** **** ****">
-                        </div>
-                    </div>
+                <div>
+                    <label for="number">Number</label>
+                    <input id="number" type="text" placeholder="**** **** **** ****">
+                    <input id="enc-number" type="text" data-encryptedfields="cc" placeholder="**** **** **** ****">
                 </div>
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="form-material">
-                            <label for="cc-name">Full Name</label>
-                            <input class="form-control" id="cc-name" name="checkout-cc-name" type="text" placeholder="JOHN DOE">
-                        </div>
-                    </div>
+
+                <div>
+                    <label for="cc-name">Full Name</label>
+                    <input id="cc-name" name="checkout-cc-name" type="text" placeholder="JOHN DOE">
                 </div>
-                <div class="form-group">
-                    <div class="col-xs-6">
-                        <div class="form-material">
-                            <label for="expiry">MMYY</label>
-                            <input class="form-control" id="expiry" name="checkout-cc-expiry" type="text" placeholder="0119">
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="form-material">
-                            <label for="cvv">CVC</label>
-                            <input class="form-control" id="cvv" data-encryptedfields="cvv" type="text" placeholder="***">
-                        </div>
-                    </div>
+
+                <div>
+                    <label for="expiry">MMYY</label>
+                    <input id="expiry" name="checkout-cc-expiry" type="text" placeholder="0119">
                 </div>
-                <div class="form-group">
-                    <div class="block-content block-content-full bg-gray-lighter text-center">
-                        <button id='add-card-button' type="button">Add Card</button>
-                    </div>
+
+                <div>
+                    <label for="cvv">CVC</label>
+                    <input id="cvv" data-encryptedfields="cvv" type="text" placeholder="***">
+                </div>
+
+                <div>
+                    <button id='add-card-button' type="button">Add Card</button>
                 </div>
             </form>
         </div>
@@ -70,21 +56,20 @@
     const cardName = ref('')
     const cardMMYY = ref('')
 
-
-    const loadScript = () => {
-        const script = document.createElement('script');
-        script.src = "https://cdn.cardknox.com/js/v1/encryptedfields.js";
-        document.body.appendChild(script);
-
-        script.onload = () => {
-            renderKey.value += 1
-            script_loaded_message.value = 'Script cargado'
-        }
-    }
+    // const loadScript = () => {
+    //     const script = document.createElement('script');
+    //     script.src = "https://cdn.cardknox.com/js/v1/encryptedfields.js";
+    //     document.body.appendChild(script);
+        
+    //     script.onload = () => {
+    //         renderKey.value += 1
+    //         script_loaded_message.value = 'Script cargado'
+    //     }
+    // }
 
     onMounted(() => {
         console.log('ready')
-        loadScript()
+        // loadScript()
     })
 
     const formatExpiry = (event) => {
