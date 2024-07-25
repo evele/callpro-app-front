@@ -35,4 +35,5 @@ function onButtonClick() {
     <li v-for="tz in data.data.timezones" :key="tz.zones_id">{{ tz.display }}</li>
   </ul>
   <button @click="onButtonClick">Add Todo</button>
+  <VueQueryDevtools />
 </template>
