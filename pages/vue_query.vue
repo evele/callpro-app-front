@@ -1,13 +1,10 @@
 <script setup>
 // Access QueryClient instance
-const queryClient = useQueryClient()
+// import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
-// Query
-const { isLoading, isError, data, error } = useQuery({
-  queryKey: ['settings'],
-  queryFn: () => fetchWrapper.get(GET_SETTINGS_DATA_URL) , // Use $fetch with your api routes to get typesafety 
-})
-console.log("data: ",data)
+const { data, error, isLoading, isError } = useFetchSettings()
+
+// const queryClient = useQueryClient()
 
 /*
 // Mutation
@@ -34,6 +31,5 @@ function onButtonClick() {
   <ul v-else>
     <li v-for="tz in data.data.timezones" :key="tz.zones_id">{{ tz.display }}</li>
   </ul>
-  <button @click="onButtonClick">Add Todo</button>
-  <VueQueryDevtools />
+
 </template>

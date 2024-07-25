@@ -4,7 +4,8 @@ export default defineNuxtConfig({
     port: 3001,
   },
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
+  // modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
+  modules: ['@pinia/nuxt'],
   app: {
     head: {
       title: "The Callpro App",
@@ -25,21 +26,4 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  vueQuery: {
-    // useState key used by nuxt for the vue query state.
-    stateKey: "vue-query-nuxt", // default
-    // If you only want to import some functions, specify them here.
-    // You can pass false or an empty array to disable this feature.
-    // default: ["useQuery", "useQueries", "useInfiniteQuery", "useMutation", "useIsFetching", "useIsMutating", "useQueryClient"]
-    autoImports: ["useQuery"],
-    // Pass the vue query client options here ...
-    queryClientOptions: {
-      defaultOptions: { queries: { staleTime: 5000 } } // default
-    },
-    // Pass the vue query plugin options here ....
-    vueQueryPluginOptions: {
-      enableDevtoolsV6Plugin: true, // enable integrate with the official vue devtools
-    }
-  }
-
 })
