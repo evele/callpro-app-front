@@ -6,6 +6,8 @@
             <p>Get all contacts</p>
             <input type="checkbox" v-model="get_all_contacts">
         </div>
+        <p v-if="!isLoading">{{ settings?.data.max_retries }}</p>
+        <p v-else>{{  isLoading }}</p>
     </div>
 </template>
 
@@ -28,6 +30,10 @@
             smsStore.getChatContacts(get_all_contacts.value)
         ])
     }
+
+    const { data:settings, error, isLoading, isError } = useFetchSettings()
+
+    
 </script>
 
 <style scoped>
