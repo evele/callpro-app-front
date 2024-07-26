@@ -5,14 +5,14 @@ function sleep(ms) {
 }
 
 export const useCreateCallinCode = () => {
+    const queryClient = useQueryClient()
     return useMutation({
         mutationFn: (data) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
         onSuccess: () => {
         // Invalidate and refetch
         /* TODO: fix this shit that doesn't work
-        const queryClient = useQueryClient()
-        queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
         */
+        queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
         },
     }) 
 }

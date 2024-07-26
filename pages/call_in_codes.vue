@@ -19,7 +19,6 @@
 
 <script setup>
     import { useCallInCodesStore } from "@/stores"
-    import { useQueryClient, useMutation} from '@tanstack/vue-query'
     
     const callInCodesStore = useCallInCodesStore()
     // const userCallInCodes = computed(() => callInCodesStore.user_call_in_codes)
@@ -37,15 +36,8 @@
         // isLoading.value = false
     }
     
-    // const { mutate: createCallInCode } = useCreateCallinCode()
-    const queryClient = useQueryClient()
-    const { mutate: createCallInCode } = useMutation({
-        mutationFn: (data) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
-        onSuccess: () => {
-        // Invalidate and refetch
-        queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
-        },
-    }) 
+    const { mutate: createCallInCode } = useCreateCallinCode()
+    
     const create_call_in_code = async (value) => {
         const data = { is_static: value }
 

@@ -1,27 +1,7 @@
 <script setup>
-// Access QueryClient instance
-// import { useQuery, useQueryClient } from '@tanstack/vue-query'
 
 const { data: settings, error, isLoading, isError } = useFetchSettings()
 
-// const queryClient = useQueryClient()
-
-/*
-// Mutation
-const { mutate } = useMutation({
-  mutationFn: (newTodo) => $fetch("/api/todos", { method: "POST", body: newTodo }),
-  onSuccess: () => {
-    // Invalidate and refetch
-    queryClient.invalidateQueries({ queryKey: ['todos'] })
-  },
-}) 
-
-function onButtonClick() {
-   mutate({
-    id: Date.now(),
-    title: 'Do Laundry',
-  })
-} */
 </script>
 
 <template>
