@@ -4,6 +4,7 @@ export default defineNuxtConfig({
     port: 3001,
   },
   devtools: { enabled: true },
+  // modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
   modules: ['@pinia/nuxt'],
   app: {
     head: {
@@ -25,5 +26,4 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-
 })
