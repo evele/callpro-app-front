@@ -9,7 +9,7 @@
         
         <p v-if="isLoading">Loading data...</p>
         <ul v-else>
-            <li v-for="code in userCallInCodes" :key="code.id" style="margin: 10px 0;">
+            <li v-for="code in userCallInCodes.user_call_in_codes" :key="code.id" style="margin: 10px 0;">
                 {{ code.call_in_code }}
                 <button type="button" @click="delete_code(code.id)">Delete code</button>
             </li>
@@ -19,27 +19,32 @@
 
 <script setup>
     import { useCallInCodesStore } from "@/stores"
-
+    
     const callInCodesStore = useCallInCodesStore()
-    const userCallInCodes = computed(() => callInCodesStore.user_call_in_codes)
-    const isLoading = ref(false)
+    // const userCallInCodes = computed(() => callInCodesStore.user_call_in_codes)
+    // const isLoading = ref(false)
+    const { data: userCallInCodes, error, isLoading, isError } = useFetchCallInCodes()
+
 
     onMounted(async() => {
-        await callInCodesStore.getUserCallInCodes()
+        // await callInCodesStore.getUserCallInCodes()
     })
     
     const load_numbers = async () => {
-        isLoading.value = true
+        // isLoading.value = true
         await callInCodesStore.getUserCallInCodes()
-        isLoading.value = false
+        // isLoading.value = false
     }
-
+    
+    const { mutate: createCallInCode } = useCreateCallinCode()
+    
     const create_call_in_code = async (value) => {
         const data = { is_static: value }
 
-        isLoading.value = true
-        await callInCodesStore.createUserCallInCode(data)
-        isLoading.value = false
+        // isLoading.value = true
+        // await callInCodesStore.createUserCallInCode(data)
+        createCallInCode(data)
+        // isLoading.value = false
     }
 
     const delete_code = async (id) => {
