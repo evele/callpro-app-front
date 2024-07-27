@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: "The Callpro App",
-      meta: [{ name: "description", content: "The Callpro App Application" }],
+      meta: [{ name: "description", content: "The Callpro App Application" }]
     },
   },
   runtimeConfig: {
