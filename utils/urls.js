@@ -25,6 +25,7 @@ export const GET_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_
 
 /* ----- Packages Store ----- */
 export const GET_PACKAGE_STEPS_URL = "/packages/get_package_steps_prices"
+export const GET_MONTHLY_GROUPS_PLANS_URL = "/packages/get_package_monthly_groups_plans"
 
 /* ----- Settings Store ----- */
 export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
