@@ -6,8 +6,8 @@
             <p>Get all contacts</p>
             <input type="checkbox" v-model="get_all_contacts">
         </div>
-        <p v-if="!isLoading">{{ settings?.data.max_retries }}</p>
-        <p v-else>{{  isLoading }}</p>
+        <p v-if="!isLoading">{{ settings?.max_retries }}</p>
+        <p v-else>{{ isLoading }}</p>
     </div>
 </template>
 
@@ -31,7 +31,7 @@
         ])
     }
 
-    const { data:settings, error, isLoading, isError } = useFetchSettings()
+    const { data: settings, error, isLoading, isError } = useFetchSettings()
 
     
 </script>

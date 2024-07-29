@@ -2,6 +2,12 @@
     <div>
         <p class="text-title">Audios page</p>
         <button type="button" @click="load_numbers">Load audios</button>
+        <span v-if="isPending">Loading audios...</span>
+        <ul v-if="isSuccess">
+            <li v-for="audio in audiosData?.audios" :key="audio.id">
+                {{ audio?.id }} - {{ audio?.name }}
+            </li>
+        </ul>
         <div class="container-div">
             <p>Show older audios</p>
             <input type="checkbox" v-model="show_older">
@@ -34,12 +40,17 @@
     const audio_id = ref(null)
     const audio_url = ref(null)
 
-    onMounted(async() => {
-        await audiosStore.getAudios()
-    })
-    
+    const { mutate: getAudiosData, data: audiosData, isPending, isSuccess, isError, error } = useFetchGetAllAudios();
+
+    onMounted(() => {
+        getAudiosData()
+    });
+
     const load_numbers = () => {
-        audiosStore.getAudios(show_older.value)   
+        const dataToSend = {
+            show_all_audios: show_older.value
+        }
+        getAudiosData(dataToSend)   
     }
 
     const convert_Text = async () => {

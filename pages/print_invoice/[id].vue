@@ -1,7 +1,8 @@
 <template>
     <div>
-        <p v-if="isFetching">Loading data...</p>
-        <div v-else>
+        <span v-if="isPending">Loading...</span>
+        <span v-else-if="isError">Error: {{ error.message }}</span>
+        <div v-if="isSuccess">
             <div class="print-btn-container">
                 <PrintPdfButton
                     elementId="print-invoice-pdf" 
@@ -17,11 +18,11 @@
                     <p>(845) 378-1500</p>
 
                     <h1 class="heading">Invoice</h1>
-                    <p>{{ general_data?.date.slice(0,10) }}</p>
+                    <p>{{ data?.invoice_data?.date.slice(0,10) }}</p>
                     <h3>Invoice for:</h3>
-                    <p>Name: {{ general_data?.last_name + ' ' + general_data?.first_name }}</p>
-                    <p>Ivr: {{ general_data?.account_no }}</p>
-                    <p>Address: {{ general_data?.address }}</p>
+                    <p>Name: {{ data?.invoice_data?.last_name + ' ' + data?.invoice_data?.first_name }}</p>
+                    <p>Ivr: {{ data?.invoice_data?.account_no }}</p>
+                    <p>Address: {{ data?.invoice_data?.address }}</p>
                 </div>
             </section>
         </div>
@@ -30,21 +31,16 @@
 
 <script setup>
     import { useRoute } from 'vue-router'
-    import { useBillingStore } from "@/stores"
 
     const route = useRoute();
-    const billingStore = useBillingStore()
+    const { mutate: getInvoiceData, data, isPending, isSuccess, isError, error } = useFetchInvoiceToPrint();
 
-    const general_data = computed(() => billingStore.invoice_data.invoice_data)
-    const coupon_data = computed(() => billingStore.invoice_data.coupon_data)
-    const isFetching = ref(false)
-
-    onMounted(async() => {
+    onMounted(() => {
         const invoice_id = route.params.id;
-        isFetching.value = true
-        await billingStore.getInvoiceDataToPrint(invoice_id)
-        isFetching.value = false
-    })
+        const id = { trx_id: invoice_id }
+        getInvoiceData(id)
+    });
+
 </script>
 
 <style scoped>
