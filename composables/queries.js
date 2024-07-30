@@ -5,12 +5,13 @@ function sleep(ms) {
 }
 
 /* ----- Audios ----- */
-export const useFetchGetAllAudios = (data) => {
-  const dataToSend = { show_all_audios: data }
+export function useFetchGetAllAudios(showOlder) {
+  const data_to_send = computed(() => ({ show_all_audios: showOlder.value }));
+
   return useQuery({
-    queryKey: ['user_all_audios', data],
-    queryFn: () => fetchWrapper.post(GET_AUDIOS_URL, dataToSend),
-  })
+      queryKey: ['user_all_audios', showOlder],
+      queryFn: () => fetchWrapper.post(GET_AUDIOS_URL, data_to_send.value),
+    });
 }
 
 export const useFetchGetAudio = (data) => {

@@ -2,15 +2,16 @@
     <div>
         <p class="text-title">Audios page</p>
         <button type="button" @click="load_audios">Load audios</button>
-        <!-- <span v-if="loadingAllAudios">Loading audios...</span> -->
-        <!-- <ul v-if="isSuccess">
+        <span v-if="loadingAllAudios">Loading audios...</span>
+        <ul v-if="isSuccess">
             <li v-for="audio in allAudiosData?.audios" :key="audio.id">
                 {{ audio?.id }} - {{ audio?.name }}
             </li>
-        </ul> -->
+        </ul> 
         <div class="container-div">
-            <p>Show older audios</p>
-            <input type="checkbox" v-model="test_variable">
+            <label>Show older audios
+                <input type="checkbox" v-model="show_older">
+            </label>
         </div>
         <div>
             <h3>Write some text and convert it to speech.</h3>
@@ -34,25 +35,24 @@
 
     const queryClient = useQueryClient()
 
-    const show_older = computed(() => test_variable.value)
-    const test_variable = ref(false)
+    
     const text_to_convert = ref('')
     const isLoading = ref(false)
-
+    
     const audio_id = ref(null)
     const audio_url = ref(null)
-
-    const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older.value)
-
-    // const { data: audioData, isLoading: loadingConvertedAudio } = useFetchGetAudio(dataToSend)
+    
+    
+    const show_older = ref(false)
+    
+    const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
 
     const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
     
 
     const load_audios = () => {
-        // queryClient.removeQueries({ queryKey: ['user_all_audios'], exact: true })
-        // refetch()
-        queryClient.invalidateQueries();
+        // refetch() // not needed, but works
+        
     }
 
     const convert_Text = async () => {
