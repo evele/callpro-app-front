@@ -1,16 +1,16 @@
 <template>
     <div>
         <p class="text-title">Audios page</p>
-        <button type="button" @click="load_numbers">Load audios</button>
-        <span v-if="isPending">Loading audios...</span>
-        <ul v-if="isSuccess">
-            <li v-for="audio in audiosData?.audios" :key="audio.id">
+        <button type="button" @click="load_audios">Load audios</button>
+        <!-- <span v-if="loadingAllAudios">Loading audios...</span> -->
+        <!-- <ul v-if="isSuccess">
+            <li v-for="audio in allAudiosData?.audios" :key="audio.id">
                 {{ audio?.id }} - {{ audio?.name }}
             </li>
-        </ul>
+        </ul> -->
         <div class="container-div">
             <p>Show older audios</p>
-            <input type="checkbox" v-model="show_older">
+            <input type="checkbox" v-model="test_variable">
         </div>
         <div>
             <h3>Write some text and convert it to speech.</h3>
@@ -30,27 +30,29 @@
 
 <script setup>
     import { useAudiosStore } from "@/stores"
+    import { useQueryClient, useQuery } from '@tanstack/vue-query'
 
-    const audiosStore = useAudiosStore()
-    const show_older = ref(false)
+    const queryClient = useQueryClient()
+
+    const show_older = computed(() => test_variable.value)
+    const test_variable = ref(false)
     const text_to_convert = ref('')
-    const isConverting = ref(false)
     const isLoading = ref(false)
 
     const audio_id = ref(null)
     const audio_url = ref(null)
 
-    const { mutate: getAudiosData, data: audiosData, isPending, isSuccess, isError, error } = useFetchGetAllAudios();
+    const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older.value)
 
-    onMounted(() => {
-        getAudiosData()
-    });
+    // const { data: audioData, isLoading: loadingConvertedAudio } = useFetchGetAudio(dataToSend)
 
-    const load_numbers = () => {
-        const dataToSend = {
-            show_all_audios: show_older.value
-        }
-        getAudiosData(dataToSend)   
+    const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
+    
+
+    const load_audios = () => {
+        // queryClient.removeQueries({ queryKey: ['user_all_audios'], exact: true })
+        // refetch()
+        queryClient.invalidateQueries();
     }
 
     const convert_Text = async () => {
@@ -67,33 +69,20 @@
             temp: 'false'
         }
 
-        isConverting.value = true
-        const res = await audiosStore.convertTextToSpeech(dataToSend)
-        isConverting.value = false
-
-        if(res.result) {
-            audio_id.value = 'preview_tts'
-            audio_url.value = res.data.full_file_url
-        } else {
-            console.log(res.db_error)
-        }
+        createTextToSpeech(dataToSend, {
+            onSuccess: (data) => {
+                audio_id.value = 'preview_tts'
+                audio_url.value = data.full_file_url
+            }
+        })
+        
     }
 
-    const fetch_audio_data = async () => {
+    const fetch_audio_data = () => {
         const dataToSend = {
             audio_id: audio_id.value,
             audio_full_url: audio_url.value,
             called_from: "callpro-app-front"
-        }
-
-        isLoading.value = true
-        const res = await audiosStore.getAudio(dataToSend)
-        isLoading.value = false
-
-        if(res.result) {
-            console.log(res.data)
-        } else {
-            console.log(res.db_error)
         }
     }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <span v-if="isPending">Loading...</span>
+        <span v-if="isLoading">Loading...</span>
         <span v-else-if="isError">Error: {{ error.message }}</span>
         <div v-if="isSuccess">
             <div class="print-btn-container">
@@ -33,14 +33,9 @@
     import { useRoute } from 'vue-router'
 
     const route = useRoute();
-    const { mutate: getInvoiceData, data, isPending, isSuccess, isError, error } = useFetchInvoiceToPrint();
+    const invoice_id = computed(() => route.params.id);
 
-    onMounted(() => {
-        const invoice_id = route.params.id;
-        const id = { trx_id: invoice_id }
-        getInvoiceData(id)
-    });
-
+    const { data, error, isLoading, isError, isSuccess } = useFetchInvoiceToPrint(invoice_id.value)
 </script>
 
 <style scoped>

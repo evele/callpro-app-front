@@ -5,24 +5,27 @@ function sleep(ms) {
 }
 
 /* ----- Audios ----- */
-export const useFetchGetAllAudios = () => {
+export const useConvertTextToSpeech = () => {
   return useMutation({
-    mutationFn: data => sleep(500).then(() => fetchWrapper.post(GET_AUDIOS_URL, data))
-  })
-}
-
-/* ----- Billing ----- */
-export const useFetchInvoiceToPrint = () => {
-  return useMutation({
-    mutationFn: data => sleep(500).then(() => fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, data))
-  })
+    mutationFn: (data) => fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, data),
+  }) 
 }
 
 /* ----- Call in codes ----- */
-export const useCreateCallinCode = () => {
+export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
+    },
+  }) 
+}
+
+export const useDeleteCallInCode = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(DELETE_CALL_IN_CODE_URL,data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
     },
