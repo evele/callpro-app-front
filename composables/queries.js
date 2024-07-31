@@ -10,7 +10,7 @@ export const useFetchGetBroadcastList = (selected_tab, show, search) => {
     length_limit: show.value,
     load_all: false,
     search: search.value,
-    start_limit: "0",
+    start_limit: "0", // It'll be dynamic when we implement pagination
     state: selected_tab.value,
   }))
 

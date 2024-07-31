@@ -23,7 +23,7 @@
 
     <div>
       <label for="search" style="margin-right: 6px;">Search:</label>
-      <input type="text" name="search" id="search" placeholder="Search..." v-model="search">
+      <input type="text" name="search" id="search" placeholder="Search..." @input="debounceSearch">
     </div>
   </div>
 
@@ -50,6 +50,14 @@
   const search = ref('')
 
   const { data, isLoading, isSuccess, isError, error } = useFetchGetBroadcastList(selected_tab, show, search)
+
+  let searchDebounce = null
+  const debounceSearch = (e) => {
+    clearTimeout(searchDebounce)
+    searchDebounce = setTimeout(() => {
+      search.value = e.target.value
+    }, 500)
+  }
 </script>
 
 <style scoped>
