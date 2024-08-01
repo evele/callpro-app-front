@@ -6,17 +6,15 @@
 </template>
 
 <script setup>
-    import { usePackagesStore } from "@/stores"
+    import { useQueryClient } from '@tanstack/vue-query'
 
-    const packagesStore = usePackagesStore()
+    const queryClient = useQueryClient()
 
-    onMounted(async() => {
-        await packagesStore.getPackagesSteps()
-        await packagesStore.getMonthlyGroupsPlans()
-    })
-    
-    const load_settings = () => {
-        packagesStore.getPackagesSteps()
+    const { data: packagesStepsData } = useFetchPackagesSteps()
+    const { data: MonthlyGroupsPlansData } = useFetchMonthlyGroupsPlans()
+
+    const load_steps = () => {
+        queryClient.invalidateQueries(['packages_steps']);
     }
 </script>
 

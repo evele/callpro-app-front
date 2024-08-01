@@ -1,21 +1,20 @@
 <template>
     <div>
         <p class="text-title">Settings page</p>
+        <span v-if="isLoading">Loading...</span>
+        <span v-else-if="isError">Error: {{ error.message }}</span>
+        <ul v-else>
+            <li v-for="tz in settings.timezones" :key="tz.zones_id">{{ tz.display }}</li>
+        </ul>
         <button type="button" @click="load_settings">Load settings</button>
     </div>
 </template>
 
 <script setup>
-    import { useSettingsStore } from "@/stores"
-
-    const settingsStore = useSettingsStore()
-
-    onMounted(async() => {
-        await settingsStore.getSettingsData()
-    })
+    const { data: settings, error, isLoading, isError, refetch } = useFetchSettings()
     
     const load_settings = () => {
-        settingsStore.getSettingsData()
+        refetch()
     }
 </script>
 

@@ -18,41 +18,24 @@
 </template>
 
 <script setup>
-    import { useCallInCodesStore } from "@/stores"
     
-    const callInCodesStore = useCallInCodesStore()
-    // const userCallInCodes = computed(() => callInCodesStore.user_call_in_codes)
-    // const isLoading = ref(false)
-    const { data: userCallInCodes, error, isLoading, isError } = useFetchCallInCodes()
+    const { data: userCallInCodes, error, isLoading, refetch } = useFetchCallInCodes()
 
-
-    onMounted(async() => {
-        // await callInCodesStore.getUserCallInCodes()
-    })
-    
-    const load_numbers = async () => {
-        // isLoading.value = true
-        await callInCodesStore.getUserCallInCodes()
-        // isLoading.value = false
+    const load_numbers = () => {
+        refetch()
     }
     
-    const { mutate: createCallInCode } = useCreateCallinCode()
+    const { mutate: createCallInCode } = useCreateCallInCode()
+    const { mutate: deleteCallInCode } = useDeleteCallInCode()
     
-    const create_call_in_code = async (value) => {
+    const create_call_in_code = (value) => {
         const data = { is_static: value }
-
-        // isLoading.value = true
-        // await callInCodesStore.createUserCallInCode(data)
         createCallInCode(data)
-        // isLoading.value = false
     }
 
-    const delete_code = async (id) => {
+    const delete_code = (id) => {
         const code_id = { call_in_code_id: id }
-
-        isLoading.value = true
-        await callInCodesStore.deleteUserCallInCode(code_id)
-        isLoading.value = false
+        deleteCallInCode(code_id)
     }
 </script>
 
