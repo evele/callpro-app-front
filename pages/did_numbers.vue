@@ -1,21 +1,17 @@
 <template>
     <div>
         <p class="text-title">Did Numbers page</p>
+        <span v-if="isLoading">Loading...</span>
+        <span v-else-if="isError">Error: {{ error.message }}</span>
         <button type="button" @click="load_numbers">Load numbers</button>
     </div>
 </template>
 
 <script setup>
-    import { useDidNumbersStore } from "@/stores"
+    const { data, error, isLoading, isError, isSuccess, refetch } = useFetchDidAndTollFreeNumbers()
 
-    const didNumbersStore = useDidNumbersStore()
-
-    onMounted(async() => {
-        await didNumbersStore.getDidAndTollFreeNumbers()
-    })
-    
     const load_numbers = () => {
-        didNumbersStore.getDidAndTollFreeNumbers()
+        refetch()
     }
 </script>
 

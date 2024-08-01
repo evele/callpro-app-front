@@ -4,15 +4,30 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export const useCreateCallinCode = () => {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationFn: (data) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
-        onSuccess: () => {
-        // Invalidate and refetch
-        /* TODO: fix this shit that doesn't work
-        */
-        queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
-        },
-    }) 
+/* ----- Audios ----- */
+export const useConvertTextToSpeech = () => {
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, data),
+  }) 
+}
+
+/* ----- Call in codes ----- */
+export const useCreateCallInCode = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
+    },
+  }) 
+}
+
+export const useDeleteCallInCode = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(DELETE_CALL_IN_CODE_URL,data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
+    },
+  }) 
 }
