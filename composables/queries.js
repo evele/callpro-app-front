@@ -102,3 +102,12 @@ export const useFetchSettings = () => {
     refetchOnWindowFocus: false,
   })
 }
+
+/* ----- Sms Test ----- */
+export const useFetchSmsTests = () => {
+  return useQuery({
+    queryKey: ['sms'],
+    queryFn: () => fetchWrapper.get(GET_SMS_DATA_URL),
+    refetchOnWindowFocus: false,
+  })
+}
