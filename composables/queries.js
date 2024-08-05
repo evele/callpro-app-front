@@ -103,11 +103,17 @@ export const useFetchSettings = () => {
   })
 }
 
-/* ----- Sms Test ----- */
-export const useFetchSmsTests = () => {
+/* ----- Sms ----- */
+export const useFetchSms = (selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    length_limit: show.value,    
+    search: search.value,
+    start_limit: "0", // It'll be dynamic when we implement pagination
+    state: selected_tab.value,
+  }))
+
   return useQuery({
-    queryKey: ['sms'],
-    queryFn: () => fetchWrapper.get(GET_SMS_DATA_URL),
-    refetchOnWindowFocus: false,
+    queryKey: ['sms_list', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
   })
 }
