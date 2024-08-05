@@ -71,6 +71,21 @@ export const useFetchChatContacts = (data) => {
   })
 }
 
+/* ----- Contacts ----- */
+export const useFetchGetSystemGroups = () => {
+  return useQuery({
+    queryKey: ['system_groups'],
+    queryFn: () => fetchWrapper.get(GET_SYSTEM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetCustomGroups = () => {
+  return useQuery({
+    queryKey: ['custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_CUSTOM_GROUPS_URL),
+  })
+}
+
 /* ----- Did numbers ----- */
 export const useFetchDidAndTollFreeNumbers = () => {
   return useQuery({

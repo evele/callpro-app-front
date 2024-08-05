@@ -20,6 +20,10 @@ export const GET_USER_CALL_IN_CODES_URL = "/call_in_codes/get_user_call_in_codes
 export const CREATE_CALL_IN_CODE_URL = "/call_in_codes/create_user_call_in_code"
 export const DELETE_CALL_IN_CODE_URL = "/call_in_codes/delete_user_call_in_code"
 
+/* ----- Contacts Store ----- */
+export const GET_SYSTEM_GROUPS_URL = "/contacts/get_system_groups"
+export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
+
 /* ----- Did Numbers Store ----- */
 export const GET_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_toll_free_numbers"
 
