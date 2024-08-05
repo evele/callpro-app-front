@@ -7,6 +7,7 @@
             <p style="font-weight: 600; line-height: 10px;">System groups</p>
             <ul v-if="SGData.result">
                 <li>All: {{ Object.values(SGData.system_groups)[0] }}</li>
+                <li v-if="SGData?.total_monthly_numbers !== false && SGData?.total_monthly_numbers >= 0">Monthly Numbers: {{ SGData.total_monthly_numbers }}</li>
                 <li>Unassigned: {{ Object.values(SGData.system_groups)[1] }}</li>
                 <li>Trash: {{ Object.values(SGData.system_groups)[2] }}</li>
             </ul>
