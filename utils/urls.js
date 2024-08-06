@@ -12,6 +12,10 @@ export const RESET_PASSWORD_URL = "/jwtauth/reset_password"
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
 export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
 
+/* ----- Broadcasts Store ----- */
+export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
+export const GET_BROADCAST_DETAIL_URL = "/broadcast/get_broadcast_detail"
+
 /* ----- Caller ID Store ----- */
 export const GET_CALLER_IDS_URL = "/caller_id/get_caller_ids"
 
