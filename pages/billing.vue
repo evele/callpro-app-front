@@ -1,9 +1,11 @@
 <template>
     <div>
         <p class="text-title">Billing page</p>
-        <button type="button" @click="load_data">Load Data</button>
+        <button type="button" @click="load_data" style="display: block;">Load Data</button>
+        <span v-if="isLoading">Loading...</span>
+        <span v-else-if="isError">Error: {{ error.message }}</span>
         <ul>
-            <li v-for="invoice in billingStore.user_invoices" :key="invoice.id" style="margin: 1rem 0;">
+            <li v-for="invoice in data?.invoices" :key="invoice.id" style="margin: 1rem 0;">
                 {{ invoice.id }}
                 <button type="button">
                     <NuxtLink :to="{ name: 'print_invoice-id', params: { id: invoice.id } }" target=”_blank”>View Invoice</NuxtLink>
@@ -14,16 +16,10 @@
 </template>
 
 <script setup>
-    import { useBillingStore } from "@/stores"
+    const { data, error, isLoading, isError, refetch } = useFetchInvoices()
 
-    const billingStore = useBillingStore()
-
-    onMounted(async() => {
-        await billingStore.getUserInvoicesData()
-    })
-    
     const load_data = () => {
-        billingStore.getUserInvoicesData()
+        refetch()
     }
 </script>
 

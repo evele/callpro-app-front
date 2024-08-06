@@ -1,39 +1,28 @@
 <template>
     <div>
         <p class="text-title">Chat page</p>
-        <button type="button" @click="load_numbers">Load data</button>
+        <button type="button" @click="load_data">Load data</button>
         <div class="container-div">
             <p>Get all contacts</p>
             <input type="checkbox" v-model="get_all_contacts">
         </div>
-        <p v-if="!isLoading">{{ settings?.data.max_retries }}</p>
-        <p v-else>{{  isLoading }}</p>
     </div>
 </template>
 
 <script setup>
-    import { useSmsStore } from "@/stores"
+    import { useQueryClient } from '@tanstack/vue-query'
 
-    const smsStore = useSmsStore()
+    const queryClient = useQueryClient()
+
     const get_all_contacts = ref(true)
 
-    onMounted(async() => {
-        Promise.all([
-            smsStore.getUnreadMessages(),
-            smsStore.getChatContacts(get_all_contacts.value)
-        ])
-    })
+    const { data: unreadMessagesData } = useFetchUnreadMessages()
+    const { data: chatContactsData } = useFetchChatContacts(get_all_contacts.value)
     
-    const load_numbers = () => {
-        Promise.all([
-            smsStore.getUnreadMessages(),
-            smsStore.getChatContacts(get_all_contacts.value)
-        ])
+    const load_data = () => {
+        queryClient.invalidateQueries(['unread_chat_messages']);
+        queryClient.invalidateQueries(['chat_contacts']);
     }
-
-    const { data:settings, error, isLoading, isError } = useFetchSettings()
-
-    
 </script>
 
 <style scoped>
