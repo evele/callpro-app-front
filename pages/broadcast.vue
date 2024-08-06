@@ -74,7 +74,7 @@
 
     const filter_broadcast_detail = (option) => {
         selected_tab.value = option
-        bDetailRefetch()
+        // bDetailRefetch() TODO: check this behavior later
     }
 
     const get_broadcast_data = () => {
