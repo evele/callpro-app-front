@@ -4,6 +4,22 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/* ----- Dashboard ----- */
+export const useFetchGetBroadcastList = (selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    length_limit: show.value,
+    load_all: false,
+    search: search.value,
+    start_limit: "0", // It'll be dynamic when we implement pagination
+    state: selected_tab.value,
+  }))
+
+  return useQuery({
+    queryKey: ['broadcast_list', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_LIST_URL, dataToSend.value), 
+  })
+}
+
 /* ----- Audios ----- */
 export function useFetchGetAllAudios(showOlder) {
   const data_to_send = computed(() => ({ show_all_audios: showOlder.value }));
