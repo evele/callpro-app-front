@@ -23,11 +23,26 @@ export const useFetchGetBroadcastDetail = (broadcast_id, selected_tab, show, sea
     start_limit: "0",
     state: selected_tab.value,
   }))
-
   return useQuery({
     queryKey: ['broadcast_detail', dataToSend],
     queryFn: () => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value),
     enabled: false, 
+  })
+}
+  
+/* ----- Dashboard ----- */
+export const useFetchGetBroadcastList = (selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    length_limit: show.value,
+    load_all: false,
+    search: search.value,
+    start_limit: "0", // It'll be dynamic when we implement pagination
+    state: selected_tab.value,
+  }))
+
+  return useQuery({
+    queryKey: ['broadcast_list', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_LIST_URL, dataToSend.value), 
   })
 }
 
