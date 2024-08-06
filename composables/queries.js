@@ -71,6 +71,16 @@ export const useFetchChatContacts = (data) => {
   })
 }
 
+/* ----- Contacts ----- */
+export const useFetchContact = (contact_id) => {
+  const id = computed(() => ({ contact_id: contact_id.value }));
+  return useQuery({
+    queryKey: ['contact', id],
+    queryFn: () => fetchWrapper.post(GET_CONTACT_URL, id.value),
+    enabled: false
+  })
+}
+
 /* ----- Did numbers ----- */
 export const useFetchDidAndTollFreeNumbers = () => {
   return useQuery({
