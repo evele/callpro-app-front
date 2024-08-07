@@ -102,3 +102,19 @@ export const useFetchSettings = () => {
     refetchOnWindowFocus: false,
   })
 }
+/* ----- Contacts ----- */
+export const useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id,filter) => {
+  const dataToSend = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    with_groups: with_groups.value,
+    is_custom_group:is_custom_group.value,
+    group_id:group_id.value,
+    filter:filter.value,
+  }))
+
+  return useQuery({
+    queryKey: ['all_contacts', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_ALL_CONTACTS_URL, dataToSend.value), 
+  })
+}
