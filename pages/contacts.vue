@@ -2,17 +2,13 @@
     <div>
         <p class="text-title">Contact page</p>
         <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error.message }}</span>
-        <!-- <ul v-else>
-            <li v-for="tz in settings.timezones" :key="tz.zones_id">{{ tz.display }}</li>
-        </ul> -->
-        <!-- <button type="button" @click="load_settings">Load settings</button> -->
+        <span v-else-if="isError">Error: {{ error.message }}</span>        
     </div>
     <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
     <ul class="tab-style">
-        <li v-for="option in tab_options" :key="option" class="tab-style__li"
-            :class="[selected_tab === option ? 'selected-tab' : '']" @click="selected_tab = option">
-            {{ option }}
+        <li v-for="option in tab_options" :key="option.action" class="tab-style__li"
+            :class="[selected_tab === option.action ? 'selected-tab' : '']" @click="selected_tab = option.action">
+            {{ option.name }}
         </li>
     </ul>
     <div class="filter-container">
@@ -47,12 +43,12 @@
 
 <script setup>
     import { useFetchAllContacts } from '#imports';
-    // useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id)
-    const page = ref("1")
-    const tab_options = ['all', 'unassigned', 'trash']
+    import { tab_options } from "@/utils/constants";
+    
+    const page = ref("1")    
     const show = ref("10")
     const search = ref("")    
-    const selected_tab = ref('all')    
+    const selected_tab = ref(tab_options[0].action)    
 
     const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
     const all_contacts_data = computed(() => data?.value?.contacts || []);
