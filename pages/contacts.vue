@@ -6,9 +6,9 @@
     </div>
     <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
     <ul class="tab-style">
-        <li v-for="option in tab_options" :key="option.action" class="tab-style__li"
-            :class="[selected_tab === option.action ? 'selected-tab' : '']" @click="selected_tab = option.action">
-            {{ option.name }}
+        <li v-for="option in tab_options" :key="option" class="tab-style__li"
+            :class="[selected_tab === option ? 'selected-tab' : '']" @click="selected_tab = option">
+            {{ option}}
         </li>
     </ul>
     <div class="filter-container">
@@ -42,13 +42,12 @@
 </template>
 
 <script setup>
-    import { useFetchAllContacts } from '#imports';
-    import { tab_options } from "@/utils/constants";
-    
+    import { useFetchAllContacts } from '#imports';    
+    const tab_options = [ALL,UNASSIGNED,TRASH]
     const page = ref("1")    
     const show = ref("10")
     const search = ref("")    
-    const selected_tab = ref(tab_options[0].action)    
+    const selected_tab = ref(ALL)    
 
     const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
     const all_contacts_data = computed(() => data?.value?.contacts || []);
