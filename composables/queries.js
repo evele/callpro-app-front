@@ -113,6 +113,14 @@ export const useFetchChatContacts = (data) => {
   })
 }
 
+/* ----- Contacts ----- */
+export const useFetchUserCustomGrups = () => {
+  return useQuery({
+    queryKey: ['user_custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_USER_CUSTOM_GROUPS_URL),
+  })
+}
+
 /* ----- Did numbers ----- */
 export const useFetchDidAndTollFreeNumbers = () => {
   return useQuery({

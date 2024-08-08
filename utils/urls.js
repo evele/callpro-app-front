@@ -24,6 +24,10 @@ export const GET_USER_CALL_IN_CODES_URL = "/call_in_codes/get_user_call_in_codes
 export const CREATE_CALL_IN_CODE_URL = "/call_in_codes/create_user_call_in_code"
 export const DELETE_CALL_IN_CODE_URL = "/call_in_codes/delete_user_call_in_code"
 
+/* ----- Contacts Store ----- */
+export const SAVE_CONTACT_URL = "/contacts/save_contact"
+export const GET_USER_CUSTOM_GROUPS_URL = "/contacts/get_user_custom_groups"
+
 /* ----- Dashboard Store ----- */
 export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"
 

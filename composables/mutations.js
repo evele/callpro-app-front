@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
+import { SAVE_CONTACT_URL } from '~/utils/urls';
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -28,6 +29,17 @@ export const useDeleteCallInCode = () => {
     mutationFn: (data) => fetchWrapper.post(DELETE_CALL_IN_CODE_URL,data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
+    },
+  }) 
+}
+
+/* ----- Contacts ----- */
+export const useSaveContact = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(SAVE_CONTACT_URL, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
     },
   }) 
 }
