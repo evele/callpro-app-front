@@ -1,5 +1,4 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
-import { SAVE_CONTACT_URL } from '~/utils/urls';
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
