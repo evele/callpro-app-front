@@ -40,7 +40,10 @@ export const GET_MONTHLY_GROUPS_PLANS_URL = "/packages/get_package_monthly_group
 
 /* ----- Settings Store ----- */
 export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
+export const UPDATE_VOICE_SETTINGS_URL = "/settings/save_audio_settings"
+export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
 
 /* ----- SMS Store ----- */
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"
 export const GET_CHAT_CONTACTS_URL = "/sms/get_chat_contacts"
+export const GET_SMS_DATA_URL = "/sms/get_sms_list"
