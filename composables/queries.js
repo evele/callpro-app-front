@@ -4,6 +4,48 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/* ----- Broadcast ----- */
+export const useFetchGetBroadcastHeader = (broadcast_id) => {
+  const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
+
+  return useQuery({
+    queryKey: ['broadcast_header', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value),
+    enabled: false, 
+  })
+}
+
+export const useFetchGetBroadcastDetail = (broadcast_id, selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    broadcast_id: broadcast_id.value,
+    length_limit: show.value,
+    search: search.value,
+    start_limit: "0",
+    state: selected_tab.value,
+  }))
+  return useQuery({
+    queryKey: ['broadcast_detail', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value),
+    enabled: false, 
+  })
+}
+  
+/* ----- Dashboard ----- */
+export const useFetchGetBroadcastList = (selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    length_limit: show.value,
+    load_all: false,
+    search: search.value,
+    start_limit: "0", // It'll be dynamic when we implement pagination
+    state: selected_tab.value,
+  }))
+
+  return useQuery({
+    queryKey: ['broadcast_list', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_LIST_URL, dataToSend.value), 
+  })
+}
+
 /* ----- Audios ----- */
 export function useFetchGetAllAudios(showOlder) {
   const data_to_send = computed(() => ({ show_all_audios: showOlder.value }));
