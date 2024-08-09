@@ -43,3 +43,6 @@ export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"
 export const GET_CHAT_CONTACTS_URL = "/sms/get_chat_contacts"
 export const GET_SMS_DATA_URL = "/sms/get_sms_list"
+
+/* ----- Contacts -----*/
+export const GET_ALL_CONTACTS_URL = "/contacts/get_all_contacts"
