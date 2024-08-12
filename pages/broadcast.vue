@@ -54,8 +54,8 @@
 
 <script setup>
     const broadcast_id = ref('')
-    const tab_options = ['ALL', 'LIVE', 'VM', 'INVALID', 'NA']
-    const selected_tab = ref('ALL')
+    const tab_options = [BROADCAST_ALL, LIVE, VM, INVALID, NA]
+    const selected_tab = ref(BROADCAST_ALL)
     const show = ref('5')
     const search = ref('')
 

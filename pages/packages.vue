@@ -14,7 +14,7 @@
     const { data: MonthlyGroupsPlansData } = useFetchMonthlyGroupsPlans()
 
     const load_steps = () => {
-        queryClient.invalidateQueries(['packages_steps']);
+        queryClient.invalidateQueries([PACKAGES_STEPS]);
     }
 </script>
 

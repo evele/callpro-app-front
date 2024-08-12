@@ -44,8 +44,8 @@
     authStore.logout()
   }
 
-  const tab_options = ['COMPLETED', 'ACTIVE', 'DRAFT']
-  const selected_tab = ref('COMPLETED')
+  const tab_options = [COMPLETED, ACTIVE, DRAFT]
+  const selected_tab = ref(COMPLETED)
   const show = ref('10')
   const search = ref('')
 
