@@ -108,7 +108,7 @@
     ]
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
-    const { mutate: createCallInCode, isPending, isError, isSuccess } = useSaveContact()
+    const { mutate: saveContact, isPending, isError, isSuccess } = useSaveContact()
 
     const format_number = (form) => {
         const regex = /^\d{0,10}$/;
@@ -145,7 +145,7 @@
             save_contact: true
         }
 
-        createCallInCode(data_to_send)
+        saveContact(data_to_send)
     }
 </script>
 
