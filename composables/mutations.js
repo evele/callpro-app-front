@@ -31,3 +31,35 @@ export const useDeleteCallInCode = () => {
     },
   }) 
 }
+
+/* ----- Contacts ----- */
+export const useSaveContact = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(SAVE_CONTACT_URL, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
+/* ----- Settings ----- */
+export const useUpdateVoiceSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(UPDATE_VOICE_SETTINGS_URL,data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+  }) 
+}
+
+export const useUpdateTextSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(UPDATE_TEXT_SETTINGS_URL,data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+  }) 
+}
