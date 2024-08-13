@@ -25,5 +25,8 @@ export default defineNuxtConfig({
       path: '~/components',
       pathPrefix: false,
     },
-  ]
+  ],
+  // typescript: {
+  //   typeCheck: true,
+  // }
 })
