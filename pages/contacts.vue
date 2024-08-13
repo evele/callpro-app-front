@@ -11,6 +11,20 @@
             {{ option}}
         </li>
     </ul>
+
+    <div class="new-group-container">
+        <h2>Create New Group</h2>
+        <div class="form-group">
+            <label for="group_name">Group Name:</label>
+            <input type="text" id="group_name" v-model="groupName" placeholder="Enter group name" />
+        </div>
+        <div class="form-group">
+            <label for="launch_id">Phone Launch ID:</label>
+            <input type="number" id="launch_id" v-model="launchID" min="0" placeholder="Enter launch ID" />
+        </div>
+        <button @click="createNewGroup">Save</button>
+    </div>
+
     <div class="filter-container">
         <div>
             <label for="show" style="margin-right: 6px;">Show:</label>
@@ -47,9 +61,12 @@
     const page = ref("1")    
     const show = ref("10")
     const search = ref("")    
-    const selected_tab = ref(ALL)    
+    const selected_tab = ref(ALL)
+    const groupName = ref('')
+    const launchID = ref(0)
 
     const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
+    const 
     const all_contacts_data = computed(() => data?.value?.contacts || []);
     let searchDebounce = null
     const debounceSearch = (e) => {
@@ -67,6 +84,8 @@
             }
         }, 500)
     }
+
+    
     
     
 </script>

@@ -52,3 +52,13 @@ export const useUpdateTextSettings = () => {
     },
   }) 
 }
+
+export const useSaveGroupContacts = () =>{
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data) => fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['group_contacts']})
+    },
+  })
+}

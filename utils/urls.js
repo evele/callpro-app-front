@@ -46,3 +46,4 @@ export const GET_SMS_DATA_URL = "/sms/get_sms_list"
 
 /* ----- Contacts -----*/
 export const GET_ALL_CONTACTS_URL = "/contacts/get_all_contacts"
+export const UPDATE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
