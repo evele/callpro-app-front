@@ -4,6 +4,48 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/* ----- Broadcast ----- */
+export const useFetchGetBroadcastHeader = (broadcast_id) => {
+  const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
+
+  return useQuery({
+    queryKey: ['broadcast_header', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value),
+    enabled: false, 
+  })
+}
+
+export const useFetchGetBroadcastDetail = (broadcast_id, selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    broadcast_id: broadcast_id.value,
+    length_limit: show.value,
+    search: search.value,
+    start_limit: "0",
+    state: selected_tab.value,
+  }))
+  return useQuery({
+    queryKey: ['broadcast_detail', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value),
+    enabled: false, 
+  })
+}
+  
+/* ----- Dashboard ----- */
+export const useFetchGetBroadcastList = (selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    length_limit: show.value,
+    load_all: false,
+    search: search.value,
+    start_limit: "0", // It'll be dynamic when we implement pagination
+    state: selected_tab.value,
+  }))
+
+  return useQuery({
+    queryKey: ['broadcast_list', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_BROADCAST_LIST_URL, dataToSend.value), 
+  })
+}
+
 /* ----- Audios ----- */
 export function useFetchGetAllAudios(showOlder) {
   const data_to_send = computed(() => ({ show_all_audios: showOlder.value }));
@@ -72,6 +114,29 @@ export const useFetchChatContacts = (data) => {
 }
 
 /* ----- Contacts ----- */
+export const useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id,filter) => {
+  const dataToSend = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    with_groups: with_groups.value,
+    is_custom_group:is_custom_group.value,
+    group_id:group_id.value,
+    filter:filter.value,
+  }))
+
+  return useQuery({
+    queryKey: ['all_contacts', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_ALL_CONTACTS_URL, dataToSend.value), 
+  })
+}
+
+export const useFetchUserCustomGrups = () => {
+  return useQuery({
+    queryKey: ['user_custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_USER_CUSTOM_GROUPS_URL),
+  })
+}
+
 export const useFetchGetSystemGroups = () => {
   return useQuery({
     queryKey: ['system_groups'],
@@ -115,5 +180,21 @@ export const useFetchSettings = () => {
     queryKey: ['settings'],
     queryFn: () => fetchWrapper.get(GET_SETTINGS_DATA_URL),
     refetchOnWindowFocus: false,
+  })
+}
+
+/* ----- Sms ----- */
+export const useFetchSms = (selected_tab, show, search) => {
+  const dataToSend = computed(() => ({
+    length_limit: show.value,    
+    search: search.value,
+    start_limit: "0", // It'll be dynamic when we implement pagination
+    state: selected_tab.value,
+  }))
+
+  return useQuery({
+    queryKey: ['sms_list', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
+
   })
 }
