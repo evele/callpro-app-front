@@ -71,7 +71,7 @@
 
         createTextToSpeech(dataToSend, {
             onSuccess: (data) => {
-                audio_id.value = 'preview_tts'
+                audio_id.value = PREVIEW_TTS
                 audio_url.value = data.full_file_url
             }
         })
@@ -82,7 +82,7 @@
         const dataToSend = {
             audio_id: audio_id.value,
             audio_full_url: audio_url.value,
-            called_from: "callpro-app-front"
+            called_from: CALLPRO_APP_FRONT
         }
     }
 </script>

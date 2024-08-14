@@ -2,7 +2,7 @@
     <div>
         <p class="text-title">Contact page</p>
         <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error.message }}</span>        
+        <span v-else-if="isError">Error: {{ error?.message }}</span>        
     </div>
     <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
     <ul class="tab-style">
@@ -25,7 +25,7 @@
         </div>
         <button @click="save_new_group">{{ !saveGroupContactsIsPending ? 'Save new group' : 'Saving...' }}</button>
         <div style="margin-top: 10px;">
-            <span v-if="saveGroupContactsIsError" style="color: red;">Error: {{ saveGroupContactsError.message }}</span>
+            <span v-if="saveGroupContactsIsError" style="color: red;">Error: {{ saveGroupContactsError?.message }}</span>
             <span v-if="saveGroupContactsIsSuccess" style="color: green;">Contact group successfully updated!</span>
         </div>
     </div>
@@ -47,62 +47,62 @@
         </div>
         <div>
             <label for="page_number" style="margin-right: 6px;">Pagina nro:</label>
-            <input type="number" name="page_number" id="page_number" placeholder="nro pagina..." v-model.number="page" @input="debounceSearch2">
+            <input type="number" name="page_number" id="page_number" placeholder="nro pagina..." v-model.number="page">
         </div>
     </div>
     <p v-if="isLoading">Loading broadcasts...</p>
-    <p v-if="isError">{{ error.message }}</p>
+    <p v-if="isError">{{ error?.message }}</p>
     <ul v-if="isSuccess" class="contact-list">
         <li v-for="contact in all_contacts_data" :key="contact.id" class="contact-item">            
             <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
-            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>            
+            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
         </li>
     </ul>
 </template>
 
-<script setup>
-    import { useFetchAllContacts } from '#imports';    
-    const tab_options = [ALL,UNASSIGNED,TRASH]
-    const page = ref("1")    
-    const show = ref("10")
+<script setup lang="ts">  
+    const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
+    const page = ref(1)    
+    const show = ref(10)
     const search = ref("")    
-    const selected_tab = ref(ALL)
+
+    const selected_tab = ref(CONTACTS_ALL)    
+    const with_groups = ref(true)
+    const is_custom_group = ref(false)
     const groupName = ref('')
     const launchID = ref('')
     const groupID = ref('')
 
-    const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
+    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
     
-    const all_contacts_data = computed(() => data?.value?.contacts || []);
-    let searchDebounce = null
-    const debounceSearch = (e) => {
-        clearTimeout(searchDebounce)
-        searchDebounce = setTimeout(() => {
-            search.value = e.target.value
-        }, 500)
-    }
-    const debounceSearch2 = (e) => {
-        clearTimeout(searchDebounce)
-        searchDebounce = setTimeout(() => {
-            const value = parseInt(e.target.value, 10)
-            if (!isNaN(value) && value > 0) {
-                page.value = value
-            }
-        }, 500)
-    }
+    // const all_contacts_data = computed(() => data?.value?.contacts || []);
+    // let searchDebounce = null
+    
 
+    
+
+   
+   
+    let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
+   
+    const debounceSearch = (e: Event) => {        
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => {
+            const target = e.target as HTMLInputElement;
+            search.value = target.value
+        }, 500) 
+    }
+    
     const save_new_group = () => {        
         const dataToSend = {
             name: groupName.value,
-            id: groupID.value === 0 || groupID.value === '' ? null : parseInt(groupID.value, 10),// TODO: es necesario?
-            phone_launch_id: launchID.value === 0 || launchID.value === '' ? null : parseInt(launchID.value, 10)
+            id: groupID.value,
+            phone_launch_id: launchID.value
         };        
         saveGroupContacts(dataToSend);
     };
 
-    
-    
 </script>
 
 <style scoped>

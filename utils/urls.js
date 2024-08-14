@@ -24,6 +24,15 @@ export const GET_USER_CALL_IN_CODES_URL = "/call_in_codes/get_user_call_in_codes
 export const CREATE_CALL_IN_CODE_URL = "/call_in_codes/create_user_call_in_code"
 export const DELETE_CALL_IN_CODE_URL = "/call_in_codes/delete_user_call_in_code"
 
+/* ----- Contacts Store ----- */
+export const GET_CONTACT_URL = "/contacts/get_contact"
+export const GET_ALL_CONTACTS_URL = "/contacts/get_all_contacts"
+export const SAVE_CONTACT_URL = "/contacts/save_contact"
+export const GET_USER_CUSTOM_GROUPS_URL = "/contacts/get_user_custom_groups"
+export const GET_SYSTEM_GROUPS_URL = "/contacts/get_system_groups"
+export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
+export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
+
 /* ----- Dashboard Store ----- */
 export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"
 
@@ -44,6 +53,3 @@ export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"
 export const GET_CHAT_CONTACTS_URL = "/sms/get_chat_contacts"
 export const GET_SMS_DATA_URL = "/sms/get_sms_list"
 
-/* ----- Contacts -----*/
-export const GET_ALL_CONTACTS_URL = "/contacts/get_all_contacts"
-export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"

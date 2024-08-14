@@ -77,7 +77,7 @@
         'time_zone': settings.value.settings.time_zone,
     }))
 
-    const format_value = (value) => value == '1' ? 'On' : 'Off';
+    const format_value = (value) => value == '1' ? ON : OFF;
 
     const time_zones = computed(() => settings.value.timezones)
 

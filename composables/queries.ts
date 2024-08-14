@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/vue-query'
+import Contacts from '~/pages/contacts.vue';
 
-function sleep(ms) {
+function sleep(ms:number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /* ----- Broadcast ----- */
-export const useFetchGetBroadcastHeader = (broadcast_id) => {
+export const useFetchGetBroadcastHeader = (broadcast_id:Ref<number>) => {
   const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
 
   return useQuery({
@@ -15,7 +16,7 @@ export const useFetchGetBroadcastHeader = (broadcast_id) => {
   })
 }
 
-export const useFetchGetBroadcastDetail = (broadcast_id, selected_tab, show, search) => {
+export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     broadcast_id: broadcast_id.value,
     length_limit: show.value,
@@ -31,7 +32,7 @@ export const useFetchGetBroadcastDetail = (broadcast_id, selected_tab, show, sea
 }
   
 /* ----- Dashboard ----- */
-export const useFetchGetBroadcastList = (selected_tab, show, search) => {
+export const useFetchGetBroadcastList = (selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value,
     load_all: false,
@@ -47,7 +48,7 @@ export const useFetchGetBroadcastList = (selected_tab, show, search) => {
 }
 
 /* ----- Audios ----- */
-export function useFetchGetAllAudios(showOlder) {
+export function useFetchGetAllAudios(showOlder:Ref<boolean>) {
   const data_to_send = computed(() => ({ show_all_audios: showOlder.value }));
 
   return useQuery({
@@ -56,12 +57,13 @@ export function useFetchGetAllAudios(showOlder) {
     });
 }
 
+/* TODO: review qué onda this.. data vs dataToSend
 export const useFetchGetAudio = (data) => {
   return useQuery({
     queryKey: ['user_converted_audio'],
     queryFn: () => fetchWrapper.post(GET_AUDIO_URL, dataToSend),
   })
-}
+} */
 
 /* ----- Billing ----- */
 export const useFetchInvoices = () => {
@@ -72,8 +74,8 @@ export const useFetchInvoices = () => {
   })
 }
 
-export const useFetchInvoiceToPrint = (invoice_id) => {
-  const id = { trx_id: invoice_id }
+export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
+  const id = { trx_id: invoice_id } // TODO: maybe will need to use computed
   return useQuery({
     queryKey: ['invoices', invoice_id],
     queryFn: () => fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, id),
@@ -105,11 +107,42 @@ export const useFetchUnreadMessages = () => {
   })
 }
 
-export const useFetchChatContacts = (data) => {
-  const dataToSend = { all_contacts: data === true ? 1 : 2 }
+export const useFetchChatContacts = (data:boolean) => {
+  const dataToSend = { all_contacts: data === true ? 1 : 2 } // TODO: maybe will need to use computed
   return useQuery({
     queryKey: ['chat_contacts'],
     queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend),
+  })
+}
+
+/* ----- Contacts ----- */
+export const useFetchContact = (contact_id:Ref<number>) => {
+  const id = computed(() => ({ contact_id: contact_id.value }));
+  return useQuery({
+    queryKey: ['contact', id],
+    queryFn: () => fetchWrapper.post(GET_CONTACT_URL, id.value),
+    enabled: false
+  })
+}
+
+export const useFetchUserCustomGrups = () => {
+  return useQuery({
+    queryKey: ['user_custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_USER_CUSTOM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetSystemGroups = () => {
+  return useQuery({
+    queryKey: ['system_groups'],
+    queryFn: () => fetchWrapper.get(GET_SYSTEM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetCustomGroups = () => {
+  return useQuery({
+    queryKey: ['custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_CUSTOM_GROUPS_URL),
   })
 }
 
@@ -146,7 +179,7 @@ export const useFetchSettings = () => {
 }
 
 /* ----- Sms ----- */
-export const useFetchSms = (selected_tab, show, search) => {
+export const useFetchSms = (selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value,    
     search: search.value,
@@ -159,22 +192,19 @@ export const useFetchSms = (selected_tab, show, search) => {
     queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
 
   })
-}
+}  
   /* ----- Contacts ----- */
-export const useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id,filter) => {
+export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_groups:Ref<boolean>,is_custom_group:Ref<boolean>,group_id:Ref<string>,filter:Ref<string>){
   const dataToSend = computed(() => ({
     page: page.value,
     limit: limit.value,
-    with_groups: with_groups.value,
-    is_custom_group:is_custom_group.value,
+    with_groups: with_groups.value, // TODO: review this
+    is_custom_group:is_custom_group.value, 
     group_id:group_id.value,
     filter:filter.value,
   }))
-
   return useQuery({
     queryKey: ['all_contacts', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_ALL_CONTACTS_URL, dataToSend.value), 
+    queryFn: () => getAllContacts(dataToSend.value), 
   })
 }
-
-// 
