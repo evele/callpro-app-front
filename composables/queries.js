@@ -146,6 +146,20 @@ export const useFetchUserCustomGrups = () => {
   })
 }
 
+export const useFetchGetSystemGroups = () => {
+  return useQuery({
+    queryKey: ['system_groups'],
+    queryFn: () => fetchWrapper.get(GET_SYSTEM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetCustomGroups = () => {
+  return useQuery({
+    queryKey: ['custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_CUSTOM_GROUPS_URL),
+  })
+}
+
 /* ----- Did numbers ----- */
 export const useFetchDidAndTollFreeNumbers = () => {
   return useQuery({
@@ -192,4 +206,8 @@ export const useFetchSms = (selected_tab, show, search) => {
     queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
 
   })
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b5a0abb21785bdfc8d5b4a567b0f53821f5857ae
