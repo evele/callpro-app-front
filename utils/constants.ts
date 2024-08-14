@@ -16,7 +16,7 @@ export const CHAT_CONTACTS = 'chat_contacts'
 /* ---- PAGE Contacts ---- */
 export const CONTACTS_ALL = 'All'
 export const UNASSIGNED = 'unassigned'
-export const TRASH = 'Trash'
+export const TRASH = 'trash'
 
 /* ---- PAGE Dahsboard, Sms ---- */
 export const COMPLETED = 'COMPLETED'
