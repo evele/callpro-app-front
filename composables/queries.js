@@ -114,10 +114,40 @@ export const useFetchChatContacts = (data) => {
 }
 
 /* ----- Contacts ----- */
+export const useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id,filter) => {
+  const dataToSend = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    with_groups: with_groups.value,
+    is_custom_group:is_custom_group.value,
+    group_id:group_id.value,
+    filter:filter.value,
+  }))
+
+  return useQuery({
+    queryKey: ['all_contacts', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_ALL_CONTACTS_URL, dataToSend.value), 
+  })
+}
+
 export const useFetchUserCustomGrups = () => {
   return useQuery({
     queryKey: ['user_custom_groups'],
     queryFn: () => fetchWrapper.get(GET_USER_CUSTOM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetSystemGroups = () => {
+  return useQuery({
+    queryKey: ['system_groups'],
+    queryFn: () => fetchWrapper.get(GET_SYSTEM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetCustomGroups = () => {
+  return useQuery({
+    queryKey: ['custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_CUSTOM_GROUPS_URL),
   })
 }
 
@@ -166,21 +196,5 @@ export const useFetchSms = (selected_tab, show, search) => {
     queryKey: ['sms_list', dataToSend],
     queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
 
-  })
-}
-  /* ----- Contacts ----- */
-export const useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id,filter) => {
-  const dataToSend = computed(() => ({
-    page: page.value,
-    limit: limit.value,
-    with_groups: with_groups.value,
-    is_custom_group:is_custom_group.value,
-    group_id:group_id.value,
-    filter:filter.value,
-  }))
-
-  return useQuery({
-    queryKey: ['all_contacts', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_ALL_CONTACTS_URL, dataToSend.value), 
   })
 }
