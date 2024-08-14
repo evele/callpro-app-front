@@ -22,7 +22,7 @@
             <label for="launch_id">Phone Launch ID:</label>
             <input type="number" id="launch_id" v-model="launchID" min="0" placeholder="Enter launch ID" />
         </div>
-        <button @click="createNewGroup">Save</button>
+        <button @click="save_new_group">Save</button>
     </div>
 
     <div class="filter-container">
@@ -66,7 +66,7 @@
     const launchID = ref(0)
 
     const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
-    const 
+    
     const all_contacts_data = computed(() => data?.value?.contacts || []);
     let searchDebounce = null
     const debounceSearch = (e) => {
@@ -85,7 +85,20 @@
         }, 500)
     }
 
-    
+    const save_new_group = () => {    
+    if (groupName.value !== '') {
+        const dataToSend = {
+            name: groupName.value,
+            id: 'new', // TODO: reemplazar por una constante
+            phone_launch_id: launchID.value
+        };        
+        useSaveGroupContacts(dataToSend);
+    } else {
+        // Mostrar un mensaje de error o manejar la validación
+        console.error('El nombre del grupo o el ID de lanzamiento no son válidos');
+    }
+};
+
     
     
 </script>
