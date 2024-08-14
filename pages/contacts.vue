@@ -42,11 +42,11 @@
 </template>
 
 <script setup lang="ts">  
-    const tab_options = [ALL,UNASSIGNED,TRASH]
+    const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
     const page = ref(1)    
     const show = ref(10)
     const search = ref("")    
-    const selected_tab = ref(ALL)    
+    const selected_tab = ref(CONTACTS_ALL)    
     const with_groups = ref(true)
     const is_custom_group = ref(false)
 

@@ -116,10 +116,33 @@ export const useFetchChatContacts = (data:boolean) => {
 }
 
 /* ----- Contacts ----- */
+export const useFetchContact = (contact_id:Ref<number>) => {
+  const id = computed(() => ({ contact_id: contact_id.value }));
+  return useQuery({
+    queryKey: ['contact', id],
+    queryFn: () => fetchWrapper.post(GET_CONTACT_URL, id.value),
+    enabled: false
+  })
+}
+
 export const useFetchUserCustomGrups = () => {
   return useQuery({
     queryKey: ['user_custom_groups'],
     queryFn: () => fetchWrapper.get(GET_USER_CUSTOM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetSystemGroups = () => {
+  return useQuery({
+    queryKey: ['system_groups'],
+    queryFn: () => fetchWrapper.get(GET_SYSTEM_GROUPS_URL),
+  })
+}
+
+export const useFetchGetCustomGroups = () => {
+  return useQuery({
+    queryKey: ['custom_groups'],
+    queryFn: () => fetchWrapper.get(GET_CUSTOM_GROUPS_URL),
   })
 }
 
