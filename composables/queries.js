@@ -206,8 +206,4 @@ export const useFetchSms = (selected_tab, show, search) => {
     queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
 
   })
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> b5a0abb21785bdfc8d5b4a567b0f53821f5857ae
