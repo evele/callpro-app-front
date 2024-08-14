@@ -14,7 +14,7 @@ export const UNREAD_CHAT_MESSAGES = 'unread_chat_messages'
 export const CHAT_CONTACTS = 'chat_contacts'
 
 /* ---- PAGE Contacts ---- */
-export const CONTACTS_ALL = 'All'
+export const CONTACTS_ALL = 'all'
 export const UNASSIGNED = 'unassigned'
 export const TRASH = 'trash'
 
