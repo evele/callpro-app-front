@@ -114,6 +114,15 @@ export const useFetchChatContacts = (data) => {
 }
 
 /* ----- Contacts ----- */
+export const useFetchContact = (contact_id) => {
+  const id = computed(() => ({ contact_id: contact_id.value }));
+  return useQuery({
+    queryKey: ['contact', id],
+    queryFn: () => fetchWrapper.post(GET_CONTACT_URL, id.value),
+    enabled: false
+  })
+}
+
 export const useFetchAllContacts = (page, limit, with_groups,is_custom_group,group_id,filter) => {
   const dataToSend = computed(() => ({
     page: page.value,
@@ -197,4 +206,8 @@ export const useFetchSms = (selected_tab, show, search) => {
     queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
 
   })
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> b5a0abb21785bdfc8d5b4a567b0f53821f5857ae
