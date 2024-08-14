@@ -1,3 +1,3 @@
-export const ALL = "All"
-export const UNASSIGNED = "Unassigned"
-export const TRASH = "Trash"
+export const ALL = "all"
+export const UNASSIGNED = "unassigned"
+export const TRASH = "trash"

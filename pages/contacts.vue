@@ -2,7 +2,7 @@
     <div>
         <p class="text-title">Contact page</p>
         <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error.message }}</span>        
+        <span v-else-if="isError">Error: {{ error?.message }}</span>        
     </div>
     <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
     <ul class="tab-style">
@@ -28,46 +28,39 @@
         </div>
         <div>
             <label for="page_number" style="margin-right: 6px;">Pagina nro:</label>
-            <input type="number" name="page_number" id="page_number" placeholder="nro pagina..." v-model.number="page" @input="debounceSearch2">
+            <input type="number" name="page_number" id="page_number" placeholder="nro pagina..." v-model.number="page">
         </div>
     </div>
     <p v-if="isLoading">Loading broadcasts...</p>
-    <p v-if="isError">{{ error.message }}</p>
+    <p v-if="isError">{{ error?.message }}</p>
     <ul v-if="isSuccess" class="contact-list">
         <li v-for="contact in all_contacts_data" :key="contact.id" class="contact-item">            
             <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
-            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>            
+            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
         </li>
     </ul>
 </template>
 
-<script setup>
-    import { useFetchAllContacts } from '#imports';    
+<script setup lang="ts">  
     const tab_options = [ALL,UNASSIGNED,TRASH]
-    const page = ref("1")    
-    const show = ref("10")
+    const page = ref(1)    
+    const show = ref(10)
     const search = ref("")    
     const selected_tab = ref(ALL)    
+    const with_groups = ref(true)
+    const is_custom_group = ref(false)
 
-    const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
-    const all_contacts_data = computed(() => data?.value?.contacts || []);
-    let searchDebounce = null
-    const debounceSearch = (e) => {
+    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
+   
+    let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
+    const debounceSearch = (e: Event) => {
+        const target = e.target as HTMLInputElement;
         clearTimeout(searchDebounce)
         searchDebounce = setTimeout(() => {
-            search.value = e.target.value
-        }, 500)
+            search.value = target.value
+        }, 500) 
     }
-    const debounceSearch2 = (e) => {
-        clearTimeout(searchDebounce)
-        searchDebounce = setTimeout(() => {
-            const value = parseInt(e.target.value, 10)
-            if (!isNaN(value) && value > 0) {
-                page.value = value
-            }
-        }, 500)
-    }
-    
+
     
 </script>
 
