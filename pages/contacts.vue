@@ -43,11 +43,11 @@
 
 <script setup>
     import { useFetchAllContacts } from '#imports';    
-    const tab_options = [ALL,UNASSIGNED,TRASH]
+    const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
     const page = ref("1")    
     const show = ref("10")
     const search = ref("")    
-    const selected_tab = ref(ALL)    
+    const selected_tab = ref(CONTACTS_ALL)    
 
     const { data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,true,false,selected_tab,search)
     const all_contacts_data = computed(() => data?.value?.contacts || []);
