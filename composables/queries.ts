@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/vue-query'
-import Contacts from '~/pages/contacts.vue';
 
 function sleep(ms:number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -57,13 +56,19 @@ export function useFetchGetAllAudios(showOlder:Ref<boolean>) {
     });
 }
 
-/* TODO: review qué onda this.. data vs dataToSend
-export const useFetchGetAudio = (data) => {
+export const useFetchGetAudio = (audio_id: Ref<string>, audio_full_url:Ref<string>, called_from: string) => {
+  const dataToSend = computed(() => ({ 
+    audio_id: audio_id.value,
+    audio_full_url: audio_full_url.value,
+    called_from
+  }))
+
   return useQuery({
-    queryKey: ['user_converted_audio'],
-    queryFn: () => fetchWrapper.post(GET_AUDIO_URL, dataToSend),
+    queryKey: ['user_converted_audio', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_AUDIO_URL, dataToSend.value),
+    enabled: false,
   })
-} */
+}
 
 /* ----- Billing ----- */
 export const useFetchInvoices = () => {
@@ -107,11 +112,11 @@ export const useFetchUnreadMessages = () => {
   })
 }
 
-export const useFetchChatContacts = (data:boolean) => {
-  const dataToSend = { all_contacts: data === true ? 1 : 2 } // TODO: maybe will need to use computed
+export const useFetchChatContacts = (data:Ref<boolean>) => {
+  const dataToSend = computed(() => ({ all_contacts: data.value ? '1' : '2' }))
   return useQuery({
-    queryKey: ['chat_contacts'],
-    queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend),
+    queryKey: ['chat_contacts', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend.value),
   })
 }
 

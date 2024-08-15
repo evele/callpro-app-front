@@ -67,7 +67,7 @@
         'repeat_library_id': settings.value.settings.repeat_library_id,
         'offer_dnc': settings.value.settings.offer_dnc,
         // 'retries': settings.value.settings.retries,
-        'retries': 2,
+        'retries': '2',
         'call_speed': settings.value.settings.call_speed,
         'amd_detection': settings.value.settings.amd_detection,
         'email_on_finish': settings.value.settings.email_on_finish,
@@ -116,7 +116,7 @@
             'settings': {
                 'text_caller_id': settings.value.text_settings.text_caller_id,
                 //'chat': settings.value.text_settings.chat,
-                'chat': 0,
+                'chat': '0',
                 'sms_dnc': settings.value.text_settings.sms_dnc
             },
         }
