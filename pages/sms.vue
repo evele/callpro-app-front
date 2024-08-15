@@ -44,8 +44,8 @@ import { useFetchSms } from '#imports';
 
 const show = ref("10")
 const search = ref("")
-const tab_options = ['COMPLETED', 'ACTIVE', 'DRAFT']
-const selected_tab = ref('COMPLETED')
+const tab_options = [COMPLETED, ACTIVE, DRAFT]
+const selected_tab = ref(COMPLETED)
 
 
 const { data, error, isSuccess, isLoading, isError } = useFetchSms(selected_tab, show, search)

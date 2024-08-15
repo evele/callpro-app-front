@@ -47,7 +47,7 @@
     
     const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
     const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
-    const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, "callpro-app-front")
+    const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, CALLPRO_APP_FRONT)
 
     const convert_Text = async () => {
         audio_id.value = null
@@ -65,7 +65,7 @@
 
         createTextToSpeech(dataToSend, {
             onSuccess: (data) => {
-                audio_id.value = 'preview_tts'
+                audio_id.value = PREVIEW_TTS
                 audio_url.value = data.full_file_url
             }
         })

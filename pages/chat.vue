@@ -20,8 +20,8 @@
     const { data: chatContactsData } = useFetchChatContacts(get_all_contacts.value)
     
     const load_data = () => {
-        queryClient.invalidateQueries(['unread_chat_messages']);
-        queryClient.invalidateQueries(['chat_contacts']);
+        queryClient.invalidateQueries([UNREAD_CHAT_MESSAGES]);
+        queryClient.invalidateQueries([CHAT_CONTACTS]);
     }
 </script>
 

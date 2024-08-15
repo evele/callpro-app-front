@@ -1,4 +1,22 @@
 {
-  // https://nuxt.com/docs/guide/concepts/typescript
-  "extends": "./.nuxt/tsconfig.json"
+  "extends": "./.nuxt/tsconfig.json",
+  "compilerOptions": {
+    "allowImportingTsExtensions":true
+  }
+  /*
+    "noImplicitAny": true,          // Disallow implicit any types
+    "strict": true,                 // Enable all strict type-checking options
+    "noImplicitReturns": true,      // Ensure functions have return types
+    "noImplicitThis": true,         // Disallow `this` of type `any`
+    "alwaysStrict": true,           // Parse in strict mode and emit "use strict"
+    "strictNullChecks": true,       // Enable strict null checks
+    "strictFunctionTypes": true,    // Enable strict checking of function types
+    "strictBindCallApply": true,    // Enable strict `bind`, `call`, and `apply` methods
+    "forceConsistentCasingInFileNames": true // Ensure consistent casing in filenames
+  
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+    */
 }
