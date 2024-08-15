@@ -46,14 +46,8 @@
     const show_older = ref(false)
     
     const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
-
     const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
-    
-
-    const load_audios = () => {
-        // refetch() // not needed, but works
-        
-    }
+    const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, "callpro-app-front")
 
     const convert_Text = async () => {
         audio_id.value = null
@@ -66,7 +60,7 @@
 
         const dataToSend = {
             text: text_to_convert.value.trim(),
-            temp: 'false'
+            temp: false
         }
 
         createTextToSpeech(dataToSend, {
@@ -79,11 +73,7 @@
     }
 
     const fetch_audio_data = () => {
-        const dataToSend = {
-            audio_id: audio_id.value,
-            audio_full_url: audio_url.value,
-            called_from: "callpro-app-front"
-        }
+        refetchAudioData()
     }
 </script>
 

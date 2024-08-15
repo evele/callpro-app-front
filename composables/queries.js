@@ -56,10 +56,17 @@ export function useFetchGetAllAudios(showOlder) {
     });
 }
 
-export const useFetchGetAudio = (data) => {
+export const useFetchGetAudio = (audio_id, audio_full_url, called_from) => {
+  const dataToSend = computed(() => ({ 
+    audio_id: audio_id.value,
+    audio_full_url: audio_full_url.value,
+    called_from
+  }))
+
   return useQuery({
-    queryKey: ['user_converted_audio'],
-    queryFn: () => fetchWrapper.post(GET_AUDIO_URL, dataToSend),
+    queryKey: ['user_converted_audio', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_AUDIO_URL, dataToSend.value),
+    enabled: false,
   })
 }
 
