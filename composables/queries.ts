@@ -207,5 +207,4 @@ export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_gr
     queryKey: ['all_contacts', dataToSend],
     queryFn: () => getAllContacts(dataToSend.value), 
   })
-   
 }

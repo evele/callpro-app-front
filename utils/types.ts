@@ -9,11 +9,18 @@ export interface PhoneNumber {
     in_trash: boolean; // Indicates if the number is in trash
   }
   
-  // Interface for a contact
-  export interface Contact {
-    id: string; // Unique identifier for the contact
-    first_name: string; // First name of the contact
-    last_name: string; // Last name of the contact
-    numbers: PhoneNumber[]; // Array of phone numbers associated with the contact
-  }
+// Interface for a contact
+export interface Contact {
+  id: string; // Unique identifier for the contact
+  first_name: string; // First name of the contact
+  last_name: string; // Last name of the contact
+  numbers: PhoneNumber[]; // Array of phone numbers associated with the contact
+}
   
+
+// Type for Group Contacts
+export type ContactGroup = {
+  name: string;
+  id: number | null;
+  phone_launch_id: number | null;
+};
