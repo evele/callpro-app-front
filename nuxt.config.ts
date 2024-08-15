@@ -5,7 +5,14 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   // modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
-  modules: ['@pinia/nuxt'],
+  modules: ['@pinia/nuxt', '@primevue/nuxt-module'],
+  primevue: {
+    /* Configuration */
+    usePrimeVue: true,
+    options: {
+      unstyled: true
+    }
+  },
   app: {
     head: {
       title: "The Callpro App",
