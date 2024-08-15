@@ -142,7 +142,7 @@
         const data_to_send = {
             action: 'create',
             contact_info: new_contact,
-            save_contact: "true"
+            save_contact: true
         }
 
         saveContact(data_to_send)
