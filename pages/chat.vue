@@ -17,11 +17,10 @@
     const get_all_contacts = ref(true)
 
     const { data: unreadMessagesData } = useFetchUnreadMessages()
-    const { data: chatContactsData } = useFetchChatContacts(get_all_contacts.value)
+    const { data: chatContactsData } = useFetchChatContacts(get_all_contacts)
     
     const load_data = () => {
         queryClient.invalidateQueries([UNREAD_CHAT_MESSAGES]);
-        queryClient.invalidateQueries([CHAT_CONTACTS]);
     }
 </script>
 

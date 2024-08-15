@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/vue-query'
-import Contacts from '~/pages/contacts.vue';
 
 function sleep(ms:number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -113,11 +112,11 @@ export const useFetchUnreadMessages = () => {
   })
 }
 
-export const useFetchChatContacts = (data:boolean) => {
-  const dataToSend = { all_contacts: data === true ? 1 : 2 } // TODO: maybe will need to use computed
+export const useFetchChatContacts = (data:Ref<boolean>) => {
+  const dataToSend = computed(() => ({ all_contacts: data.value ? '1' : '2' }))
   return useQuery({
-    queryKey: ['chat_contacts'],
-    queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend),
+    queryKey: ['chat_contacts', dataToSend],
+    queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend.value),
   })
 }
 
