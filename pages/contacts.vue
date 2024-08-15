@@ -24,7 +24,7 @@
             <input type="number" id="group_id" v-model="groupID" placeholder="Enter Group ID" />
         </div>
         <button @click="save_new_group">{{ !saveGroupContactsIsPending ? 'Save new group' : 'Saving...' }}</button>
-        <div style="margin-top: 10px;">
+         <div style="margin-top: 10px;">
             <span v-if="saveGroupContactsIsError" style="color: red;">Error: {{ saveGroupContactsError?.message }}</span>
             <span v-if="saveGroupContactsIsSuccess" style="color: green;">Contact group successfully updated!</span>
         </div>
@@ -76,14 +76,6 @@
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
     
-    // const all_contacts_data = computed(() => data?.value?.contacts || []);
-    // let searchDebounce = null
-    
-
-    
-
-   
-   
     let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
    
     const debounceSearch = (e: Event) => {        
@@ -93,15 +85,15 @@
             search.value = target.value
         }, 500) 
     }
-    
-    const save_new_group = () => {        
+   
+    const save_new_group = () => {
         const dataToSend = {
             name: groupName.value,
-            id: groupID.value,
-            phone_launch_id: launchID.value
-        };        
-        saveGroupContacts(dataToSend);
-    };
+            id: groupID.value ? parseInt(groupID.value, 10) : null,
+            phone_launch_id: launchID.value ? parseInt(launchID.value, 10) : null
+        } 
+        saveGroupContacts(dataToSend)
+    }
 
 </script>
 

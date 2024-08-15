@@ -1,8 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
 
 /* ----- Audios ----- */
 export const useConvertTextToSpeech = () => {
@@ -64,10 +61,10 @@ export const useUpdateTextSettings = () => {
   }) 
 }
 
-export const useSaveGroupContacts = () =>{
+export const useSaveGroupContacts = () =>{  
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data),
+    mutationFn: (data:ContactGroup) => fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['group_contacts']})
     },
