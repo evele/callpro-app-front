@@ -1,6 +1,6 @@
 <template>
   <p>Logged IN :D</p>
-  <button type="button" @click=logout>Logout</button>
+  <button type="button" class="button is-primary" @click=logout>Logout</button>
 
   <h2 style="margin: 2rem 0 0 10px">Voice Broadcasts</h2>
   <ul class="tab-style">

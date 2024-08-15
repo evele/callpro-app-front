@@ -13,6 +13,9 @@ export default defineNuxtConfig({
       unstyled: true
     }
   },
+  css: [
+    '@/assets/main.scss', // Adjust the path if you named your file differently
+  ],
   app: {
     head: {
       title: "The Callpro App",
