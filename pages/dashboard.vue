@@ -28,15 +28,15 @@
   </div>
 
   <p v-if="isLoading">Loading broadcasts...</p>
-  <p v-if="isError">{{ error.message }}</p>
+  <p v-if="isError">{{ error?.message }}</p>
   <ul v-if="isSuccess">
-    <li v-for="broadcast in data.broadcast_list" :key="broadcast.id" style="margin: 10px 0;">
+    <li v-if="data?.result" v-for="broadcast in data?.broadcast_list" :key="broadcast?.broadcast_id" style="margin: 10px 0;">
       <span style="font-weight: 600; margin-right: 6px;">Broadcast name:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.name }}</span> 
       <span style="font-weight: 600; margin-right: 6px;">Broadcast ID:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.broadcast_id }}</span> 
     </li>
   </ul>
 </template>
-<script setup>
+<script setup lang="ts">
   import { useAuthStore } from "@/stores"
 
   const authStore = useAuthStore()
@@ -51,11 +51,12 @@
 
   const { data, isLoading, isSuccess, isError, error } = useFetchGetBroadcastList(selected_tab, show, search)
 
-  let searchDebounce = null
-  const debounceSearch = (e) => {
+  let searchDebounce: ReturnType<typeof setTimeout>
+  const debounceSearch = (e: Event) => {
     clearTimeout(searchDebounce)
     searchDebounce = setTimeout(() => {
-      search.value = e.target.value
+      const target = e.target as HTMLInputElement;
+      search.value = target.value
     }, 500)
   }
 </script>

@@ -31,7 +31,7 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
 }
   
 /* ----- Dashboard ----- */
-export const useFetchGetBroadcastList = (selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
+export const useFetchGetBroadcastList = (selected_tab:Ref<string>, show:Ref<string>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value,
     load_all: false,
@@ -42,7 +42,7 @@ export const useFetchGetBroadcastList = (selected_tab:Ref<string>, show:Ref<numb
 
   return useQuery({
     queryKey: ['broadcast_list', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_BROADCAST_LIST_URL, dataToSend.value), 
+    queryFn: () => getBroadcastList(dataToSend.value), 
   })
 }
 
@@ -100,7 +100,7 @@ export const useFetchCallInCodes = () => {
 export const useFetchCallerID = () => {
   return useQuery({
     queryKey: ['caller_id'],
-    queryFn: () => fetchWrapper.get(GET_CALLER_IDS_URL),  
+    queryFn: () => getCallerID()
   })
 }
 
@@ -108,15 +108,16 @@ export const useFetchCallerID = () => {
 export const useFetchUnreadMessages = () => {
   return useQuery({
     queryKey: ['unread_chat_messages'],
-    queryFn: () => fetchWrapper.get(GET_UNREAD_MESSAGES_URL),
+    queryFn: () => getUnreadMessages(),
   })
 }
 
 export const useFetchChatContacts = (data:Ref<boolean>) => {
-  const dataToSend = computed(() => ({ all_contacts: data.value ? '1' : '2' }))
+  type fnProps = { all_contacts: '1' | '2' };
+  const dataToSend = computed((): fnProps => ({ all_contacts: data.value ? '1' : '2' }))
   return useQuery({
     queryKey: ['chat_contacts', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend.value),
+    queryFn: () => getChatContacts(dataToSend.value)
   })
 }
 
