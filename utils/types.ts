@@ -24,3 +24,4 @@ export type ContactGroup = {
   id: number | null;
   phone_launch_id: number | null;
 };
+

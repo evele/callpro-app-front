@@ -1,10 +1,9 @@
 <template>
     <div>
-        <p class="text-title">Audios page</p>
-        <button type="button" @click="load_audios">Load audios</button>
+        <p class="text-title">Audios page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
         <ul v-if="isSuccess">
-            <li v-for="audio in allAudiosData?.audios" :key="audio.id">
+            <li v-if="allAudiosData?.result" v-for="audio in allAudiosData" :key="audio?.id">
                 {{ audio?.id }} - {{ audio?.name }}
             </li>
         </ul> 
@@ -29,8 +28,9 @@
     </div>
 </template>
 
-<script setup>
-    import { useAudiosStore } from "@/stores"
+<script setup lang="ts">
+    import type { Audio } from "#imports";
+import { useAudiosStore } from "@/stores"
     import { useQueryClient, useQuery } from '@tanstack/vue-query'
 
     const queryClient = useQueryClient()
