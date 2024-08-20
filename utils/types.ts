@@ -16,7 +16,16 @@ export interface Contact {
   last_name: string; // Last name of the contact
   numbers: PhoneNumber[]; // Array of phone numbers associated with the contact
 }
-  
+
+export type Poronga = {
+  text: string, 
+  temp: boolean    
+}
+
+export type Tts_Convert = {
+  full_file_url:string,
+  file_name: string
+}
 
 // Type for Group Contacts
 export type ContactGroup = {
@@ -25,3 +34,28 @@ export type ContactGroup = {
   phone_launch_id: number | null;
 };
 
+// Interface for a audio
+export interface Audio {
+  id: number;
+  user_id: number;
+  name: string;
+  created_at: string;
+  last_used: string;
+  file_name: string;
+  length: number;
+  is_delete: "N" | "Y";
+  full_file_url: string;
+}
+
+export interface AudioAux {
+  id: string;
+  audio_id: string | null;
+  audio_url: string | null;
+  name: string;
+  created_at: string;
+  last_used: string;
+  file_name: string;
+  length: string;
+  is_delete: string;
+  full_file_url: string;
+}

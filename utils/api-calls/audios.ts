@@ -3,24 +3,37 @@ type ShowOlderFilter ={
     show_all_audios: boolean,
 }
 
-interface APIResponse{
+type FilterAudio ={
+    audio_id: string | null, 
+    audio_full_url: string | null,
+    called_from:string
+}
+
+
+
+
+interface APIResponseConvertedAudios{
+    result: boolean,
+    audios?: AudioAux[],
+    db_error?: string,    
+}
+interface APIResponseAllAudios{
     result: boolean,
     audios?: Audio[],
-    error?: string|null
+    db_error?: string,
+    validation_error?: Record<validation_keys,string>
 }
 
-// tyope // audio_id
-//         $this->form_validation->set_rules('broadcast_id', 'Broadcast ID', 'integer');
-//         $this->form_validation->set_rules('audio_full_url', 'Audio URL', 'required|trim');
-//         $this->form_validation->set_rules('called_from', 'Called from', 'required|trim');
 
-export async function getUserAllAudios(data:ShowOlderFilter):Promise<APIResponse> {
+export async function getUserAllAudios(data:ShowOlderFilter):Promise<APIResponseAllAudios> {
     const response = await fetchWrapper.post(GET_AUDIOS_URL, data)     
-    return response as APIResponse
+    return response as APIResponseAllAudios
 }
+
+type validation_keys = 'audio_id' | 'broadcast_id' | 'audio_full_url' | 'called_from'
 
 //enabled: false,
-export async function getUserConvertedAudios(data:Audio):Promise<APIResponse> {
+export async function getUserConvertedAudios(data:FilterAudio):Promise<APIResponseConvertedAudios> {
     const response = await fetchWrapper.post(GET_AUDIO_URL, data)
-    return response as APIResponse
+    return response as APIResponseConvertedAudios
 }

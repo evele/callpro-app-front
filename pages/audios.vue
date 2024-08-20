@@ -3,10 +3,14 @@
         <p class="text-title">Audios page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
         <ul v-if="isSuccess">
-            <li v-if="allAudiosData?.result" v-for="audio in allAudiosData" :key="audio?.id">
-                {{ audio?.id }} - {{ audio?.name }}
+            <li 
+                v-if="allAudiosData?.result && Array.isArray(allAudiosData.audios)" 
+                v-for="audio in allAudiosData.audios" 
+                :key="audio.id"
+            >
+                {{ audio.id }} - {{ audio.name }}
             </li>
-        </ul> 
+        </ul>
         <div class="container-div">
             <label>Show older audios
                 <input type="checkbox" v-model="show_older">
@@ -29,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-    import type { Audio } from "#imports";
+import type { Audio } from "#imports";
 import { useAudiosStore } from "@/stores"
     import { useQueryClient, useQuery } from '@tanstack/vue-query'
 
@@ -39,8 +43,8 @@ import { useAudiosStore } from "@/stores"
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
-    const audio_id = ref(null)
-    const audio_url = ref(null)
+    const audio_id = ref<string | null>(null);
+    const audio_url = ref<string | null>(null);    
     
     
     const show_older = ref(false)
@@ -64,7 +68,8 @@ import { useAudiosStore } from "@/stores"
         }
 
         createTextToSpeech(dataToSend, {
-            onSuccess: (data) => {
+            onSuccess: (data:Tts_Convert) => {
+                console.log("data: -",data)
                 audio_id.value = PREVIEW_TTS
                 audio_url.value = data.full_file_url
             }

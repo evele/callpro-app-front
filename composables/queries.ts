@@ -56,12 +56,10 @@ export function useFetchGetAllAudios(showOlder:Ref<boolean>) {
     });
 }
 
-export const useFetchGetAudio = (audio_id: Ref<number>, audio_full_url:Ref<string>, called_from: string) => {
+export const useFetchGetAudio = (audio_id: Ref<string | null>, audio_full_url:Ref<string | null>, called_from: string) => {
   const dataToSend = computed(() => ({ 
-    // audio_id: audio_id.value,
-    id: audio_id.value,
-    name: audio_full_url.value,
-    // audio_full_url: audio_full_url.value,
+    audio_id: audio_id.value, 
+    audio_full_url: audio_full_url.value,
     called_from
   }))
 

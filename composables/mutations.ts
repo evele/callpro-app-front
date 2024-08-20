@@ -1,11 +1,10 @@
-import type { Audio } from '#imports'
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
 
 /* ----- Audios ----- */
 export const useConvertTextToSpeech = () => {
   return useMutation({
-    mutationFn: (data:Audio) => fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, data),
+    mutationFn: (data:Poronga) => fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, data),
   }) 
 }
 
