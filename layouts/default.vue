@@ -1,7 +1,7 @@
 <template>
     <div class="grid-container">
         <div class="item1">Header</div>
-        <div class="item2">Menu</div>
+        <Navbar class="item2"></Navbar>
         <div class="item3">
             <slot></slot>
         </div>  
@@ -9,6 +9,8 @@
     </div>
 </template>  
 <script setup>
+import NavbarB from '~/components/reusables/navbar.vue';
+
 </script>
 <style scoped>
     .item1 { grid-area: header; }
@@ -24,12 +26,11 @@
     'menu main main main main main'
     'menu footer footer footer footer footer';
     gap: 10px;
-    background-color: #2196F3;
     height: 100vh;
 }
 
 .grid-container > div {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.99);
   font-size: 30px;
 }
 </style>

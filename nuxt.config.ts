@@ -4,7 +4,6 @@ export default defineNuxtConfig({
     port: 3001,
   },
   devtools: { enabled: true },
-  // modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
   modules: ['@pinia/nuxt', '@primevue/nuxt-module'],
   primevue: {
     /* Configuration */
@@ -14,7 +13,7 @@ export default defineNuxtConfig({
     }
   },
   css: [
-    '@/assets/main.scss', // Adjust the path if you named your file differently
+    '@/assets/styles/main.scss'
   ],
   app: {
     head: {

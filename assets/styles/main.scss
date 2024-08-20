@@ -3,18 +3,29 @@ $pink: #fa7c91;
 $brown: #757763;
 $beige-light: #d0d1cd;
 $beige-lighter: #eff0eb;
+// $family-sans-serif: "Roboto", sans-serif;
 
 
 @use "bulma/sass" with (
- // $family-primary: '"Nunito", sans-serif',
+  // $family-primary: '"Roboto", sans-serif',
   $grey-dark: $brown,
   $grey-light: $beige-light,
   $primary: #653494,
   $link: $pink,
   $control-border-width: 2px,
   $input-shadow: none,
-
+  
   $button-border-style: "dotted",
   $button-border-color: "#ffffff",
   $button-border-width: 2px
 );
+
+
+// @import 'fonts';
+
+@import url("https://fonts.googleapis.com/css?family=Roboto:400,700");
+
+:root {
+  --bulma-family-primary: 'Roboto', sans-serif;
+}
+
