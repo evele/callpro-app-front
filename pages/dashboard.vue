@@ -11,14 +11,14 @@
   </ul>
 
   <div class="filter-container">
-    <div>
-      <label for="show" style="margin-right: 6px;">Show:</label>
-      <select name="show" id="show" v-model="show">
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
+    <div style="width: 75px;">
+      <Select v-model="selected_items_per_page" :options="select_options" optionLabel="name" class="p-2 is-flex is-justify-content-space-between is-fullwidth has-background-white has-text-grey-darker">
+        <template #option="slotProps">
+          <div class="has-background-white">
+            <span class="p-2 has-text-grey-darker">{{ slotProps.option.name }}</span>
+          </div>
+        </template>
+      </Select>
     </div>
 
     <div>
@@ -44,12 +44,18 @@
     authStore.logout()
   }
 
-  const tab_options = [COMPLETED, ACTIVE, DRAFT]
-  const selected_tab = ref(COMPLETED)
-  const show = ref('10')
+  const tab_options: BroadcastDashboardState[] = [COMPLETED, ACTIVE, DRAFT]
+  const selected_tab: Ref<BroadcastDashboardState> = ref(COMPLETED)
+  const select_options: Ref<ItemsPerPageOption[]> = ref([
+    { name: '10', code: 10 },
+    { name: '25', code: 25 },
+    { name: '50', code: 50 },
+    { name: '100', code: 100 }
+  ])
+  const selected_items_per_page: Ref<ItemsPerPageOption> = ref({ name: '10', code: 10 })
   const search = ref('')
 
-  const { data, isLoading, isSuccess, isError, error } = useFetchGetBroadcastList(selected_tab, show, search)
+  const { data, isLoading, isSuccess, isError, error } = useFetchGetBroadcastList(selected_tab, selected_items_per_page, search)
 
   let searchDebounce: ReturnType<typeof setTimeout>
   const debounceSearch = (e: Event) => {

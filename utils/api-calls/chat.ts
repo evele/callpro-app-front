@@ -8,7 +8,7 @@ type ChatContact = {
 
 type validation_keys = 'all_contacts'
 
-interface APIResponseChatContacts {
+type APIResponseChatContacts = {
     result: boolean;
     contacts?: ChatContact[];
     db_error?: string;
@@ -23,7 +23,7 @@ export async function getChatContacts(data: fnProps):Promise<APIResponseChatCont
 }
 
 /* ----- Unread messages ----- */
-interface APIResponseUnreadMessages {
+type APIResponseUnreadMessages = {
     result: boolean;
     unread_messages?: number;
     db_error?: string;

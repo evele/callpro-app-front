@@ -1,20 +1,17 @@
-type State = 'COMPLETED' | 'ACTIVE' | 'DRAFT'
-
 type fnProps = {
-    // length_limit: '10' | '25' | '50' | '100',
-    length_limit: string,
+    length_limit: ItemsPerPage,
     load_all: boolean,
     search: string,
     start_limit: string, 
-    state: string,
+    state: BroadcastDashboardState,
 }
 
-type validation_keys = 'length_limit' | 'load_all' | 'search' | 'start_limit' | 'state'
+type validation_keys = 'length_limit' | 'load_all' | 'search' | 'start_limit' | 'state';
 
-interface APIResponseBroadcastList {
+type APIResponseBroadcastList = {
     result: boolean;
     broadcast_list?: BroadcastDashboardData[];
-    state?: State;
+    state?: BroadcastDashboardState;
     total_broadcast?: string;
     db_error?: string;
     validation_error?: Record<validation_keys, string>;

@@ -6,13 +6,13 @@
         <ul v-else>
             <li v-for="tz in settings.timezones" :key="tz.zones_id">{{ tz.display }}</li>
         </ul>
-        <button type="button" @click="load_settings">Load settings</button>
+        <button type="button" class="button is-primary" @click="load_settings">Load settings</button>
 
         <div v-if="isSuccess" style="padding: 10px 0 2rem 1rem;">
             <p v-if="isFetching">Updating data...</p>
             <div v-else>
                 <div>
-                    <h2>Voice settings:</h2>
+                    <h2 style="font-weight: bold;">Voice settings:</h2>
                     <p class="setting-label">Caller ID: <span class="setting-value"> {{ settings?.settings?.caller_id }}</span></p>
                     <p class="setting-label">Static Intro: <span class="setting-value"> {{ format_value(settings?.settings?.static_intro) }}</span></p>
                     <p class="setting-label">Repeat: <span class="setting-value"> {{ format_value(settings?.settings?.repeat) }}</span></p>
@@ -24,7 +24,7 @@
                     <p class="setting-label">Number When Completed: <span class="setting-value"> {{ format_value(settings?.settings?.number_when_completed_status) }}</span></p>
                     <p class="setting-label">Call Time Guard: <span class="setting-value"> {{ format_value(settings?.settings?.time_guard) }}</span></p>
                     <p class="setting-label">Time Zones: <span class="setting-value"> {{ format_tz(settings?.settings?.time_zone) }}</span></p>
-                    <button type="button" @click="save_voice_settings">{{ !isPending ? 'Save Voice Settings' : 'Saving...' }}</button>
+                    <button type="button" class="button is-info" @click="save_voice_settings">{{ !isPending ? 'Save Voice Settings' : 'Saving...' }}</button>
                 
                     <div style="margin-top: 10px;">
                         <span v-if="updateVoiceIsError" style="color: red;">Error: {{ updateVoiceError.message }}</span>
@@ -32,12 +32,12 @@
                     </div>
                 </div>
                 <div>
-                    <h2>Text settings:</h2>
+                    <h2 style="font-weight: bold;">Text settings:</h2>
                     <p class="setting-label">Text message caller ID: <span class="setting-value"> {{ settings?.text_settings?.text_caller_id }}</span></p>
                     <p class="setting-label">Chat: <span class="setting-value"> {{ format_value(settings?.text_settings?.chat) }}</span></p>
                     <p class="setting-label">Offer Opt Out Response: <span class="setting-value"> {{ format_value(settings?.text_settings?.sms_dnc) }}</span></p>
                     
-                    <button type="button" @click="save_text_settings">{{ !updateTextIsPending ? 'Save Text Settings' : 'Saving...' }}</button>
+                    <button type="button" class="button is-info" @click="save_text_settings">{{ !updateTextIsPending ? 'Save Text Settings' : 'Saving...' }}</button>
                 
                     <div style="margin-top: 10px;">
                         <span v-if="updateTextIsError" style="color: red;">Error: {{ updateTextError.message }}</span>
@@ -133,11 +133,11 @@
     }
     .setting-label {
         font-weight: 600;
-        margin-right: 6px;
         line-height: 10px;
+        margin: 10px 6px 10px 0;
     }
     .setting-value {
         margin-right: 10px;
-        color: blue;
+        color: rgb(133, 133, 237);
     }
 </style>

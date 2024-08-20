@@ -1,4 +1,4 @@
-interface APIResponseCID {
+type APIResponseCID = {
     result: boolean;
     caller_ids?: CallerID[];
     db_error?: string;
