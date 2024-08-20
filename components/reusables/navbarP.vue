@@ -23,5 +23,5 @@
 <script setup>
 import { ref } from "vue";
 
-const visible = ref(false);
+const visible = ref(true);
 </script>
