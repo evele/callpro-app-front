@@ -19,9 +19,9 @@
         <div>
             <h3>Write some text and convert it to speech.</h3>
             <textarea cols="50" rows="10" v-model="text_to_convert" />
-            <button type="button" @click="convert_Text" class="btn-convert" :disabled="isConverting">
+            <!-- <button type="button" @click="convert_Text" class="btn-convert" :disabled="isConverting">
                 {{ isConverting ? 'Converting...' : 'Convert' }}
-            </button>
+            </button> -->
         </div>
         <div v-if="audio_id">
             <h4>Preview the converted file</h4>
@@ -50,7 +50,7 @@ import { useAudiosStore } from "@/stores"
     const show_older = ref(false)
     
     const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
-    const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
+    // const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
     const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, CALLPRO_APP_FRONT)
 
     const convert_Text = async () => {
@@ -67,13 +67,13 @@ import { useAudiosStore } from "@/stores"
             temp: false
         }
 
-        createTextToSpeech(dataToSend, {
-            onSuccess: (data:Tts_Convert) => {
-                console.log("data: -",data)
-                audio_id.value = PREVIEW_TTS
-                audio_url.value = data.full_file_url
-            }
-        })
+        // createTextToSpeech(dataToSend, {
+        //     onSuccess: (data:Tts_Convert) => {
+        //         console.log("data: -",data)
+        //         audio_id.value = PREVIEW_TTS
+        //         audio_url.value = data.full_file_url
+        //     }
+        // })
         
     }
 

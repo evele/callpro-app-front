@@ -71,9 +71,9 @@ export const useFetchGetAudio = (audio_id: Ref<string | null>, audio_full_url:Re
 
 /* ----- Billing ----- */
 export const useFetchInvoices = () => {
-  return useQuery({
+  return useQuery<APIResponse>({
     queryKey: ['user_invoices'],
-    queryFn: () => fetchWrapper.get(GET_USER_INVOICES_DATA_URL),
+    queryFn: ():Promise<APIResponse> => fetchWrapper.get(GET_USER_INVOICES_DATA_URL)as Promise<APIResponse>,
     refetchOnWindowFocus: false,
   })
 }
