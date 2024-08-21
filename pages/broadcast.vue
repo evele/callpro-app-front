@@ -5,11 +5,12 @@
             <input type="text" v-model="broadcast_id" placeholder="Write the broadcast ID">
             <button @click="get_broadcast_data">Get broadcast data</button>
             <p v-if="isLoading">Loading broadcasts...</p>
-            <p v-if="isError">{{ error.message }}</p>
+            <p v-if="isError">{{ error?.message }}</p>
             <div v-if="bHeaderIsSuccess">
-                <p v-if="!bHeaderData.result" style="color: red;">{{ bHeaderData?.db_error?.broadcast_id }}</p>
-                <p v-else-if="!bHeaderData.broadcast.length">No broadcast found.</p>
-                <p v-else>Broadcast name: <span style="font-weight: bold;">{{ bHeaderData.broadcast[0].name }}</span></p>
+                <!-- <p v-if="!bHeaderData.result" style="color: red;">{{ bHeaderData?.db_error?.broadcast_id }}</p> -->
+                <p v-if="!bHeaderData?.result" style="color: red;">{{ bHeaderData?.db_error?.broadcast_id ?? 'Unknown error' }}</p>
+                <p v-else-if="!bHeaderData.broadcast?.length">No broadcast found.</p>
+                <p v-else>Broadcast name: <span style="font-weight: bold;">{{ bHeaderData?.broadcast?.[0].name }}</span></p>
             </div>
         </div>
 
@@ -23,7 +24,7 @@
         <div class="filter-container">
             <div>
                 <label for="show" style="margin-right: 6px;">Show:</label>
-                <select name="show" id="show" v-model="show" @change="bDetailRefetch">
+                <select name="show" id="show" v-model="show" @change="handleRefetch">
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="25">25</option>
@@ -38,9 +39,9 @@
             </div>
         </div>
 
-        <p style="margin-left: 1rem;" v-if="bDetailIsLoading">Loading broadcasts...</p>
-        <p style="margin-left: 1rem;" v-if="bDetailIsError">No broadcast found.</p>
-        <ul v-if="bDetailIsSuccess">
+        <!-- <p style="margin-left: 1rem;" v-if="bDetailIsLoading">Loading broadcasts...</p>
+        <p style="margin-left: 1rem;" v-if="bDetailIsError">No broadcast found.</p> -->
+        <!-- <ul v-if="bDetailIsSuccess">
             <p v-if="!bDetailData.result" style="color: red;">{{ bDetailData?.db_error?.broadcast_id }}</p>
             <p v-else-if="!bDetailData.broadcast_details.length">No broadcast found.</p>
             <li v-for="broadcast in bDetailData.broadcast_details" :key="broadcast.id" style="margin: 10px 0;">
@@ -48,11 +49,14 @@
                 <span style="font-weight: 600; margin-right: 6px;">Broadcast result:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.result }}</span> 
                 <span style="font-weight: 600; margin-right: 6px;">Duration:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.duration }}</span> 
             </li>
-        </ul>
+        </ul> -->
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+    const handleRefetch = (event: Event) => {
+        // bDetailRefetch()
+    }
     const broadcast_id = ref('')
     const tab_options = [BROADCAST_ALL, LIVE, VM, INVALID, NA]
     const selected_tab = ref(BROADCAST_ALL)
@@ -61,7 +65,7 @@
 
     const { data: bHeaderData, isLoading, isSuccess: bHeaderIsSuccess, isError, error, refetch: bHeaderRefetch } = useFetchGetBroadcastHeader(broadcast_id)
 
-    const { data: bDetailData, isLoading: bDetailIsLoading, isSuccess: bDetailIsSuccess, isError: bDetailIsError, refetch: bDetailRefetch } = useFetchGetBroadcastDetail(broadcast_id, selected_tab, show, search)
+    // const { data: bDetailData, isLoading: bDetailIsLoading, isSuccess: bDetailIsSuccess, isError: bDetailIsError, refetch: bDetailRefetch } = useFetchGetBroadcastDetail(broadcast_id, selected_tab, show, search)
 
     let searchDebounce = null
     const debounceSearch = (e) => {
@@ -79,7 +83,7 @@
 
     const get_broadcast_data = () => {
         bHeaderRefetch()
-        bDetailRefetch()
+        // bDetailRefetch()
     }
     
 </script>

@@ -5,16 +5,24 @@ function sleep(ms:number) {
 }
 
 /* ----- Broadcast ----- */
-export const useFetchGetBroadcastHeader = (broadcast_id:Ref<number>) => {
-  const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
+// export const useFetchGetBroadcastHeader = (broadcast_id:Ref<number>) => {
+//   const dataToSend = computed<broadCastIdSend>(() => ({ broadcast_id: broadcast_id.value }))
 
-  return useQuery({
+//   return useQuery<BroadcastResponse>({
+//     queryKey: ['broadcast_header', dataToSend],
+//     queryFn: ():Promise<BroadcastResponse> => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value)as Promise <BroadcastResponse>,
+//     enabled: false, 
+//   })
+// }
+export function useFetchGetBroadcastHeader(broadcast_id:Ref<number>){
+  const dataToSend = computed<broadcastIdParams>(() => ({ broadcast_id: broadcast_id.value }))
+
+  return useQuery<BroadcastResponse>({
     queryKey: ['broadcast_header', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value),
+    queryFn: ():Promise<BroadcastResponse> => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value)as Promise <BroadcastResponse>,
     enabled: false, 
   })
 }
-
 export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     broadcast_id: broadcast_id.value,
