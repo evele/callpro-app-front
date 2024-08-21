@@ -1,15 +1,15 @@
 <template>
-    <aside class="menu">
-      <div class="logo"></div>
+    <aside class="menu is-flex is-flex-direction-column">
+      <div class="logo p-4">Aca el logo</div>
       <ul class="menu-list">
-        <li><a>Dashboard</a></li>
+        <li><a :class="is_active('dashboard')">Dashboard</a></li>
         <li><a>Chat</a></li>
         <li><a>Contacts</a></li>
         <li><a>Library</a></li>
         <li><a>Billing</a></li>
 
       </ul>
-      <ul class="menu-list">
+      <ul class="menu-list mb-auto">
         <li>
           <a class="is-active">Our Test Pages</a>
           <ul>
@@ -30,6 +30,26 @@
           </ul>
         </li>
       </ul>
-      <div class="menu-footer"></div>
+      <div class="menu-footer p-4">
+        <ul class="menu-list">
+          <li><a>Settings</a></li>
+          <li><a @click=logout>Logout</a></li>
+        </ul>
+      </div>
   </aside>
 </template>
+<script setup lang="ts">
+  import { useAuthStore } from "@/stores"
+
+  const authStore = useAuthStore()
+  function logout() {
+    authStore.logout()
+  }
+
+  const router = useRouter();
+
+  const currentRoute = router.currentRoute;
+
+  const is_active = (route:string) => currentRoute.value.name == route?"is-active": "" 
+  
+</script>

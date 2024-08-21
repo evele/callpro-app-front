@@ -1,6 +1,6 @@
 <template>
   <p>Logged IN :D</p>
-  <button type="button" class="button is-primary" @click=logout>Logout</button>
+  
 
   <h2 style="margin: 2rem 0 0 10px">Voice Broadcasts</h2>
   <ul class="tab-style">
@@ -37,12 +37,6 @@
   </ul>
 </template>
 <script setup>
-  import { useAuthStore } from "@/stores"
-
-  const authStore = useAuthStore()
-  function logout() {
-    authStore.logout()
-  }
 
   const tab_options = [COMPLETED, ACTIVE, DRAFT]
   const selected_tab = ref(COMPLETED)
