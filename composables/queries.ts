@@ -1,21 +1,13 @@
 import { useQuery } from '@tanstack/vue-query'
+import type { StateOption } from '~/utils/api-calls';
 
 function sleep(ms:number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /* ----- Broadcast ----- */
-// export const useFetchGetBroadcastHeader = (broadcast_id:Ref<number>) => {
-//   const dataToSend = computed<broadCastIdSend>(() => ({ broadcast_id: broadcast_id.value }))
-
-//   return useQuery<BroadcastResponse>({
-//     queryKey: ['broadcast_header', dataToSend],
-//     queryFn: ():Promise<BroadcastResponse> => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value)as Promise <BroadcastResponse>,
-//     enabled: false, 
-//   })
-// }
-export function useFetchGetBroadcastHeader(broadcast_id:Ref<number>){
-  const dataToSend = computed<broadcastIdParams>(() => ({ broadcast_id: broadcast_id.value }))
+export function useFetchGetBroadcastHeader(broadcast_id:Ref<string>){
+  const dataToSend = computed<{broadcast_id:string}>(() => ({ broadcast_id: broadcast_id.value }))
 
   return useQuery<BroadcastResponse>({
     queryKey: ['broadcast_header', dataToSend],
@@ -23,17 +15,17 @@ export function useFetchGetBroadcastHeader(broadcast_id:Ref<number>){
     enabled: false, 
   })
 }
-export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
-  const dataToSend = computed(() => ({
+export const useFetchGetBroadcastDetail = (broadcast_id:Ref<string>, selected_tab:Ref<StateOption>,start_limit:Ref<number>, show:Ref<number>, search:Ref<string>) => {
+  const dataToSend = computed<BroadcastDetailParams>(() => ({
     broadcast_id: broadcast_id.value,
     length_limit: show.value,
     search: search.value,
-    start_limit: "0",
+    start_limit: start_limit.value,//"0",
     state: selected_tab.value,
   }))
-  return useQuery({
+  return useQuery<BroadcastDetailResponse>({
     queryKey: ['broadcast_detail', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value),
+    queryFn: (): Promise<BroadcastDetailResponse> => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value)as Promise <BroadcastDetailResponse>,
     enabled: false, 
   })
 }

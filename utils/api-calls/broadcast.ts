@@ -1,6 +1,3 @@
-export type broadcastIdParams ={
-    broadcast_id:number;
-}
 export type Broadcast = {
     user_id: string;
     broadcast_id: string;
@@ -38,25 +35,28 @@ result: boolean;
 broadcast: Array<{ id: number; name: string }>;
 db_error?: { broadcast_id?: string };
 }
+export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
+
+export type StatusOption = 'COMPLETED' | 'PROCESSING' | 'SCHEDULED' | 'CALLING' | 'TRANSFERRED' | 'PAUSED' |'CONNECTED'| 'WAITING_FOR_RETRY';    
 
 export type BroadcastDetailParams = {
-    broadcast_id: number;
+    broadcast_id: string;
     length_limit:number;
     search: string;
     start_limit:number;
-    state: 'ALL' | 'LIVE' | 'VM' | 'INVALID' | 'NA';
+    state: StateOption;
   }
 
-export type broadcast_details ={
+export type BroadcastDetails ={
     id: number; 
     broadcast_id: number;
     last_name:string;
 	first_name:string;
 	contact_phone_number: number;
-	status: 'COMPLETED' | 'PROCESSING' | 'SCHEDULED' | 'CALLING' | 'TRANSFERRED' | 'PAUSED' |'CONNECTED'| 'WAITING_FOR_RETRY';    
-    result: 'ALL' | 'LIVE' | 'VM' | 'INVALID' | 'NA';
+	status: StatusOption;
+    result: StateOption;
     duration: number;			
-    group: 'ALL' | 'LIVE' | 'VM' | 'INVALID' | 'NA';
+    group:StateOption;
 	attempts: number;//"1"?
 	feedback: string | null;
 	started_at: string| null;
@@ -67,7 +67,7 @@ export type broadcast_details ={
 export type BroadcastDetailResponse = {
     result: boolean;
     results_count: number;
-    broadcast_details: Array<{ id: number; broadcast_id: number; result: string; duration: string }>;
-    state: string;
+    broadcast_details: BroadcastDetails[];//Array<{ id: number; broadcast_id: number; result: string; duration: string }>;
+    state: StateOption;
     db_error?: { broadcast_id?: string };
   }
