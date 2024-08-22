@@ -174,8 +174,8 @@ export type Timezone = {
 export type Settings = {
   amd_detection: ZeroOrOne;
   call_speed: CallSpeed;
-  call_window_end?: string;
-  call_window_start?: string;
+  call_window_end: string;
+  call_window_start: string;
   caller_id: string;
   chat: ZeroOrOne;
   email_on_finish: ZeroOrOne;
