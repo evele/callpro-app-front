@@ -179,14 +179,14 @@ export const useFetchDidAndTollFreeNumbers = () => {
 export const useFetchPackagesSteps = () => {
   return useQuery({
     queryKey: ['packages_steps'],
-    queryFn: () => fetchWrapper.get(GET_PACKAGE_STEPS_URL),
+    queryFn: () => getPackagesSteps(),
   })
 }
 
 export const useFetchMonthlyGroupsPlans = () => {
   return useQuery({
     queryKey: ['monthly_groups_plans'],
-    queryFn: () => fetchWrapper.get(GET_MONTHLY_GROUPS_PLANS_URL),
+    queryFn: () => getMonthlyGroupsPlans(),
   })
 }
 
@@ -194,7 +194,7 @@ export const useFetchMonthlyGroupsPlans = () => {
 export const useFetchSettings = () => {
   return useQuery({
     queryKey: ['settings'],
-    queryFn: () => fetchWrapper.get(GET_SETTINGS_DATA_URL),
+    queryFn: () => getSettings(),
     refetchOnWindowFocus: false,
   })
 }

@@ -3,7 +3,7 @@ type ChatContact = {
     contact_phone_number: string;
     name: string;
     time: string | null;
-    unread: '0' | '1';
+    unread: ZeroOrOne;
 }
 
 type validation_keys = 'all_contacts'

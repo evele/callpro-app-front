@@ -43,7 +43,7 @@ export const useSaveContact = () => {
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(UPDATE_VOICE_SETTINGS_URL,data),
+    mutationFn: (data: VoiceSettingsDataToSave) => updateVoiceSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
@@ -53,7 +53,7 @@ export const useUpdateVoiceSettings = () => {
 export const useUpdateTextSettings = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(UPDATE_TEXT_SETTINGS_URL,data),
+    mutationFn: (data: TextSettingsDataToSave) => updateTextSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
