@@ -40,6 +40,16 @@ export const useSaveContact = () => {
   })
 }
 
+export const useUploadContacts = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: FormData) => uploadContactCSV(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
 /* ----- Settings ----- */
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()

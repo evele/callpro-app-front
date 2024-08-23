@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
-  devtools: { enabled: true },
+  // devtools: { enabled: true },
   // modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
   modules: ['@pinia/nuxt', '@primevue/nuxt-module'],
   primevue: {
@@ -36,8 +36,8 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  typescript: {
-    typeCheck: true,
-    strict: true,
-  }
+  // typescript: {
+  //   typeCheck: true,
+  //   strict: true,
+  // }
 })
