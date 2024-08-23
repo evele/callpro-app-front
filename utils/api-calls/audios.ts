@@ -9,8 +9,11 @@ type FilterAudio ={
     called_from:string
 }
 
-
-
+//TODO no cambie el nombre perdon
+export type Poronga = {
+    text: string, 
+    temp: boolean    
+  }
 
 interface APIResponseConvertedAudios{
     result: boolean,

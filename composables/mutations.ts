@@ -12,7 +12,7 @@ export const useConvertTextToSpeech = () => {
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
+    mutationFn: (data:{ is_static: 0 | 1 }) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
     },
@@ -22,7 +22,7 @@ export const useCreateCallInCode = () => {
 export const useDeleteCallInCode = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(DELETE_CALL_IN_CODE_URL,data),
+    mutationFn: (data: { call_in_code_id: number }) => fetchWrapper.post(DELETE_CALL_IN_CODE_URL,data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
     },

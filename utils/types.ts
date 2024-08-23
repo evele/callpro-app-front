@@ -17,11 +17,6 @@ export interface Contact {
   numbers: PhoneNumber[]; // Array of phone numbers associated with the contact
 }
 
-export type Poronga = {
-  text: string, 
-  temp: boolean    
-}
-
 export type Tts_Convert = {
   full_file_url:string,
   file_name: string

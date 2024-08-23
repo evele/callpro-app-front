@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/vue-query'
-import type { StateOption } from '~/utils/api-calls';
 
 function sleep(ms:number) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -91,7 +90,7 @@ export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
 export const useFetchCallInCodes = () => {
   return useQuery({
     queryKey: ['call_in_codes'],
-    queryFn: () => fetchWrapper.get(GET_USER_CALL_IN_CODES_URL),  
+    queryFn: ():Promise<CallInCodeResponse> => fetchWrapper.get(GET_USER_CALL_IN_CODES_URL)as Promise<CallInCodeResponse>,  
   })
 }
 

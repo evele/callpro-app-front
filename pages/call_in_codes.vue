@@ -9,15 +9,15 @@
         
         <p v-if="isLoading">Loading data...</p>
         <ul v-else>
-            <li v-for="code in userCallInCodes.user_call_in_codes" :key="code.id" style="margin: 10px 0;">
-                {{ code.call_in_code }}
-                <button type="button" @click="delete_code(code.id)">Delete code</button>
+            <li v-for="code in userCallInCodes?.user_call_in_codes" :key="code?.id" style="margin: 10px 0;">
+                {{ code?.call_in_code }}
+                <button type="button" @click="delete_code(code?.id)">Delete code</button>
             </li>
         </ul>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     
     const { data: userCallInCodes, error, isLoading, refetch } = useFetchCallInCodes()
 
@@ -28,12 +28,12 @@
     const { mutate: createCallInCode } = useCreateCallInCode()
     const { mutate: deleteCallInCode } = useDeleteCallInCode()
     
-    const create_call_in_code = (value) => {
+    const create_call_in_code = (value: 0 | 1) => {
         const data = { is_static: value }
         createCallInCode(data)
     }
 
-    const delete_code = (id) => {
+    const delete_code = (id: number) => {
         const code_id = { call_in_code_id: id }
         deleteCallInCode(code_id)
     }
