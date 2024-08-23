@@ -7,9 +7,12 @@ type ContactFilter = {
     filter:string,
 }
 
-interface APIResponse {
+type validation_keys = 'page' | 'limit' | 'with_groups' | 'is_custom_group' | 'group_id' | 'dnc' | 'filter'
+
+type APIResponse = {
     result: boolean,
     contacts: Contact[]
+    validation_error?: Record<validation_keys,string>
 }
 
 export async function getAllContacts(data:ContactFilter):Promise<Contact[] | null>{

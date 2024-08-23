@@ -5,9 +5,9 @@ export type UserCallInCode = {
     date: string;
 }
 
+
 export type CallInCodeResponse = {
     result: boolean;
-    user_call_in_codes: UserCallInCode[];
-    validation_error?: { [key: string]: string };
+    user_call_in_codes: UserCallInCode[];    
     db_error?:string;
 }

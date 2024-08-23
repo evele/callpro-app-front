@@ -29,10 +29,12 @@ export type Broadcast = {
     TRANSFERRED: string;
     INVALID: string;
 }
+type validation_keys = 'broadcast_id' | 'state' | 'length_limit' | 'start_limit' | 'search'
 
 export type BroadcastResponse = {
 result: boolean;
 broadcast: Array<{ id: number; name: string }>;
+validation_error?: Record<validation_keys,string>
 db_error?: { broadcast_id?: string };
 }
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
@@ -64,10 +66,12 @@ export type BroadcastDetails ={
 	transfer_duration:  string| null;
 }
 
+
 export type BroadcastDetailResponse = {
     result: boolean;
     results_count: number;
     broadcast_details: BroadcastDetails[];//Array<{ id: number; broadcast_id: number; result: string; duration: string }>;
     state: StateOption;
+    validation_error?: Record<validation_keys,string>
     db_error?: { broadcast_id?: string };
   }
