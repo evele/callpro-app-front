@@ -1,3 +1,4 @@
+export type SelectOption = { name: string; code: string | number };
 // Interface for a phone number and its associated groups
 export interface PhoneNumber {
     number_id: string; // Unique identifier for the number

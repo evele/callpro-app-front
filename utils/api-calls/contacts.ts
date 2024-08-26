@@ -20,22 +20,16 @@ export async function getAllContacts(data:ContactFilter):Promise<Contact[] | nul
 
 
 /* ----- Upload Contact ----- */
-type save_contact_validation_fields = 'id' | 'number' | 'type' | 'notes';
-
-type save_contact_validation_keys = 
-    'action' | 
-    'save_contact' |
-    `contact_info[numbers][${number}][${save_contact_validation_fields}]` |
-    `contact_info[numbers][${number}][number_groups][${number}]`;
+type upload_contact_validation_keys = 'from_broadcast' | 'group_id' | 'save_contact';
 
 type UploadContactAPIResponse = {
     result: boolean;
-    validation_error? : Record<save_contact_validation_keys, string>
-    db_error?: string
+    // contact?: uploadedContact; //TODO: Define uploadedContact
+    validation_error? : Record<upload_contact_validation_keys, string>;
+    db_error?: string;
 }
 
-export async function uploadContactCSV(data: FormData): Promise<UploadContactAPIResponse>{
-    console.log('llega')
+export async function uploadContactCSV(data): Promise<UploadContactAPIResponse> {
     const response = await fetchWrapper.post(UPLOAD_CONTACT_CSV_URL, data) 
     return response as UploadContactAPIResponse
 }
