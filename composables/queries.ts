@@ -213,3 +213,16 @@ export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_gr
     queryFn: () => getAllContacts(dataToSend.value), 
   })
 }
+
+
+export function useFetchDownloadContacts(group_id:Ref<string>,enabled: boolean = true) {  
+  const dataToSend = computed(() => ({
+    group_id: group_id.value
+  }));
+
+  return useQuery({
+    queryKey: ['download_contacts_file', dataToSend.value],
+    queryFn: () => downloadContactsFile(dataToSend.value),
+    enabled,
+  });
+}
