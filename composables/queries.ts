@@ -31,9 +31,9 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
 }
   
 /* ----- Dashboard ----- */
-export const useFetchGetBroadcastList = (selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
+export const useFetchGetBroadcastList = (selected_tab:Ref<BroadcastDashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
-    length_limit: show.value,
+    length_limit: show.value.code,
     load_all: false,
     search: search.value,
     start_limit: "0", // It'll be dynamic when we implement pagination
@@ -42,7 +42,7 @@ export const useFetchGetBroadcastList = (selected_tab:Ref<string>, show:Ref<numb
 
   return useQuery({
     queryKey: ['broadcast_list', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_BROADCAST_LIST_URL, dataToSend.value), 
+    queryFn: () => getBroadcastList(dataToSend.value), 
   })
 }
 
@@ -100,7 +100,7 @@ export const useFetchCallInCodes = () => {
 export const useFetchCallerID = () => {
   return useQuery({
     queryKey: ['caller_id'],
-    queryFn: () => fetchWrapper.get(GET_CALLER_IDS_URL),  
+    queryFn: () => getCallerID()
   })
 }
 
@@ -108,24 +108,40 @@ export const useFetchCallerID = () => {
 export const useFetchUnreadMessages = () => {
   return useQuery({
     queryKey: ['unread_chat_messages'],
-    queryFn: () => fetchWrapper.get(GET_UNREAD_MESSAGES_URL),
+    queryFn: () => getUnreadMessages(),
   })
 }
 
 export const useFetchChatContacts = (data:Ref<boolean>) => {
-  const dataToSend = computed(() => ({ all_contacts: data.value ? '1' : '2' }))
+  type fnProps = { all_contacts: '1' | '2' };
+  const dataToSend = computed((): fnProps => ({ all_contacts: data.value ? '1' : '2' }))
   return useQuery({
     queryKey: ['chat_contacts', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_CHAT_CONTACTS_URL, dataToSend.value),
+    queryFn: () => getChatContacts(dataToSend.value)
   })
 }
 
 /* ----- Contacts ----- */
-export const useFetchContact = (contact_id:Ref<number>) => {
+export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_groups:Ref<boolean>,is_custom_group:Ref<boolean>,group_id:Ref<string>,filter:Ref<string>){
+  const dataToSend = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    with_groups: with_groups.value, // TODO: review this
+    is_custom_group:is_custom_group.value, 
+    group_id:group_id.value,
+    filter:filter.value,
+  }))
+  return useQuery({
+    queryKey: ['all_contacts', dataToSend],
+    queryFn: () => getAllContacts(dataToSend.value), 
+  })
+}
+
+export const useFetchContact = (contact_id:Ref<string>) => {
   const id = computed(() => ({ contact_id: contact_id.value }));
   return useQuery({
     queryKey: ['contact', id],
-    queryFn: () => fetchWrapper.post(GET_CONTACT_URL, id.value),
+    queryFn: () => getContact(id.value),
     enabled: false
   })
 }
@@ -133,21 +149,21 @@ export const useFetchContact = (contact_id:Ref<number>) => {
 export const useFetchUserCustomGrups = () => {
   return useQuery({
     queryKey: ['user_custom_groups'],
-    queryFn: () => fetchWrapper.get(GET_USER_CUSTOM_GROUPS_URL),
+    queryFn: () => getUserCustomGroups(),
   })
 }
 
 export const useFetchGetSystemGroups = () => {
   return useQuery({
     queryKey: ['system_groups'],
-    queryFn: () => fetchWrapper.get(GET_SYSTEM_GROUPS_URL),
+    queryFn: () => getSystemGroups(),
   })
 }
 
 export const useFetchGetCustomGroups = () => {
   return useQuery({
     queryKey: ['custom_groups'],
-    queryFn: () => fetchWrapper.get(GET_CUSTOM_GROUPS_URL),
+    queryFn: () => getCustomGroups(),
   })
 }
 
@@ -155,7 +171,7 @@ export const useFetchGetCustomGroups = () => {
 export const useFetchDidAndTollFreeNumbers = () => {
   return useQuery({
     queryKey: ['did_and_toll_free_numbers'],
-    queryFn: () => fetchWrapper.get(GET_DID_AND_TOLL_FREE_NUMBERS_URL),
+    queryFn: () => getDidAndTollFreeNumbers(),
   })
 }
 
@@ -163,14 +179,14 @@ export const useFetchDidAndTollFreeNumbers = () => {
 export const useFetchPackagesSteps = () => {
   return useQuery({
     queryKey: ['packages_steps'],
-    queryFn: () => fetchWrapper.get(GET_PACKAGE_STEPS_URL),
+    queryFn: () => getPackagesSteps(),
   })
 }
 
 export const useFetchMonthlyGroupsPlans = () => {
   return useQuery({
     queryKey: ['monthly_groups_plans'],
-    queryFn: () => fetchWrapper.get(GET_MONTHLY_GROUPS_PLANS_URL),
+    queryFn: () => getMonthlyGroupsPlans(),
   })
 }
 
@@ -178,7 +194,7 @@ export const useFetchMonthlyGroupsPlans = () => {
 export const useFetchSettings = () => {
   return useQuery({
     queryKey: ['settings'],
-    queryFn: () => fetchWrapper.get(GET_SETTINGS_DATA_URL),
+    queryFn: () => getSettings(),
     refetchOnWindowFocus: false,
   })
 }
@@ -196,20 +212,5 @@ export const useFetchSms = (selected_tab:Ref<string>, show:Ref<number>, search:R
     queryKey: ['sms_list', dataToSend],
     queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
 
-  })
-}  
-  /* ----- Contacts ----- */
-export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_groups:Ref<boolean>,is_custom_group:Ref<boolean>,group_id:Ref<string>,filter:Ref<string>){
-  const dataToSend = computed(() => ({
-    page: page.value,
-    limit: limit.value,
-    with_groups: with_groups.value, // TODO: review this
-    is_custom_group:is_custom_group.value, 
-    group_id:group_id.value,
-    filter:filter.value,
-  }))
-  return useQuery({
-    queryKey: ['all_contacts', dataToSend],
-    queryFn: () => getAllContacts(dataToSend.value), 
   })
 }
