@@ -58,6 +58,37 @@ export type ContactToSaveData = {
   save_contact: boolean
 }
 
+export type ContactUploadedData = {
+  contact_id: number;
+  first_name: string;
+  last_name: string;
+  valid: boolean;
+  validation_desc: string;
+  numbers: {
+    notes: string;
+    number: number;
+    number_groups: string[];
+    type: OneToFour;
+    valid: boolean;
+    validation_desc: string;
+    number_id: -1;
+    in_trash: 0;
+    dnc: 0;
+  }[];
+}
+
+export type uploadedContactToSave = {
+  first_name: string;
+  last_name: string;
+  number: string;
+  contact_id: string;
+};
+
+export type uploadedContactToSaveData = {
+  contact: uploadedContactToSave[];
+  group_id: string;
+}
+
 export type UserCustomGroup = {
   audio_name: string | null,
   group_code: number | '',

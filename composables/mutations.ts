@@ -40,16 +40,15 @@ export const useSaveContact = () => {
 }
 
 export const useUploadContact = () => {
-  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => uploadContactCSV(data)
+    mutationFn: (data: FormData) => uploadContactCSV(data)
   })
 }
 
 export const useSaveUploadedContact = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => saveUploadedContact(data),
+    mutationFn: (data: uploadedContactToSaveData) => saveUploadedContact(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
     }

@@ -5,13 +5,13 @@
         <p v-if="CGIsError" style="color: red;">Custom groups fetch failed D:</p>
                 <div v-if="CGIsSuccess" class="div-style">
                     <label>Choose group</label>
-                    <span style="color: red;" v-if="!userCustomGroups.result">Custom groups fetch failed D:</span>
+                    <span style="color: red;" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
                     <select v-else v-model="selectedGroup">
-                        <option v-if="!userCustomGroups.custom_groups.length" :value="null">No results found.</option>
+                        <option v-if="!userCustomGroups?.custom_groups?.length" :value="null">No results found.</option>
                         <option value="all">All</option>
                         <option value="unassigned">Unassigned</option>
                         <option value="trash">Trash</option>
-                        <option v-if="userCustomGroups.custom_groups.length" v-for="group in userCustomGroups.custom_groups" :value="group.id">{{ group.group_name }}</option>
+                        <option v-if="userCustomGroups?.custom_groups?.length" v-for="group in userCustomGroups?.custom_groups" :value="group?.id">{{ group?.group_name }}</option>
                     </select>
                 </div>
 
@@ -58,13 +58,13 @@
             </div>
 
             <button class="button is-primary" @click="save_contact">Save Contact</button>
+
+            <p style="color: green;" v-if="savedSuccess">Contact saved!</p>
         </section>
     </div>
 </template>
 
 <script setup lang="ts">
-    const primevue = usePrimeVue();
-
     const selectedGroup: Ref<SelectOption['name']> = ref('all');
 
     const first_name: Ref<string> = ref('');
@@ -76,25 +76,44 @@
     const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData } = useUploadContact();
     const { mutate: saveUploadedContact, isSuccess: savedSuccess } = useSaveUploadedContact();
 
-    const onRemoveTemplatingFile = (removeFileCallback, index) => {
+    const onRemoveTemplatingFile = (removeFileCallback: (index: number) => void, index: number) => {
         removeFileCallback(index);
     }
 
-    const uploadEvent = (file) => {
-        const uploadedContact = new FormData();
+    type UploadContactData = {
+        file: File;
+        from_broadcast: string;
+        save_contact: string;
+        group_id: string;
+    };
 
-        uploadedContact.append('file', file[0]);
-        uploadedContact.append('from_broadcast', 'false');
-        uploadedContact.append('save_contact', 'true');
-        uploadedContact.append('group_id', selectedGroup.value);
+    // Did this to help ts understand the data
+    const createFormData = (data: UploadContactData): FormData => {
+        const formData = new FormData();
+        formData.append('file', data.file);
+        formData.append('from_broadcast', data.from_broadcast);
+        formData.append('save_contact', data.save_contact);
+        formData.append('group_id', data.group_id);
+        return formData;
+    };
 
-        uploadContact(uploadedContact, {
-            onSuccess: (data) => {
+    const uploadEvent = (file: File[]) => {
+        const data: UploadContactData = {
+            file: file[0],
+            from_broadcast: 'false',
+            save_contact: 'true',
+            group_id: selectedGroup.value
+        };
+
+        const data_to_send = createFormData(data);
+
+        uploadContact(data_to_send, {
+            onSuccess: (data: UploadContactAPIResponse) => {
                 if(data.result) {
-                    first_name.value = data.contact.first_name;
-                    last_name.value = data.contact.last_name;
-                    group_id.value = data.group_id;
-                    data.contact.numbers.forEach((number: any) => {
+                    first_name.value = data?.contact?.first_name || '';
+                    last_name.value = data?.contact?.last_name || '';
+                    group_id.value = data?.group_id || 'all';
+                    data?.contact?.numbers.forEach((number: any) => {
                         numbers.value.push(number.number)
                     });
                 }
@@ -105,10 +124,10 @@
     const formatSize = (bytes: number) => {
         const k = 1024;
         const dm = 3;
-        const sizes = primevue.config.locale.fileSizeTypes;
+        const sizes = ['B', 'KB', 'MB'];
 
         if (bytes === 0) {
-            return `0 ${sizes[0]}`;
+            return '0 B';
         }
 
         const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -118,14 +137,7 @@
     };
 
     const save_contact = () => {
-        type ContactToSave = {
-            first_name: string;
-            last_name: string;
-            number: string;
-            contact_id: string;
-        }
-
-        const contact_to_save: ContactToSave[] = []
+        const contact_to_save: uploadedContactToSave[] = []
 
         numbers.value.forEach((number: string) => {
             contact_to_save.push({
@@ -136,7 +148,7 @@
             });
         });
 
-        const data_to_send = {
+        const data_to_send: uploadedContactToSaveData = {
             contact: contact_to_save,
             group_id: group_id.value
         }

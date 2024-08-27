@@ -73,12 +73,13 @@ type upload_contact_validation_keys = 'from_broadcast' | 'group_id' | 'save_cont
 
 export type UploadContactAPIResponse = {
     result: boolean;
-    // contact?: uploadedContact; //TODO: Define uploadedContact
+    contact?: ContactUploadedData;
+    group_id?: string;
     validation_error? : Record<upload_contact_validation_keys, string>;
     db_error?: string;
 }
 
-export async function uploadContactCSV(data): Promise<UploadContactAPIResponse> {
+export async function uploadContactCSV(data: FormData): Promise<UploadContactAPIResponse> {
     const response = await fetchWrapper.post(UPLOAD_CONTACT_CSV_URL, data) 
     return response as UploadContactAPIResponse
 }
@@ -88,12 +89,10 @@ type save_uploaded_contact_validation_keys = `contact[${number}][number]` | 'gro
 
 export type SaveUploadedContactAPIResponse = {
     result: boolean;
-    // contact?: uploadedContact; //TODO: Define uploadedContact
     validation_error? : Record<save_uploaded_contact_validation_keys, string>;
-    db_error?: string;
 }
 
-export async function saveUploadedContact(data): Promise<SaveUploadedContactAPIResponse> {
+export async function saveUploadedContact(data: uploadedContactToSaveData): Promise<SaveUploadedContactAPIResponse> {
     const response = await fetchWrapper.post(SAVE_UPLOADED_CONTACT_URL, data) 
     return response as SaveUploadedContactAPIResponse
 }
