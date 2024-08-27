@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     }
   },
   css: [
-    '@/assets/styles/main.scss'
+    '@/assets/sass/main.scss'
   ],
   app: {
     head: {
@@ -39,8 +39,9 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
+  /*
   typescript: {
     typeCheck: true,
     strict: true,
-  } 
+  } */
 })

@@ -5,27 +5,37 @@ $beige-light: #d0d1cd;
 $beige-lighter: #eff0eb;
 // $family-sans-serif: "Roboto", sans-serif;
 
-
-@use "bulma/sass" with (
-  // $family-primary: '"Roboto", sans-serif',
+// @use "bulma/sass" with (
+@use "bulma/sass/utilities" with (
   $grey-dark: $brown,
   $grey-light: $beige-light,
   $primary: $purple,
   $link: $purple,
   $control-border-width: 2px,
-  $input-shadow: none,
+  // $input-shadow: none,
   
-  $button-border-style: "dotted",
-  $button-border-color: "#ffffff",
-  $button-border-width: 2px
+  // $button-border-style: "dotted",
+  // $button-border-color: "#ffffff",
+  // $button-border-width: 2px
   );
 
-
-  // @import 'fonts';
+  @forward "bulma/sass/base";
+  @forward "bulma/sass/helpers";
+/*
+  @forward "bulma/sass/elements";
+  @forward "bulma/sass/components";
+  @forward "bulma/sass/form";
+  */
+  // @forward "bulma/sass/themes";
   
-  @import url("https://fonts.googleapis.com/css?family=Roboto:400,700");
+  @forward 'fonts';
+  
+  // @import url("https://fonts.googleapis.com/css?family=Roboto:400,700");
+  
   
   :root {
-  --bulma-family-primary: 'Roboto', sans-serif;
-}
+    --bulma-family-primary: 'Roboto';
+    --bulma-body-size: 1.2rem;
+  } 
+  
 

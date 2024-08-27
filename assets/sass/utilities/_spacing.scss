@@ -1,0 +1,70 @@
+// _spacing.scss
+
+// Variables de espacio
+$spacing-small: 0.5rem;
+$spacing-medium: 1rem;
+$spacing-large: 2rem;
+
+// Utilidades para margen
+@mixin generate-margin-utilities() {
+  @for $i from 1 through 4 {
+    .m-#{$i} {
+      margin: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .mt-#{$i} {
+      margin-top: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .mr-#{$i} {
+      margin-right: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .mb-#{$i} {
+      margin-bottom: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .ml-#{$i} {
+      margin-left: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+  }
+  .m-auto {
+    margin: auto;
+  }
+  .mt-auto {
+    margin-top: auto;
+  }
+  .mb-auto {
+    margin-bottom: auto;
+  }
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .my-auto {
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+
+}
+
+// Utilidades para padding
+@mixin generate-padding-utilities() {
+  @for $i from 1 through 4 {
+    .p-#{$i} {
+      padding: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .pt-#{$i} {
+      padding-top: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .pr-#{$i} {
+      padding-right: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .pb-#{$i} {
+      padding-bottom: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+    .pl-#{$i} {
+      padding-left: nth(($spacing-small, $spacing-medium, $spacing-large, auto), $i);
+    }
+  }
+}
+
+// Generar clases
+@include generate-margin-utilities();
+@include generate-padding-utilities();
