@@ -17,7 +17,7 @@
 
         <div class="card has-background-grey-dark has-text-white py-2 px-4" style="width: 50%;">
             <Toast />
-            <FileUpload name="file" @upload="onAdvancedUpload($event)" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000">
+            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000">
                 <template #header="{ files }">
                         <Button @click="uploadEvent(files)" class="button is-primary" :class="[!files || files.length === 0 ? 'is-hidden' : 'is-block']">Upload</Button>
                 </template>
@@ -46,31 +46,39 @@
                 </template>
             </FileUpload>
         </div>
+
+        <section v-if="uploadedSuccess && uploadedData?.result">
+            <div>
+                <h3 class="has-text-primary has-text-weight-semibold mb-2">Contact to save</h3>
+                <p class="has-text-primary">First name: {{ uploadedData?.contact?.first_name }}</p>
+                <p class="has-text-primary">Last name: {{ uploadedData?.contact?.last_name }}</p>
+                <p class="has-text-primary" v-if="uploadedData?.contact?.numbers?.length" v-for="number in uploadedData?.contact?.numbers" :key="number?.number">
+                    Number: {{ number?.number }}
+                </p>
+            </div>
+
+            <button class="button is-primary" @click="save_contact">Save Contact</button>
+        </section>
     </div>
 </template>
 
 <script setup lang="ts">
-    const toast = useToast();
     const primevue = usePrimeVue();
 
     const selectedGroup: Ref<SelectOption['name']> = ref('all');
 
+    const first_name: Ref<string> = ref('');
+    const last_name: Ref<string> = ref('');
+    const group_id: Ref<string> = ref('');
+    const numbers: Ref<string[]> = ref([]);
+
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
-    const { mutate: uploadContact } = useUploadContacts();
+    const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData } = useUploadContact();
+    const { mutate: saveUploadedContact, isSuccess: savedSuccess } = useSaveUploadedContact();
 
     const onRemoveTemplatingFile = (removeFileCallback, index) => {
         removeFileCallback(index);
-    };
-
-    const onTemplatedUpload = () => {
-        toast.add({ severity: "primary", summary: "Success", detail: "File Uploaded", life: 3000 });
-    };
-
-    const onAdvancedUpload = (event) => {
-        toast.add({ severity: "primary", summary: "Success", detail: "File Uploaded", life: 3000 });
-        console.log(JSON.parse(event.xhr.response));
-    };
-
+    }
 
     const uploadEvent = (file) => {
         const uploadedContact = new FormData();
@@ -80,7 +88,18 @@
         uploadedContact.append('save_contact', 'true');
         uploadedContact.append('group_id', selectedGroup.value);
 
-        uploadContact(uploadedContact);
+        uploadContact(uploadedContact, {
+            onSuccess: (data) => {
+                if(data.result) {
+                    first_name.value = data.contact.first_name;
+                    last_name.value = data.contact.last_name;
+                    group_id.value = data.group_id;
+                    data.contact.numbers.forEach((number: any) => {
+                        numbers.value.push(number.number)
+                    });
+                }
+            }
+        });
     };
 
     const formatSize = (bytes: number) => {
@@ -97,4 +116,31 @@
 
         return `${formattedSize} ${sizes[i]}`;
     };
+
+    const save_contact = () => {
+        type ContactToSave = {
+            first_name: string;
+            last_name: string;
+            number: string;
+            contact_id: string;
+        }
+
+        const contact_to_save: ContactToSave[] = []
+
+        numbers.value.forEach((number: string) => {
+            contact_to_save.push({
+                first_name: first_name.value,
+                last_name: last_name.value,
+                number: number,
+                contact_id: 'fake-1'
+            });
+        });
+
+        const data_to_send = {
+            contact: contact_to_save,
+            group_id: group_id.value
+        }
+
+        saveUploadedContact(data_to_send)
+    }
 </script>

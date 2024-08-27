@@ -22,7 +22,7 @@ export async function getAllContacts(data:ContactFilter):Promise<Contact[] | nul
 /* ----- Upload Contact ----- */
 type upload_contact_validation_keys = 'from_broadcast' | 'group_id' | 'save_contact';
 
-type UploadContactAPIResponse = {
+export type UploadContactAPIResponse = {
     result: boolean;
     // contact?: uploadedContact; //TODO: Define uploadedContact
     validation_error? : Record<upload_contact_validation_keys, string>;
@@ -32,4 +32,19 @@ type UploadContactAPIResponse = {
 export async function uploadContactCSV(data): Promise<UploadContactAPIResponse> {
     const response = await fetchWrapper.post(UPLOAD_CONTACT_CSV_URL, data) 
     return response as UploadContactAPIResponse
+}
+
+/* ----- Save Uploaded Contact ----- */
+type save_uploaded_contact_validation_keys = `contact[${number}][number]` | 'group_id';
+
+export type SaveUploadedContactAPIResponse = {
+    result: boolean;
+    // contact?: uploadedContact; //TODO: Define uploadedContact
+    validation_error? : Record<save_uploaded_contact_validation_keys, string>;
+    db_error?: string;
+}
+
+export async function saveUploadedContact(data): Promise<SaveUploadedContactAPIResponse> {
+    const response = await fetchWrapper.post(SAVE_UPLOADED_CONTACT_URL, data) 
+    return response as SaveUploadedContactAPIResponse
 }
