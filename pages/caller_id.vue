@@ -2,17 +2,18 @@
     <div>
         <p class="text-title">Caller Ids page</p>
         <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error.message }}</span>
-        <button type="button" @click="load_numbers">Load numbers</button>
+        <span v-else-if="isError">Error: {{ error?.message }}</span>
+        <Button label="Reload numbers" icon="pi pi-refresh" class="button is-info" @click="load_numbers" />
         <ul v-if="isSuccess">
-            <li v-for="number in data.caller_ids" :key="number">
+            <li v-if="data?.result" v-for="number in data?.caller_ids" :key="number?.id">
                 {{ number.caller_id }}
             </li>
+            <span v-else>{{ data?.db_error }}</span>
         </ul>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     const { data, error, isSuccess, isLoading, isError, refetch } = useFetchCallerID()
     
     const load_numbers = () => {

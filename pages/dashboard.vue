@@ -11,14 +11,14 @@
   </ul>
 
   <div class="filter-container">
-    <div>
-      <label for="show" style="margin-right: 6px;">Show:</label>
-      <select name="show" id="show" v-model="show">
-        <option value="10">10</option>
-        <option value="25">25</option>
-        <option value="50">50</option>
-        <option value="100">100</option>
-      </select>
+    <div style="width: 75px;">
+      <Select v-model="selected_items_per_page" :options="select_options" optionLabel="name" class="p-2 is-flex is-justify-content-space-between is-fullwidth has-background-white has-text-grey-darker">
+        <template #option="slotProps">
+          <div class="has-background-white">
+            <span class="p-2 has-text-grey-darker">{{ slotProps.option.name }}</span>
+          </div>
+        </template>
+      </Select>
     </div>
 
     <div>
@@ -28,15 +28,15 @@
   </div>
 
   <p v-if="isLoading">Loading broadcasts...</p>
-  <p v-if="isError">{{ error.message }}</p>
+  <p v-if="isError">{{ error?.message }}</p>
   <ul v-if="isSuccess">
-    <li v-for="broadcast in data.broadcast_list" :key="broadcast.id" style="margin: 10px 0;">
+    <li v-if="data?.result" v-for="broadcast in data?.broadcast_list" :key="broadcast?.broadcast_id" style="margin: 10px 0;">
       <span style="font-weight: 600; margin-right: 6px;">Broadcast name:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.name }}</span> 
       <span style="font-weight: 600; margin-right: 6px;">Broadcast ID:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.broadcast_id }}</span> 
     </li>
   </ul>
 </template>
-<script setup>
+<script setup lang="ts">
   import { useAuthStore } from "@/stores"
 
   const authStore = useAuthStore()
@@ -44,18 +44,25 @@
     authStore.logout()
   }
 
-  const tab_options = [COMPLETED, ACTIVE, DRAFT]
-  const selected_tab = ref(COMPLETED)
-  const show = ref('10')
+  const tab_options: BroadcastDashboardState[] = [COMPLETED, ACTIVE, DRAFT]
+  const selected_tab: Ref<BroadcastDashboardState> = ref(COMPLETED)
+  const select_options: Ref<ItemsPerPageOption[]> = ref([
+    { name: '10', code: 10 },
+    { name: '25', code: 25 },
+    { name: '50', code: 50 },
+    { name: '100', code: 100 }
+  ])
+  const selected_items_per_page: Ref<ItemsPerPageOption> = ref({ name: '10', code: 10 })
   const search = ref('')
 
-  const { data, isLoading, isSuccess, isError, error } = useFetchGetBroadcastList(selected_tab, show, search)
+  const { data, isLoading, isSuccess, isError, error } = useFetchGetBroadcastList(selected_tab, selected_items_per_page, search)
 
-  let searchDebounce = null
-  const debounceSearch = (e) => {
+  let searchDebounce: ReturnType<typeof setTimeout>
+  const debounceSearch = (e: Event) => {
     clearTimeout(searchDebounce)
     searchDebounce = setTimeout(() => {
-      search.value = e.target.value
+      const target = e.target as HTMLInputElement;
+      search.value = target.value
     }, 500)
   }
 </script>

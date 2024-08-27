@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
-
 /* ----- Audios ----- */
 export const useConvertTextToSpeech = () => {
   return useMutation({
@@ -33,7 +32,7 @@ export const useDeleteCallInCode = () => {
 export const useSaveContact = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(SAVE_CONTACT_URL, data),
+    mutationFn: (data: ContactToSaveData) => saveContact(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
     }
@@ -61,7 +60,7 @@ export const useSaveUploadedContact = () => {
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(UPDATE_VOICE_SETTINGS_URL,data),
+    mutationFn: (data: VoiceSettingsDataToSave) => updateVoiceSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
@@ -71,7 +70,7 @@ export const useUpdateVoiceSettings = () => {
 export const useUpdateTextSettings = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data) => fetchWrapper.post(UPDATE_TEXT_SETTINGS_URL,data),
+    mutationFn: (data: TextSettingsDataToSave) => updateTextSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
