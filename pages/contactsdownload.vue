@@ -20,7 +20,7 @@
 <script setup lang="ts">
 const tab_options = [CONTACTS_ALL, UNASSIGNED, TRASH]
 const selected_tab = ref(CONTACTS_ALL);
-const { refetch,isLoading,isError } = useFetchDownloadContacts(selected_tab, false)
+const { refetch,isLoading,isError,error } = useFetchDownloadContacts(selected_tab, false)
 
 const downloadContacts = () => {
   refetch();
