@@ -1,10 +1,17 @@
 <template>
     <div>
         <p class="text-title">Audios page</p>
-        <button type="button" @click="load_numbers">Load audios</button>
+        <button type="button" @click="load_audios">Load audios</button>
+        <span v-if="loadingAllAudios">Loading audios...</span>
+        <ul v-if="isSuccess">
+            <li v-for="audio in allAudiosData?.audios" :key="audio.id">
+                {{ audio?.id }} - {{ audio?.name }}
+            </li>
+        </ul> 
         <div class="container-div">
-            <p>Show older audios</p>
-            <input type="checkbox" v-model="show_older">
+            <label>Show older audios
+                <input type="checkbox" v-model="show_older">
+            </label>
         </div>
         <div>
             <h3>Write some text and convert it to speech.</h3>
@@ -24,23 +31,23 @@
 
 <script setup>
     import { useAudiosStore } from "@/stores"
+    import { useQueryClient, useQuery } from '@tanstack/vue-query'
 
-    const audiosStore = useAudiosStore()
-    const show_older = ref(false)
+    const queryClient = useQueryClient()
+
+    
     const text_to_convert = ref('')
-    const isConverting = ref(false)
     const isLoading = ref(false)
-
+    
     const audio_id = ref(null)
     const audio_url = ref(null)
-
-    onMounted(async() => {
-        await audiosStore.getAudios()
-    })
     
-    const load_numbers = () => {
-        audiosStore.getAudios(show_older.value)   
-    }
+    
+    const show_older = ref(false)
+    
+    const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
+    const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
+    const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, CALLPRO_APP_FRONT)
 
     const convert_Text = async () => {
         audio_id.value = null
@@ -53,37 +60,20 @@
 
         const dataToSend = {
             text: text_to_convert.value.trim(),
-            temp: 'false'
+            temp: false
         }
 
-        isConverting.value = true
-        const res = await audiosStore.convertTextToSpeech(dataToSend)
-        isConverting.value = false
-
-        if(res.result) {
-            audio_id.value = 'preview_tts'
-            audio_url.value = res.data.full_file_url
-        } else {
-            console.log(res.db_error)
-        }
+        createTextToSpeech(dataToSend, {
+            onSuccess: (data) => {
+                audio_id.value = PREVIEW_TTS
+                audio_url.value = data.full_file_url
+            }
+        })
+        
     }
 
-    const fetch_audio_data = async () => {
-        const dataToSend = {
-            audio_id: audio_id.value,
-            audio_full_url: audio_url.value,
-            called_from: "callpro-app-front"
-        }
-
-        isLoading.value = true
-        const res = await audiosStore.getAudio(dataToSend)
-        isLoading.value = false
-
-        if(res.result) {
-            console.log(res.data)
-        } else {
-            console.log(res.db_error)
-        }
+    const fetch_audio_data = () => {
+        refetchAudioData()
     }
 </script>
 

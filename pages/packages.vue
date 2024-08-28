@@ -1,21 +1,20 @@
 <template>
     <div>
-        <p class="text-title">Packages page</p>
-        <button type="button" @click="load_steps">Load steps</button>
+        <p class="text-title" style="color: green;">Packages page</p>
+        <button type="button" class="button is-primary" @click="load_steps">Load steps</button>
     </div>
 </template>
 
-<script setup>
-    import { usePackagesStore } from "@/stores"
+<script setup lang="ts">
+    import { useQueryClient } from '@tanstack/vue-query'
 
-    const packagesStore = usePackagesStore()
+    const queryClient = useQueryClient()
 
-    onMounted(async() => {
-        await packagesStore.getPackagesSteps()
-    })
-    
-    const load_settings = () => {
-        packagesStore.getPackagesSteps()
+    const { data: packagesStepsData } = useFetchPackagesSteps()
+    const { data: MonthlyGroupsPlansData } = useFetchMonthlyGroupsPlans()
+
+    const load_steps = () => {
+        queryClient.invalidateQueries({ queryKey: [PACKAGES_STEPS] });
     }
 </script>
 
