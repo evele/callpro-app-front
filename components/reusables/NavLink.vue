@@ -1,7 +1,7 @@
 <template>
     <li class="nav-link" :class="is_active(route)">
         <NuxtLink :to="route" :class="is_active(route)">
-            <component :is="svg" />
+            <component :is="icon" />
             <span>{{ name }}</span>
         </NuxtLink>
     </li>
@@ -11,7 +11,7 @@
     const props = defineProps({
         route: { type: String, required: true },
         name: { type: String, required: true },
-        svg: { type: Object, required: true },
+        icon: { type: Object, required: true },
     });
 
     const router = useRouter();

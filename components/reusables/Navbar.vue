@@ -2,7 +2,7 @@
     <aside class="menu flex flex-col">
       <div class="logo p-4">Aca el logo</div>
       <ul class="menu-list">
-        <NavLink v-for="link in LINKS" :key="link.name" :name="link.name" :route="link.route" :svg="link.svg" />
+        <NavLink v-for="link in LINKS" :key="link.name" :name="link.name" :route="link.route" :icon="link.icon" />
       </ul>
       <ul class="menu-list mt-8 mb-auto">
         <li>
@@ -46,15 +46,15 @@
   type NavLink = {
     name: string
     route: string
-    svg: object
+    icon: object
   }
 
   const LINKS: NavLink[] = [
-    { name: "Dashboard", route: "dashboard", svg: AudioSVG },
-    { name: "Chat", route: "chat", svg: AudioSVG },
-    { name: "Contacts", route: "contacts", svg: AudioSVG },
-    { name: "Library", route: "#", svg: AudioSVG },
-    { name: "Billing", route: "billing", svg: AudioSVG },
+    { name: "Dashboard", route: "dashboard", icon: AudioSVG },
+    { name: "Chat", route: "chat", icon: AudioSVG },
+    { name: "Contacts", route: "contacts", icon: AudioSVG },
+    { name: "Library", route: "#", icon: AudioSVG },
+    { name: "Billing", route: "billing", icon: AudioSVG },
   ]
 </script>
 <style>
