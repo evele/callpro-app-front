@@ -3,8 +3,7 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
-  devtools: { enabled: true },
-  // modules: ['@pinia/nuxt',"@hebilicious/vue-query-nuxt"],
+  devtools: { enabled: false },
   modules: ['@pinia/nuxt', '@primevue/nuxt-module'],
   primevue: {
     /* Configuration */
@@ -14,12 +13,16 @@ export default defineNuxtConfig({
     }
   },
   css: [
-    '@/assets/main.scss', // Adjust the path if you named your file differently
+    '@/assets/sass/main.scss'
   ],
   app: {
     head: {
       title: "The Callpro App",
       meta: [{ name: "description", content: "The Callpro App Application" }],
+      htmlAttrs: {
+        "data-theme":"light",
+        lang: 'en',
+      },
     },
   },
   runtimeConfig: {
@@ -39,5 +42,5 @@ export default defineNuxtConfig({
   typescript: {
     typeCheck: true,
     strict: true,
-  }
+  } 
 })

@@ -1,11 +1,11 @@
 <template>
     <div>
-        <p class="text-title">Packages page</p>
-        <button type="button" @click="load_steps">Load steps</button>
+        <p class="text-title" style="color: green;">Packages page</p>
+        <button type="button" class="button is-primary" @click="load_steps">Load steps</button>
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import { useQueryClient } from '@tanstack/vue-query'
 
     const queryClient = useQueryClient()
@@ -14,7 +14,7 @@
     const { data: MonthlyGroupsPlansData } = useFetchMonthlyGroupsPlans()
 
     const load_steps = () => {
-        queryClient.invalidateQueries([PACKAGES_STEPS]);
+        queryClient.invalidateQueries({ queryKey: [PACKAGES_STEPS] });
     }
 </script>
 

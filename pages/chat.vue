@@ -1,7 +1,7 @@
 <template>
     <div>
         <p class="text-title">Chat page</p>
-        <button type="button" @click="load_data">Load data</button>
+        <Button label="Reload data" icon="pi pi-refresh" class="button is-info" @click="load_data" />
         <div class="container-div">
             <p>Get all contacts</p>
             <input type="checkbox" v-model="get_all_contacts">
@@ -9,7 +9,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import { useQueryClient } from '@tanstack/vue-query'
 
     const queryClient = useQueryClient()
@@ -20,7 +20,7 @@
     const { data: chatContactsData } = useFetchChatContacts(get_all_contacts)
     
     const load_data = () => {
-        queryClient.invalidateQueries([UNREAD_CHAT_MESSAGES]);
+        queryClient.invalidateQueries({ queryKey: [UNREAD_CHAT_MESSAGES] });
     }
 </script>
 
