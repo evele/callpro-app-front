@@ -1,6 +1,6 @@
 <template>
   <p>Logged IN :D</p>
-  <button type="button" class="button is-primary" @click=logout>Logout</button>
+  
 
   <h2 style="margin: 2rem 0 0 10px">Voice Broadcasts</h2>
   <ul class="tab-style">
@@ -37,13 +37,7 @@
   </ul>
 </template>
 <script setup lang="ts">
-  import { useAuthStore } from "@/stores"
-
-  const authStore = useAuthStore()
-  function logout() {
-    authStore.logout()
-  }
-
+  
   const tab_options: BroadcastDashboardState[] = [COMPLETED, ACTIVE, DRAFT]
   const selected_tab: Ref<BroadcastDashboardState> = ref(COMPLETED)
   const select_options: Ref<ItemsPerPageOption[]> = ref([

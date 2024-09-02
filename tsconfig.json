@@ -2,7 +2,11 @@
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
     "allowImportingTsExtensions":true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
   /*
     "noImplicitAny": true,          // Disallow implicit any types
     "strict": true,                 // Enable all strict type-checking options
@@ -14,9 +18,5 @@
     "strictBindCallApply": true,    // Enable strict `bind`, `call`, and `apply` methods
     "forceConsistentCasingInFileNames": true // Ensure consistent casing in filenames
   
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
     */
 }
