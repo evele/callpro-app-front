@@ -58,6 +58,8 @@
             <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
         </li>
     </ul>
+
+    <ContactsActionsContainer />
 </template>
 
 <script setup lang="ts">  
