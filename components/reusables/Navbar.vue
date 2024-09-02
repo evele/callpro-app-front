@@ -28,8 +28,18 @@
       <div class="menu-footer p-4">
         <hr>
         <ul class="menu-list">
-          <li><a>Settings</a></li>
-          <li><a @click=logout>Logout</a></li>
+          <li class="nav-link">
+            <a>
+              <SettingsSVG />
+              <span>Settings</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a @click=logout>
+              <LogoutSVG />
+              <span>Logout</span>
+            </a>
+          </li>
         </ul>
       </div>
   </aside>
@@ -87,6 +97,7 @@
   }
   .nav-link:hover {
     background-color: #EEEEEE;
+    cursor: pointer;
   }
 
   .nav-link--active {
