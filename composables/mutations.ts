@@ -3,9 +3,12 @@ import { useMutation, useQueryClient } from '@tanstack/vue-query'
 
 /* ----- Audios ----- */
 export const useConvertTextToSpeech = () => {
-  return useMutation({
-    mutationFn: (data:Poronga) => fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, data),
-  }) 
+  return useMutation<Tts_Convert, unknown, TextToConvert>({
+    mutationFn: async (data: TextToConvert): Promise<Tts_Convert> => {
+      const response = await fetchWrapper.post(CONVERT_TEXT_TO_SPEECH_URL, data);
+      return response as Tts_Convert;
+    },
+  });
 }
 
 /* ----- Call in codes ----- */

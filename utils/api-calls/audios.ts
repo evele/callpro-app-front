@@ -10,19 +10,20 @@ type FilterAudio ={
 }
 
 //TODO no cambie el nombre perdon
-export type Poronga = {
+export type TextToConvert = {
     text: string, 
     temp: boolean    
   }
 
-interface APIResponseConvertedAudios{
+type APIResponseConvertedAudios = {
     result: boolean,
     audios?: AudioAux[],
     db_error?: string,    
 }
-interface APIResponseAllAudios{
+type APIResponseAllAudios = {
     result: boolean,
     audios?: Audio[],
+    has_older_audios?:boolean,
     db_error?: string,
     validation_error?: Record<validation_keys,string>
 }
