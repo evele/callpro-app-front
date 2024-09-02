@@ -28,47 +28,36 @@
       <div class="menu-footer p-4">
         <hr>
         <ul class="menu-list">
-          <li class="nav-link">
-            <a>
-              <SettingsSVG />
-              <span>Settings</span>
-            </a>
-          </li>
-          <li class="nav-link">
-            <a @click=logout>
-              <LogoutSVG />
-              <span>Logout</span>
-            </a>
-          </li>
+          <NavLink name="Settings" :icon="SettingsSVG" />
+          <NavLink name="Logout" :icon="LogoutSVG" />
         </ul>
       </div>
   </aside>
 </template>
 <script setup lang="ts">
-  import { useAuthStore } from "@/stores"
+  import DashboardSVG from "@/components/svgs/DashboardSVG.vue"
+  import ChatSVG from "@/components/svgs/ChatSVG.vue"
+  import ContactsSVG from "@/components/svgs/ContactsSVG.vue"
   import AudioSVG from "@/components/svgs/AudioSVG.vue"
-
-  const authStore = useAuthStore()
-  function logout() {
-    authStore.logout()
-  }
+  import BillingSVG from "@/components/svgs/BillingSVG.vue"
+  import SettingsSVG from "@/components/svgs/SettingsSVG.vue"
+  import LogoutSVG from "@/components/svgs/LogoutSVG.vue"
   
   type NavLink = {
     name: string
-    route: string
+    route?: string
     icon: object
   }
 
   const LINKS: NavLink[] = [
-    { name: "Dashboard", route: "dashboard", icon: AudioSVG },
-    { name: "Chat", route: "chat", icon: AudioSVG },
-    { name: "Contacts", route: "contacts", icon: AudioSVG },
-    { name: "Library", route: "#", icon: AudioSVG },
-    { name: "Billing", route: "billing", icon: AudioSVG },
+    { name: "Dashboard", route: "dashboard", icon: DashboardSVG },
+    { name: "Chat", route: "chat", icon: ChatSVG },
+    { name: "Contacts", route: "contacts", icon: ContactsSVG },
+    { name: "Library", icon: AudioSVG },
+    { name: "Billing", route: "billing", icon: BillingSVG },
   ]
 </script>
 <style>
-
   .menu {
     width: 250px;
     border: 1px solid #DED8E1;
@@ -81,42 +70,4 @@
     align-items: center;
     gap: 18px;
   }
-
- .nav-link {
-    padding: 0.75rem;
-    list-style-type: none;
-    border-radius: 1.25rem;
-    width: 172px;
-    height: 45px;
-    display: flex;
-    align-items: center;
-    padding-left: 2rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.5rem;
-  }
-  .nav-link:hover {
-    background-color: #EEEEEE;
-    cursor: pointer;
-  }
-
-  .nav-link--active {
-    background-color: #653494;
-    color: #ffffff;
-  }
-
-  .nav-link--active:hover {
-    background-color: #8244bc;
-  }
-
-  .nav-link a {
-    display: flex;
-    width: 100%;
-  }
-
-  .nav-link span {
-    width: 100%;
-    text-align: center;
-  }
-
 </style>
