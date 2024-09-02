@@ -3,9 +3,11 @@
         <p class="text-title">Audios page</p>
         <button type="button" @click="load_audios">Load audios</button>
         <span v-if="loadingAllAudios">Loading audios...</span>
-        <ul v-if="isSuccess">
-            <li v-for="audio in allAudiosData?.audios" :key="audio.id">
-                {{ audio?.id }} - {{ audio?.name }}
+        <ul v-if="isSuccess" class="ml-2 is-flex is-flex-direction-column is-gap-1">
+            <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
+                <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
+                <!-- <AudioPlayer :audioUrl="audio?.full_file_url" /> -->
+                <AudioPlayer :audio-url="'http://soundbible.com/grab.php?id=528&type=mp3'" />
             </li>
         </ul> 
         <div class="container-div">
@@ -30,7 +32,6 @@
 </template>
 
 <script setup>
-    import { useAudiosStore } from "@/stores"
     import { useQueryClient, useQuery } from '@tanstack/vue-query'
 
     const queryClient = useQueryClient()

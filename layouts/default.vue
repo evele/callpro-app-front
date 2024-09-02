@@ -8,10 +8,6 @@
         <div class="item5">Footer</div>
     </div>
 </template>  
-<script setup>
-import NavbarB from '~/components/reusables/navbar.vue';
-
-</script>
 <style scoped>
     .item1 { grid-area: header; }
     .item2 { grid-area: menu; }
