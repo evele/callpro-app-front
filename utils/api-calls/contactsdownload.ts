@@ -5,13 +5,12 @@ type data_string = {
 export async function downloadContactsFile(data: data_string): Promise<null> {
     try {
         const response = await fetchWrapper.post(GET_DOWNLOAD_CONTACT_FILE, data) ;
-        const tipo = data.group_id;
-        const ahora = new Date();
-        const fecha:string = `${ahora.getFullYear()}-${(ahora.getMonth() + 1).toString().padStart(2, '0')}-${ahora.getDate().toString().padStart(2, '0')}`;
+        const group_type = data.group_id;        
+        const date_string = date_time_to_string();
         
         if (response instanceof  Blob) {
             const blob = response;
-            const filename = `${tipo}-${'contacts'}-${fecha}${'.csv'}`;
+            const filename = `${group_type}-${'contacts'}-${date_string}${'.csv'}`;            
 
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
@@ -23,10 +22,10 @@ export async function downloadContactsFile(data: data_string): Promise<null> {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
         } else {
-            console.error('La respuesta no es un Blob.');
+            console.error('The response is not a Blob.');
         }        
     } catch (error) {
-        console.error('Error al procesar la descarga del archivo:', error);
+        console.error('Error processing the file download:', error);
     }
     return null;// TODO me tiraba error, busque y encontre esta solucion    
 }
