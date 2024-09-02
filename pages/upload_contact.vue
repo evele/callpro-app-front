@@ -17,9 +17,9 @@
 
         <div class="card has-background-grey-dark has-text-white py-2 px-4" style="width: 50%;">
             <Toast />
-            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000">
+            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
                 <template #header="{ files }">
-                        <Button @click="uploadEvent(files)" class="button is-primary" :class="[!files || files.length === 0 ? 'is-hidden' : 'is-block']">Upload</Button>
+                        <Button @click="uploadEvent(files)" class="button is-primary" :class="[!files || files.length !== 1 ? 'is-hidden' : 'is-block']">Upload</Button>
                 </template>
 
                 <template #content="{ files, uploadedFiles, removeFileCallback }">
@@ -48,18 +48,20 @@
         </div>
 
         <section v-if="uploadedSuccess && uploadedData?.result">
-            <div>
-                <h3 class="has-text-primary has-text-weight-semibold mb-2">Contact to save</h3>
-                <p class="has-text-primary">First name: {{ uploadedData?.contact?.first_name }}</p>
-                <p class="has-text-primary">Last name: {{ uploadedData?.contact?.last_name }}</p>
-                <p class="has-text-primary" v-if="uploadedData?.contact?.numbers?.length" v-for="number in uploadedData?.contact?.numbers" :key="number?.number">
-                    Number: {{ number?.number }}
-                </p>
+            <div v-if="uploadedData?.contacts?.length">
+                <h3 class="has-text-primary has-text-weight-semibold mb-2">Contact(s) to save:</h3>
+                <div v-for="contact in uploadedData.contacts" :key="contact.numbers[0].number" style="margin-bottom: 1rem;">
+                    <p class="has-text-primary">First name: {{ contact.first_name }}</p>
+                    <p class="has-text-primary">Last name: {{ contact.last_name }}</p>
+                    <p class="has-text-primary" v-for="number in contact.numbers" :key="number.number">
+                        Number: {{ number?.number }}
+                    </p>
+                </div>
             </div>
 
             <button class="button is-primary" @click="save_contact">Save Contact</button>
 
-            <p style="color: green;" v-if="savedSuccess">Contact saved!</p>
+            <p style="color: green;" v-if="savedSuccess && savedData?.result">Contact saved!</p>
         </section>
     </div>
 </template>
@@ -67,18 +69,17 @@
 <script setup lang="ts">
     const selectedGroup: Ref<SelectOption['name']> = ref('all');
 
-    const first_name: Ref<string> = ref('');
-    const last_name: Ref<string> = ref('');
-    const group_id: Ref<string> = ref('');
-    const numbers: Ref<string[]> = ref([]);
+    const group_id = ref('');
+    const contacts: Ref<uploadedContactToSave[]> = ref([]);
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData } = useUploadContact();
-    const { mutate: saveUploadedContact, isSuccess: savedSuccess } = useSaveUploadedContact();
+    const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData } = useSaveUploadedContact();
 
     const onRemoveTemplatingFile = (removeFileCallback: (index: number) => void, index: number) => {
         removeFileCallback(index);
     }
+
 
     type UploadContactData = {
         file: File;
@@ -86,6 +87,11 @@
         save_contact: string;
         group_id: string;
     };
+
+    type FileUploadEvent = {
+        originalEvent: Event;
+        files: File[]
+    }
 
     // Did this to help ts understand the data
     const createFormData = (data: UploadContactData): FormData => {
@@ -97,7 +103,15 @@
         return formData;
     };
 
+    const onSelectedFiles = (files: FileUploadEvent) => {
+        if(files.files.length > 1) {
+            files.files.shift();
+        }
+    };
+
     const uploadEvent = (file: File[]) => {
+        contacts.value = [];
+
         const data: UploadContactData = {
             file: file[0],
             from_broadcast: 'false',
@@ -109,13 +123,18 @@
 
         uploadContact(data_to_send, {
             onSuccess: (data: UploadContactAPIResponse) => {
-                if(data.result) {
-                    first_name.value = data?.contact?.first_name || '';
-                    last_name.value = data?.contact?.last_name || '';
-                    group_id.value = data?.group_id || 'all';
-                    data?.contact?.numbers.forEach((number: any) => {
-                        numbers.value.push(number.number)
-                    });
+                if(data.result && data.contacts?.length) {
+                    data.contacts.forEach((contact, i) => {
+                        contact.numbers.forEach(number => {
+                            contacts.value.push({
+                                first_name: contact.first_name,
+                                last_name: contact.last_name,
+                                number: number.number,
+                                contact_id: `fake-${i+1}`
+                            });
+                        });
+                    })
+                    group_id.value = data.group_id || 'all';
                 }
             }
         });
@@ -137,22 +156,20 @@
     };
 
     const save_contact = () => {
-        const contact_to_save: uploadedContactToSave[] = []
-
-        numbers.value.forEach((number: string) => {
-            contact_to_save.push({
-                first_name: first_name.value,
-                last_name: last_name.value,
-                number: number,
-                contact_id: 'fake-1'
-            });
-        });
-
         const data_to_send: uploadedContactToSaveData = {
-            contact: contact_to_save,
+            contacts: contacts.value,
             group_id: group_id.value
         }
 
         saveUploadedContact(data_to_send)
     }
 </script>
+
+<style scoped>
+    .is-hidden {
+        display: none;
+    }
+    .is-block {
+        display: block;
+    }
+</style>

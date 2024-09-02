@@ -80,12 +80,12 @@ export type ContactUploadedData = {
 export type uploadedContactToSave = {
   first_name: string;
   last_name: string;
-  number: string;
+  number: number;
   contact_id: string;
 };
 
 export type uploadedContactToSaveData = {
-  contact: uploadedContactToSave[];
+  contacts: uploadedContactToSave[];
   group_id: string;
 }
 

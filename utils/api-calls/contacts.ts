@@ -73,7 +73,7 @@ type upload_contact_validation_keys = 'from_broadcast' | 'group_id' | 'save_cont
 
 export type UploadContactAPIResponse = {
     result: boolean;
-    contact?: ContactUploadedData;
+    contacts?: ContactUploadedData[];
     group_id?: string;
     validation_error? : Record<upload_contact_validation_keys, string>;
     db_error?: string;
