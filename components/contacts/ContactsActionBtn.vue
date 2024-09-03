@@ -1,17 +1,21 @@
 <template>
-    <button @click="do_action" class="button">
-        <div class="button__icon">
-            <ContactsSVG/>
+    <button class="button">
+        <div class="button__icon" :style="{ color: props.iconColor, backgroundColor: props.iconBG }">
+            <component :is="icon"/>
         </div>
-        <span class="button__title">Contacts</span>
-        <span class="button__amount">123</span>
+        <span :class="[ count ? 'button__title' : 'button__only-title' ]">{{ text }}</span>
+        <span class="button__amount" v-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
     </button>
 </template>
 
 <script setup lang="ts">
-    const do_action = () => {
-        console.log('nothing to do');
-    }
+    const props = defineProps({
+        text: { type: String, required: true },
+        count: { type: Number, required: false, default: null },
+        icon: { type: Object, required: true },
+        iconColor: { type: String, required: true },
+        iconBG: { type: String, required: true },
+    });
 </script>
 
 <style scoped>
@@ -31,7 +35,7 @@
 
     .button:hover {
         cursor: pointer;
-        background-color: #dcdbdb;
+        background-color: #e8e7e7;
     }
 
     .button__icon {
@@ -39,8 +43,6 @@
         justify-content: center;
         align-items: center;
         border-radius: 100%;
-        background-color: #E8DEF8;
-        color: #4F378B;
         width: 36px;
         height: 36px;
     }
@@ -52,8 +54,16 @@
         line-height: 22.4px;
     }
 
+    .button__only-title {
+        color: #79747E;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 500;
+        line-height: 18px;
+        letter-spacing: 0.1px;
+    }
+
     .button__amount {
-        color: #4F378B;
         text-align: center;
         font-size: 20px;
         font-weight: 600;
