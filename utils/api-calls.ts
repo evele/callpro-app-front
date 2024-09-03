@@ -10,4 +10,3 @@ export * from "./api-calls/did_numbers.ts"
 export * from "./api-calls/groups.ts"
 export * from "./api-calls/packages.ts"
 export * from "./api-calls/settings.ts"
-

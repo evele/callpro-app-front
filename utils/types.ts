@@ -5,6 +5,7 @@ export type ZeroOrOne = '0' | '1';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
 export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
+export type SelectOption = { name: string; code: string | number };
 
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
@@ -55,6 +56,37 @@ export type ContactToSaveData = {
   action: 'create' | 'update',
   contact_info: ContactToSave,
   save_contact: boolean
+}
+
+export type ContactUploadedData = {
+  contact_id: number;
+  first_name: string;
+  last_name: string;
+  valid: boolean;
+  validation_desc: string;
+  numbers: {
+    notes: string;
+    number: number;
+    number_groups: string[];
+    type: OneToFour;
+    valid: boolean;
+    validation_desc: string;
+    number_id: -1;
+    in_trash: 0;
+    dnc: 0;
+  }[];
+}
+
+export type uploadedContactToSave = {
+  first_name: string;
+  last_name: string;
+  number: number;
+  contact_id: string;
+};
+
+export type uploadedContactToSaveData = {
+  contacts: uploadedContactToSave[];
+  group_id: string;
 }
 
 export type UserCustomGroup = {

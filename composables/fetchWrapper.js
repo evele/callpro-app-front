@@ -18,7 +18,9 @@ const request = (method) => {
       body: null,
     };
 
-    if (body) {
+    if (body instanceof FormData) {
+      requestOptions.body = body;
+    } else if (body) {
       requestOptions.headers['Content-Type'] = 'application/json';
       requestOptions.body = JSON.stringify(body);
     }
