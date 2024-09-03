@@ -75,7 +75,7 @@ type data_string = {
 
 export async function downloadContactsFile(data: data_string): Promise<null> {
     try {
-        const response = await fetchWrapper.post(GET_DOWNLOAD_CONTACT_FILE, data) ;
+        const response = await fetchWrapper.post(DOWNLOAD_CONTACTS_FILE, data) ;
         const group_type = data.group_id;        
         const date_string = date_time_to_string();
         
