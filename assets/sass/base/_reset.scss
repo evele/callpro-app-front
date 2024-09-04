@@ -44,3 +44,6 @@
   #root, #__next {
     isolation: isolate;
   }
+  .special-input input[type="file"] {
+    display: none;
+  }
