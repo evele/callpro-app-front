@@ -2,7 +2,7 @@
     <div>
         <p class="text-title">SMS page</p>
         <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error.message }}</span>
+        <span v-else-if="isError">Error: {{ error?.message }}</span>
 
         <!-- <button type="button" @click="load_settings">Load settings</button> -->
     </div>
@@ -17,20 +17,20 @@
         <div>
             <label for="show" style="margin-right: 6px;">Show:</label>
             <select name="show" id="show" v-model="show">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
+                <option value=10>10</option>
+                <option value=25>25</option>
+                <option value=50>50</option>
+                <option value=100>100</option>
             </select>
         </div>
 
         <div>
             <label for="search" style="margin-right: 6px;">Search:</label>
-            <input type="text" name="search" id="search" placeholder="Search..." @input="debounceSearch">
+            <input type="text" name="search" id="search" placeholder="Search..." v-model="search">
         </div>
     </div>
     <p v-if="isLoading">Loading broadcasts...</p>
-    <p v-if="isError">{{ error.message }}</p>
+    <p v-if="isError">{{ error?.message }}</p>
     <ul v-if="isSuccess" class="sms-list">
         <li v-for="sms in sms_list_data" :key="sms.sms_id" class="sms-item">
             <span class="sms-label">SMS name:</span><span class="sms-value">{{ sms.name }}</span>
@@ -39,11 +39,11 @@
     </ul>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useFetchSms } from '#imports';
 
-const show = ref("10")
-const search = ref("")
+const show = ref(10)
+const search = useDebouncedRef("", 500)
 const tab_options = [COMPLETED, ACTIVE, DRAFT]
 const selected_tab = ref(COMPLETED)
 
@@ -51,13 +51,7 @@ const selected_tab = ref(COMPLETED)
 const { data, error, isSuccess, isLoading, isError } = useFetchSms(selected_tab, show, search)
 const sms_list_data = computed(() => data?.value?.sms_list || []);
 
-let searchDebounce = null
-const debounceSearch = (e) => {
-    clearTimeout(searchDebounce)
-    searchDebounce = setTimeout(() => {
-        search.value = e.target.value
-    }, 500)
-}
+
 </script>
 
 <style scoped>

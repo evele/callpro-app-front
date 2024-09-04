@@ -1,4 +1,23 @@
-export const format_date_time = (time) => {
+export function useDebouncedRef(value:string, delay = 300) {
+    let timeout:ReturnType<typeof setTimeout>
+    return customRef((track, trigger) => {
+      return {
+        get() {
+          track()
+          return value
+        },
+        set(newValue:string) {
+          clearTimeout(timeout)
+          timeout = setTimeout(() => {
+            value = newValue
+            trigger()
+          }, delay)
+        }
+      }
+    })
+  }
+
+export const format_date_time = (time:string) => {
     const currentDate = new Date();
     const year = currentDate.getFullYear();
     const month = String(currentDate.getMonth() + 1).padStart(2, '0');
@@ -9,7 +28,7 @@ export const format_date_time = (time) => {
     return formattedDate;
 }
 
-export const date_time_to_string = (time) => {
+export const date_time_to_string = (time:StringOrNull=null) => {
     // Si time es null o undefined, usa la fecha y hora actual
     const dateObject = time ? new Date(time) : new Date();
 

@@ -6,6 +6,10 @@ export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
 export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
 export type SelectOption = { name: string; code: string | number };
+export type StringOrNumber = string | number;
+export type StringOrNull = string | null;
+export type NumberOrNull = number | null;
+export type StringOrNumberOrNull = string | number | null;
 
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
