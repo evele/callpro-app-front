@@ -89,32 +89,32 @@ export async function getUserInvoices():Promise<APIResponse>{
   return response as APIResponse
 }
 type InvoiceData = {
-  item_desc: string;      // Descripción del ítem, parece ser un string.
-  number: string;         // Número de la factura (id).
-  date: string;           // Fecha de la factura.
-  amount: string;         // Monto total de la factura.
-  first_name: string;     // Primer nombre del usuario.
-  last_name: string;      // Apellido del usuario.
-  account_no: string;     // Número de cuenta del usuario.
-  address: string;        // Dirección del usuario.
-  email: string;          // Email del usuario.
-  quantity: number;       // Cantidad, aparentemente siempre 1.
-  cc_last_four: string;   // Últimos cuatro dígitos de la tarjeta de crédito.
+  item_desc: string;
+  number: string;
+  date: string;
+  amount: string;
+  first_name: string;
+  last_name: string;
+  account_no: string;
+  address: string;
+  email: string;
+  quantity: number;
+  cc_last_four: string;
 };
 type InvoiceCoupon = {
-  id: string;             // ID del cupón.
-  coupon_amount: string;  // Monto del cupón.
-  coupon_details: string; // Detalles del cupón.
+  id: string;
+  coupon_amount: string;
+  coupon_details: string;
 };
 
 type InvoiceCouponArray = InvoiceCoupon[];
 
 type InvoiceDataResponse = {
-  result:boolean;                  // Indica si la operación fue exitosa.
-  invoice_data?: InvoiceData;                // Datos de la factura.
-  invoice_coupon?: InvoiceCouponArray;       // Lista de cupones asociados.
-  validation_error?: Record<string, string>; // Errores de validación, si existen.
-  db_error?: string;                         // Error de base de datos, si ocurre.
+  result:boolean;
+  invoice_data?: InvoiceData;
+  invoice_coupon?: InvoiceCouponArray;
+  validation_error?: Record<string, string>;
+  db_error?: string;
 }
 
 export async function getInvoiceDataToPrint(data:{trx_id: number}):Promise<InvoiceDataResponse>{
