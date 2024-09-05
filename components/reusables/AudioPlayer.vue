@@ -1,9 +1,8 @@
 <template>
     <div>
-        <button v-if="!isAudioLoaded" @click="loadAudio" class="audio-load-button">
-            <AudioSVG />
-            <span class="audio-text">Cargar Audio</span>
-        </button>
+        <Button v-if="!isAudioLoaded" @click="loadAudio" class="audio-load-button">
+            <AudioSVG />            
+        </Button>
         <audio v-else controls>
             <source :src="audioUrl" :type="audioType">
             {{ fallbackMessage }}
@@ -28,15 +27,12 @@
 .audio-load-button {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     cursor: pointer;
     background: none;
     border: none;
     color: inherit;
-    font-size: 1em;
+    font-size: 0.9rem;
     padding: 0;
-}
-.audio-text {
-    font-size: 0.95rem;
 }
 </style>
