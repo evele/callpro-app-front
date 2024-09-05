@@ -10,7 +10,7 @@
                         <Button class="modal__header--close" @click="close"><CloseSVG/></Button>
                     </header>
 
-                    <section class="modal__dropfile special-input">
+                    <section v-if="!has_uploaded" class="modal__dropfile special-input">
                         <FileUpload name="file" :multiple="false" class="special-input" @upload="onAdvancedUpload($event)" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
                             <template #header="{ files }">
                                 <Button @click="uploadEvent(files)" class="is-hidden" />
@@ -28,6 +28,8 @@
                             </template>
                         </FileUpload>
                     </section>
+
+                    <p v-if="isPending">Uploading File...</p>
 
                     <!-- <ProgressSpinner style="width: 50px; height: 50px; color:red;" strokeWidth="8" fill="green"
                         animationDuration=".5s" aria-label="Custom ProgressSpinner" 
@@ -93,6 +95,7 @@
         body.style.overflow = 'auto';
         has_uploaded.value = false;
         contacts_formatted.value = [];
+        contacts.value = [];
     }
 
     defineExpose({ open });
