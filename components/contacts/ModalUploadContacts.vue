@@ -1,15 +1,14 @@
 <template>
-    <Dialog v-model:visible="visible" style="width: 100%; max-width: 850px; padding: 10px; max-height: 98vh; overflow-y: auto;">
+    <Dialog v-model:visible="visible" pt:root:class="modal">
         <template #container>
             <div class="modal__bg"></div>
             <section class="modal__container">
                 <div class="modal__layout">
                     <header class="modal__header">
-                        <h2 class="modal__header--title">Upload new file <ChevronDownSVG /></h2>
+                        <h2 v-if="has_uploaded" class="modal__header--title">Upload Summary</h2>
+                        <h2 v-else class="modal__header--title">Upload new file <ChevronDownSVG /></h2>
                         <Button class="modal__header--close" @click="close"><CloseSVG/></Button>
                     </header>
-
-                    
 
                     <section class="modal__dropfile special-input">
                         <FileUpload name="file" :multiple="false" class="special-input" @upload="onAdvancedUpload($event)" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
@@ -30,29 +29,22 @@
                         </FileUpload>
                     </section>
 
-                    <ProgressSpinner style="width: 50px; height: 50px; color:red;" strokeWidth="8" fill="green"
+                    <!-- <ProgressSpinner style="width: 50px; height: 50px; color:red;" strokeWidth="8" fill="green"
                         animationDuration=".5s" aria-label="Custom ProgressSpinner" 
-                    />
+                    /> -->
 
-                    <section v-if="uploadedSuccess && uploadedData?.result">
-                        <div v-if="uploadedData?.contacts?.length">
-                            <h3 class="has-text-primary has-text-weight-semibold mb-2">Contact(s) to save:</h3>
-                            <div v-for="contact in uploadedData.contacts" :key="contact.numbers[0].number" style="margin-bottom: 1rem;">
-                                <p class="has-text-primary">First name: {{ contact.first_name }}</p>
-                                <p class="has-text-primary">Last name: {{ contact.last_name }}</p>
-                                <p class="has-text-primary" v-for="number in contact.numbers" :key="number.number">
-                                    Number: {{ number?.number }}
-                                </p>
-                            </div>
+                    <section v-if="has_uploaded">
+                        <div v-if="uploadedSuccess && uploadedData?.result">
+                            <DataTable v-if="uploadedData?.contacts?.length" :value="contacts_formatted" tableStyle="min-width: 40rem" scrollable scrollHeight="350px">
+                                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
+                                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
+                            </DataTable>
+                            <p v-else class="text-no-contacts">There is no contacts on your file</p>
                         </div>
-
-                        <button class="button is-primary" @click="save_contact">Save Contact</button>
-
-                        <p style="color: green;" v-if="savedSuccess && savedData?.result">Contact saved!</p>
                     </section>
 
 
-                    <div class="modal__info">
+                    <div v-if="!has_uploaded" class="modal__info">
                         <p>Accepted format files: .csv, .xlsx</p>
                         <p>Your data should be in this order:</p>
                         <ul>
@@ -62,8 +54,10 @@
                             <li>Column D, E, F...: Number (optional)</li>
                         </ul>
                     </div>
+
+                    <p v-if="savedSuccess" class="text-success">Contacts Saved!</p>
                     <footer class="modal__footer">
-                        <Button label="Save" @click="close" class="modal__footer--btn" :disabled="can_save" />
+                        <Button :label="!savedIsPending ? 'Save' : 'Saving...'" @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || is_disabled" />
                     </footer>
                 </div>
             </section>
@@ -77,12 +71,15 @@
     })
     
     const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending } = useUploadContact();
-    const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData } = useSaveUploadedContact();
+    const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData, isPending: savedIsPending } = useSaveUploadedContact();
 
     const visible = ref(false);
-    const can_save = ref(false);
+    const is_disabled = ref(true);
     const contacts: Ref<uploadedContactToSave[]> = ref([]);
     const group_id = ref('');
+    const has_uploaded = ref(false);
+
+    const contacts_formatted = ref([]);
 
     const open = () => {
         visible.value = true;
@@ -94,6 +91,8 @@
         visible.value = false;
         const body = document.body;
         body.style.overflow = 'auto';
+        has_uploaded.value = false;
+        contacts_formatted.value = [];
     }
 
     defineExpose({ open });
@@ -139,6 +138,8 @@
         uploadContact(data_to_send, {
             onSuccess: (data: UploadContactAPIResponse) => {
                 if(data.result && data.contacts?.length) {
+                    has_uploaded.value = true;
+                    is_disabled.value = false;
                     data.contacts.forEach((contact, i) => {
                         contact.numbers.forEach(number => {
                             contacts.value.push({
@@ -146,6 +147,14 @@
                                 last_name: contact.last_name,
                                 number: number.number,
                                 contact_id: `fake-${i+1}`
+                            });
+
+                            contacts_formatted.value.push({
+                                selected: true,
+                                name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
+                                number: number?.number,
+                                status: contact?.valid,
+                                result: contact?.validation_desc === "Valid and inserted" ? 'Ok' : contact?.validation_desc
                             });
                         });
                     })
@@ -155,33 +164,31 @@
         });
     };
 
-    const formatSize = (bytes: number) => {
-        const k = 1024;
-        const dm = 3;
-        const sizes = ['B', 'KB', 'MB'];
-
-        if (bytes === 0) {
-            return '0 B';
-        }
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
-
-        return `${formattedSize} ${sizes[i]}`;
-    };
-
     const save_contact = () => {
         const data_to_send: uploadedContactToSaveData = {
             contacts: contacts.value,
             group_id: group_id.value
         }
 
-        saveUploadedContact(data_to_send)
+        saveUploadedContact(data_to_send, {
+            onSuccess: () => {
+                // Should be a toast
+                setTimeout(() => {
+                    close()
+                }, 2000);
+            }
+        })
     }
+
+    const columns = [
+        { field: 'name', header: 'Last, First' },
+        { field: 'number', header: 'Phone' },
+        { field: 'status', header: 'Status' },
+        { field: 'result', header: 'Result' },
+    ];
 </script>
 
 <style scoped lang="scss">
-
     .modal__bg {
         position: absolute;
         left: 0;
@@ -330,5 +337,17 @@
 
     .is-hidden {
         display: none;
+    }
+
+    .text-no-contacts {
+        text-align: center;
+        color: #cf2626;
+        font-size: 20px;
+    }
+
+    .text-success {
+        text-align: center;
+        color: #1abd28;
+        font-size: 20px;
     }
 </style>
