@@ -75,3 +75,13 @@ export type BroadcastDetailResponse = {
     validation_error?: Record<validation_keys,string>
     db_error?: { broadcast_id?: string };
   }
+
+export async function getBroadcastHeader(data:{ broadcast_id: string }):Promise<BroadcastResponse>{
+    const response = await fetchWrapper.post(GET_BROADCAST_HEADER_URL,data)
+    return response as BroadcastResponse
+}
+
+export async function getBroadcastDetail(data:BroadcastDetailParams):Promise<BroadcastDetailResponse>{
+    const response = await fetchWrapper.post(GET_BROADCAST_DETAIL_URL, data)
+    return response as BroadcastDetailResponse
+}

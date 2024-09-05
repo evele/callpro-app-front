@@ -6,26 +6,24 @@ function sleep(ms:number) {
 
 /* ----- Broadcast ----- */
 export function useFetchGetBroadcastHeader(broadcast_id:Ref<string>){
-  const dataToSend = computed<{broadcast_id:string}>(() => ({ broadcast_id: broadcast_id.value }))
+  const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
 
-  return useQuery<BroadcastResponse>({
+  return useQuery({
     queryKey: ['broadcast_header', dataToSend],
-    queryFn: ():Promise<BroadcastResponse> => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value)as Promise <BroadcastResponse>,
-    enabled: false, 
+    queryFn: () => getBroadcastHeader(dataToSend.value)    
   })
 }
 export const useFetchGetBroadcastDetail = (broadcast_id:Ref<string>, selected_tab:Ref<StateOption>,start_limit:Ref<number>, show:Ref<number>, search:Ref<string>) => {
-  const dataToSend = computed<BroadcastDetailParams>(() => ({
+  const dataToSend = computed(() => ({
     broadcast_id: broadcast_id.value,
     length_limit: show.value,
     search: search.value,
     start_limit: start_limit.value,//"0",
     state: selected_tab.value,
   }))
-  return useQuery<BroadcastDetailResponse>({
+  return useQuery({
     queryKey: ['broadcast_detail', dataToSend],
-    queryFn: (): Promise<BroadcastDetailResponse> => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value)as Promise <BroadcastDetailResponse>,
-    enabled: false, 
+    queryFn: () => getBroadcastDetail(dataToSend.value)    
   })
 }
   
@@ -70,22 +68,30 @@ export const useFetchGetAudio = (audio_id: Ref<string | null>, audio_full_url:Re
 
 /* ----- Billing ----- */
 export const useFetchInvoices = () => {
-  return useQuery<APIResponse>({
+  return useQuery({
     queryKey: ['user_invoices'],
-    queryFn: ():Promise<APIResponse> => fetchWrapper.get(GET_USER_INVOICES_DATA_URL)as Promise<APIResponse>,
-    refetchOnWindowFocus: false,
+    queryFn: () => getUserInvoices(),
   })
 }
 
 export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
-  const id = { trx_id: invoice_id } // TODO: maybe will need to use computed
+  const dataToSend = computed(()=> ({
+    trx_id: invoice_id.value
+  }))
+  //{ trx_id: invoice_id } // TODO: maybe will need to use computed
   return useQuery({
-    queryKey: ['invoices', invoice_id],
-    queryFn: () => fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, id),
-    refetchOnWindowFocus: false,
+    queryKey: ['invoices', dataToSend],
+    queryFn: () => getInvoiceDataToPrint(dataToSend.value),      
   })
 }
-
+// export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
+//   const id = { trx_id: invoice_id } // TODO: maybe will need to use computed
+//   return useQuery({
+//     queryKey: ['invoices', invoice_id],
+//     queryFn: () => fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, id),
+//     refetchOnWindowFocus: false,
+//   })
+// }
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({
