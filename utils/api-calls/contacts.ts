@@ -70,3 +70,65 @@ export async function saveContact(data: ContactToSaveData): Promise<SaveContactA
     const response = await fetchWrapper.post(SAVE_CONTACT_URL, data) 
     return response as SaveContactAPIResponse
 }
+
+/* ----- Upload Contact ----- */
+type upload_contact_validation_keys = 'from_broadcast' | 'group_id' | 'save_contact';
+
+export type UploadContactAPIResponse = {
+    result: boolean;
+    contacts?: ContactUploadedData[];
+    group_id?: string;
+    validation_error? : Record<upload_contact_validation_keys, string>;
+    db_error?: string;
+}
+
+export async function uploadContactCSV(data: FormData): Promise<UploadContactAPIResponse> {
+    const response = await fetchWrapper.post(UPLOAD_CONTACT_CSV_URL, data) 
+    return response as UploadContactAPIResponse
+}
+
+/* ----- Save Uploaded Contact ----- */
+type save_uploaded_contact_validation_keys = `contact[${number}][number]` | 'group_id';
+
+export type SaveUploadedContactAPIResponse = {
+    result: boolean;
+    validation_error? : Record<save_uploaded_contact_validation_keys, string>;
+}
+
+export async function saveUploadedContact(data: uploadedContactToSaveData): Promise<SaveUploadedContactAPIResponse> {
+    const response = await fetchWrapper.post(SAVE_UPLOADED_CONTACT_URL, data) 
+    return response as SaveUploadedContactAPIResponse
+}
+
+/* ----- Download Contacts ----- */
+type data_string = {
+    group_id: string
+}
+
+export async function downloadContactsFile(data: data_string): Promise<null> {
+    try {
+        const response = await fetchWrapper.post(DOWNLOAD_CONTACTS_FILE, data) ;
+        const group_type = data.group_id;        
+        const date_string = date_time_to_string();
+
+        if (response instanceof  Blob) {
+            const blob = response;
+            const filename = `${group_type}-${'contacts'}-${date_string}${'.csv'}`;            
+
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } else {
+            console.error('The response is not a Blob.');
+        }        
+    } catch (error) {
+        console.error('Error processing the file download:', error);
+    }
+    return null;// TODO me tiraba error, busque y encontre esta solucion    
+}
