@@ -11,3 +11,8 @@ export type CallInCodeResponse = {
     user_call_in_codes: UserCallInCode[];    
     db_error?:string;
 }
+
+export async function getUserCallInCodes():Promise<CallInCodeResponse>{
+    const response = await fetchWrapper.get(GET_USER_CALL_IN_CODES_URL)
+    return response as CallInCodeResponse
+}

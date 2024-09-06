@@ -84,19 +84,11 @@ export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
     queryFn: () => getInvoiceDataToPrint(dataToSend.value),      
   })
 }
-// export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
-//   const id = { trx_id: invoice_id } // TODO: maybe will need to use computed
-//   return useQuery({
-//     queryKey: ['invoices', invoice_id],
-//     queryFn: () => fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, id),
-//     refetchOnWindowFocus: false,
-//   })
-// }
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({
     queryKey: ['call_in_codes'],
-    queryFn: ():Promise<CallInCodeResponse> => fetchWrapper.get(GET_USER_CALL_IN_CODES_URL)as Promise<CallInCodeResponse>,  
+    queryFn: () => getUserCallInCodes(),
   })
 }
 
