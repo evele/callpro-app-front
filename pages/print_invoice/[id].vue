@@ -1,7 +1,7 @@
 <template>
     <div>
         <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error.message }}</span>
+        <span v-else-if="isError">Error: {{ error?.message }}</span>
         <div v-if="isSuccess">
             <div class="print-btn-container">
                 <PrintPdfButton
@@ -29,13 +29,16 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import { useRoute } from 'vue-router'
 
     const route = useRoute();
-    const invoice_id = computed(() => route.params.id);
+    const invoice_id = computed(() => {
+        const idParam = route.params.id;
+        return Number(idParam);
+    });
 
-    const { data, error, isLoading, isError, isSuccess } = useFetchInvoiceToPrint(invoice_id.value)
+    const { data, error, isLoading, isError, isSuccess } = useFetchInvoiceToPrint(invoice_id)
 </script>
 
 <style scoped>

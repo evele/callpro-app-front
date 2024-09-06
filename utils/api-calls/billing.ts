@@ -90,9 +90,9 @@ export async function getUserInvoices():Promise<APIResponse>{
 }
 type InvoiceData = {
   item_desc: string;
-  number: string;
+  number: number;
   date: string;
-  amount: string;
+  amount: number;
   first_name: string;
   last_name: string;
   account_no: string;
@@ -101,24 +101,24 @@ type InvoiceData = {
   quantity: number;
   cc_last_four: string;
 };
+
 type InvoiceCoupon = {
-  id: string;
-  coupon_amount: string;
-  coupon_details: string;
+  id: number;
+  coupon_amount: number;
+  coupon_details: CouponDetails;
 };
 
-type InvoiceCouponArray = InvoiceCoupon[];
+type validation_keys = 'trx_id'
 
 type InvoiceDataResponse = {
   result:boolean;
   invoice_data?: InvoiceData;
-  invoice_coupon?: InvoiceCouponArray;
-  validation_error?: Record<string, string>;
+  invoice_coupon?: InvoiceCoupon[];
+  validation_error?: Record<validation_keys,string>
   db_error?: string;
 }
 
 export async function getInvoiceDataToPrint(data:{trx_id: number}):Promise<InvoiceDataResponse>{
-  const response = await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL,data)
-  console.log("aca estoy",response)
+  const response = await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL,data)  
   return response as InvoiceDataResponse  
 }
