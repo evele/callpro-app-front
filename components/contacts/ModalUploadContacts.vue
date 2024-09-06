@@ -11,7 +11,7 @@
                     </header>
 
                     <section v-if="!has_uploaded" class="modal__dropfile special-input">
-                        <FileUpload name="file" :multiple="false" class="special-input" @upload="onAdvancedUpload($event)" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
+                        <FileUpload name="file" :multiple="false" class="special-input" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
                             <template #header="{ files }">
                                 <Button @click="uploadEvent(files)" class="is-hidden" />
                             </template>
@@ -31,13 +31,9 @@
 
                     <p v-if="isPending">Uploading File...</p>
 
-                    <!-- <ProgressSpinner style="width: 50px; height: 50px; color:red;" strokeWidth="8" fill="green"
-                        animationDuration=".5s" aria-label="Custom ProgressSpinner" 
-                    /> -->
-
                     <section v-if="has_uploaded">
                         <div v-if="uploadedSuccess && uploadedData?.result">
-                            <DataTable v-if="uploadedData?.contacts?.length" :value="contacts_formatted" tableStyle="min-width: 40rem" scrollable scrollHeight="350px">
+                            <DataTable v-if="uploadedData?.contacts?.length" :value="formatted_contact" tableStyle="min-width: 40rem" scrollable scrollHeight="350px" class="uploaded-contacts-table">
                                 <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
                                 <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
                             </DataTable>
@@ -45,6 +41,7 @@
                         </div>
                     </section>
 
+                    <p v-if="(showError && isError) || (showError && (uploadedSuccess && !uploadedData?.result))" class="text-no-contacts">Something went wrong!</p>
 
                     <div v-if="!has_uploaded" class="modal__info">
                         <p>Accepted format files: .csv, .xlsx</p>
@@ -72,7 +69,7 @@
         selectedGroup: { type: String, required: true }
     })
     
-    const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending } = useUploadContact();
+    const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending, isError } = useUploadContact();
     const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData, isPending: savedIsPending } = useSaveUploadedContact();
 
     const visible = ref(false);
@@ -80,8 +77,9 @@
     const contacts: Ref<uploadedContactToSave[]> = ref([]);
     const group_id = ref('');
     const has_uploaded = ref(false);
+    const showError = ref(false);
 
-    const contacts_formatted = ref([]);
+    const formatted_contact: Ref<FormattedContact[]> = ref([]);
 
     const open = () => {
         visible.value = true;
@@ -94,11 +92,20 @@
         const body = document.body;
         body.style.overflow = 'auto';
         has_uploaded.value = false;
-        contacts_formatted.value = [];
+        formatted_contact.value = [];
         contacts.value = [];
+        showError.value = false;
     }
 
     defineExpose({ open });
+
+    type FormattedContact = {
+        selected: boolean;
+        name: string;
+        number: number;
+        status: boolean;
+        result: string;
+    }
 
     type UploadContactData = {
         file: File;
@@ -135,7 +142,7 @@
             save_contact: 'true',
             group_id: props.selectedGroup
         };
-
+        showError.value = true;
         const data_to_send = createFormData(data);
 
         uploadContact(data_to_send, {
@@ -152,7 +159,7 @@
                                 contact_id: `fake-${i+1}`
                             });
 
-                            contacts_formatted.value.push({
+                            formatted_contact.value.push({
                                 selected: true,
                                 name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
                                 number: number?.number,

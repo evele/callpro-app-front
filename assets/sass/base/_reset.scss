@@ -45,6 +45,7 @@
     isolation: isolate;
   }
 
+  //TODO: CHECK THESE CLASES HERE
   .special-input input[type="file"] {
     display: none;
   }
@@ -57,7 +58,7 @@
     overflow-y: auto;
   }
 
-  td {
+  .uploaded-contacts-table td {
     text-align: center;
     vertical-align: middle;
   }

@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
     const selectedGroup: Ref<SelectOption['name']> = ref('all');
-    const modalUploadContacts = ref(null)
+    const modalUploadContacts = ref()
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
 
