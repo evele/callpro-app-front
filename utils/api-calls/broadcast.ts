@@ -70,7 +70,7 @@ export type BroadcastDetails ={
 export type BroadcastDetailResponse = {
     result: boolean;
     results_count: number;
-    broadcast_details: BroadcastDetails[];//Array<{ id: number; broadcast_id: number; result: string; duration: string }>;
+    broadcast_details: BroadcastDetails[];
     state: StateOption;
     validation_error?: Record<validation_keys,string>
     db_error?: { broadcast_id?: string };
