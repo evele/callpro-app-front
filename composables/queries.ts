@@ -198,7 +198,7 @@ export const useFetchSettings = () => {
 }
 
 /* ----- Sms ----- */
-export const useFetchSms = (selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
+export const useFetchSms = (selected_tab:Ref<string>, show:Ref<string>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value,    
     search: search.value,
@@ -208,8 +208,8 @@ export const useFetchSms = (selected_tab:Ref<string>, show:Ref<number>, search:R
 
   return useQuery({
     queryKey: ['sms_list', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
-
+    // queryFn: () => getSmsList(), 
+    queryFn: ()=> fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value),
   })
 }
 

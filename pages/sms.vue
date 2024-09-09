@@ -17,10 +17,10 @@
         <div>
             <label for="show" style="margin-right: 6px;">Show:</label>
             <select name="show" id="show" v-model="show">
-                <option value=10>10</option>
-                <option value=25>25</option>
-                <option value=50>50</option>
-                <option value=100>100</option>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
             </select>
         </div>
 
@@ -39,10 +39,10 @@
     </ul>
 </template>
 
-<script setup lang="ts">
+<script setup >
 import { useFetchSms } from '#imports';
 
-const show = ref(10)
+const show = ref("10")
 const search = useDebouncedRef("", 500)
 const tab_options = [COMPLETED, ACTIVE, DRAFT]
 const selected_tab = ref(COMPLETED)
