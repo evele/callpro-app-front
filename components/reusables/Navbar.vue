@@ -14,6 +14,7 @@
             <li><NuxtLink to="call_in_codes">Call In Codes</NuxtLink></li>
             <li><NuxtLink to="caller_id">Caller Id</NuxtLink></li>
             <li><NuxtLink to="chat">Chat</NuxtLink></li>
+            <li><NuxtLink to="contacts">Contacts</NuxtLink></li>
             <li><NuxtLink to="dashboard">Dashboard</NuxtLink></li>
             <li><NuxtLink to="did_numbers">Did Numbers</NuxtLink></li>
             <li><NuxtLink to="get_contact">Get Contact</NuxtLink></li>
