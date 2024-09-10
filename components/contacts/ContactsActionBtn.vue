@@ -1,10 +1,10 @@
 <template>
     <button class="button">
-        <div class="button__icon" :style="{ color: props.iconColor, backgroundColor: props.iconBG }">
+        <div class="button-icon" :style="{ color: props.iconColor, backgroundColor: props.iconBG }">
             <component :is="icon"/>
         </div>
-        <span :class="[ count ? 'button__title' : 'button__only-title' ]">{{ text }}</span>
-        <span class="button__amount" v-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
+        <span :class="[ count ? 'button-title' : 'button-only-title' ]">{{ text }}</span>
+        <span class="button-amount" v-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
     </button>
 </template>
 
@@ -22,15 +22,14 @@
     .button {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
         align-items: center;
         width: 125px;
         height: 125px;
         border: none;
-        padding: 16px 27px 15px 28px;
+        padding: 16px 28px 16px 28px;
         background-color: #FFFFFF;
-        flex-shrink: 0;
         transition: background-color 0.3s;  
+        gap: 6px;
     }
 
     .button:hover {
@@ -38,7 +37,7 @@
         background-color: #e8e7e7;
     }
 
-    .button__icon {
+    .button-icon {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -47,24 +46,21 @@
         height: 36px;
     }
 
-    .button__title {
+    .button-title {
         color: #79747E;
-        text-align: center;
         font-size: 16px;
         line-height: 22.4px;
     }
 
-    .button__only-title {
+    .button-only-title {
         color: #79747E;
-        text-align: center;
         font-size: 14px;
         font-weight: 500;
         line-height: 18px;
         letter-spacing: 0.1px;
     }
 
-    .button__amount {
-        text-align: center;
+    .button-amount {
         font-size: 20px;
         font-weight: 600;
         line-height: 24px;
