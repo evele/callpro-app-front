@@ -18,6 +18,7 @@
   body {
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
+    background-color: var(--body-background);
   }
   /*
     5. Improve media defaults
@@ -43,4 +44,14 @@
   */
   #root, #__next {
     isolation: isolate;
+  }
+
+  .contacts-table td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  // Here we can define some CSS variables
+  :root {
+    --body-background: #F5F5F5;
   }

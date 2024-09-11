@@ -12,6 +12,21 @@
         </li>
     </ul>
 
+    <main class="py-5 main-container">
+        <ContactsTable />
+    </main>
+    
+    <p v-if="isLoading">Loading contacts...</p>
+    <p v-if="isError">{{ error?.message }}</p>
+    <ul v-if="isSuccess" class="contact-list">
+        <li v-for="contact in all_contacts_data" :key="contact.id" class="contact-item">            
+            <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
+            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
+        </li>
+    </ul>
+
+    <ContactsActions />
+
     <div class="new-group-container">
         <h2>Create New Group</h2>
         <div class="form-group">
@@ -29,37 +44,6 @@
             <span v-if="saveGroupContactsIsSuccess" style="color: green;">Contact group successfully updated!</span>
         </div>
     </div>
-
-    <div class="filter-container">
-        <div>
-            <label for="show" style="margin-right: 6px;">Show:</label>
-            <select name="show" id="show" v-model="show">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="search" style="margin-right: 6px;">Search:</label>
-            <input type="text" name="search" id="search" placeholder="Search..." @input="debounceSearch">
-        </div>
-        <div>
-            <label for="page_number" style="margin-right: 6px;">Pagina nro:</label>
-            <input type="number" name="page_number" id="page_number" placeholder="nro pagina..." v-model.number="page">
-        </div>
-    </div>
-    <p v-if="isLoading">Loading broadcasts...</p>
-    <p v-if="isError">{{ error?.message }}</p>
-    <ul v-if="isSuccess" class="contact-list">
-        <li v-for="contact in all_contacts_data" :key="contact.id" class="contact-item">            
-            <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
-            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
-        </li>
-    </ul>
-
-    <ContactsActions />
 </template>
 
 <script setup lang="ts">  
@@ -121,6 +105,7 @@
     font-weight: bold;
     border: 1px solid gray;
     padding: 6px 1rem;
+    font-size: 14px;
 }
 
 .tab-style__li:hover {
@@ -165,5 +150,9 @@
 .contact-value {
   margin-right: 10px;
   color: blue;
+}
+
+.main-container {
+    background-color: var(--body-background);
 }
 </style>
