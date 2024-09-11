@@ -14,14 +14,9 @@
         </li>
     </ul>
     <div class="filter-container">
-        <div>
-            <label for="show" style="margin-right: 6px;">Show:</label>
-            <select name="show" id="show" v-model="show">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
+        <div class="card flex justify-center">
+            <label for="show" class="mr-3">Show:</label>
+            <Select v-model="selected_items_per_page" :options="select_options" placeholder="Select a City" />
         </div>
 
         <div>
@@ -39,17 +34,25 @@
     </ul>
 </template>
 
-<script setup >
-import { useFetchSms } from '#imports';
+<script setup lang="ts">
+import { useFetchSms, type DashboardState, type ItemsPerPage } from '#imports';
 
-const show = ref("10")
 const search = useDebouncedRef("", 500)
-const tab_options = [COMPLETED, ACTIVE, DRAFT]
-const selected_tab = ref(COMPLETED)
+const select_options:Ref<ItemsPerPage[]> = ref([10,25,50,100])
+
+const tab_options:DashboardState[] = [COMPLETED, ACTIVE, DRAFT] // TODO: review this
+const selected_tab:Ref<DashboardState> = ref(COMPLETED)
+const selected_items_per_page:Ref<ItemsPerPage>= ref(10)
 
 
-const { data, error, isSuccess, isLoading, isError } = useFetchSms(selected_tab, show, search)
-const sms_list_data = computed(() => data?.value?.sms_list || []);
+const { data, error, isSuccess, isLoading, isError } = useFetchSms(selected_tab, selected_items_per_page, search)
+const sms_list_data = computed(() => {
+    if (data.value?.result) {
+        return data.value.sms_list;      
+    }
+    return [];
+    } 
+);
 
 
 </script>

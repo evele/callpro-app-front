@@ -38,8 +38,8 @@
 </template>
 <script setup lang="ts">
   
-  const tab_options: BroadcastDashboardState[] = [COMPLETED, ACTIVE, DRAFT]
-  const selected_tab: Ref<BroadcastDashboardState> = ref(COMPLETED)
+  const tab_options: DashboardState[] = [COMPLETED, ACTIVE, DRAFT]
+  const selected_tab: Ref<DashboardState> = ref(COMPLETED)
   const select_options: Ref<ItemsPerPageOption[]> = ref([
     { name: '10', code: 10 },
     { name: '25', code: 25 },
