@@ -1,11 +1,21 @@
 export type ItemsPerPage = 10 | 25 | 50 | 100;
 export type ItemsPerPageOption = { name: string; code: ItemsPerPage };
-export type BroadcastDashboardState = typeof COMPLETED | typeof ACTIVE | typeof DRAFT;
+export type DashboardState = typeof COMPLETED | typeof ACTIVE | typeof DRAFT;
 export type ZeroOrOne = '0' | '1';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
 export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
 export type SelectOption = { name: string; code: string | number };
+export type StringOrNumber = string | number;
+export type StringOrNull = string | null;
+export type NumberOrNull = number | null;
+export type StringOrNumberOrNull = string | number | null;
+
+export type APIResponseError = {
+  result: false,
+  db_error?:string,
+  validation_error?: Record<string, string>
+}
 
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
@@ -134,6 +144,24 @@ export type BroadcastDashboardData ={
   static_intro_library_id: string | null;
   status: string; //TODO: ASK FOR ALL POSSIBLE VALUES TO AVOID STRING
   user_id: number;
+}
+
+export type SMSDashboardData = {
+  user_id: number,
+  sms_id: number,
+  status: DashboardState,
+  name: string,
+  text: string,
+  did: string,
+  created_at: string,
+  start_time: string,
+  started_at: StringOrNull,
+  ended_at: StringOrNull,
+  duration: NumberOrNull,
+  PENDING: number,
+  SENDING: number,
+  SUCCESFULL: number,
+  INVALID: number
 }
 
 /* ----- Did numbers ----- */

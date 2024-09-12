@@ -3,7 +3,7 @@ type fnProps = {
     load_all: boolean,
     search: string,
     start_limit: string, 
-    state: BroadcastDashboardState,
+    state: DashboardState,
 }
 
 type validation_keys = 'length_limit' | 'load_all' | 'search' | 'start_limit' | 'state';
@@ -11,7 +11,7 @@ type validation_keys = 'length_limit' | 'load_all' | 'search' | 'start_limit' | 
 type APIResponseBroadcastList = {
     result: boolean;
     broadcast_list?: BroadcastDashboardData[];
-    state?: BroadcastDashboardState;
+    state?: DashboardState;
     total_broadcast?: string;
     db_error?: string;
     validation_error?: Record<validation_keys, string>;
