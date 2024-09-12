@@ -1,0 +1,88 @@
+/* Estilo para el contenedor del select */
+[data-pc-name="select"] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1px 2px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.3s ease;
+  }
+  
+  /* Estilo para el valor seleccionado */
+  [data-pc-section="label"] {
+    display: inline-block;
+    color: #333;
+  }
+  
+  /* Estilo para la flecha del dropdown */
+  [data-pc-section="dropdownicon"] {
+    margin-left: 4px;
+    /*
+    width: 14px;
+    height: 14px; */
+    fill: #333; /* Color de la flecha */
+    transition: transform 0.3s ease;
+  }
+  
+  /* Estilo cuando el dropdown está abierto (para rotar la flecha) */
+  [data-pc-name="select"][aria-expanded="true"] [data-pc-section="dropdownicon"] {
+    transform: rotate(180deg);
+  }
+  
+  /* Hover efecto */
+  [data-pc-name="select"]:hover {
+    border-color: #888;
+  }
+
+  /* Estilo para el overlay del dropdown */
+[data-pc-section="overlay"] {
+    position: absolute;
+    z-index: 1001;
+    min-width: 200px; /* Ajusta según sea necesario */
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 8px 0;
+    max-height: 14rem;
+    overflow-y: auto; /* Añade scroll si hay muchas opciones */
+  }
+  
+  /* Estilo para el contenedor de la lista de opciones */
+  [data-pc-section="list"] {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Estilo para cada opción (li) */
+  [data-pc-section="option"] {
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* Estilo cuando una opción está seleccionada */
+  [data-p-selected="true"] {
+    background-color: #f0f0f0; /* Fondo claro para la opción seleccionada */
+    font-weight: bold;
+  }
+  
+  /* Estilo cuando una opción está enfocada (hover) */
+  [data-p-focused="true"], [data-pc-section="option"]:hover {
+    background-color: #e6e6e6; /* Color de fondo al pasar el mouse */
+  }
+  
+  /* Estilo para el texto dentro de la opción */
+  [data-pc-section="optionlabel"] {
+    color: #333;
+  }
+  
+  
