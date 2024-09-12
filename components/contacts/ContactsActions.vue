@@ -1,7 +1,7 @@
 <template>
     <section class="container">
-        <ContactsActionBtn v-for="option in OPTIONS" :key="option.text" :text="option.text" :count="option.count" 
-            :icon="option.icon" :iconColor="option.iconColor" :iconBG="option.iconBG"
+        <ContactsActionBtn v-for="option in OPTIONS" :key="option.text" :text="option.text" :count="option.count" :icon="option.icon" :icon-color="option.iconColor"
+            :icon-bg="option.iconBG" :bg-gradient="option.bgGradient" :icon-on-hover="option.iconOnHover" :icon-on-hover-color="option.iconOnHoverColor"
         />
     </section>
 </template>
@@ -11,13 +11,13 @@
     import GroupsSVG from "@/components/svgs/GroupsSVG.vue"
     import DncSVG from "@/components/svgs/DncSVG.vue"
     import UploadSVG from "@/components/svgs/UploadSVG.vue"
-
+    import PlusSVG from "@/components/svgs/PlusSVG.vue"
 
     const OPTIONS = [
-        { text: "Contacts", count: 123, icon: ContactsSVG, iconColor: "#4F378B", iconBG: "#E8DEF8" },
-        { text: "Groups", count: 23, icon: GroupsSVG, iconColor: "#009951", iconBG: "#CFF7D3" },
-        { text: "DNC", count: 12, icon: DncSVG, iconColor: "#E5A000", iconBG: "#FFF1C2" },
-        { text: "Upload a new file", icon: UploadSVG, iconColor: "#1D1B20", iconBG: "#E8DEF8" },
+        { text: "Contacts", count: 123, icon: ContactsSVG, iconColor: "#4F378B", iconBG: "#E8DEF8", bgGradient: "bg-contacts", iconOnHover: PlusSVG },
+        { text: "Groups", count: 23, icon: GroupsSVG, iconColor: "#009951", iconBG: "#CFF7D3", bgGradient: "bg-groups", iconOnHover: PlusSVG },
+        { text: "DNC", count: 12, icon: DncSVG, iconColor: "#E5A000", iconBG: "#FFF1C2", bgGradient: "bg-dnc", iconOnHover: PlusSVG },
+        { text: "Upload a new file", icon: UploadSVG, iconColor: "#1D1B20", iconBG: "#E8DEF8", iconOnHoverColor: "#1D1B20" },
     ]
 </script>
 
