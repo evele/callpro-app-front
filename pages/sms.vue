@@ -21,7 +21,7 @@
 
         <div>
             <label for="search" style="margin-right: 6px;">Search:</label>
-            <input type="text" name="search" id="search" placeholder="Search..." v-model="search">
+            <input type="text" name="search" id="search" placeholder="Search..."  v-model="search">
         </div>
     </div>
     <p v-if="isLoading">Loading broadcasts...</p>

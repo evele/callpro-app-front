@@ -13,7 +13,7 @@ export type StringOrNumberOrNull = string | number | null;
 
 export type APIResponseError = {
   result: false,
-  db_error?:string,
+  error?:string,
   validation_error?: Record<string, string>
 }
 
