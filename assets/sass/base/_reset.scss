@@ -46,12 +46,16 @@
     isolation: isolate;
   }
 
-  .contacts-table td {
-    text-align: center;
-    vertical-align: middle;
-  }
 
   // Here we can define some CSS variables
   :root {
     --body-background: #F5F5F5;
+  }
+
+  .left-aligned-column {
+    text-align: left;
+  }
+
+  .center-aligned-column {
+    text-align: center;
   }
