@@ -31,7 +31,7 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
 }
   
 /* ----- Dashboard ----- */
-export const useFetchGetBroadcastList = (selected_tab:Ref<BroadcastDashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
+export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value.code,
     load_all: false,
