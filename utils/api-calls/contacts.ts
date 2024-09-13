@@ -13,10 +13,9 @@ type APIResponse = {
     contacts: ContactPhoneNumber[]
 }
 
-export async function getAllContacts(data:ContactFilter):Promise<ContactPhoneNumber[] | null>{
-    const response = await fetchWrapper.post(GET_ALL_CONTACTS_URL, data) as APIResponse
-    if (!response.result) return null
-    return response.contacts
+export async function getAllContacts(data:ContactFilter):Promise<APIResponse>{
+    const response = await fetchWrapper.post(GET_ALL_CONTACTS_URL, data) 
+    return response as APIResponse
 }
 
 /* ----- Get contact ----- */

@@ -1,8 +1,6 @@
 <template>
     <div>
-        <p class="text-title">Contact page</p>
-        <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error?.message }}</span>        
+        <p class="text-title">Contact page</p>     
     </div>
     <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
     <ul class="tab-style">
@@ -13,17 +11,8 @@
     </ul>
 
     <main class="py-5 main-container">
-        <ContactsTable />
+        <ContactsTable :selected-tab="selected_tab" />
     </main>
-    
-    <p v-if="isLoading">Loading contacts...</p>
-    <p v-if="isError">{{ error?.message }}</p>
-    <ul v-if="isSuccess" class="contact-list">
-        <li v-for="contact in all_contacts_data" :key="contact.id" class="contact-item">            
-            <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
-            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
-        </li>
-    </ul>
 
     <ContactsActions />
 
@@ -48,29 +37,15 @@
 
 <script setup lang="ts">  
     const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
-    const page = ref(1)    
-    const show = ref(10)
-    const search = ref("")    
-
+    
     const selected_tab = ref(CONTACTS_ALL)    
-    const with_groups = ref(true)
-    const is_custom_group = ref(false)
+    
     const groupName = ref('')
     const launchID = ref('')
     const groupID = ref('')
 
-    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
-    const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
     
-    let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
-   
-    const debounceSearch = (e: Event) => {        
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => {
-            const target = e.target as HTMLInputElement;
-            search.value = target.value
-        }, 500) 
-    }
+    const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
    
     const save_new_group = () => {
         const dataToSend = {

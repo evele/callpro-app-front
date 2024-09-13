@@ -1,0 +1,15 @@
+/* ----- Contacts Table ----- */
+.left-aligned-column {
+    text-align: left;
+  }
+
+.center-aligned-column {
+    text-align: center;
+}
+
+.contacts-table div[data-pc-name="pcpaginator"] {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
