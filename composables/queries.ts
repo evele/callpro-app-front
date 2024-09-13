@@ -31,7 +31,7 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
 }
   
 /* ----- Dashboard ----- */
-export const useFetchGetBroadcastList = (selected_tab:Ref<BroadcastDashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
+export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value.code,
     load_all: false,
@@ -200,7 +200,7 @@ export const useFetchSettings = () => {
 }
 
 /* ----- Sms ----- */
-export const useFetchSms = (selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
+export const useFetchSms = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPage>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     length_limit: show.value,    
     search: search.value,
@@ -210,7 +210,7 @@ export const useFetchSms = (selected_tab:Ref<string>, show:Ref<number>, search:R
 
   return useQuery({
     queryKey: ['sms_list', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_SMS_DATA_URL, dataToSend.value), 
+    queryFn: () => getSmsList(dataToSend.value), 
 
   })
 }
