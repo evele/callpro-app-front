@@ -48,17 +48,17 @@ card_response: CardResponse;
 
 type CouponDb = {
 id: number;
-code: string;//TODO en teoria puede ser string
+code: string;
 discount_type: string;
 discount_value: number;
-public: "1" | "0";
-all_plans: "1" | "0";
-times: string;//TODO 100?
+public: ZeroOrOne;
+all_plans: ZeroOrOne;
+times: string;
 expiry_date: string;
 }
 
 type CouponDetails = {
-couponCode: string;//TODO en teoria puede ser string
+couponCode: string;
 discountDisplay: string;
 discountAmount: number;
 finalPrice: number;
@@ -73,21 +73,21 @@ user_id: number;
 payment_method_data: PaymentMethodData;
 total: number;
 response_data: ResponseData | string; // Puede ser un string serializado o un objeto
-status:  "1" | "0";
+status: ZeroOrOne;
 coupon_details: CouponDetails | string; // Puede ser un string serializado o un objeto
 invoice_data: string;
 time_stamp: string;
 }
 
-export type APIResponse = {
+type APIResponseInvoices = {
 result: boolean;
 invoices: Invoice[];
 }
 
-export async function getUserInvoices():Promise<APIResponse>{
-  const response = await fetchWrapper.get(GET_USER_INVOICES_DATA_URL)
-  return response as APIResponse
+export async function getUserInvoices():Promise<APIResponseInvoices | APIResponseError>{
+  return await fetchWrapper.get(GET_USER_INVOICES_DATA_URL) as APIResponseInvoices | APIResponseError
 }
+
 type InvoiceData = {
   item_desc: string;
   number: number;
@@ -108,17 +108,12 @@ type InvoiceCoupon = {
   coupon_details: CouponDetails;
 };
 
-type validation_keys = 'trx_id'
-
 type InvoiceDataResponse = {
   result:boolean;
-  invoice_data?: InvoiceData;
-  invoice_coupon?: InvoiceCoupon[];
-  validation_error?: Record<validation_keys,string>
-  db_error?: string;
+  invoice_data: InvoiceData;
+  invoice_coupon: InvoiceCoupon[];  
 }
 
-export async function getInvoiceDataToPrint(data:{trx_id: number}):Promise<InvoiceDataResponse>{
-  const response = await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL,data)  
-  return response as InvoiceDataResponse  
+export async function getInvoiceDataToPrint(data:{trx_id: number}):Promise<InvoiceDataResponse | APIResponseError>{
+  return await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL,data) as InvoiceDataResponse  | APIResponseError
 }

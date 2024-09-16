@@ -2,7 +2,7 @@
     <div>
         <span v-if="isLoading">Loading...</span>
         <span v-else-if="isError">Error: {{ error?.message }}</span>
-        <div v-if="isSuccess">
+        <div v-if="isSuccess && data && 'invoice_data' in data">
             <div class="print-btn-container">
                 <PrintPdfButton
                     elementId="print-invoice-pdf" 

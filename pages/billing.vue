@@ -4,7 +4,7 @@
         <button type="button" @click="load_data" style="display: block;">Load Data</button>
         <span v-if="isLoading">Loading...</span>
         <span v-else-if="isError">Error: {{ error?.message }}</span>
-        <ul v-if="data?.invoices">
+        <ul v-if="isSuccess && data && 'invoices' in data">
             <li v-for="invoice in data.invoices" :key="invoice.id" style="margin: 1rem 0;">
                 {{ invoice.id }}
                 <button type="button">
@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-    const { data, error, isLoading, isError, refetch } = useFetchInvoices()
+    const { data, error, isLoading, isError, refetch, isSuccess } = useFetchInvoices()
 
     const load_data = () => {
         refetch()
