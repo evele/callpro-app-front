@@ -11,7 +11,7 @@
     </ul>
 
     <main class="py-5 main-container">
-        <ContactsTable :selected-tab="selected_tab" />
+        <test :selected-tab="selected_tab" />
     </main>
 
     <ContactsActions />

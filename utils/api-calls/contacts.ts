@@ -11,6 +11,7 @@ type ContactFilter = {
 type APIResponse = {
     result: boolean,
     contacts: ContactPhoneNumber[]
+    total_numbers: number;
 }
 
 export async function getAllContacts(data:ContactFilter):Promise<APIResponse>{

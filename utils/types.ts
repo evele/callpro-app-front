@@ -24,7 +24,7 @@ export type PhoneNumber = {
   notes: string; // Notes associated with the number
   dnc: ZeroOrOne; // Do Not Call status
   type: OneToFour; // Type of the number
-  number_groups: string[]; // Array of group identifiers the number belongs to
+  number_groups: string[] | string; // Array of group identifiers the number belongs to
   in_trash: ZeroOrOne; // Indicates if the number is in trash
 }
   

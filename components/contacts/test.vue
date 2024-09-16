@@ -12,7 +12,10 @@
             :loading="isLoading"
             :totalRecords="total_records"
             @page="onPageChange($event)"
-            v-model:expandedRows="expandedRows"
+            v-model:expandedRowGroups="expandedRowGroups"
+            expandableRowGroups 
+            rowGroupMode="subheader" 
+            groupRowsBy="id"
         >
 
             <template #header>
@@ -42,6 +45,16 @@
                         <span>All</span>
                     </div>
                 </header>
+            </template>
+
+            <template #groupheader="slotProps">
+                <button @click="console.log(slotProps.data)">{{ slotProps.data.name }}</button>
+                <Button class="expand-btn" @click="toggleRow(slotProps.data.id)">
+                        <template #icon>
+                            <ChevronUpSVG v-if="isRowExpanded(slotProps.data.id)" class="chevron-icon" />
+                            <ChevronDownSVG v-else class="chevron-icon" />
+                        </template>
+                    </Button>
             </template>
 
             <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
@@ -81,40 +94,6 @@
                     </Button>
                 </template>
             </Column>
-
-            <template #expansion="slotProps">
-                <DataTable 
-                    :value="[slotProps.data]"
-                    tableStyle="min-width: 35rem"
-                    class="contacts-expanded-row w-full"
-                >
-                    <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
-                    <Column field="name" header="" class="left-aligned-column">
-                        <template #body="slotProps">
-                            <span class="name-item">{{ slotProps.data.name }}</span>
-                        </template>
-                    </Column>
-
-                    <Column field="number" header="" class="center-aligned-column">
-                        <template #body="slotProps">
-                            <span class="phone-item">{{ slotProps.data.numbers[0].number }}</span>
-                        </template>
-                    </Column>
-
-                    <Column field="groups" header="" class="center-aligned-column">
-                        <template #body="slotProps">
-                            <span class="font-bold">{{ slotProps.data.numbers[0].group }}</span>
-                        </template>
-                    </Column>
-
-                    <Column field="dnc" header="" class="center-aligned-column">
-                        <template #body="slotProps">
-                            <DncSVG v-if="slotProps.data.numbers[0].dnc === '1'" class="dnc-icon w-full" />
-                            <PhoneSVG v-else class="w-full" />
-                        </template>
-                    </Column>
-                </DataTable>
-            </template>
 
             <template #empty>
                 <tr v-if="isLoading">
@@ -161,7 +140,7 @@
     const search = ref("")
     const total_records = ref()
 
-    const expandedRows = ref([]);
+    const expandedRowGroups = ref([]);
 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
     
@@ -169,51 +148,36 @@
 
     const formatted_contacts = computed(() => {
         total_records.value = all_contacts_data?.value?.total_numbers;
-        if(!all_contacts_data?.value?.contacts) return []
-
-        const groupedContacts = all_contacts_data?.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
-        // if the contact already exists, add the new number to the numbers array.
-        if (acc[contact.id]) {
-            acc[contact.id].numbers.push({
-                number: format_number_to_show(contact.number),
-                number_id: contact.number_id,
-                group: contact.number_groups === null ? '0' : typeof contact.number_groups === "string" ? contact.number_groups.trim().split(/\s*,\s*/).length : '0',
-                dnc: contact.dnc
-            });
-        } else {
-            // if doesn't exist, create a new contact object.
-            acc[contact.id] = {
+        return all_contacts_data?.value?.contacts?.map((contact: ContactPhoneNumber) => {
+            return {
                 id: contact.id,
                 name: show_full_name(contact.first_name, contact.last_name),
-                numbers: [{
-                    number: format_number_to_show(contact.number),
-                    number_id: contact.number_id,
-                    group: contact.number_groups === null ? '0' : typeof contact.number_groups === "string" ? contact.number_groups.trim().split(/\s*,\s*/).length : '0',
-                    dnc: contact.dnc
-                }]
-            };
-        }
-
-        return acc;
+                number: format_number_to_show(contact.number),
+                group: contact.number_groups === null ? '0' : typeof contact.number_groups === "string" ? contact.number_groups.trim().split(/\s*,\s*/).length : '0',
+                dnc: contact.dnc == '1' ? 'Yes' : 'No'
+            }
+        })
     }, {});
-
-    return Object.values(groupedContacts);
-    });
 
     const onPageChange = (event: any) => {
         page.value = event.page + 1
     }
 
     const toggleRow = (id: string) => {
-        if (expandedRows.value.length) {
-            expandedRows.value = [];
-            if(id) expandedRows.value[id] = true;
+        if(Object.keys(expandedRowGroups.value)[0] === id) {
+            expandedRowGroups.value = [];
             return
         }
-        expandedRows.value[id] = true;
+        
+        if (expandedRowGroups.value.length) {
+            expandedRowGroups.value = [];
+            if(id) expandedRowGroups.value[id] = true;
+            return
+        }
+        expandedRowGroups.value[id] = true;
     }
 
-    const isRowExpanded = (id: string) => !!expandedRows.value[id];
+    const isRowExpanded = (id: string) => !!expandedRowGroups.value[id];
 </script>
 
 <style scoped lang="scss">
