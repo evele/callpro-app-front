@@ -1,13 +1,13 @@
-export type Broadcast = {
+type Broadcast = {
     user_id: string;
     broadcast_id: string;
     status: string;
     name: string;
-    library_id: string | null;
-    file_name: string | null;
-    audio_name: string | null;
+    library_id: StringOrNull;
+    file_name: StringOrNull;
+    audio_name: StringOrNull;
     caller_id: string;
-    static_intro_library_id: string | null;
+    static_intro_library_id: StringOrNull;
     repeat: string;
     offer_dnc: string;
     retries: string;
@@ -17,10 +17,10 @@ export type Broadcast = {
     number_when_completed: string;
     created_at: string;
     start_time: string;
-    started_at: string | null;
-    ended_at: string | null;
+    started_at: StringOrNull;
+    ended_at: StringOrNull;
     feedback: string;
-    duration: string | null;
+    duration: StringOrNull;
     PENDING: string;
     ACTIVE: string;
     LIVE: string;
@@ -31,17 +31,18 @@ export type Broadcast = {
 }
 type validation_keys = 'broadcast_id' | 'state' | 'length_limit' | 'start_limit' | 'search'
 
-export type BroadcastResponse = {
+type BroadcastResponse = {
 result: boolean;
 broadcast: Array<{ id: number; name: string }>;
 validation_error?: Record<validation_keys,string>
 db_error?: { broadcast_id?: string };
 }
-export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 
-export type StatusOption = 'COMPLETED' | 'PROCESSING' | 'SCHEDULED' | 'CALLING' | 'TRANSFERRED' | 'PAUSED' |'CONNECTED'| 'WAITING_FOR_RETRY';    
+type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 
-export type BroadcastDetailParams = {
+type StatusOption = 'COMPLETED' | 'PROCESSING' | 'SCHEDULED' | 'CALLING' | 'TRANSFERRED' | 'PAUSED' |'CONNECTED'| 'WAITING_FOR_RETRY';    
+
+type BroadcastDetailParams = {
     broadcast_id: string;
     length_limit:number;
     search: string;
@@ -49,7 +50,7 @@ export type BroadcastDetailParams = {
     state: StateOption;
   }
 
-export type BroadcastDetails ={
+type BroadcastDetails ={
     id: number; 
     broadcast_id: number;
     last_name:string;
@@ -60,28 +61,24 @@ export type BroadcastDetails ={
     duration: number;			
     group:StateOption;
 	attempts: number;//"1"?
-	feedback: string | null;
-	started_at: string| null;
-	ended_at:  string| null;
-	transfer_duration:  string| null;
+	feedback: StringOrNull;
+	started_at: StringOrNull;
+	ended_at:  StringOrNull;
+	transfer_duration:  StringOrNull;
 }
 
 
-export type BroadcastDetailResponse = {
+type BroadcastDetailResponse = {
     result: boolean;
     results_count: number;
     broadcast_details: BroadcastDetails[];
-    state: StateOption;
-    validation_error?: Record<validation_keys,string>
-    db_error?: { broadcast_id?: string };
+    state: StateOption;    
   }
 
-export async function getBroadcastHeader(data:{ broadcast_id: string }):Promise<BroadcastResponse>{
-    const response = await fetchWrapper.post(GET_BROADCAST_HEADER_URL,data)
-    return response as BroadcastResponse
+export async function getBroadcastHeader(data:{ broadcast_id: string }):Promise<BroadcastResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_BROADCAST_HEADER_URL,data) as BroadcastResponse | APIResponseError
 }
 
-export async function getBroadcastDetail(data:BroadcastDetailParams):Promise<BroadcastDetailResponse>{
-    const response = await fetchWrapper.post(GET_BROADCAST_DETAIL_URL, data)
-    return response as BroadcastDetailResponse
+export async function getBroadcastDetail(data:BroadcastDetailParams):Promise<BroadcastDetailResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_BROADCAST_DETAIL_URL, data) as BroadcastDetailResponse | APIResponseError
 }
