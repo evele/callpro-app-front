@@ -2,7 +2,7 @@
     <div>
         <p class="text-title">Audios page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
-        <ul v-if="isSuccess" class="ml-2 is-flex is-flex-direction-column is-gap-1">
+        <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
             <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
                 <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
                 <!-- <AudioPlayer :audioUrl="audio?.full_file_url" /> -->

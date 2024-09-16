@@ -317,8 +317,8 @@ export type Tts_Convert = {
   full_file_url:string,
   file_name: string
 }
-// Interface for a audio
-export interface Audio {
+// TODO: Ver Audio y AudioAUX para extender o algo similar
+export type Audio = {
   id: number;
   user_id: number;
   name: string;
@@ -330,7 +330,7 @@ export interface Audio {
   full_file_url: string;
 }
 
-export interface AudioAux {
+export type AudioAux = {
   id: string;
   audio_id: string | null;
   audio_url: string | null;
@@ -341,4 +341,9 @@ export interface AudioAux {
   length: string;
   is_delete: string;
   full_file_url: string;
+}
+
+export type TextToConvert = {
+  text: string, 
+  temp: boolean    
 }
