@@ -109,7 +109,7 @@ export const useFetchUnreadMessages = () => {
 }
 
 export const useFetchChatContacts = (data:Ref<boolean>) => {
-  type fnProps = { all_contacts: '1' | '2' };
+  type fnProps = { all_contacts: OneOrTwo };
   const dataToSend = computed((): fnProps => ({ all_contacts: data.value ? '1' : '2' }))
   return useQuery({
     queryKey: ['chat_contacts', dataToSend],

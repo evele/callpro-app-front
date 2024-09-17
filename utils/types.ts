@@ -2,6 +2,7 @@ export type ItemsPerPage = 10 | 25 | 50 | 100;
 export type ItemsPerPageOption = { name: string; code: ItemsPerPage };
 export type DashboardState = typeof COMPLETED | typeof ACTIVE | typeof DRAFT;
 export type ZeroOrOne = '0' | '1';
+export type OneOrTwo = '1' | '2';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
 export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;

@@ -2,34 +2,27 @@
 type ChatContact = {
     contact_phone_number: string;
     name: string;
-    time: string | null;
+    time: StringOrNull;
     unread: ZeroOrOne;
 }
 
-type validation_keys = 'all_contacts'
-
 type APIResponseChatContacts = {
     result: boolean;
-    contacts?: ChatContact[];
-    db_error?: string;
-    validation_error?: Record<validation_keys, string>;
+    contacts?: ChatContact[];    
 }
 
-type fnProps = { all_contacts: '1' | '2' }
+type fnProps = { all_contacts: OneOrTwo }
 
-export async function getChatContacts(data: fnProps):Promise<APIResponseChatContacts>{
-    const response = await fetchWrapper.post(GET_CHAT_CONTACTS_URL, data)
-    return response as APIResponseChatContacts
+export async function getChatContacts(data: fnProps):Promise<APIResponseChatContacts | APIResponseError>{
+    return await fetchWrapper.post(GET_CHAT_CONTACTS_URL, data) as APIResponseChatContacts | APIResponseError
 }
 
 /* ----- Unread messages ----- */
 type APIResponseUnreadMessages = {
     result: boolean;
-    unread_messages?: number;
-    db_error?: string;
+    unread_messages?: number;    
 }
 
-export async function getUnreadMessages():Promise<APIResponseUnreadMessages>{
-    const response = await fetchWrapper.get(GET_UNREAD_MESSAGES_URL)
-    return response as APIResponseUnreadMessages
+export async function getUnreadMessages():Promise<APIResponseUnreadMessages | APIResponseError>{
+    return await fetchWrapper.get(GET_UNREAD_MESSAGES_URL) as APIResponseUnreadMessages | APIResponseError
 }
