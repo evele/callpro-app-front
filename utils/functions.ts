@@ -58,3 +58,18 @@ export const show_full_name = (first_name: StringOrNull, last_name: StringOrNull
   if(!last_name) return first_name;
   return `${last_name}, ${first_name}`
 }
+
+export const format_contact_type = (type: OneToFour) => {
+  switch (type) {
+    case '1':
+      return "Mobile";
+    case '2':
+      return "Office";
+    case '3':
+      return "Other";
+    case '4':
+      return "Home";
+    default:
+      return "";
+  }
+}

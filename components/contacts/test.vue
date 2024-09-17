@@ -48,7 +48,8 @@
             </template>
 
             <template #groupheader="slotProps">
-                <button @click="console.log(slotProps.data)">{{ slotProps.data.name }}</button>
+                <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
+                <span @click="console.log(slotProps.data)" class="left-aligned-column">{{ slotProps.data.name }}</span>
                 <Button class="expand-btn" @click="toggleRow(slotProps.data.id)">
                         <template #icon>
                             <ChevronUpSVG v-if="isRowExpanded(slotProps.data.id)" class="chevron-icon" />
@@ -67,19 +68,19 @@
 
             <Column field="number" header="Phone" class="center-aligned-column">
                 <template #body="slotProps">
-                    <span class="phone-item">{{ slotProps.data.numbers[0].number }}</span>
+                    <span class="phone-item">{{ slotProps.data.number }}</span>
                 </template>
             </Column>
 
             <Column field="groups" header="Groups" class="center-aligned-column">
                 <template #body="slotProps">
-                    <span class="font-bold">{{ slotProps.data.numbers[0].group }}</span>
+                    <span class="font-bold">{{ slotProps.data.group }}</span>
                 </template>
             </Column>
 
             <Column field="dnc" header="DNC" class="center-aligned-column">
                 <template #body="slotProps">
-                    <DncSVG v-if="slotProps.data.numbers[0].dnc === '1'" class="dnc-icon w-full" />
+                    <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon w-full" />
                     <PhoneSVG v-else class="w-full" />
                 </template>
             </Column>
@@ -164,16 +165,12 @@
     }
 
     const toggleRow = (id: string) => {
-        if(Object.keys(expandedRowGroups.value)[0] === id) {
+        let is_same_row = false;
+        if(expandedRowGroups.value.length) {
+            is_same_row = Object.keys(expandedRowGroups.value)[0] === id;
             expandedRowGroups.value = [];
-            return
-        }
-        
-        if (expandedRowGroups.value.length) {
-            expandedRowGroups.value = [];
-            if(id) expandedRowGroups.value[id] = true;
-            return
-        }
+        } 
+        if(is_same_row) return;
         expandedRowGroups.value[id] = true;
     }
 

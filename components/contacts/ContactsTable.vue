@@ -1,5 +1,5 @@
 <template>
-    <div class="w-full table-container rounded-7 py-4 pl-4 px-2">
+    <div class="w-full table-container rounded-7 py-5 px-4">
         <DataTable 
             :value="formatted_contacts" 
             tableStyle="min-width: 40rem" 
@@ -7,12 +7,13 @@
             :paginator="show_pagination" 
             :rows="10" 
             dataKey="id"
-            paginatorTemplate="PrevPageLink CurrentPageReport NextPageLink"
+            paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
             :loading="isLoading"
             :totalRecords="total_records"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
+            stripedRows
         >
 
             <template #header>
@@ -48,23 +49,32 @@
 
             <Column field="name" header="Name" class="left-aligned-column">
                 <template #body="slotProps">
-                    <span class="name-item">{{ slotProps.data.name }}</span>
+                    <span class="name-item" @click="console.log(formatted_contacts)">{{ slotProps.data.name }}</span>
                 </template>
             </Column>
 
             <Column field="number" header="Phone" class="center-aligned-column">
                 <template #body="slotProps">
-                    <span class="phone-item">{{ slotProps.data.numbers[0].number }}</span>
+                    <div class="phone-data-container">
+                        <span class="phone-item">{{ slotProps.data.numbers[0].number }}</span>
+                        <span v-if="slotProps.data.numbers.length > 1" class="extra-number-chip"> +{{ slotProps.data.numbers.length -1 }}</span>
+                    </div>
                 </template>
             </Column>
 
             <Column field="groups" header="Groups" class="center-aligned-column">
                 <template #body="slotProps">
-                    <span class="font-bold">{{ slotProps.data.numbers[0].group }}</span>
+                    <span class="font-bold">{{ slotProps.data.numbers[0].group.length }}</span>
                 </template>
             </Column>
 
-            <Column field="dnc" header="DNC" class="center-aligned-column">
+            <Column field="dnc" header="" class="center-aligned-column">
+                <template #header>
+                    <div class="dnc-header-container">
+                        <span>DNC</span>
+                        <ErrorIconSVG />
+                    </div>
+                </template>
                 <template #body="slotProps">
                     <DncSVG v-if="slotProps.data.numbers[0].dnc === '1'" class="dnc-icon w-full" />
                     <PhoneSVG v-else class="w-full" />
@@ -82,35 +92,57 @@
                 </template>
             </Column>
 
+
             <template #expansion="slotProps">
                 <DataTable 
                     :value="[slotProps.data]"
                     tableStyle="min-width: 35rem"
                     class="contacts-expanded-row w-full"
                 >
-                    <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
-                    <Column field="name" header="" class="left-aligned-column">
+                    <Column selectionMode="multiple" headerStyle="text-align: left" style="width: 10%"></Column>
+                    <Column field="name" header="" class="left-aligned-column" style="width: 22.5%">
                         <template #body="slotProps">
-                            <span class="name-item">{{ slotProps.data.name }}</span>
+                            <tr v-for="number, i in slotProps.data.numbers" :key="i" @click="console.log(slotProps.data)">
+                                <td class="name-item">
+                                    {{ format_contact_type(number.type) }}
+                                </td>
+                            </tr>
                         </template>
                     </Column>
 
-                    <Column field="number" header="" class="center-aligned-column">
+                    <Column field="number" header="" class="center-aligned-column" style="width: 22.5%">
                         <template #body="slotProps">
-                            <span class="phone-item">{{ slotProps.data.numbers[0].number }}</span>
+                            <tr v-for="number, i in slotProps.data.numbers" :key="i">
+                                <td class="phone-item">
+                                    {{ number.number }}
+                                </td>
+                            </tr>
                         </template>
                     </Column>
 
-                    <Column field="groups" header="" class="center-aligned-column">
+                    <Column field="groups" header="" class="center-aligned-column" style="width: 25%">
                         <template #body="slotProps">
-                            <span class="font-bold">{{ slotProps.data.numbers[0].group }}</span>
+                            <tr class="group-container"v-for="(number, index) in slotProps.data.numbers" :key="index">
+                                <td v-for="(group, g_i) in number.group" :key="g_i">
+                                    <span class="rounded-4 group-chip">Group {{ g_i + 1 }}</span>
+                                </td>
+                            </tr>
                         </template>
                     </Column>
 
-                    <Column field="dnc" header="" class="center-aligned-column">
+                    <Column field="dnc" header="" class="center-aligned-column" style="width: 15%">
                         <template #body="slotProps">
-                            <DncSVG v-if="slotProps.data.numbers[0].dnc === '1'" class="dnc-icon w-full" />
-                            <PhoneSVG v-else class="w-full" />
+                            <tr v-for="(number, index) in slotProps.data.numbers" :key="index">
+                                <td>
+                                    <DncSVG v-if="number.dnc === '1'" class="dnc-icon w-full" />
+                                    <PhoneSVG v-else class="w-full" />
+                                </td>
+                            </tr>
+                        </template>
+                    </Column>
+
+                    <Column field="empty" header="" class="center-aligned-column" style="width: 15%">
+                        <template #body="slotProps">
                         </template>
                     </Column>
                 </DataTable>
@@ -177,8 +209,9 @@
             acc[contact.id].numbers.push({
                 number: format_number_to_show(contact.number),
                 number_id: contact.number_id,
-                group: contact.number_groups === null ? '0' : typeof contact.number_groups === "string" ? contact.number_groups.trim().split(/\s*,\s*/).length : '0',
-                dnc: contact.dnc
+                group: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups) : [],
+                dnc: contact.dnc,
+                type: contact.type,
             });
         } else {
             // if doesn't exist, create a new contact object.
@@ -188,8 +221,9 @@
                 numbers: [{
                     number: format_number_to_show(contact.number),
                     number_id: contact.number_id,
-                    group: contact.number_groups === null ? '0' : typeof contact.number_groups === "string" ? contact.number_groups.trim().split(/\s*,\s*/).length : '0',
-                    dnc: contact.dnc
+                    group: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups) : [],
+                    dnc: contact.dnc,
+                    type: contact.type,
                 }]
             };
         }
@@ -205,15 +239,18 @@
     }
 
     const toggleRow = (id: string) => {
-        if (expandedRows.value.length) {
+        let is_same_row = false;
+        if(expandedRows.value.length) {
+            is_same_row = Object.keys(expandedRows.value)[0] === id;
             expandedRows.value = [];
-            if(id) expandedRows.value[id] = true;
-            return
-        }
+        } 
+        if(is_same_row) return;
         expandedRows.value[id] = true;
     }
 
     const isRowExpanded = (id: string) => !!expandedRows.value[id];
+
+    const get_number_groups = (groups: string) => groups === null ? '0' : groups.trim().split(/\s*,\s*/);
 </script>
 
 <style scoped lang="scss">
@@ -317,4 +354,39 @@
     .chevron-icon {
         color: #302f31;
     }
+
+    .phone-data-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        .extra-number-chip {
+            background-color: #49454F;
+            color: #FFF;
+            font-size: 10px;
+            padding: 1.5px 7px;
+            border-radius: 10px;
+        }
+    }
+    
+    .dnc-header-container {
+        display: flex;
+        justify-content: center;
+        padding-left: 14px;
+    }
+
+    .group-container {
+        display: flex;
+        gap: 5px;
+
+        .group-chip {
+            background-color: #EBFFEE;
+            font-size: 12px;
+            font-weight: 600;
+            color: #49454F;
+            padding: 2px 8px 3px 8px;
+        }
+    }
+
 </style>

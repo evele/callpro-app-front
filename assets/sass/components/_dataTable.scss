@@ -7,11 +7,83 @@
     text-align: center;
 }
 
-.contacts-table div[data-pc-name="pcpaginator"] {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
+.contacts-table {
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    tr {
+        height: 68px;
+    }
+
+    td, th {
+        padding: 0;
+        padding-left: 1.5rem;
+        border: none;
+    }
+
+    thead {
+        tr {
+            height: 38px;
+        }
+    }
+
+    thead th {
+        background-color: rgba(121, 116, 126, 0.16);
+        line-height: 28px;
+    
+        &:first-child {
+            border-top-left-radius: 6px;
+        }
+        &:last-child {
+            border-top-right-radius: 6px;
+        }
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: rgba(121, 116, 126, 0.08);
+    }
+
+    input[type="checkbox"] {
+        height: 14px;
+        width: 14px;
+    }
+
+    div[data-pc-section="content"] {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    button[data-pc-group-section="pagebutton"],
+    span[data-pc-section="pages"] button {
+        background-color: transparent;
+        border: none;
+        border-radius: 6px;
+        padding: 2px 9px;
+        margin: 0 3px;
+        cursor: pointer;
+    }
+
+    button[data-pc-group-section="pagebutton"] {
+        background-color: transparent;
+    }
+
+    span[data-pc-section="pages"] button[data-p-active="true"] {
+        background-color: #2C2C2C;
+        color: white;
+    }
+
+    div[data-pc-name="pcpaginator"] {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    [data-pc-section="rowexpansioncell"] {
+        padding-left: 0;
+    }
 }
 
 .contacts-expanded-row {
@@ -19,4 +91,12 @@
     padding: 10px;
     border-top: .5px solid #DED8E1;
     border-bottom: 1px solid #e0e0e0;
+
+    thead {
+        display: none;
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: transparent;
+    }
 }
