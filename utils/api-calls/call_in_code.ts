@@ -1,18 +1,16 @@
-export type UserCallInCode = {
+type UserCallInCode = {
     id: number;
     call_in_code: number;
-    is_static: 0 | 1;
+    is_static: ZeroOrOne;
     date: string;
 }
 
 
-export type CallInCodeResponse = {
+type CallInCodeResponse = {
     result: boolean;
-    user_call_in_codes: UserCallInCode[];    
-    db_error?:string;
+    user_call_in_codes: UserCallInCode[];        
 }
 
-export async function getUserCallInCodes():Promise<CallInCodeResponse>{
-    const response = await fetchWrapper.get(GET_USER_CALL_IN_CODES_URL)
-    return response as CallInCodeResponse
+export async function getUserCallInCodes():Promise<CallInCodeResponse | APIResponseError>{
+    return await fetchWrapper.get(GET_USER_CALL_IN_CODES_URL) as CallInCodeResponse | APIResponseError
 }

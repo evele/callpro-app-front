@@ -14,7 +14,7 @@ export const useConvertTextToSpeech = () => {
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data:{ is_static: 0 | 1 }) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
+    mutationFn: (data:{ is_static: ZeroOrOne }) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
     },
