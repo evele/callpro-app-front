@@ -13,7 +13,6 @@
             :totalRecords="total_records"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
-            stripedRows
         >
 
             <template #header>
@@ -56,15 +55,15 @@
             <Column field="number" header="Phone" class="center-aligned-column">
                 <template #body="slotProps">
                     <div class="phone-data-container">
-                        <span class="phone-item">{{ slotProps.data.numbers[0].number }}</span>
-                        <span v-if="slotProps.data.numbers.length > 1" class="extra-number-chip"> +{{ slotProps.data.numbers.length -1 }}</span>
+                        <span class="phone-item">{{ slotProps.data.number }}</span>
+                        <span v-if="slotProps.data.total_numbers > 1" class="extra-number-chip"> +{{ slotProps.data.total_numbers -1 }}</span>
                     </div>
                 </template>
             </Column>
 
             <Column field="groups" header="Groups" class="center-aligned-column">
                 <template #body="slotProps">
-                    <span class="font-bold">{{ slotProps.data.numbers[0].group.length }}</span>
+                    <span class="font-bold">{{ slotProps.data.total_groups }}</span>
                 </template>
             </Column>
 
@@ -76,7 +75,7 @@
                     </div>
                 </template>
                 <template #body="slotProps">
-                    <DncSVG v-if="slotProps.data.numbers[0].dnc === '1'" class="dnc-icon w-full" />
+                    <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon w-full" />
                     <PhoneSVG v-else class="w-full" />
                 </template>
             </Column>
@@ -95,54 +94,48 @@
 
             <template #expansion="slotProps">
                 <DataTable 
-                    :value="[slotProps.data]"
+                    :value="formatted_contact"
                     tableStyle="min-width: 35rem"
                     class="contacts-expanded-row w-full"
                 >
-                    <Column selectionMode="multiple" headerStyle="text-align: left" style="width: 10%"></Column>
-                    <Column field="name" header="" class="left-aligned-column" style="width: 22.5%">
+                    <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
+                    <Column field="name" header="" class="left-aligned-column" style="width: 35%;">
                         <template #body="slotProps">
-                            <tr v-for="number, i in slotProps.data.numbers" :key="i" @click="console.log(slotProps.data)">
-                                <td class="name-item">
-                                    {{ format_contact_type(number.type) }}
-                                </td>
-                            </tr>
+                            <span class="name-item" @click="console.log(slotProps.data)">
+                                {{ format_contact_type(slotProps.data.type) }}
+                            </span>
                         </template>
                     </Column>
 
-                    <Column field="number" header="" class="center-aligned-column" style="width: 22.5%">
+                    <Column field="number" header="" class="center-aligned-column" style="width: 20%;">
                         <template #body="slotProps">
-                            <tr v-for="number, i in slotProps.data.numbers" :key="i">
-                                <td class="phone-item">
-                                    {{ number.number }}
-                                </td>
-                            </tr>
+                            <span class="phone-item">
+                                {{ slotProps.data.number }}
+                            </span>
                         </template>
                     </Column>
 
-                    <Column field="groups" header="" class="center-aligned-column" style="width: 25%">
+                    <Column field="groups" header="" class="center-aligned-column" style="width: 25%; padding-left: 0;">
                         <template #body="slotProps">
-                            <tr class="group-container"v-for="(number, index) in slotProps.data.numbers" :key="index">
-                                <td v-for="(group, g_i) in number.group" :key="g_i">
-                                    <span class="rounded-4 group-chip">Group {{ g_i + 1 }}</span>
-                                </td>
-                            </tr>
+                            <div class="group-container">
+                                <span class="rounded-4 group-chip" v-for="(group, g_i) in slotProps.data.group" :key="g_i">Group {{ g_i + 1 }}</span>
+                            </div>
                         </template>
                     </Column>
 
-                    <Column field="dnc" header="" class="center-aligned-column" style="width: 15%">
+                    <Column field="dnc" header="" class="center-aligned-column" style="width: 9%; padding-left: 12px;">
                         <template #body="slotProps">
-                            <tr v-for="(number, index) in slotProps.data.numbers" :key="index">
-                                <td>
-                                    <DncSVG v-if="number.dnc === '1'" class="dnc-icon w-full" />
-                                    <PhoneSVG v-else class="w-full" />
-                                </td>
-                            </tr>
+                            <span>
+                                <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon" />
+                                <PhoneSVG v-else />
+                            </span>
                         </template>
                     </Column>
 
-                    <Column field="empty" header="" class="center-aligned-column" style="width: 15%">
-                        <template #body="slotProps">
+                    <Column field="empty" header="" class="center-aligned-column" style="width: 12%;">
+                        <template body>
+                            <span>
+                            </span>
                         </template>
                     </Column>
                 </DataTable>
@@ -194,6 +187,7 @@
     const total_records = ref()
 
     const expandedRows = ref([]);
+    const formatted_contact = ref([]);
 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
     
@@ -204,34 +198,26 @@
         if(!all_contacts_data?.value?.contacts) return []
 
         const groupedContacts = all_contacts_data?.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
-        // if the contact already exists, add the new number to the numbers array.
-        if (acc[contact.id]) {
-            acc[contact.id].numbers.push({
-                number: format_number_to_show(contact.number),
-                number_id: contact.number_id,
-                group: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups) : [],
-                dnc: contact.dnc,
-                type: contact.type,
-            });
-        } else {
-            // if doesn't exist, create a new contact object.
-            acc[contact.id] = {
-                id: contact.id,
-                name: show_full_name(contact.first_name, contact.last_name),
-                numbers: [{
+            if (acc[contact.id]) {
+                acc[contact.id].total_numbers += 1;
+                if(typeof contact.number_groups === 'string') {
+                    acc[contact.id].total_groups += get_number_groups(contact.number_groups).length;
+                }
+            } else {
+                acc[contact.id] = {
+                    id: contact.id,
+                    name: show_full_name(contact.first_name, contact.last_name),
                     number: format_number_to_show(contact.number),
-                    number_id: contact.number_id,
-                    group: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups) : [],
-                    dnc: contact.dnc,
-                    type: contact.type,
-                }]
-            };
-        }
+                    total_numbers: 1,
+                    total_groups: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups).length : '0',
+                    dnc: contact.dnc
+                };
+            }
 
-        return acc;
-    }, {});
+            return acc;
+        }, {});
 
-    return Object.values(groupedContacts);
+        return Object.values(groupedContacts);
     });
 
     const onPageChange = (event: any) => {
@@ -246,17 +232,30 @@
         } 
         if(is_same_row) return;
         expandedRows.value[id] = true;
+        format_expanded_contact(id);
+    }
+
+    const format_expanded_contact = (id: string | number) => {
+        formatted_contact.value = all_contacts_data?.value?.contacts
+                            ?.filter((contact: ContactPhoneNumber) => contact.id === id)
+                            .map((contact: ContactPhoneNumber) => {
+                                return {
+                                    type: contact.type,
+                                    number: format_number_to_show(contact.number),
+                                    group: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups) : [],
+                                    dnc: contact.dnc
+                                }
+                            })
     }
 
     const isRowExpanded = (id: string) => !!expandedRows.value[id];
 
-    const get_number_groups = (groups: string) => groups === null ? '0' : groups.trim().split(/\s*,\s*/);
+    const get_number_groups = (groups: string) => groups === null ? [] : groups.trim().split(/\s*,\s*/);
 </script>
 
 <style scoped lang="scss">
     .table-container {
         max-width: 850px;
-        max-height: 780px;
         background-color: white;
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
         font-size: 14px;
@@ -356,12 +355,12 @@
     }
 
     .phone-data-container {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
+        position: relative;
 
         .extra-number-chip {
+            position: absolute;
+            right: 2px;
+            top: 2px;
             background-color: #49454F;
             color: #FFF;
             font-size: 10px;
@@ -378,6 +377,7 @@
 
     .group-container {
         display: flex;
+        justify-content: center;
         gap: 5px;
 
         .group-chip {
