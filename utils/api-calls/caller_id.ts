@@ -1,10 +1,8 @@
 type APIResponseCID = {
     result: boolean;
-    caller_ids?: CallerID[];
-    db_error?: string;
+    caller_ids?: CallerID[];    
 }
 
-export async function getCallerID():Promise<APIResponseCID>{
-    const response = await fetchWrapper.get(GET_CALLER_IDS_URL)
-    return response as APIResponseCID
+export async function getCallerID():Promise<APIResponseCID | APIResponseError>{    
+    return await fetchWrapper.get(GET_CALLER_IDS_URL) as APIResponseCID | APIResponseError
 }

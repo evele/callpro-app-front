@@ -4,11 +4,11 @@
         <span v-if="isLoading">Loading...</span>
         <span v-else-if="isError">Error: {{ error?.message }}</span>
         <Button label="Reload numbers" icon="pi pi-refresh" class="button is-info" @click="load_numbers" />
-        <ul v-if="isSuccess">
+        <ul v-if="isSuccess && data && 'caller_ids' in data">
             <li v-if="data?.result" v-for="number in data?.caller_ids" :key="number?.id">
                 {{ number.caller_id }}
             </li>
-            <span v-else>{{ data?.db_error }}</span>
+            <span v-else-if="isError">Error: {{ error?.message }}</span>                       
         </ul>
     </div>
 </template>
