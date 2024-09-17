@@ -29,16 +29,11 @@ type Broadcast = {
     TRANSFERRED: string;
     INVALID: string;
 }
-type validation_keys = 'broadcast_id' | 'state' | 'length_limit' | 'start_limit' | 'search'
 
 type BroadcastResponse = {
 result: boolean;
 broadcast: Array<{ id: number; name: string }>;
-validation_error?: Record<validation_keys,string>
-db_error?: { broadcast_id?: string };
 }
-
-type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 
 type StatusOption = 'COMPLETED' | 'PROCESSING' | 'SCHEDULED' | 'CALLING' | 'TRANSFERRED' | 'PAUSED' |'CONNECTED'| 'WAITING_FOR_RETRY';    
 

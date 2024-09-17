@@ -7,10 +7,10 @@ import { TabOption, StateOption } from '../utils/api-calls/broadcast';
             <button @click="get_broadcast_data">Get broadcast data</button>
             <p v-if="isLoading">Loading broadcasts...</p>
             <p v-if="isError">{{ error?.message }}</p>
-            <div v-if="bHeaderIsSuccess">
-                <p v-if="!bHeaderData?.result" style="color: red;">{{ bHeaderData?.db_error?.broadcast_id }}</p>                
-                <p v-else-if="!bHeaderData?.broadcast?.length">No broadcast found.</p>
-                <p v-else>Broadcast name: <span style="font-weight: bold;">{{ bHeaderData?.broadcast?.[0].name }}</span></p>
+            <div v-if="bHeaderIsSuccess && bHeaderData?.result">
+                <p>Broadcast name: 
+                    <span style="font-weight: bold;">{{ bHeaderData?.broadcast?.[0].name }}</span>
+                </p>
             </div>
         </div>
 
@@ -40,10 +40,8 @@ import { TabOption, StateOption } from '../utils/api-calls/broadcast';
         </div>
 
         <p style="margin-left: 1rem;" v-if="bDetailIsLoading">Loading broadcasts...</p>
-        <p style="margin-left: 1rem;" v-if="bDetailIsError">No broadcast found.</p>
-        <ul v-if="bDetailIsSuccess">
-            <p v-if="!bDetailData?.result" style="color: red;">{{ bDetailData?.db_error?.broadcast_id }}</p>
-            <p v-else-if="!bDetailData?.broadcast_details?.length">No broadcast found.</p>
+        <p style="margin-left: 1rem;" v-if="bDetailIsError && !bDetailData?.result">{{errorDetail}}</p>
+        <ul v-if="bDetailIsSuccess && bDetailData?.result">                        
             <li v-for="broadcast in bDetailData?.broadcast_details" :key="broadcast?.id" style="margin: 10px 0;">
                 <span style="font-weight: 600; margin-right: 6px;">Broadcast ID:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast?.broadcast_id }}</span> 
                 <span style="font-weight: 600; margin-right: 6px;">Broadcast result:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast?.result }}</span> 
@@ -66,7 +64,7 @@ import { TabOption, StateOption } from '../utils/api-calls/broadcast';
 
     const { data: bHeaderData, isLoading, isSuccess: bHeaderIsSuccess, isError, error, refetch: bHeaderRefetch } = useFetchGetBroadcastHeader(broadcast_id)
 
-    const { data: bDetailData, isLoading: bDetailIsLoading, isSuccess: bDetailIsSuccess, isError: bDetailIsError, refetch: bDetailRefetch } = useFetchGetBroadcastDetail(broadcast_id, selected_tab,start_limit, show, search)
+    const { data: bDetailData, isLoading: bDetailIsLoading, isSuccess: bDetailIsSuccess, isError: bDetailIsError,error:errorDetail, refetch: bDetailRefetch } = useFetchGetBroadcastDetail(broadcast_id, selected_tab,start_limit, show, search)
 
     let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
    
