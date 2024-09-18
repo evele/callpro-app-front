@@ -1,9 +1,10 @@
 <template>
     <div class="w-full table-container rounded-7 py-5 px-4">
         <DataTable 
-            :value="formatted_contacts" 
-            tableStyle="min-width: 40rem" 
-            class="contacts-table w-full flex flex-col gap-18" 
+            :value="formatted_contacts"
+            scrollable 
+            tableStyle="min-width: 50rem"
+            class="table w-full flex flex-col gap-18" 
             :paginator="show_pagination" 
             :rows="10" 
             dataKey="id"
@@ -48,13 +49,13 @@
 
             <Column field="name" header="Name" class="left-aligned-column">
                 <template #body="slotProps">
-                    <span class="name-item" @click="console.log(formatted_contacts)">{{ slotProps.data.name }}</span>
+                    <span class="name-item">{{ slotProps.data.name }}</span>
                 </template>
             </Column>
 
             <Column field="number" header="Phone" class="center-aligned-column">
                 <template #body="slotProps">
-                    <div class="phone-data-container">
+                    <div class="phone-data-container h-row">
                         <span class="phone-item">{{ slotProps.data.number }}</span>
                         <span v-if="slotProps.data.total_numbers > 1" class="extra-number-chip"> +{{ slotProps.data.total_numbers -1 }}</span>
                     </div>
@@ -92,7 +93,7 @@
             </Column>
 
 
-            <template #expansion="slotProps">
+            <template #expansion>
                 <DataTable 
                     :value="formatted_contact"
                     tableStyle="min-width: 35rem"
@@ -101,7 +102,7 @@
                     <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
                     <Column field="name" header="" class="left-aligned-column" style="width: 35%;">
                         <template #body="slotProps">
-                            <span class="name-item" @click="console.log(slotProps.data)">
+                            <span class="name-item">
                                 {{ format_contact_type(slotProps.data.type) }}
                             </span>
                         </template>
@@ -186,8 +187,15 @@
     const search = ref("")
     const total_records = ref()
 
-    const expandedRows = ref([]);
-    const formatted_contact = ref([]);
+    const expandedRows = ref<{ [key: string]: boolean }>({});
+    const formatted_contact: Ref<FormattedContact[]> = ref([]);
+
+    type FormattedContact = {
+        dnc: ZeroOrOne,
+        group: string[],
+        number: string,
+        type: OneToFour
+    }
 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
     
@@ -226,9 +234,9 @@
 
     const toggleRow = (id: string) => {
         let is_same_row = false;
-        if(expandedRows.value.length) {
+        if(Object.keys(expandedRows.value).length) {
             is_same_row = Object.keys(expandedRows.value)[0] === id;
-            expandedRows.value = [];
+            expandedRows.value = {};
         } 
         if(is_same_row) return;
         expandedRows.value[id] = true;
@@ -236,6 +244,8 @@
     }
 
     const format_expanded_contact = (id: string | number) => {
+        if(!all_contacts_data?.value?.contacts) return [];
+        
         formatted_contact.value = all_contacts_data?.value?.contacts
                             ?.filter((contact: ContactPhoneNumber) => contact.id === id)
                             .map((contact: ContactPhoneNumber) => {
@@ -255,10 +265,17 @@
 
 <style scoped lang="scss">
     .table-container {
-        max-width: 850px;
+        max-width: 700px;
         background-color: white;
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
         font-size: 14px;
+
+        @media (min-width: 980px) {
+            max-width: 800px;
+        }
+        @media (min-width: 1100px) {
+            max-width: 850px;
+        }
     }
     
     .table-action-btn {
@@ -356,11 +373,14 @@
 
     .phone-data-container {
         position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         .extra-number-chip {
             position: absolute;
             right: 2px;
-            top: 2px;
+            top: 25px;
             background-color: #49454F;
             color: #FFF;
             font-size: 10px;
@@ -389,4 +409,7 @@
         }
     }
 
+    .h-row {
+        height: 68px;
+    }
 </style>

@@ -129,5 +129,6 @@
 
 .main-container {
     background-color: var(--body-background);
+    overflow-x: hidden;
 }
 </style>

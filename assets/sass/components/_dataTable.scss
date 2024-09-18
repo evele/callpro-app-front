@@ -7,13 +7,10 @@
     text-align: center;
 }
 
-.contacts-table {
+.table {
     table {
         border-collapse: collapse;
         width: 100%;
-    }
-    tr {
-        height: 68px;
     }
 
     td, th {
@@ -60,13 +57,22 @@
         background-color: transparent;
         border: none;
         border-radius: 6px;
-        padding: 2px 9px;
         margin: 0 3px;
         cursor: pointer;
+        transition: background-color 0.3s;
+
+        &:hover {
+            background-color: #e6e2e2;
+        }
     }
 
     button[data-pc-group-section="pagebutton"] {
         background-color: transparent;
+        padding: 6px;
+    }
+
+    span[data-pc-section="pages"] button {
+        padding: 2px 9px;
     }
 
     span[data-pc-section="pages"] button[data-p-active="true"] {
@@ -102,6 +108,10 @@
 
     tbody tr:nth-child(even) {
         background-color: transparent;
+    }
+
+    td {
+        height: 40px;
     }
 
     tr {
