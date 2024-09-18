@@ -39,8 +39,8 @@
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
-    const audio_id = ref<string | null>(null);
-    const audio_url = ref<string | null>(null);    
+    const audio_id: Ref<string | null>= (null);
+    const audio_url: Ref<string | null> = (null);    
     
     
     const show_older = ref(false)
@@ -64,8 +64,7 @@
         }
 
         createTextToSpeech(dataToSend, {
-            onSuccess: (data:Tts_Convert) => {
-                console.log("data: -",data)
+            onSuccess: (data:Tts_Convert) => {                
                 audio_id.value = PREVIEW_TTS
                 audio_url.value = data.full_file_url
             }
