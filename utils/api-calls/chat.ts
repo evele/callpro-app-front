@@ -7,8 +7,8 @@ type ChatContact = {
 }
 
 type APIResponseChatContacts = {
-    result: boolean;
-    contacts?: ChatContact[];    
+    result: true;
+    contacts: ChatContact[];    
 }
 
 type fnProps = { all_contacts: OneOrTwo }
@@ -19,8 +19,8 @@ export async function getChatContacts(data: fnProps):Promise<APIResponseChatCont
 
 /* ----- Unread messages ----- */
 type APIResponseUnreadMessages = {
-    result: boolean;
-    unread_messages?: number;    
+    result: true;
+    unread_messages: number;    
 }
 
 export async function getUnreadMessages():Promise<APIResponseUnreadMessages | APIResponseError>{

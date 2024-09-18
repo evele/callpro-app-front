@@ -1,6 +1,6 @@
 type APIResponseCID = {
-    result: boolean;
-    caller_ids?: CallerID[];    
+    result: true;
+    caller_ids: CallerID[];    
 }
 
 export async function getCallerID():Promise<APIResponseCID | APIResponseError>{    

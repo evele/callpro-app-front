@@ -9,11 +9,11 @@ type FilterAudio ={
 }
 
 type APIResponseConvertedAudios = {
-    result: boolean,
+    result: true,
     audios: AudioAux[],
 }
 type APIResponseAllAudios = {
-    result: boolean,
+    result: true,
     audios: Audio[],
     has_older_audios?:boolean,
 }

@@ -80,7 +80,7 @@ time_stamp: string;
 }
 
 type APIResponseInvoices = {
-result: boolean;
+result: true;
 invoices: Invoice[];
 }
 
@@ -109,7 +109,7 @@ type InvoiceCoupon = {
 };
 
 type InvoiceDataResponse = {
-  result:boolean;
+  result: true;
   invoice_data: InvoiceData;
   invoice_coupon: InvoiceCoupon[];  
 }

@@ -31,7 +31,7 @@ type Broadcast = {
 }
 
 type BroadcastResponse = {
-result: boolean;
+result: true;
 broadcast: Array<{ id: number; name: string }>;
 }
 
@@ -64,7 +64,7 @@ type BroadcastDetails ={
 
 
 type BroadcastDetailResponse = {
-    result: boolean;
+    result: true;
     results_count: number;
     broadcast_details: BroadcastDetails[];
     state: StateOption;    

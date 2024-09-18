@@ -7,10 +7,10 @@ type fnProps = {
 }
 
 type APIResponseBroadcastList = {
-    result: boolean;
-    broadcast_list?: BroadcastDashboardData[];
-    state?: DashboardState;
-    total_broadcast?: string;    
+    result: true;
+    broadcast_list: BroadcastDashboardData[];
+    state: DashboardState;
+    total_broadcast: string;    
 }
 
 export async function getBroadcastList(data: fnProps):Promise<APIResponseBroadcastList | APIResponseError> {

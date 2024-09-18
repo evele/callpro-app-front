@@ -7,7 +7,7 @@ type UserCallInCode = {
 
 
 type CallInCodeResponse = {
-    result: boolean;
+    result: true;
     user_call_in_codes: UserCallInCode[];        
 }
 

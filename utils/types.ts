@@ -171,7 +171,7 @@ export type SMSDashboardData = {
 export type DidNumber = {
   id: number;
   number: string;
-  cnam: string | null;
+  cnam: StringOrNull;
   created_at: string;
   order_id: string;
   root_user_id: number;
@@ -335,8 +335,8 @@ export type Audio = {
 
 export type AudioAux = {
   id: string;
-  audio_id: string | null;
-  audio_url: string | null;
+  audio_id: StringOrNull;
+  audio_url: StringOrNull;
   name: string;
   created_at: string;
   last_used: string;

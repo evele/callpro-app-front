@@ -9,7 +9,7 @@ type ContactFilter = {
 }
 
 type APIResponse = {
-    result: boolean,
+    result: true,
     contacts: ContactPhoneNumber[]
 }
 
@@ -21,8 +21,8 @@ export async function getAllContacts(data:ContactFilter):Promise<APIResponse | A
 type fnProps = { contact_id: string }
 
 type GetContactAPIResponse = {
-    result: boolean,
-    contact_data?: ContactPhoneNumber,    
+    result: true,
+    contact_data: ContactPhoneNumber,    
 }
 
 export async function getContact(data: fnProps): Promise<GetContactAPIResponse | APIResponseError>{    
@@ -31,8 +31,8 @@ export async function getContact(data: fnProps): Promise<GetContactAPIResponse |
 
 /* ----- Get user custom groups ----- */
 type UserCustomGroupsAPIResponse = {
-    result: boolean,
-    custom_groups?: UserCustomGroup[],    
+    result: true,
+    custom_groups: UserCustomGroup[],    
 }
 
 export async function getUserCustomGroups(): Promise<UserCustomGroupsAPIResponse | APIResponseError>{
@@ -49,7 +49,7 @@ type save_contact_validation_keys =
     `contact_info[numbers][${number}][number_groups][${number}]`;
 
 type SaveContactAPIResponse = {
-    result: boolean,    
+    result: true,    
 }
 
 export async function saveContact(data: ContactToSaveData): Promise<SaveContactAPIResponse | APIResponseError>{    
@@ -58,9 +58,9 @@ export async function saveContact(data: ContactToSaveData): Promise<SaveContactA
 
 /* ----- Upload Contact ----- */
 export type UploadContactAPIResponse = {
-    result: boolean,
-    contacts?: ContactUploadedData[],
-    group_id?: string,    
+    result: true,
+    contacts: ContactUploadedData[],
+    group_id: string,    
 }
 
 export async function uploadContactCSV(data: FormData): Promise<UploadContactAPIResponse | APIResponseError> {    
@@ -69,7 +69,7 @@ export async function uploadContactCSV(data: FormData): Promise<UploadContactAPI
 
 /* ----- Save Uploaded Contact ----- */
 export type SaveUploadedContactAPIResponse = {
-    result: boolean;    
+    result: true;    
 }
 
 export async function saveUploadedContact(data: uploadedContactToSaveData): Promise<SaveUploadedContactAPIResponse | APIResponseError> {
