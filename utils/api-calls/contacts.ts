@@ -40,14 +40,6 @@ export async function getUserCustomGroups(): Promise<UserCustomGroupsAPIResponse
 }
 
 /* ----- Save Contact ----- */
-type save_contact_validation_fields = 'id' | 'number' | 'type' | 'notes';
-
-type save_contact_validation_keys = 
-    'action' | 
-    'save_contact' |
-    `contact_info[numbers][${number}][${save_contact_validation_fields}]` |
-    `contact_info[numbers][${number}][number_groups][${number}]`;
-
 type SaveContactAPIResponse = {
     result: true,    
 }

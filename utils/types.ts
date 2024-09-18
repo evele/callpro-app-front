@@ -10,6 +10,7 @@ export type SelectOption = { name: string; code: string | number };
 export type StringOrNumber = string | number;
 export type StringOrNull = string | null;
 export type NumberOrNull = number | null;
+export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 

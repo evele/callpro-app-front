@@ -1,4 +1,4 @@
-export type DidAndTollFreeNumbersAPIResponse = {
+type DidAndTollFreeNumbersAPIResponse = {
     result: true,
     did_numbers: DidNumber[],
     toll_free_numbers: DidNumber[],  

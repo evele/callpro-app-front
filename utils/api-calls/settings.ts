@@ -2,8 +2,8 @@
 type SettingsAPIResponse = {
     result: true,
     monthly_groups_plans: MonthlyGroupPlan[],
-    max_retries: number | null,
-    static_intro_enabled?: boolean | null,
+    max_retries: NumberOrNull,
+    static_intro_enabled: BooleanOrNull,
     settings: Settings,
     text_settings: TextSettings,
     timezones: Timezone[],
@@ -15,28 +15,8 @@ export async function getSettings(): Promise<SettingsAPIResponse | APIResponseEr
 }
 
 /* ----- Update voice settings ----- */
-type update_voice_settings_validation_fields = 
-    'caller_id' |
-    'static_intro' |
-    'static_intro_library_id' |
-    'repeat' |
-    'offer_dnc' |
-    'retries' |
-    'call_speed' |
-    'amd_detection' |
-    'email_on_finish' |
-    'number_when_completed_status' |
-    'number_when_completed' |
-    'time_guard' |
-    'call_window_start' |
-    'call_window_end' |
-    'time_zone';
-    
-type update_voice_settings_validation_keys = 'cid_confirm' | `settings[${update_voice_settings_validation_fields}]`;
-
 type UpdateVoiceSettingsAPIResponse = {
     result: true;
-    validation_error? : Record<update_voice_settings_validation_keys, string>    
 }
 
 export async function updateVoiceSettings(data: VoiceSettingsDataToSave): Promise<UpdateVoiceSettingsAPIResponse | APIResponseError>{    
@@ -44,13 +24,8 @@ export async function updateVoiceSettings(data: VoiceSettingsDataToSave): Promis
 }
 
 /* ----- Update text settings ----- */
-type update_text_settings_validation_fields = 'text_caller_id' | 'chat' | 'sms_dnc';
-    
-type update_text_settings_validation_keys = `settings[${update_text_settings_validation_fields}]`;
-
 type UpdateTextSettingsAPIResponse = {
-    result: true;
-    validation_error: Record<update_text_settings_validation_keys, string>    
+    result: true;       
 }
 
 export async function updateTextSettings(data: TextSettingsDataToSave): Promise<UpdateTextSettingsAPIResponse | APIResponseError>{    
