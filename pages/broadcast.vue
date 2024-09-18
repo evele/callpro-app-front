@@ -3,7 +3,7 @@ import { TabOption, StateOption } from '../utils/api-calls/broadcast';
     <div>
         <p class="text-title">Broadcast page</p>
         <div style="margin-left: 1rem;">
-            <input type="text" v-model="broadcast_id" placeholder="Write the broadcast ID">
+            <input type="text" v-model.number="broadcast_id" placeholder="Write the broadcast ID">
             <button @click="get_broadcast_data">Get broadcast data</button>
             <p v-if="isLoading">Loading broadcasts...</p>
             <p v-if="isError">{{ error?.message }}</p>
@@ -55,7 +55,8 @@ import { TabOption, StateOption } from '../utils/api-calls/broadcast';
     const handleRefetch = (event: Event) => {
         bDetailRefetch()
     }
-    const broadcast_id = ref('')
+    // const broadcast_id = ref('')
+    const broadcast_id = ref<number>(0)
     const tab_options: StateOption[] = [BROADCAST_ALL, LIVE, VM, INVALID, NA]
     const selected_tab:Ref<StateOption> = ref(BROADCAST_ALL)
     const start_limit = ref(0)

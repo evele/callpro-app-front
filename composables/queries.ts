@@ -5,7 +5,7 @@ function sleep(ms:number) {
 }
 
 /* ----- Broadcast ----- */
-export function useFetchGetBroadcastHeader(broadcast_id:Ref<string>){
+export function useFetchGetBroadcastHeader(broadcast_id:Ref<number>){
   const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
 
   return useQuery({
@@ -13,7 +13,7 @@ export function useFetchGetBroadcastHeader(broadcast_id:Ref<string>){
     queryFn: () => getBroadcastHeader(dataToSend.value)    
   })
 }
-export const useFetchGetBroadcastDetail = (broadcast_id:Ref<string>, selected_tab:Ref<StateOption>,start_limit:Ref<number>, show:Ref<number>, search:Ref<string>) => {
+export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_tab:Ref<StateOption>,start_limit:Ref<number>, show:Ref<number>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     broadcast_id: broadcast_id.value,
     length_limit: show.value,
@@ -53,7 +53,7 @@ export function useFetchGetAllAudios(showOlder:Ref<boolean>) {
     });
 }
 
-export const useFetchGetAudio = (audio_id: Ref<string | null>, audio_full_url:Ref<string | null>, called_from: string) => {
+export const useFetchGetAudio = (audio_id: Ref<StringOrNull>, audio_full_url:Ref<StringOrNull>, called_from: string) => {
   const dataToSend = computed(() => ({ 
     audio_id: audio_id.value, 
     audio_full_url: audio_full_url.value,
