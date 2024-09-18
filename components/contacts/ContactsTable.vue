@@ -176,6 +176,8 @@
 </template>
 
 <script setup lang="ts">
+    import { format_contact_type } from '@/utils/functions';
+
     const props = defineProps({
         selectedTab: { type: String, required: true }
     })
@@ -245,7 +247,7 @@
 
     const format_expanded_contact = (id: string | number) => {
         if(!all_contacts_data?.value?.contacts) return [];
-        
+
         formatted_contact.value = all_contacts_data?.value?.contacts
                             ?.filter((contact: ContactPhoneNumber) => contact.id === id)
                             .map((contact: ContactPhoneNumber) => {
