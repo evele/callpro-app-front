@@ -23,7 +23,7 @@
                             <template #empty>
                                     <div class="modal__dropfile--container">
                                         <CircleSVG style="color: #E8DEF8;" />
-                                        <p class="modal__dropfile--content">Drop files here to download</p>
+                                        <p class="modal__dropfile--content">Drop files here to upload</p>
                                     </div>
                             </template>
                         </FileUpload>
@@ -54,9 +54,11 @@
                         </ul>
                     </div>
 
-                    <p v-if="savedSuccess" class="text-success">Contacts Saved!</p>
+                    <p v-if="savedSuccess && showSuccess" class="text-success">Contacts Saved!</p>
                     <footer class="modal__footer">
-                        <Button :label="!savedIsPending ? 'Save' : 'Saving...'" @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || is_disabled" />
+                        <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || is_disabled">
+                            {{ !savedIsPending ? 'Save' : 'Saving...' }}
+                        </Button>
                     </footer>
                 </div>
             </section>
@@ -78,6 +80,7 @@
     const group_id = ref('');
     const has_uploaded = ref(false);
     const showError = ref(false);
+    const showSuccess = ref(false);
 
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
 
@@ -95,6 +98,7 @@
         formatted_contact.value = [];
         contacts.value = [];
         showError.value = false;
+        showSuccess.value = false;
     }
 
     defineExpose({ open });
@@ -152,12 +156,14 @@
                     is_disabled.value = false;
                     data.contacts.forEach((contact, i) => {
                         contact.numbers.forEach(number => {
-                            contacts.value.push({
-                                first_name: contact.first_name,
-                                last_name: contact.last_name,
-                                number: number.number,
-                                contact_id: `fake-${i+1}`
-                            });
+                            if(number.validation_desc === 'ok') {
+                                contacts.value.push({
+                                    first_name: contact.first_name,
+                                    last_name: contact.last_name,
+                                    number: number.number,
+                                    contact_id: `fake-${i+1}`
+                                });
+                            }
 
                             formatted_contact.value.push({
                                 selected: true,
@@ -183,6 +189,7 @@
         saveUploadedContact(data_to_send, {
             onSuccess: () => {
                 // Should be a toast
+                showSuccess.value = true;
                 setTimeout(() => {
                     close()
                 }, 2000);
@@ -318,31 +325,32 @@
         width: 100%;
         text-align: center;
         padding: 0 26px;
-    }
 
-    .modal__footer--btn {
-        border-radius: 30px;
-        max-width: 300px;
-        width: 100%;
-        height: 40px;
-        background-color: #653494;
-        color: #FFF;
-        border: 1px solid #FFF;
-        font-size: 15.854px;
-        font-weight: 700;
-        line-height: 100%;
-        transition: background-color 0.3s;
-    }
-    .modal__footer--btn:hover {
-        background-color: #4A1D6E;
-        cursor: pointer;
-    }
+        .modal__footer--btn {
+            border-radius: 30px;
+            max-width: 300px;
+            width: 100%;
+            height: 40px;
+            background-color: #653494;
+            color: #FFF;
+            border: 1px solid #FFF;
+            font-size: 15.854px;
+            font-weight: 700;
+            line-height: 100%;
+            transition: background-color 0.3s;
+        }
+        
+        .modal__footer--btn:hover {
+            background-color: #4A1D6E;
+            cursor: pointer;
+        }
 
-    .modal__footer--btn[disabled] {
-        opacity: 0.6;
-        background-color: rgba(101, 52, 148, 0.60);
-        color: #B3B3B3;
-        border: 1px solid #B3B3B3;
+        .modal__footer--btn[disabled] {
+            opacity: 0.6;
+            background-color: rgba(101, 52, 148, 0.60);
+            color: #B3B3B3;
+            border: 1px solid #B3B3B3;
+        }
     }
 
     .is-hidden {
