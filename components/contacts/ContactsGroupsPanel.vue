@@ -1,5 +1,5 @@
 <template>
-    <nav class="container flex flex-col">
+    <section class="container flex flex-col">
         <div class="first-section">
             <h4 class="groups-title">Groups</h4>
 
@@ -31,7 +31,7 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
-    </nav>
+    </section>
 </template>
 
 <script setup lang="ts">
