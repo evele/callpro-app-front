@@ -150,7 +150,7 @@
         const data_to_send = createFormData(data);
 
         uploadContact(data_to_send, {
-            onSuccess: (data: UploadContactAPIResponse) => {
+            onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
                     has_uploaded.value = true;
                     is_disabled.value = false;
