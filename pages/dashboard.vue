@@ -29,8 +29,8 @@
 
   <p v-if="isLoading">Loading broadcasts...</p>
   <p v-if="isError">{{ error?.message }}</p>
-  <ul v-if="isSuccess">
-    <li v-if="data?.result" v-for="broadcast in data?.broadcast_list" :key="broadcast?.broadcast_id" style="margin: 10px 0;">
+  <ul v-if="isSuccess && data && 'broadcast_list' in data">
+    <li v-for="broadcast in data?.broadcast_list" :key="broadcast?.broadcast_id" style="margin: 10px 0;">
       <span style="font-weight: 600; margin-right: 6px;">Broadcast name:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.name }}</span> 
       <span style="font-weight: 600; margin-right: 6px;">Broadcast ID:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.broadcast_id }}</span> 
     </li>

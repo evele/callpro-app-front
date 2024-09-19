@@ -1,4 +1,8 @@
 export * from "./api-calls/contacts.ts"
+export * from "./api-calls/audios.ts"
+export * from "./api-calls/billing.ts"
+export * from "./api-calls/broadcast.ts"
+export * from "./api-calls/call_in_code.ts"
 export * from "./api-calls/caller_id.ts"
 export * from "./api-calls/chat.ts"
 export * from "./api-calls/dashboard.ts"
@@ -7,3 +11,4 @@ export * from "./api-calls/groups.ts"
 export * from "./api-calls/packages.ts"
 export * from "./api-calls/settings.ts"
 export * from "./api-calls/sms.ts"
+

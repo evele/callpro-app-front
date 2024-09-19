@@ -1,23 +1,19 @@
 /* ----- System Groups ----- */
 type PackagesStepsAPIResponse = {
-    result: boolean,
-    steps?: PackageStep[],
-    db_error?: string,
+    result: true,
+    steps: PackageStep[],    
 }
 
-export async function getPackagesSteps(): Promise<PackagesStepsAPIResponse>{
-    const response = await fetchWrapper.get(GET_PACKAGE_STEPS_URL) 
-    return response as PackagesStepsAPIResponse
+export async function getPackagesSteps(): Promise<PackagesStepsAPIResponse | APIResponseError>{
+    return await fetchWrapper.get(GET_PACKAGE_STEPS_URL) as PackagesStepsAPIResponse | APIResponseError
 }
 
 /* ----- Custom Groups ----- */
 type MonthlyGroupsPlansAPIResponse = {
-    result: boolean,
-    monthly_groups_plans?: MonthlyGroupPlan[],
-    db_error?: string,
+    result: true,
+    monthly_groups_plans: MonthlyGroupPlan[],    
 }
 
-export async function getMonthlyGroupsPlans(): Promise<MonthlyGroupsPlansAPIResponse>{
-    const response = await fetchWrapper.get(GET_MONTHLY_GROUPS_PLANS_URL) 
-    return response as MonthlyGroupsPlansAPIResponse
+export async function getMonthlyGroupsPlans(): Promise<MonthlyGroupsPlansAPIResponse | APIResponseError>{    
+    return await fetchWrapper.get(GET_MONTHLY_GROUPS_PLANS_URL) as MonthlyGroupsPlansAPIResponse | APIResponseError
 }
