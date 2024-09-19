@@ -39,8 +39,8 @@
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
-    const audio_id: Ref<string | null>= (null);
-    const audio_url: Ref<string | null> = (null);    
+    const audio_id: Ref<string | null> = ref(null);
+    const audio_url: Ref<string | null> = ref(null);    
     
     
     const show_older = ref(false)
