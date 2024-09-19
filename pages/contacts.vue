@@ -60,6 +60,7 @@
     </ul>
 
     <ContactsActions />
+    <ContactsGroupsPanel />
 </template>
 
 <script setup lang="ts">  
