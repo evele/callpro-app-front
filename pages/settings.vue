@@ -8,7 +8,7 @@
 
         <div v-if="isSuccess" style="padding: 10px 0 2rem 1rem;">
             <p v-if="isFetching">Updating data...</p>
-            <div v-if="settings !== null && settings?.settings !== undefined">
+            <div v-if="settings?.result && settings && 'settings' in settings">
                 <div>
                     <h2 style="font-weight: bold;">Voice settings:</h2>
                     <p class="setting-label">Caller ID: <span class="setting-value"> {{ settings.settings.caller_id }}</span></p>
@@ -61,7 +61,13 @@
         return value == '1' ? ON : OFF;
     }
 
-    const time_zones = computed(() => settings?.value?.timezones)
+    const time_zones = computed(() => {
+        if (settings.value && 'result' in settings.value && settings.value.result) {
+            return settings.value.timezones;
+        }
+        return [];
+    }
+    )
 
     const format_date_time = (time: string) => {
         const currentDate = new Date();
@@ -81,10 +87,7 @@
     }
 
     const save_voice_settings = () => {
-        if( settings?.value?.settings !== undefined && 
-            settings?.value?.text_settings !== undefined && 
-            settings?.value?.user_admin_settings !== undefined
-        ) {
+        if( settings?.value && 'result' in settings.value && settings.value.result) {
             const voice_settings: VoiceSettingsToSave = {
                 'caller_id': settings.value.settings.caller_id,
                 'static_intro': settings.value.settings.static_intro,
@@ -117,7 +120,7 @@
     }
 
     const save_text_settings = () => {
-        if( settings?.value?.text_settings !== undefined ) {
+        if( settings?.value && 'result' in settings.value && settings.value.result) {
             const dataToSend: TextSettingsDataToSave = {
                 'settings': {
                     'text_caller_id': settings.value.text_settings.text_caller_id,

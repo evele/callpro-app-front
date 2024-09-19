@@ -4,8 +4,8 @@
         <input type="text" placeholder="Search for Contact ID" v-model="contact_id" @input="handle_input">
         <button type="button" class="button is-primary" @click="search_contact_data">Search</button>
         <span v-if="isLoading">Loading contact data...</span>
-        <span v-else-if="isError">Something failed while getting contact data.</span>
-        <div v-if="isSuccess">
+        <span v-else-if="isError">Something failed while getting contact data. Error: {{ error?.message }}</span>
+        <div v-if="isSuccess && data && 'contact_data' in data">
             <div v-if="data?.result">
                 <p v-if="!data?.contact_data">No contact found.</p>
                 <div v-else>
@@ -22,7 +22,7 @@
 <script setup lang="ts">
     const contact_id = ref('')
 
-    const { data, isLoading, isSuccess, isError, refetch } = useFetchContact(contact_id)
+    const { data, isLoading, isSuccess, isError, error, refetch } = useFetchContact(contact_id)
 
     const handle_input = (e: Event) => {
         const target = e.target as HTMLInputElement
