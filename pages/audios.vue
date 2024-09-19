@@ -1,15 +1,14 @@
 <template>
     <div>
-        <p class="text-title">Audios page</p>
-        <button type="button" @click="load_audios">Load audios</button>
+        <p class="text-title">Audios Page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
-        <ul v-if="isSuccess" class="ml-2 is-flex is-flex-direction-column is-gap-1">
+        <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
             <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
                 <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
                 <!-- <AudioPlayer :audioUrl="audio?.full_file_url" /> -->
                 <AudioPlayer :audio-url="'http://soundbible.com/grab.php?id=528&type=mp3'" />
             </li>
-        </ul> 
+        </ul>
         <div class="container-div">
             <label>Show older audios
                 <input type="checkbox" v-model="show_older">
@@ -31,7 +30,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
     import { useQueryClient, useQuery } from '@tanstack/vue-query'
 
     const queryClient = useQueryClient()
@@ -40,8 +39,8 @@
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
-    const audio_id = ref(null)
-    const audio_url = ref(null)
+    const audio_id: Ref<string | null> = ref(null);
+    const audio_url: Ref<string | null> = ref(null);    
     
     
     const show_older = ref(false)
@@ -65,7 +64,7 @@
         }
 
         createTextToSpeech(dataToSend, {
-            onSuccess: (data) => {
+            onSuccess: (data:Tts_Convert) => {                
                 audio_id.value = PREVIEW_TTS
                 audio_url.value = data.full_file_url
             }

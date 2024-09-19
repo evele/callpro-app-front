@@ -52,8 +52,8 @@
     </div>
     <p v-if="isLoading">Loading broadcasts...</p>
     <p v-if="isError">{{ error?.message }}</p>
-    <ul v-if="isSuccess" class="contact-list">
-        <li v-for="contact in all_contacts_data" :key="contact.id" class="contact-item">            
+    <ul v-if="isSuccess && all_contacts_data && 'contacts' in all_contacts_data" class="contact-list">
+        <li v-for="contact in all_contacts_data?.contacts" :key="contact.id" class="contact-item">            
             <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
             <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
         </li>

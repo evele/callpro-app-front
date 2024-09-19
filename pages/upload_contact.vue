@@ -122,8 +122,8 @@
         const data_to_send = createFormData(data);
 
         uploadContact(data_to_send, {
-            onSuccess: (data: UploadContactAPIResponse) => {
-                if(data.result && data.contacts?.length) {
+            onSuccess: (data: UploadContactAPIResponse | APIResponseError) => {
+                if(data && data.result && data.contacts?.length) {
                     data.contacts.forEach((contact, i) => {
                         contact.numbers.forEach(number => {
                             contacts.value.push({

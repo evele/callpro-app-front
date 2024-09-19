@@ -13,7 +13,7 @@
                     <li>Trash: {{ Object.values(SGData?.system_groups)[2] }}</li>
                 </ul>
             </div>
-            <p v-else>{{ SGData?.db_error }}</p>
+            <p v-else>{{ SGData?.error }}</p>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
                 </ul>
                 <span v-else>No custom groups to show.</span>
             </div>
-            <p v-else>{{ CGData?.db_error }}</p>
+            <p v-else>{{ CGData?.error }}</p>
         </div>
     </div>
 </template>
