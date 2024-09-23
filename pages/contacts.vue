@@ -30,6 +30,8 @@
         </div>
     </div>
 
+    <Button label="Add new contact" @click="open_new_contact_modal" />
+
     <div class="filter-container">
         <div>
             <label for="show" style="margin-right: 6px;">Show:</label>
@@ -60,6 +62,7 @@
     </ul>
 
     <ContactsActions />
+    <ModalAddNewContact ref="modalAddNewContact" />
 </template>
 
 <script setup lang="ts">  
@@ -74,6 +77,8 @@
     const groupName = ref('')
     const launchID = ref('')
     const groupID = ref('')
+
+    const modalAddNewContact = ref()
 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
@@ -97,6 +102,9 @@
         saveGroupContacts(dataToSend)
     }
 
+    const open_new_contact_modal = () => {
+        modalAddNewContact.value.open();
+    }
 </script>
 
 <style scoped>
