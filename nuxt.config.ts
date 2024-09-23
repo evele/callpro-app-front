@@ -28,8 +28,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     currencyKey: "",
     public: {
-      DEVELOPMENT: process.env.NUXT_PUBLIC_DEVELOPMENT_URL,
-      PRODUCTION: process.env.NUXT_PUBLIC_PRODUCTION_URL,
+      DEVELOPMENT: process.env.NUXT_PUBLIC_DEVELOPMENT_URL || '',
+      TEST_URL: process.env.NUXT_PUBLIC_TEST_URL || '',
+      PRODUCTION: process.env.NUXT_PUBLIC_PRODUCTION_URL || '',
+      ENVIRONMENT: process.env.NUXT_ENV || 'development'
     },
   },
   ssr: false,
