@@ -1,30 +1,33 @@
 <template>
+    <div>
+        <p class="text-title">Test GroupButton page</p>         
+    </div>
     <div class="button-container">
-      <PrimeCustomButton
+      <GroupButton
         v-for="(button, index) in buttons"
         :key="index"
-        :text="button.text"
-        :value="button.value"
-        :icon="button.icon" 
+        :group-name="button.text"
+        :contacts-count="button.value"        
         :active="activeButtonIndex === index"
         @click="setActiveButton(index)"
       >
         <!-- iconos personalizados slot -->
-        <template #icon v-if="button.icon">
-          <component :is="button.icon" alt="custom-icon" class="custom-icon" />
+        <template #icon>
+          <component :is="button.icon" alt="custom-icon" class="custom-icon" />        
+          <!-- <GroupsSVG /> -->
         </template>
-      </PrimeCustomButton>
+      </GroupButton>
     </div>
   </template>
   
   <script setup lang="ts">
-  import ContactsSVG from "@/components/svgs/ContactsSVG.vue";
-  import GroupsSVG from "@/components/svgs/GroupsSVG.vue";
-  import DncSVG from "@/components/svgs/DncSVG.vue";
-  import UploadSVG from "@/components/svgs/UploadSVG.vue";
+  import ContactsSVG from "@/components/svgs/AllSVG.vue";
+  import GroupsSVG from "@/components/svgs/UnassignedSVG.vue";
+  import DncSVG from "@/components/svgs/MyGroupsSVG.vue";
+  import UploadSVG from "@/components/svgs/TrashSVG.vue";
   
   const buttons = [
-    { text: 'ALL', value: 0, icon: ContactsSVG },
+    { text: 'ALLddddd', value: 0, icon: ContactsSVG },
     { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: GroupsSVG },
     { text: 'Monthly Number', value: Math.floor(Math.random() * 100), icon: DncSVG },
     { text: 'Trash', value: Math.floor(Math.random() * 100), icon: UploadSVG }
