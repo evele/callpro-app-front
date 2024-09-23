@@ -21,16 +21,16 @@
   </template>
   
   <script setup lang="ts">
-  import ContactsSVG from "@/components/svgs/AllSVG.vue";
-  import GroupsSVG from "@/components/svgs/UnassignedSVG.vue";
-  import DncSVG from "@/components/svgs/MyGroupsSVG.vue";
-  import UploadSVG from "@/components/svgs/TrashSVG.vue";
+  import AllSVG from "@/components/svgs/AllSVG.vue";
+  import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
+  import MyGroup from "@/components/svgs/MyGroupsSVG.vue";
+  import TrashSVG from "@/components/svgs/TrashSVG.vue";
   
   const buttons = [
-    { text: 'ALLddddd', value: 0, icon: ContactsSVG },
-    { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: GroupsSVG },
-    { text: 'Monthly Number', value: Math.floor(Math.random() * 100), icon: DncSVG },
-    { text: 'Trash', value: Math.floor(Math.random() * 100), icon: UploadSVG }
+    { text: 'ALL', value: 0, icon: AllSVG },
+    { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: UnassginedSVG },    
+    { text: 'Trash', value: Math.floor(Math.random() * 100), icon: TrashSVG },
+    { text: 'My Group', value: Math.floor(Math.random() * 100), icon: MyGroup }
   ];
   
   buttons[0].value = buttons.slice(1).reduce((acc, button) => acc + button.value, 0);

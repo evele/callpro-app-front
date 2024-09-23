@@ -1,9 +1,9 @@
 <template>
   <Button :class="['group-button', { 'active': active }]" @click="handleClick">
     <!-- slot para renderizar -->
-    <slot name="icon"></slot>       
-    <div class="content">
-      <span class="group-name">{{ groupName }}</span>
+    <div :class="['icon-bg', { 'icon-active': active }]"><slot name="icon"></slot></div>
+    <div :class="['content', { 'name-active': active }]">
+      {{ groupName }}
       <span class="contacts-count">{{ contactsCount }}</span>
     </div>
   </Button>
@@ -18,7 +18,7 @@ const props = defineProps({
   contactsCount: {
     type: [String, Number],
     default: undefined
-  }, 
+  },
   active: {
     type: Boolean,
     default: false
@@ -35,44 +35,66 @@ const handleClick = () => {
 <style scoped>
 .group-button {
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  width: 100%;
+  height: 50px;
   padding: 12px;
-  cursor: pointer;
+  align-items: center;
+  gap: 10px;  
   border-radius: 10px;
-  background: var(--Schemes-Surface-Tint, #FFF);
-  color: var(--Schemes-On-Primary, #6750A4);
+  border: none;
+  background: #F4F0EF;  
   transition: background 0.3s ease;
 }
-
-.group-button.active {
-  background: var(--Schemes-On-Primary, #6750A4);
-  color: var(--Schemes-Surface-Tint, #FFF);
-}
-
 .content {
   display: flex;
   align-items: center;
-  margin-left: 10px;
+  gap: 12px;
+  color: #1D192B;  
+  font-size: 14px;  
+  font-weight: 500; 
+
+  .contacts-count {
+    color: #79747E;    
+    font-size: 11px;
+  }  
+}
+.name-active{
+    color: #FFF;
+  }
+
+.icon-bg{
+  width: 28px;
+  height: 28px;
+  background-color: #E8DEF8;
+  color: #1E1E1E;
+  border-radius: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.icon-active{
+  background-color: #FFF;
+  color: #1E1E1E;
 }
 
-.group-name {
-  margin-right: 5px;
-  font-family: 'Roboto', sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 20px;
+.group-button.active {
+  background: #6750A4;
+  color: #FFF;
 }
 
-.contacts-count {
-  font-family: 'Roboto', sans-serif;
-  font-size: 12px;
-  font-weight: 500;
-  line-height: 15px;
-  color: var(--Schemes-Surface-Container-Low, #1c1b1d);
+.group-button .custom-icon {
+  width: 24px; 
+  height: 24px;
+  border-radius: 28px;
+  background: #E8DEF8;
+  transition: background 0.3s ease;
+}
+
+.group-button.active .custom-icon {  
+  background: #FFF;
 }
 
 .group-button.active .contacts-count {
-  color: var(--Schemes-Surface-Tint, #FFF); 
+  color:#FFF;
 }
 </style>
