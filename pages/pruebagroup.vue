@@ -13,8 +13,7 @@
       >
         <!-- iconos personalizados slot -->
         <template #icon>
-          <component :is="button.icon" alt="custom-icon" class="custom-icon" />        
-          <!-- <GroupsSVG /> -->
+          <component :is="button.icon" :alt="button.text" />        
         </template>
       </GroupButton>
     </div>
@@ -42,6 +41,7 @@
   };
   </script>
   <style scoped>
+  /*
   .button-page {
       display: flex;
       flex-direction: column;
@@ -58,5 +58,5 @@
   
   .styled-button.active :deep(.custom-button) {
     background-color: var(--Schemes-On-Primary, #FFF);
-  }
+  }*/ 
   </style>

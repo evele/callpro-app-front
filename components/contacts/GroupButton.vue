@@ -46,14 +46,13 @@ const handleClick = () => {
   transition: background 0.3s ease;
 }
 .content {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+
   color: #1D192B;  
   font-size: 14px;  
   font-weight: 500; 
 
   .contacts-count {
+    margin-left: 12px;
     color: #79747E;    
     font-size: 11px;
   }  
@@ -80,18 +79,6 @@ const handleClick = () => {
 .group-button.active {
   background: #6750A4;
   color: #FFF;
-}
-
-.group-button .custom-icon {
-  width: 24px; 
-  height: 24px;
-  border-radius: 28px;
-  background: #E8DEF8;
-  transition: background 0.3s ease;
-}
-
-.group-button.active .custom-icon {  
-  background: #FFF;
 }
 
 .group-button.active .contacts-count {
