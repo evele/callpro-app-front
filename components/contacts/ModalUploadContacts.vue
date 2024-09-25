@@ -33,9 +33,32 @@
 
                     <section v-if="has_uploaded">
                         <div v-if="uploadedSuccess && uploadedData?.result">
-                            <DataTable v-if="uploadedData?.contacts?.length" :value="formatted_contact" tableStyle="min-width: 40rem" scrollable scrollHeight="350px" class="uploaded-contacts-table">
-                                <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>
+                            <DataTable 
+                            v-if="uploadedData?.contacts?.length" 
+                            v-model:selection="selectedContacts" 
+                            :value="formatted_contact" 
+                            dataKey="name" 
+                            tableStyle="min-width: 40rem" 
+                            scrollable scrollHeight="350px" 
+                            class="uploaded-contacts-table">
+                                <Column headerStyle="width: 3rem">
+                                    <template #header="headerSlot">
+                                        <input 
+                                            type="checkbox" 
+                                            :checked="isAllSelected" 
+                                            @change="toggleSelectAll($event)" 
+                                        />                                        
+                                    </template>
+                                    <template #body="slotProps">                                        
+                                        <input 
+                                        type="checkbox" 
+                                        :disabled="slotProps.data.disabled"  
+                                        :checked="isSelected(slotProps.data)"
+                                        @change="toggleSelection(slotProps.data, $event)"
+                                        />
+                                    </template>
+                                </Column>
+                                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>                                
                             </DataTable>
                             <p v-else class="text-no-contacts">There is no contacts on your file</p>
                         </div>
@@ -75,7 +98,7 @@
     const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData, isPending: savedIsPending } = useSaveUploadedContact();
 
     const visible = ref(false);
-    const is_disabled = ref(true);
+    
     const contacts: Ref<uploadedContactToSave[]> = ref([]);
     const group_id = ref('');
     const has_uploaded = ref(false);
@@ -83,6 +106,10 @@
     const showSuccess = ref(false);
 
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
+    const selectedContacts = ref([]);
+    const is_disabled = computed(() => {
+        return !selectedContacts.value || selectedContacts.value.length === 0;
+    });
 
     const open = () => {
         visible.value = true;
@@ -156,33 +183,68 @@
                     is_disabled.value = false;
                     data.contacts.forEach((contact, i) => {
                         contact.numbers.forEach(number => {
-                            if(number.validation_desc === 'ok') {
-                                contacts.value.push({
-                                    first_name: contact.first_name,
+                            if(number.validation_desc === 'ok') {                                
+                                selectedContacts.value.push({                                    
+                                    name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
+                                    first_name:contact.first_name,
                                     last_name: contact.last_name,
-                                    number: number.number,
-                                    contact_id: `fake-${i+1}`
-                                });
+                                    number: number?.number,
+                                    contact_id: `fake-${i+1}`,
+                                    status: contact?.valid,
+                                    result: contact?.validation_desc
+                                })
                             }
 
-                            formatted_contact.value.push({
-                                selected: true,
+                            formatted_contact.value.push({                                
                                 name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
                                 number: number?.number,
                                 status: contact?.valid,
-                                result: contact?.validation_desc === "Valid and inserted" ? 'Ok' : contact?.validation_desc
+                                result: contact?.validation_desc === "Valid and inserted" ? 'Ok' : contact?.validation_desc,
+                                disabled: number.validation_desc != 'ok' ? true : false
                             });
+                            
                         });
                     })
                     group_id.value = data.group_id || 'all';
                 }
             }
         });
-    };
+    };    
 
-    const save_contact = () => {
+    const isSelected = (contact: FormattedContact) => {
+        return selectedContacts.value.some(selected => selected.name === contact.name && selected.number === contact.number);
+    }
+
+    const toggleSelection = (contact: FormattedContact, event: Event) => {
+        const target = event.target as HTMLInputElement;
+        if (target.checked) {            
+            selectedContacts.value.push(contact);
+        } else {            
+            selectedContacts.value = selectedContacts.value.filter(selected => selected.name !== contact.name || selected.number !== contact.number);
+        }
+    }
+
+    const isAllSelected = computed(() => {        
+        return formatted_contact.value.every(contact => contact.disabled || isSelected(contact));
+    });
+
+    const toggleSelectAll = (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        if (target.checked) {            
+            formatted_contact.value.forEach(contact => {
+                if (!contact.disabled && !isSelected(contact)) {
+                    selectedContacts.value.push(contact);
+                }
+            });
+        } else {            
+            selectedContacts.value = selectedContacts.value.filter(contact => contact.disabled);
+        }
+    };
+    
+    const save_contact = () => {  
+        // TODO controlar el momento posterior al save, y anterior al cierre del modal, el boton save se muestra habilitado    
         const data_to_send: uploadedContactToSaveData = {
-            contacts: contacts.value,
+            contacts: selectedContacts.value,
             group_id: group_id.value
         }
 
@@ -197,11 +259,11 @@
         })
     }
 
-    const columns = [
+    const columns = [        
         { field: 'name', header: 'Last, First' },
         { field: 'number', header: 'Phone' },
         { field: 'status', header: 'Status' },
-        { field: 'result', header: 'Result' },
+        { field: 'result', header: 'Result' },        
     ];
 </script>
 
