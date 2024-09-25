@@ -26,13 +26,13 @@
                             <div class="input-group">
                                 <label for="phone-1" class="block">Phone 1*</label>
                                 <InputMask id="phone-1" :invalid="number_error.length > 0" v-model="new_contact.numbers[0].number" mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="custom-input" />
-                                <p class="text-red">{{ number_error }}</p>
+                                <p class="text-red absolute">{{ number_error }}</p>
                             </div>
 
                             <div class="input-group">
                                 <label class="block">Type*</label>
                                 <Select v-model="new_contact.numbers[0].type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="custom-select" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
-                                <p class="text-red">{{ type_error }}</p>
+                                <p class="text-red absolute">{{ type_error }}</p>
                             </div>
                         </div>
 
@@ -53,13 +53,12 @@
                                 <label for="notes-1" class="block">Notes</label>
                                 <Textarea v-model="new_contact.numbers[0].notes" id="notes-1" cols="50" rows="5" placeholder="Enter text" class="custom-textarea" />
                                 <p class="text-info">*This information is mandatory to create a new contact</p>
+                                <p v-if="isSuccess" class="text-green">All good :D</p>
+                                <p class="text-red" v-if="isError">Something went wrong.</p>
                             </div>
                         </div>
                     </form>
 
-                    <p v-if="isSuccess" class="text-green">All good :D</p>
-
-                    <p class="text-red" v-if="isError">Something went wrong.</p>
                     <footer class="modal-footer">
                         <Button @click="add_new" class="modal-footer-btn btn-add-new">
                             Add new phone
@@ -93,7 +92,7 @@
             number_groups: []
         }] 
     }
-    const new_contact = reactive<ContactToSave>({...empty_contact})
+    let new_contact = reactive<ContactToSave>({...empty_contact})
 
     const type_options = [
         { name: 'Home', code: '4' },
@@ -103,7 +102,7 @@
     ]
 
     const custom_groups_options = computed(() => {
-        if (userCustomGroups?.value?.custom_groups) {
+        if (userCustomGroups?.value?.result && userCustomGroups?.value?.custom_groups) {
             return userCustomGroups.value.custom_groups.map((group: UserCustomGroup) => {
                 return {
                     name: group.group_name,
@@ -112,6 +111,15 @@
             })
         }
         return []
+    })
+
+    watchEffect(() => {
+        if (new_contact.numbers[0].type) {
+            type_error.value = ''
+        }
+        if (new_contact.numbers[0].number) {
+            number_error.value = ''
+        }
     })
 
     const open = () => {
@@ -124,7 +132,14 @@
         visible.value = false;
         const body = document.body;
         body.style.overflow = 'auto';
-        //TODO: RESET CONTACT OBJECT AND RESET VALIDATION
+        Object.assign(new_contact, empty_contact)
+        new_contact.numbers[0] = {
+            id: 'new',
+            number: '',
+            notes: '',
+            type: '',
+            number_groups: []
+        }
         number_error.value = ''
         type_error.value = ''
     }
@@ -144,7 +159,7 @@
                 return {
                     ...number,
                     number: number.number.replace(/\D/g, ''),
-                    number_groups: number.number_groups.map((group: number_groups_option) => group.code),
+                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group: number_groups_option) => group.code) : null,
                     type: number.type.code
                 }
             })
@@ -267,15 +282,16 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            gap: 40px;
+            gap: 25px;
 
             @media (min-width: 600px) {
                 flex-direction: row;
+                gap: 40px;
             }
 
             .input-group {
                 width: 100%;
-
+                
                 label {
                     color: #1E1E1E;
                     font-size: 19px;
@@ -285,7 +301,8 @@
                 .custom-input, .custom-select, .custom-textarea {
                     width: 100%;
                     border: 1px solid #D9D9D9;
-                    padding: 8px 16px
+                    padding: 8px 16px;
+                    transition: border-color 0.5s;
                 }
 
                 .custom-input, .custom-select {
@@ -372,11 +389,7 @@
         color: green;
     }
 
-    .errors-section {
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
+    .absolute {
+        position: absolute;
     }
 </style>
