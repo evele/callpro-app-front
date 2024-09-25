@@ -65,7 +65,7 @@
     <ModalAddNewContact ref="modalAddNewContact" />
 </template>
 
-<script setup lang="ts">  
+<script setup lang="ts">
     const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
     const page = ref(1)    
     const show = ref(10)
