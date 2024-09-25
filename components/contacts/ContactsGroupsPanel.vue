@@ -4,21 +4,39 @@
             <h4 class="groups-title">Groups</h4>
 
             <ul class="flex flex-col default-groups-ul">
-                <li class="fake-button"></li>
-                <li class="fake-button"></li>
-                <li class="fake-button"></li>
+                <li v-for="(button, index) in DefaultGroupsButtons" :key="index">
+                    <GroupButton
+                        :group-name="button.text"
+                        :contacts-count="button.value"        
+                        :active="activeButton === button.text"
+                        @click="setActiveButton(button.text)"
+                    >
+                        <template #icon>
+                        <component :is="button.icon" :alt="button.text" />        
+                        </template>
+                    </GroupButton>
+                </li>
             </ul>
         </div>
 
         <Divider class="divider" />
 
         <div class="second-section flex flex-col">
-            <div class="fake-button"></div>
+            <GroupButton
+                group-name="My Group"
+                :contacts-count="Math.floor(Math.random() * 100)"        
+                :active="activeButton === 'My Group'"
+                @click="setActiveButton('My Group')"
+            >
+                <template #icon>
+                    <MyGroupSVG alt="My Group" />     
+                </template>
+            </GroupButton>
             <ul class="user-group-container flex flex-col">
                 <li class="flex justify-end" v-for="group in USER_GROUPS" :key="group.number">
                     <Button class="user-group-btn flex justify-between items-center" :class="group.bgColor">
                         <div class="flex items-center user-group-data">
-                            <span class="user-group-name">{{ group.name }}</span>
+                            {{ group.name }}
                             <span class="user-group-number">#{{ group.number }}</span>
                         </div>
                         <EditIconSVG />
@@ -36,6 +54,22 @@
 
 <script setup lang="ts">
     import EditIconSVG from "@/components/svgs/EditIconSVG.vue"
+    import AllSVG from "@/components/svgs/AllSVG.vue";
+    import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
+    import MyGroupSVG from "@/components/svgs/MyGroupsSVG.vue";
+    import TrashSVG from "@/components/svgs/TrashSVG.vue";
+  
+    const DefaultGroupsButtons = [
+        { text: 'ALL', value: Math.floor(Math.random() * 100), icon: AllSVG },
+        { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: UnassginedSVG },    
+        { text: 'Trash', value: Math.floor(Math.random() * 100), icon: TrashSVG }
+    ];
+    
+    const activeButton = ref<string>('');
+    
+    const setActiveButton = (name: string) => {
+        activeButton.value = name;
+    };
 
     const USER_GROUPS = [
         { name: "Group 1", number: "0054", bgColor: "bg-green" },
@@ -50,7 +84,6 @@
         min-height: 500px;
         border-radius: 16px;
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-        overflow: hidden;
         background-color: #FFF;
         gap: 12px;
         padding: 28px 0 0 0;
@@ -107,19 +140,16 @@
 
         .user-group-data {
             gap: 4px;
-
-            .user-group-name {
-                font-size: 14px;
-                font-weight: 500;
-                line-height: 140%;
-                color: #1D192B;
-            }
+            font-size: 14px;
+            font-weight: 500;
+            color: #1D192B;
 
             .user-group-number {
                 color: #79747E;
                 font-size: 12px;
                 font-style: italic;
-                line-height: 140%;
+                font-weight: 400;
+                padding-top: .5px;
             }
         }
     }
