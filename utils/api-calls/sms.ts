@@ -6,7 +6,7 @@ type smsFilters = {
 } 
 
 type APIResponseSmsList = {
-    result: boolean,
+    result: true,
     sms_list: SMSDashboardData[],
     state: DashboardState,
     total_sms: string

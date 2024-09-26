@@ -2,6 +2,7 @@ export type ItemsPerPage = 10 | 25 | 50 | 100;
 export type ItemsPerPageOption = { name: string; code: ItemsPerPage };
 export type DashboardState = typeof COMPLETED | typeof ACTIVE | typeof DRAFT;
 export type ZeroOrOne = '0' | '1';
+export type OneOrTwo = '1' | '2';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
 export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
@@ -9,7 +10,10 @@ export type SelectOption = { name: string; code: string | number };
 export type StringOrNumber = string | number;
 export type StringOrNull = string | null;
 export type NumberOrNull = number | null;
+export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
+export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
+
 
 export type APIResponseError = {
   result: false,
@@ -46,8 +50,8 @@ export type ContactPhoneNumber = PhoneNumber & {
 // Type for Group Contacts
 export type ContactGroup = {
   name: string;
-  id: number | null;
-  phone_launch_id: number | null;
+  id: NumberOrNull;
+  phone_launch_id: NumberOrNull;
 };
 
 export type ContactToSave = {
@@ -100,7 +104,7 @@ export type uploadedContactToSaveData = {
 }
 
 export type UserCustomGroup = {
-  audio_name: string | null,
+  audio_name: StringOrNull,
   group_code: number | '',
   group_name: string,
   id: number,
@@ -141,7 +145,7 @@ export type BroadcastDashboardData ={
   retries: '1' | '2' | '3' | '4';
   start_time: string;
   started_at: string;
-  static_intro_library_id: string | null;
+  static_intro_library_id: StringOrNull;
   status: string; //TODO: ASK FOR ALL POSSIBLE VALUES TO AVOID STRING
   user_id: number;
 }
@@ -168,7 +172,7 @@ export type SMSDashboardData = {
 export type DidNumber = {
   id: number;
   number: string;
-  cnam: string | null;
+  cnam: StringOrNull;
   created_at: string;
   order_id: string;
   root_user_id: number;
@@ -185,8 +189,8 @@ export type SystemGroup = {
 
 export type CustomGroup = {
   id: number;
-  group_code: string | number | null;
-  group_name: string | number;
+  group_code: StringOrNumberOrNull;
+  group_name: StringOrNumber;
   count: number;
 }
 
@@ -202,8 +206,8 @@ export type PackageStep = {
 
 export type MonthlyGroupPlan = {
   id: number;
-  ivr_input: number | null;
-  name: number | string;
+  ivr_input: NumberOrNull;
+  name: StringOrNumber;
   numbers: number;
   price: number;
   public: ZeroOrOne;
@@ -245,11 +249,11 @@ export type Settings = {
   opt: ZeroOrOne;
   repeat: ZeroOrOne;
   repeat_audio: 'system' | 'library' | 'broadcast' | null;
-  repeat_library_id: number | null;
+  repeat_library_id: NumberOrNull;
   retries: '1' | '2' | '3' | '4';
   root_user_id: number;
   static_intro: ZeroOrOne;
-  static_intro_library_id: number | null;
+  static_intro_library_id: NumberOrNull;
   text_caller_id: string;
   time_guard: ZeroOrOne;
   time_zone: OneToNine;
@@ -274,8 +278,8 @@ export type UserAdminSettings = {
   root_user_id: number;
   sms_enabled: ZeroOrOne;
   sms_price: number;
-  special_monthly_credits_id: number | null;
-  special_monthly_groups_id: number | null;
+  special_monthly_credits_id: NumberOrNull;
+  special_monthly_groups_id: NumberOrNull;
   special_paug_id: number;
   voice_price: number;
 }
@@ -283,10 +287,10 @@ export type UserAdminSettings = {
 export type VoiceSettingsToSave = {
   caller_id: string;
   static_intro: ZeroOrOne;
-  static_intro_library_id: number | null;
+  static_intro_library_id: NumberOrNull;
   repeat: ZeroOrOne;
   repeat_audio: 'system' | 'library' | 'broadcast' | null;
-  repeat_library_id: number | null;
+  repeat_library_id: NumberOrNull;
   offer_dnc: ZeroOrOne;
   retries: '1' | '2' | '3' | '4';
   call_speed: CallSpeed;
@@ -311,4 +315,39 @@ export type TextSettingsDataToSave = {
     chat: ZeroOrOne;
     sms_dnc: ZeroOrOne;
   }
+}
+
+export type Tts_Convert = {
+  full_file_url:string,
+  file_name: string
+}
+// TODO: Ver Audio y AudioAUX para extender o algo similar
+export type Audio = {
+  id: number;
+  user_id: number;
+  name: string;
+  created_at: string;
+  last_used: string;
+  file_name: string;
+  length: number;
+  is_delete: "N" | "Y";
+  full_file_url: string;
+}
+
+export type AudioAux = {
+  id: string;
+  audio_id: StringOrNull;
+  audio_url: StringOrNull;
+  name: string;
+  created_at: string;
+  last_used: string;
+  file_name: string;
+  length: string;
+  is_delete: string;
+  full_file_url: string;
+}
+
+export type TextToConvert = {
+  text: string, 
+  temp: boolean    
 }

@@ -5,28 +5,25 @@ function sleep(ms:number) {
 }
 
 /* ----- Broadcast ----- */
-export const useFetchGetBroadcastHeader = (broadcast_id:Ref<number>) => {
+export function useFetchGetBroadcastHeader(broadcast_id:Ref<number>){
   const dataToSend = computed(() => ({ broadcast_id: broadcast_id.value }))
 
   return useQuery({
     queryKey: ['broadcast_header', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_BROADCAST_HEADER_URL, dataToSend.value),
-    enabled: false, 
+    queryFn: () => getBroadcastHeader(dataToSend.value)    
   })
 }
-
-export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_tab:Ref<string>, show:Ref<number>, search:Ref<string>) => {
+export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_tab:Ref<StateOption>,start_limit:Ref<number>, show:Ref<number>, search:Ref<string>) => {
   const dataToSend = computed(() => ({
     broadcast_id: broadcast_id.value,
     length_limit: show.value,
     search: search.value,
-    start_limit: "0",
+    start_limit: start_limit.value,//"0",
     state: selected_tab.value,
   }))
   return useQuery({
     queryKey: ['broadcast_detail', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_BROADCAST_DETAIL_URL, dataToSend.value),
-    enabled: false, 
+    queryFn: () => getBroadcastDetail(dataToSend.value)    
   })
 }
   
@@ -48,25 +45,24 @@ export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:
 
 /* ----- Audios ----- */
 export function useFetchGetAllAudios(showOlder:Ref<boolean>) {
-  const data_to_send = computed(() => ({ show_all_audios: showOlder.value }));
+  const dataToSend = computed(() => ({ show_all_audios: showOlder.value }));
 
   return useQuery({
-      queryKey: ['user_all_audios', showOlder],
-      queryFn: () => fetchWrapper.post(GET_AUDIOS_URL, data_to_send.value),
+      queryKey: ['user_all_audios', dataToSend],
+      queryFn: () => getUserAllAudios(dataToSend.value),      
     });
 }
 
-export const useFetchGetAudio = (audio_id: Ref<string>, audio_full_url:Ref<string>, called_from: string) => {
+export const useFetchGetAudio = (audio_id: Ref<StringOrNull>, audio_full_url:Ref<StringOrNull>, called_from: string) => {
   const dataToSend = computed(() => ({ 
-    audio_id: audio_id.value,
+    audio_id: audio_id.value, 
     audio_full_url: audio_full_url.value,
     called_from
   }))
 
   return useQuery({
     queryKey: ['user_converted_audio', dataToSend],
-    queryFn: () => fetchWrapper.post(GET_AUDIO_URL, dataToSend.value),
-    enabled: false,
+    queryFn: () => getUserConvertedAudios(dataToSend.value),
   })
 }
 
@@ -74,25 +70,25 @@ export const useFetchGetAudio = (audio_id: Ref<string>, audio_full_url:Ref<strin
 export const useFetchInvoices = () => {
   return useQuery({
     queryKey: ['user_invoices'],
-    queryFn: () => fetchWrapper.get(GET_USER_INVOICES_DATA_URL),
-    refetchOnWindowFocus: false,
+    queryFn: () => getUserInvoices(),
   })
 }
 
 export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
-  const id = { trx_id: invoice_id } // TODO: maybe will need to use computed
+  const dataToSend = computed(()=> ({
+    trx_id: invoice_id.value
+  }))
+  //{ trx_id: invoice_id } // TODO: maybe will need to use computed
   return useQuery({
-    queryKey: ['invoices', invoice_id],
-    queryFn: () => fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL, id),
-    refetchOnWindowFocus: false,
+    queryKey: ['invoices', dataToSend],
+    queryFn: () => getInvoiceDataToPrint(dataToSend.value),      
   })
 }
-
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({
     queryKey: ['call_in_codes'],
-    queryFn: () => fetchWrapper.get(GET_USER_CALL_IN_CODES_URL),  
+    queryFn: () => getUserCallInCodes(),
   })
 }
 
@@ -113,7 +109,7 @@ export const useFetchUnreadMessages = () => {
 }
 
 export const useFetchChatContacts = (data:Ref<boolean>) => {
-  type fnProps = { all_contacts: '1' | '2' };
+  type fnProps = { all_contacts: OneOrTwo };
   const dataToSend = computed((): fnProps => ({ all_contacts: data.value ? '1' : '2' }))
   return useQuery({
     queryKey: ['chat_contacts', dataToSend],

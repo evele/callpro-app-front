@@ -35,7 +35,12 @@
     </div>
 </template>
 
-<script setup lang="ts">  
+<script setup lang="ts">
+
+
+
+
+  
     const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
     
     const selected_tab = ref(CONTACTS_ALL)    

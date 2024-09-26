@@ -46,8 +46,25 @@
     isolation: isolate;
   }
 
-
   // Here we can define some CSS variables
   :root {
     --body-background: #F5F5F5;
+  }
+
+  //TODO: CHECK THESE CLASES HERE
+  .special-input input[type="file"] {
+    display: none;
+  }
+  
+  .modal {
+    width: 100%;
+    max-width: 850px;
+    padding: 10px;
+    max-height: 98vh;
+    overflow-y: auto;
+  }
+
+  .uploaded-contacts-table td {
+    text-align: center;
+    vertical-align: middle;
   }
