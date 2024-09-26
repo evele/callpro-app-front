@@ -201,13 +201,18 @@
 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
     
-    const show_pagination = computed(() => all_contacts_data?.value?.contacts?.length ? true : false);
+    const contacts_data = computed(() => {
+        if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }
+        return all_contacts_data?.value
+    })
+
+    const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
 
     const formatted_contacts = computed(() => {
-        total_records.value = all_contacts_data?.value?.total_numbers;
-        if(!all_contacts_data?.value?.contacts) return []
+        total_records.value = contacts_data.value.total_numbers;
+        if(!contacts_data.value.contacts) return []
 
-        const groupedContacts = all_contacts_data?.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
+        const groupedContacts = contacts_data.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
             if (acc[contact.id]) {
                 acc[contact.id].total_numbers += 1;
                 if(typeof contact.number_groups === 'string') {
@@ -246,9 +251,9 @@
     }
 
     const format_expanded_contact = (id: string | number) => {
-        if(!all_contacts_data?.value?.contacts) return [];
+        if(!contacts_data.value?.contacts) return [];
 
-        formatted_contact.value = all_contacts_data?.value?.contacts
+        formatted_contact.value = contacts_data.value.contacts
                             ?.filter((contact: ContactPhoneNumber) => contact.id === id)
                             .map((contact: ContactPhoneNumber) => {
                                 return {
