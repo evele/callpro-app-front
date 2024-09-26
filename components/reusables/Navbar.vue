@@ -18,7 +18,6 @@
             <li><NuxtLink to="dashboard">Dashboard</NuxtLink></li>
             <li><NuxtLink to="did_numbers">Did Numbers</NuxtLink></li>
             <li><NuxtLink to="get_contact">Get Contact</NuxtLink></li>
-            <li><NuxtLink to="groups">Groups</NuxtLink></li>
             <li><NuxtLink to="packages">Packages</NuxtLink></li>
             <li><NuxtLink to="save_contact">Save Contact</NuxtLink></li>
             <li><NuxtLink to="settings">Settings</NuxtLink></li>

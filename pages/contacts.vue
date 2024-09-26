@@ -59,15 +59,51 @@
         </li>
     </ul>
 
-    <ContactsActions />        
+    <ContactsActions />
+
+    <div style="margin-top: 1rem;">
+        <Button @click="handle_group_action('move')" style="margin-right: 1rem;">Move to Group</Button>
+        <Button @click="handle_group_action('add')">Add to Group</Button>
+    </div>
+
+    <div class="flex" style="margin-top: 1rem;">
+        <div>
+            <span v-if="isLoadingSG">Loading system groups...</span>
+            <span v-else-if="isErrorSG">Something failed while getting system groups.</span>
+            <div v-else-if="isSuccessSG">
+                <p style="font-weight: 600; line-height: 10px; color:blue; margin-bottom: .5rem;">System groups</p>
+                <div v-if="SGData?.result">
+                    <ul v-if="SGData?.system_groups">
+                        <li>All: {{ SGData?.system_groups?.not_trash }}</li>
+                        <li v-if="SGData?.total_monthly_numbers && SGData?.total_monthly_numbers >= 0">Monthly Numbers: {{ SGData?.total_monthly_numbers }}</li>
+                        <li>Unassigned: {{ SGData?.system_groups?.unassigned }}</li>
+                        <li>Trash: {{ SGData?.system_groups?.trash }}</li>
+                    </ul>
+                </div>
+                <p v-else>{{ SGData?.error }}</p>
+            </div>
+        </div>
+    
+        <div>
+            <span v-if="isLoadingCG">Loading custom groups...</span>
+            <span v-else-if="isErrorCG">Something failed while getting custom groups.</span>
+            <div v-else-if="isSuccessCG">
+                <p style="font-weight: 600; line-height: 10px; color:blue; margin-bottom: .5rem;">Custom groups</p>
+                <div v-if="CGData?.result">
+                    <ul v-if="CGData?.custom_groups?.length">
+                        <li v-for="group in CGData?.custom_groups" :key="group?.id">
+                            {{ group?.group_name }}: {{ group?.count }}
+                        </li>
+                    </ul>
+                    <span v-else>No custom groups to show.</span>
+                </div>
+                <p v-else>{{ CGData?.error }}</p>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script setup lang="ts">
-
-
-
-
-  
     const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
     const page = ref(1)    
     const show = ref(10)
@@ -80,6 +116,8 @@
     const launchID = ref('')
     const groupID = ref('')
 
+    const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
+    const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
     
@@ -102,6 +140,9 @@
         saveGroupContacts(dataToSend)
     }
 
+    const handle_group_action = (action: string) => {
+        console.log('action', action) //TODO: CREATE MUTATION
+    }
 </script>
 
 <style scoped>
