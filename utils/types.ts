@@ -195,12 +195,12 @@ export type CustomGroup = {
 }
 
 export type AddNumberToGroup = {
-  number_id: any; //TODO: Undefined va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
-  groups: any; //TODO: Undefined va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+  number_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+  groups: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
 }
 
 export type MoveNumberToGroup = AddNumberToGroup & {
-  current_group_id: any; //TODO: Undefined va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+  current_group_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
 }
 
 /* ----- Packages ----- */
