@@ -120,6 +120,8 @@
     const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
+    const { mutate: moveNumberToGroup, isPending: MTGIsPending, isError: MTGIsError, isSuccess: MTGIsSuccess } = useMoveNumberToGroup()
+    const { mutate: addNumberToGroup, isPending: ATGIsPending, isError: ATGIIsError, isSuccess: ATGIIsSuccess } = useAddNumberToGroup()
     
     let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
    
@@ -140,8 +142,42 @@
         saveGroupContacts(dataToSend)
     }
 
+    const target_groups = computed(() => {
+        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
+            return CGData.value.custom_groups.map((group: CustomGroup) => group.id).slice(0, 2)
+        }
+    })
+
+    const hardcoded_contact_data = computed(() => {
+        if(all_contacts_data?.value?.result && all_contacts_data?.value?.contacts?.length) {
+            const contact = all_contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups?.length < 5)
+            console.log('contact', contact)
+            if(contact) return { number_id: contact.number_id, group_id: contact.number_groups }; 
+        }
+        return null
+    })
+
     const handle_group_action = (action: string) => {
-        console.log('action', action) //TODO: CREATE MUTATION
+        if(action === 'move') {
+            const data_to_send: MoveNumberToGroup = {
+                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
+                groups: target_groups?.value,
+                current_group_id: hardcoded_contact_data?.value?.group_id
+            }
+            console.log('move', data_to_send)
+
+            moveNumberToGroup(data_to_send)
+        } else if(action === 'add') {
+            const data_to_send: AddNumberToGroup = {
+                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
+                groups: target_groups?.value
+            }
+            console.log('add', data_to_send)
+
+            addNumberToGroup(data_to_send)
+        } else {
+            return 'Error';
+        }
     }
 </script>
 

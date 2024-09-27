@@ -29,9 +29,6 @@ export const GET_CONTACT_URL = "/contacts/get_contact"
 export const GET_ALL_CONTACTS_URL = "/contacts/get_all_contacts"
 export const SAVE_CONTACT_URL = "/contacts/save_contact"
 export const GET_USER_CUSTOM_GROUPS_URL = "/contacts/get_user_custom_groups"
-export const GET_SYSTEM_GROUPS_URL = "/contacts/get_system_groups"
-export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
-export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
 export const UPLOAD_CONTACT_CSV_URL = "/contacts/upload_contact_csv"
 export const SAVE_UPLOADED_CONTACT_URL = "/contacts/save_uploaded_contact"
 export const DOWNLOAD_CONTACTS_FILE = "/contacts/download_contacts_as_csv"
@@ -41,6 +38,13 @@ export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"
 
 /* ----- Did Numbers Store ----- */
 export const GET_DID_AND_TOLL_FREE_NUMBERS_URL = "/did_numbers/get_user_did_and_toll_free_numbers"
+
+/* ----- Groups Store ----- */
+export const GET_SYSTEM_GROUPS_URL = "/contacts/get_system_groups"
+export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
+export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
+export const MOVE_NUMBER_TO_GROUP_URL = "/contacts/move_number_to_group"
+export const ADD_NUMBER_TO_GROUP_URL = "/contacts/add_number_to_group"
 
 /* ----- Packages Store ----- */
 export const GET_PACKAGE_STEPS_URL = "/packages/get_package_steps_prices"
