@@ -24,11 +24,6 @@
             case 'test':
                 env = 'Test'
                 break
-            case 'production':
-                break
-            default:
-                env = ''
-            break
         }
         return env
     }
