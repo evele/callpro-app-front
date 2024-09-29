@@ -44,3 +44,32 @@ export const date_time_to_string = (time:StringOrNull = null) => {
 
     return formattedDate;
 }
+
+export const format_number_to_show = function (number: string) {
+  if (number.slice(0, 1) != "+") {
+    return "(" + number.slice(0, 3) + ") " + number.slice(3, 6) + "-" + number.slice(6)
+  }
+  return number
+}
+
+export const show_full_name = (first_name: StringOrNull, last_name: StringOrNull) => {
+  if(!first_name && !last_name) return '';
+  if(!first_name) return last_name;
+  if(!last_name) return first_name;
+  return `${last_name}, ${first_name}`
+}
+
+export const format_contact_type = (type: OneToFour) => {
+  switch (type) {
+    case '1':
+      return "Mobile";
+    case '2':
+      return "Office";
+    case '3':
+      return "Other";
+    case '4':
+      return "Home";
+    default:
+      return "";
+  }
+}
