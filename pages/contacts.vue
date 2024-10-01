@@ -2,20 +2,13 @@
     <div>
         <p class="text-title">Contact page</p>     
     </div>
-    <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
-    <ul class="tab-style">
-        <li v-for="option in tab_options" :key="option" class="tab-style__li"
-            :class="[selected_tab === option ? 'selected-tab' : '']" @click="selected_tab = option">
-            {{ option}}
-        </li>
-    </ul>
-
-    <main class="py-5 main-container">
+    <div class="py-5 main-container">
         <ContactsTable :selected-tab="selected_tab" />
-    </main>
-
-    <ContactsActions />
-
+        <div>
+            <ContactsActions />
+            <ContactsGroupsPanel />
+        </div>
+    </div>
     <div class="new-group-container">
         <h2>Create New Group</h2>
         <div class="form-group">
@@ -36,11 +29,6 @@
 </template>
 
 <script setup lang="ts">
-
-
-
-
-  
     const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
     
     const selected_tab = ref(CONTACTS_ALL)    
@@ -135,5 +123,7 @@
 .main-container {
     background-color: var(--body-background);
     overflow-x: hidden;
+    display: grid;
+    grid-template-columns: 1fr auto;
 }
 </style>

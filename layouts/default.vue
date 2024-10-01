@@ -5,9 +5,9 @@
             <span v-if="show_current_env() !== ''" class="env-title">{{ show_current_env() }}</span>
         </div>
         <Navbar class="item2"></Navbar>
-        <div class="item3">
+        <main class="item3">
             <slot></slot>
-        </div>  
+        </main>  
         <div class="item5">Footer</div>
     </div>
 </template>
@@ -38,10 +38,11 @@
 
 .grid-container {
     display: grid;
+    grid-template-columns: auto 1fr;
     grid-template-areas:
-    'menu header header header header header'
-    'menu main main main main main'
-    'menu footer footer footer footer footer';
+        'menu header'
+        'menu main'
+        'menu footer';
     gap: 10px;
     height: 100vh;
 }
