@@ -1,13 +1,34 @@
 <template>
     <div class="grid-container">
-        <div class="item1">Header</div>
+        <div class="item1">
+            Header
+            <span v-if="show_current_env() !== ''" class="env-title">{{ show_current_env() }}</span>
+        </div>
         <Navbar class="item2"></Navbar>
         <div class="item3">
             <slot></slot>
         </div>  
         <div class="item5">Footer</div>
     </div>
-</template>  
+</template>
+
+<script setup lang="ts">
+    const show_current_env = () => {
+        const runtimeConfig = useRuntimeConfig()
+        let env = '';
+
+        switch (runtimeConfig.public.ENVIRONMENT) {
+            case 'development':
+                env = 'Development'
+                break
+            case 'test':
+                env = 'Test'
+                break
+        }
+        return env
+    }
+</script>
+
 <style scoped>
     .item1 { grid-area: header; }
     .item2 { grid-area: menu; }
@@ -27,6 +48,18 @@
 
 .grid-container > div {
   background-color: rgba(255, 255, 255, 0.99);
+}
+
+.env-title {
+    color: white;
+    background-color: #f00;
+    font-weight: bold;
+    padding: 2px 10px;
+    letter-spacing: .8px;
+}
+
+.item1 {
+    padding: 10px 0;
 }
 </style>
   

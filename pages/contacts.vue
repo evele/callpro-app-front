@@ -1,8 +1,6 @@
 <template>
     <div>
-        <p class="text-title">Contact page</p>
-        <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error?.message }}</span>        
+        <p class="text-title">Contact page</p>     
     </div>
     <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
     <ul class="tab-style">
@@ -11,6 +9,12 @@
             {{ option}}
         </li>
     </ul>
+
+    <main class="py-5 main-container">
+        <ContactsTable :selected-tab="selected_tab" />
+    </main>
+
+    <ContactsActions />
 
     <div class="new-group-container">
         <h2>Create New Group</h2>
@@ -65,29 +69,15 @@
 
 <script setup lang="ts">
     const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
-    const page = ref(1)    
-    const show = ref(10)
-    const search = ref("")    
-
+    
     const selected_tab = ref(CONTACTS_ALL)    
-    const with_groups = ref(true)
-    const is_custom_group = ref(false)
+    
     const groupName = ref('')
     const launchID = ref('')
     const groupID = ref('')
 
-    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
-    const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
     
-    let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
-   
-    const debounceSearch = (e: Event) => {        
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => {
-            const target = e.target as HTMLInputElement;
-            search.value = target.value
-        }, 500) 
-    }
+    const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
    
     const save_new_group = () => {
         const dataToSend = {
@@ -122,6 +112,7 @@
     font-weight: bold;
     border: 1px solid gray;
     padding: 6px 1rem;
+    font-size: 14px;
 }
 
 .tab-style__li:hover {
@@ -166,5 +157,10 @@
 .contact-value {
   margin-right: 10px;
   color: blue;
+}
+
+.main-container {
+    background-color: var(--body-background);
+    overflow-x: hidden;
 }
 </style>

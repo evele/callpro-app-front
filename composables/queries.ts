@@ -118,13 +118,13 @@ export const useFetchChatContacts = (data:Ref<boolean>) => {
 }
 
 /* ----- Contacts ----- */
-export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_groups:Ref<boolean>,is_custom_group:Ref<boolean>,group_id:Ref<string>,filter:Ref<string>){
+export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_groups:Ref<boolean>,is_custom_group:Ref<boolean>,group_id:string,filter:Ref<string>){
   const dataToSend = computed(() => ({
     page: page.value,
     limit: limit.value,
     with_groups: with_groups.value, // TODO: review this
     is_custom_group:is_custom_group.value, 
-    group_id:group_id.value,
+    group_id:group_id,
     filter:filter.value,
   }))
   return useQuery({
