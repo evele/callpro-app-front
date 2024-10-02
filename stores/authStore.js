@@ -35,12 +35,12 @@ export const useAuthStore = defineStore("AuthStore", {
       location.reload()
       //router.push("/login")
     },
-    /*
+    
     async sendRecoveryPass(email) {
-      return await fetchWrapper.post(RECOVERY_MAIL_URL, { email })
+      return await fetchWrapper.post(FORGOT_PASSWORD_URL, { email })
     },
-    async resetPassword(password, passwordc, token) {
-      return await fetchWrapper.post(RESET_PASSWORD_URL, { new: password, new_confirm: passwordc, token })
-    },*/
+    async resetPassword(new_password, new_password_confirm, token) {
+      return await fetchWrapper.post(RESET_PASSWORD_URL, { new_password, new_password_confirm, token })
+    },
   },
 })

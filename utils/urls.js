@@ -5,7 +5,7 @@ export const CONVERT_TEXT_TO_SPEECH_URL = "/audios/tts_convertion"
 
 /* ----- Auth Store ----- */
 export const LOGIN_URL = "/jwtauth/login"
-export const RECOVERY_MAIL_URL = "/jwtauth/send_recovery_mail"
+export const FORGOT_PASSWORD_URL ="/jwtauth/forgot_password"
 export const RESET_PASSWORD_URL = "/jwtauth/reset_password"
 
 /* ----- Billing Store ----- */
