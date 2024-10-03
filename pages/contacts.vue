@@ -1,17 +1,14 @@
 <template>
     <div>
-        <p class="text-title">Contact page</p>
-        <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error?.message }}</span>        
+        <p class="text-title">Contact page</p>     
     </div>
-    <h2 style="margin: 2rem 0 0 10px">Contacts</h2>
-    <ul class="tab-style">
-        <li v-for="option in tab_options" :key="option" class="tab-style__li"
-            :class="[selected_tab === option ? 'selected-tab' : '']" @click="selected_tab = option">
-            {{ option}}
-        </li>
-    </ul>
-
+    <div class="py-5 main-container">
+        <ContactsTable :selected-tab="selected_tab" />
+        <div>
+            <ContactsActions />
+            <ContactsGroupsPanel />
+        </div>
+    </div>
     <div class="new-group-container">
         <h2>Create New Group</h2>
         <div class="form-group">
@@ -30,109 +27,18 @@
         </div>
     </div>
 
-    <div class="filter-container">
-        <div>
-            <label for="show" style="margin-right: 6px;">Show:</label>
-            <select name="show" id="show" v-model="show">
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-            </select>
-        </div>
-
-        <div>
-            <label for="search" style="margin-right: 6px;">Search:</label>
-            <input type="text" name="search" id="search" placeholder="Search..." @input="debounceSearch">
-        </div>
-        <div>
-            <label for="page_number" style="margin-right: 6px;">Pagina nro:</label>
-            <input type="number" name="page_number" id="page_number" placeholder="nro pagina..." v-model.number="page">
-        </div>
-    </div>
-    <p v-if="isLoading">Loading broadcasts...</p>
-    <p v-if="isError">{{ error?.message }}</p>
-    <ul v-if="isSuccess && all_contacts_data && 'contacts' in all_contacts_data" class="contact-list">
-        <li v-for="contact in all_contacts_data?.contacts" :key="contact.id" class="contact-item">            
-            <span class="contact-label">Contact ID:</span><span class="contact-value">{{ contact.id }}</span>
-            <span class="contact-label">Name:</span><span class="contact-value">{{contact.last_name}}, {{contact.first_name}}</span>              
-        </li>
-    </ul>
-
     <ContactsActions />
-
-    <div style="margin-top: 1rem;">
-        <Button @click="handle_group_action('move')" style="margin-right: 1rem;">Move to Group</Button>
-        <Button @click="handle_group_action('add')">Add to Group</Button>
-    </div>
-
-    <div class="flex" style="margin-top: 1rem;">
-        <div>
-            <span v-if="isLoadingSG">Loading system groups...</span>
-            <span v-else-if="isErrorSG">Something failed while getting system groups.</span>
-            <div v-else-if="isSuccessSG">
-                <p style="font-weight: 600; line-height: 10px; color:blue; margin-bottom: .5rem;">System groups</p>
-                <div v-if="SGData?.result">
-                    <ul v-if="SGData?.system_groups">
-                        <li>All: {{ SGData?.system_groups?.not_trash }}</li>
-                        <li v-if="SGData?.total_monthly_numbers && SGData?.total_monthly_numbers >= 0">Monthly Numbers: {{ SGData?.total_monthly_numbers }}</li>
-                        <li>Unassigned: {{ SGData?.system_groups?.unassigned }}</li>
-                        <li>Trash: {{ SGData?.system_groups?.trash }}</li>
-                    </ul>
-                </div>
-                <p v-else>{{ SGData?.error }}</p>
-            </div>
-        </div>
-    
-        <div>
-            <span v-if="isLoadingCG">Loading custom groups...</span>
-            <span v-else-if="isErrorCG">Something failed while getting custom groups.</span>
-            <div v-else-if="isSuccessCG">
-                <p style="font-weight: 600; line-height: 10px; color:blue; margin-bottom: .5rem;">Custom groups</p>
-                <div v-if="CGData?.result">
-                    <ul v-if="CGData?.custom_groups?.length">
-                        <li v-for="group in CGData?.custom_groups" :key="group?.id">
-                            {{ group?.group_name }}: {{ group?.count }}
-                        </li>
-                    </ul>
-                    <span v-else>No custom groups to show.</span>
-                </div>
-                <p v-else>{{ CGData?.error }}</p>
-            </div>
-        </div>
-    </div>
 </template>
 
 <script setup lang="ts">
-    const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
-    const page = ref(1)    
-    const show = ref(10)
-    const search = ref("")    
-
     const selected_tab = ref(CONTACTS_ALL)    
-    const with_groups = ref(true)
-    const is_custom_group = ref(false)
+    
     const groupName = ref('')
     const launchID = ref('')
     const groupID = ref('')
 
-    const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
-    const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
-    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,selected_tab,search) 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
-    const { mutate: moveNumberToGroup, isPending: MTGIsPending, isError: MTGIsError, isSuccess: MTGIsSuccess } = useMoveNumberToGroup()
-    const { mutate: addNumberToGroup, isPending: ATGIsPending, isError: ATGIIsError, isSuccess: ATGIIsSuccess } = useAddNumberToGroup()
-    
-    let searchDebounce: ReturnType<typeof setTimeout> // TODO: check if this works
-   
-    const debounceSearch = (e: Event) => {        
-        clearTimeout(searchDebounce);
-        searchDebounce = setTimeout(() => {
-            const target = e.target as HTMLInputElement;
-            search.value = target.value
-        }, 500) 
-    }
-   
+
     const save_new_group = () => {
         const dataToSend = {
             name: groupName.value,
@@ -140,44 +46,6 @@
             phone_launch_id: launchID.value ? parseInt(launchID.value, 10) : null
         } 
         saveGroupContacts(dataToSend)
-    }
-
-    const target_groups = computed(() => {
-        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
-            return CGData.value.custom_groups.map((group: CustomGroup) => group.id).slice(0, 2)
-        }
-    })
-
-    const hardcoded_contact_data = computed(() => {
-        if(all_contacts_data?.value?.result && all_contacts_data?.value?.contacts?.length) {
-            const contact = all_contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups?.length < 5)
-            console.log('contact', contact)
-            if(contact) return { number_id: contact.number_id, group_id: contact.number_groups }; 
-        }
-        return null
-    })
-
-    const handle_group_action = (action: string) => {
-        if(action === 'move') {
-            const data_to_send: MoveNumberToGroup = {
-                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
-                groups: target_groups?.value,
-                current_group_id: hardcoded_contact_data?.value?.group_id
-            }
-            console.log('move', data_to_send)
-
-            moveNumberToGroup(data_to_send)
-        } else if(action === 'add') {
-            const data_to_send: AddNumberToGroup = {
-                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
-                groups: target_groups?.value
-            }
-            console.log('add', data_to_send)
-
-            addNumberToGroup(data_to_send)
-        } else {
-            return 'Error';
-        }
     }
 </script>
 
@@ -203,6 +71,7 @@
     font-weight: bold;
     border: 1px solid gray;
     padding: 6px 1rem;
+    font-size: 14px;
 }
 
 .tab-style__li:hover {
@@ -247,5 +116,12 @@
 .contact-value {
   margin-right: 10px;
   color: blue;
+}
+
+.main-container {
+    background-color: var(--body-background);
+    overflow-x: hidden;
+    display: grid;
+    grid-template-columns: 1fr auto;
 }
 </style>
