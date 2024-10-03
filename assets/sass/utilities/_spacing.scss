@@ -96,3 +96,10 @@ $spacing-px: 1px;
 // Generar clases
 @include generate-margin-utilities();
 @include generate-padding-utilities();
+
+.w-full {
+  width: 100%;
+}
+.h-full {
+  height: 100%;
+}
