@@ -1,3 +1,5 @@
+import { MyPreset } from './my_theme';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   devServer: {
@@ -9,12 +11,28 @@ export default defineNuxtConfig({
     /* Configuration */
     usePrimeVue: true,
     options: {
-      unstyled: true
+      theme: {
+          preset: MyPreset,
+          options: {
+            darkModeSelector: 'light',
+            cssLayer: {
+                name: 'primevue',
+                order: 'tailwind-base, primevue, tailwind-utilities'
+            }
+        }
+      }
     }
   },
   css: [
-    '@/assets/sass/main.scss'
+    '@/assets/sass/main.scss',
+    '@/assets/css/main.css'
   ],
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
   app: {
     head: {
       title: "The Callpro App",
