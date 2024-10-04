@@ -427,6 +427,12 @@ export const MyPreset = definePreset(Aura, {
         }
     },
     components: {
+        dialog: {
+            borderRadius: "30px",
+            headerPadding: "2rem 2rem 0 2rem",
+            contentPadding: "0 2rem",
+            footerPadding: "0 2rem 2rem 2rem"
+        },
         button: {
             rounded: {
                 borderRadius:"30px"
