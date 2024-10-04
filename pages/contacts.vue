@@ -26,8 +26,11 @@
             <span v-if="saveGroupContactsIsSuccess" style="color: green;">Contact group successfully updated!</span>
         </div>
     </div>
+    
+    <Button label="Add new contact" @click="open_new_contact_modal" />
 
     <ContactsActions />
+    <ModalAddNewContact ref="modalAddNewContact" />
 </template>
 
 <script setup lang="ts">
@@ -36,6 +39,8 @@
     const groupName = ref('')
     const launchID = ref('')
     const groupID = ref('')
+
+    const modalAddNewContact = ref()
 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
 
@@ -46,6 +51,10 @@
             phone_launch_id: launchID.value ? parseInt(launchID.value, 10) : null
         } 
         saveGroupContacts(dataToSend)
+    }
+
+    const open_new_contact_modal = () => {
+        modalAddNewContact.value.open();
     }
 </script>
 

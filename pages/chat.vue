@@ -2,6 +2,7 @@
     <div>
         <p class="text-title">Chat page</p>
         <Button label="Reload data" icon="pi pi-refresh" class="button is-info" @click="load_data" />
+        <Button label="Success" class="ml-4 text-amber-500" severity="success" />
         <div class="container-div">
             <p>Get all contacts</p>
             <input type="checkbox" v-model="get_all_contacts">
