@@ -11,4 +11,4 @@ export * from "./api-calls/groups.ts"
 export * from "./api-calls/packages.ts"
 export * from "./api-calls/settings.ts"
 export * from "./api-calls/sms.ts"
-
+export * from "./api-calls/general.ts"
