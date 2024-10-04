@@ -25,7 +25,7 @@
                         <div class="form-block">
                             <div class="input-group">
                                 <label for="phone-1" class="block">Phone 1*</label>
-                                <InputMask id="phone-1" :invalid="number_error.length > 0" v-model="new_contact.numbers[0].number" mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="custom-input" />
+                                <PhoneInput :phone-number-model="phone_number" :phone-number-error="phone_number_error" :int-phone-number-model="int_phone_number" :int-phone-number-error="int_phone_number_error" />
                                 <p class="text-red absolute">{{ number_error }}</p>
                             </div>
 
@@ -77,6 +77,12 @@
     const visible = ref(false);
     const number_error = ref('');
     const type_error = ref('');
+
+    //TODO: Continuar acá, tengo que tomar el evento del componente
+    const phone_number = ref('')
+    const phone_number_error = ref('')
+    const int_phone_number = ref('')
+    const int_phone_number_error = ref('')
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact()
