@@ -9,44 +9,19 @@
             <ContactsGroupsPanel />
         </div>
     </div>
-    <div class="new-group-container">
-        <h2>Create New Group</h2>
-        <div class="form-group">
-            <label for="group_name">Group Name:</label>
-            <input type="text" id="group_name" v-model="groupName" placeholder="Enter group name" />
-        </div>
-        <div class="form-group">
-            <label for="launch_id">Phone Launch ID:</label>
-            <input type="number" id="launch_id" v-model="launchID" min="1" placeholder="Enter Phone Launch ID" />
-            <input type="number" id="group_id" v-model="groupID" placeholder="Enter Group ID" />
-        </div>
-        <button @click="save_new_group">{{ !saveGroupContactsIsPending ? 'Save new group' : 'Saving...' }}</button>
-         <div style="margin-top: 10px;">
-            <span v-if="saveGroupContactsIsError" style="color: red;">Error: {{ saveGroupContactsError?.message }}</span>
-            <span v-if="saveGroupContactsIsSuccess" style="color: green;">Contact group successfully updated!</span>
-        </div>
-    </div>
+    
+    <Button label="Save Custom Groups" @click="open_modal" />
+    <SaveCustomGroups ref="saveCustomGroups"/>
 </template>
 
-<script setup lang="ts">
-    const tab_options = [CONTACTS_ALL,UNASSIGNED,TRASH]
+<script setup lang="ts">   
     
-    const selected_tab = ref(CONTACTS_ALL)    
-    
-    const groupName = ref('')
-    const launchID = ref('')
-    const groupID = ref('')
+    const selected_tab = ref(CONTACTS_ALL)        
 
-    
-    const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
-   
-    const save_new_group = () => {
-        const dataToSend = {
-            name: groupName.value,
-            id: groupID.value ? parseInt(groupID.value, 10) : null,
-            phone_launch_id: launchID.value ? parseInt(launchID.value, 10) : null
-        } 
-        saveGroupContacts(dataToSend)
+    const saveCustomGroups = ref();    
+
+    const open_modal = () => {
+        saveCustomGroups.value.open();
     }
 
 </script>
