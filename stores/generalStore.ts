@@ -23,5 +23,4 @@ export const useGeneralStore = defineStore("GeneralStore", {
       }
     }
   },
-  //getters:{}
 })
