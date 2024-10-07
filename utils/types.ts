@@ -61,8 +61,8 @@ export type ContactToSave = {
       id: 'new' | number,
       number: string,
       notes: string,
-      type: OneToFour,
-      number_groups: string[] | null
+      type: '' | OneToFour,
+      number_groups: string[]
   }[]
 }
 

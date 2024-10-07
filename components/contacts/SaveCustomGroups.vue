@@ -1,38 +1,34 @@
 <template>
-
-    <Dialog v-model:visible="visible" modal header="Create New Group" :style="{ width: '25rem' }">
-        <div class="flex flex-col items-start gap-2 w-[786px] h-[73px]">
-            <label for="group-name" class="font-normal text-[19.55px] leading-[27.37px] text-left">Group
+    <Dialog v-model:visible="visible" modal header="Create new group" class="text-2xl font-semibold leading-8 w-full max-w-[800px]">        
+        <div class="flex flex-col items-start gap-2 w-full">
+            <label for="group-name" class="text-xl leading-6 text-left">Group
                 Name*</label>
             <InputText id="group-name"
-                class="flex w-[786px] min-w-[293.25px] h-[38px] p-[12px_16px] border border-gray-300 rounded-[30px] bg-white"
+                class="flex w-full text-sm px-3 py-4 border border-gray-300 rounded-[30px] bg-white"
                 autocomplete="off" placeholder="Enter Name" v-model="groupName" />
         </div>
 
-        <div class="flex flex-col items-start gap-2 w-[786px] h-[73px]">
-            <label for="group-name" class="font-normal text-[19.55px] leading-[27.37px] text-left">Phone
+        <div class="flex flex-col items-start gap-2 w-full">
+            <label for="group-name" class="text-xl leading-6 text-left">Phone
                 Launch ID</label>
             <InputText id="launch-id"
-                class="flex w-[786px] min-w-[293.25px] h-[38px] p-[12px_16px] border border-gray-300 rounded-[30px] bg-white"
+                class="flex w-full text-sm px-3 py-4 border border-gray-300 rounded-[30px] bg-white"
                 autocomplete="off" placeholder="Enter a number ID" v-model="launchID" />
         </div>
         <span class="text-surface-500 dark:text-surface-400 block mb-8">*This information is mandatory
             to create a new group</span>
         <div class="flex justify-center mt-4">
-            <Button type="button" label="Save"
-                class="flex justify-center items-center py-2 px-4 w-[300px] h-[40px] rounded-[30px]"
-                @click="save_new_group">
-            </Button>+            
+            <Button type="button" label="Save" rounded
+                class="flex justify-center items-center py-2 px-4 w-[300px]"
+                @click="groupID ? editGroup(groupID) : save_new_group"
+            </Button>
         </div>
         <div style="margin-top: 10px;">
             <span v-if="saveGroupContactsIsError" style="color: red;">Error: {{ saveGroupContactsError?.message
                 }}</span>
             <span v-if="saveGroupContactsIsSuccess" style="color: green;">Group successfully created!</span>
         </div>
-
-
     </Dialog>
-
 </template>
 
 <script setup lang="ts">
@@ -45,34 +41,12 @@ const open = () => {
     // body.style.overflow = 'hidden';
 }
 defineExpose({ open });
-/*
-
-<div class="new-group-container">
-        <h2>Create New Group</h2>
-        <div class="form-group">
-            <label for="group_name">Group Name:</label>
-            <input type="text" id="group_name" v-model="groupName" placeholder="Enter group name" />
-        </div>
-        <div class="form-group">
-            <label for="launch_id">Phone Launch ID:</label>
-            <input type="number" id="launch_id" v-model="launchID" min="1" placeholder="Enter Phone Launch ID" />
-            <input type="number" id="group_id" v-model="groupID" placeholder="Enter Group ID" />
-        </div>
-        <button @click="save_new_group">{{ !saveGroupContactsIsPending ? 'Save new group' : 'Saving...' }}</button>
-         <div style="margin-top: 10px;">
-            <span v-if="saveGroupContactsIsError" style="color: red;">Error: {{ saveGroupContactsError?.message }}</span>
-            <span v-if="saveGroupContactsIsSuccess" style="color: green;">Contact group successfully updated!</span>
-        </div>
-    </div>
-
-    - cambiar nombre input id.
-    - capturar input groupName = ref('') const launchID = ref('')
-
-*/
 
 const groupName = ref('')
 const launchID = ref<number | null>(null);
 const groupID = ref<number | null>(null);
+
+const emit = defineEmits(["editGroup"]);
 
 const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
 
@@ -88,6 +62,17 @@ const save_new_group = () => {
     }
     saveGroupContacts(dataToSend)
 }
+
+
+const editGroup = (groupId) => {
+    console.log(groupID);
+    // const dataToSend = {
+    //     id: groupId,
+    //     name: groupName.value,
+    //     phone_launch_id: launchID.value ? parseInt(launchID.value, 10) : null
+    // };
+    // emit("funcionedit", dataToSend); // Emitir evento para editar el grupo
+};
 </script>
 <style scoped>
 /* @layer primevue {

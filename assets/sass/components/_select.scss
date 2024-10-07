@@ -1,5 +1,5 @@
 /* Estilo para el contenedor del select */
-[data-pc-name="select"] {
+[data-pc-name="select"], [data-pc-name="multiselect"] {
     display: inline-flex;
     align-items: center;
     justify-content: space-between;
@@ -84,5 +84,32 @@
   [data-pc-section="optionlabel"] {
     color: #333;
   }
+
+  [data-pc-name="multiselect"] {
+    [data-pc-section="label"] {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    [data-pc-name="pcchip"] {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background-color: #f0f0f0;
+      padding: 0 6px;
+      border-radius: 4px;
+    }
+  }
+
+  [data-pc-section="overlay"] {
+    [data-pc-section="header"] {
+      display: none;
+    }
+
+    [data-pc-section="box"] {
+      display: none;
+    }
+  } 
   
   

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p class="text-title">Contact page</p>     
+        <p class="text-title">Contact page</p>
     </div>
     <div class="py-5 main-container">
         <ContactsTable :selected-tab="selected_tab" />
@@ -9,21 +9,31 @@
             <ContactsGroupsPanel />
         </div>
     </div>
-    
+
     <Button label="Save Custom Groups" @click="open_modal" />
-    <SaveCustomGroups ref="saveCustomGroups"/>
+    <SaveCustomGroups ref="saveCustomGroups" />
+    <Button label="Add new contact" @click="open_new_contact_modal" />
+
+    <ContactsActions />
+    <ModalAddNewContact ref="modalAddNewContact" />
 </template>
 
-<script setup lang="ts">   
-    
-    const selected_tab = ref(CONTACTS_ALL)        
+<script setup lang="ts">
 
-    const saveCustomGroups = ref();    
+const selected_tab = ref(CONTACTS_ALL)
 
-    const open_modal = () => {
-        saveCustomGroups.value.open();
-    }
+const saveCustomGroups = ref();
 
+const open_modal = () => {
+    saveCustomGroups.value.open();
+}
+
+const modalAddNewContact = ref()
+
+
+const open_new_contact_modal = () => {
+    modalAddNewContact.value.open();
+}
 </script>
 
 <style scoped>
@@ -67,32 +77,33 @@
     gap: 1.4rem;
     margin: 1rem 0 0 1rem;
 }
+
 .contact-list {
-  list-style-type: none;
-  padding: 0;
-  margin: 1rem 0;
-  border: 1px solid #ccc;
-  border-collapse: collapse;
+    list-style-type: none;
+    padding: 0;
+    margin: 1rem 0;
+    border: 1px solid #ccc;
+    border-collapse: collapse;
 }
 
 .contact-item {
-  display: flex;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
+    display: flex;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
 }
 
 .contact-item:last-child {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .contact-label {
-  font-weight: 600;
-  margin-right: 6px;
+    font-weight: 600;
+    margin-right: 6px;
 }
 
 .contact-value {
-  margin-right: 10px;
-  color: blue;
+    margin-right: 10px;
+    color: blue;
 }
 
 .main-container {
