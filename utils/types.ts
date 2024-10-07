@@ -244,6 +244,13 @@ export type Timezone = {
   country_initials: 'CA' | 'US' | 'UK';
 }
 
+export type AreaCodes = {
+  id: number;
+  area_code: number;
+  area_description: string;
+  available: ZeroOrOne;
+}
+
 export type Settings = {
   amd_detection: ZeroOrOne;
   call_speed: CallSpeed;

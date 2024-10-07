@@ -37,7 +37,13 @@
   </ul>
 </template>
 <script setup lang="ts">
+import {useGeneralStore} from "@/stores"
+  const generalStore = useGeneralStore()
   
+  onMounted(() => {
+    generalStore.getUserAreaCodesAndTimezonesData()
+  })
+
   const tab_options: DashboardState[] = [COMPLETED, ACTIVE, DRAFT]
   const selected_tab: Ref<DashboardState> = ref(COMPLETED)
   const select_options: Ref<ItemsPerPageOption[]> = ref([

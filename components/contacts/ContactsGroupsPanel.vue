@@ -23,21 +23,24 @@
 
         <div class="second-section flex flex-col">
             <GroupButton
-                group-name="My Group"
-                :contacts-count="Math.floor(Math.random() * 100)"        
-                :active="activeButton === 'My Group'"
-                @click="setActiveButton('My Group')"
+                group-name="My Groups"
+                :contacts-count="isSuccessCG && CGData?.result ? CGData?.custom_groups.length : 0"       
+                :active="false"
+                @click.prevent
             >
                 <template #icon>
-                    <MyGroupSVG alt="My Group" />     
+                    <MyGroupsSVG alt="My Groups" />     
                 </template>
             </GroupButton>
             <ul class="user-group-container flex flex-col">
-                <li class="flex justify-end" v-for="group in USER_GROUPS" :key="group.number">
-                    <Button class="user-group-btn flex justify-between items-center" :class="group.bgColor">
+                <li v-if="isLoadingCG">Loading...</li>
+                <li v-if="isErrorCG">Error loading groups.</li>
+                <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []" :key="group.id">
+                    
+                    <Button class="user-group-btn flex justify-between items-center" >
                         <div class="flex items-center user-group-data">
-                            {{ group.name }}
-                            <span class="user-group-number">#{{ group.number }}</span>
+                            {{  group.group_name }}                            
+                            <span class="contacts-count">{{ group.count }}</span>
                         </div>
                         <EditIconSVG />
                     </Button>
@@ -56,7 +59,7 @@
     import EditIconSVG from "@/components/svgs/EditIconSVG.vue"
     import AllSVG from "@/components/svgs/AllSVG.vue";
     import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
-    import MyGroupSVG from "@/components/svgs/MyGroupsSVG.vue";
+    import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
     import TrashSVG from "@/components/svgs/TrashSVG.vue";
   
     const DefaultGroupsButtons = [
@@ -71,11 +74,8 @@
         activeButton.value = name;
     };
 
-    const USER_GROUPS = [
-        { name: "Group 1", number: "0054", bgColor: "bg-green" },
-        { name: "Group 2", number: "0044", bgColor: "bg-yellow" },
-        { name: "Group 3", number: "0034", bgColor: "bg-red" },
-    ]
+    const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
+    
 </script>
 
 <style scoped lang="scss">
@@ -101,6 +101,11 @@
             padding: 0 16px;
             gap: 10px;
         }
+        .contacts-count {
+            margin-left: 12px;
+            color: #79747E;    
+            font-size: 11px;
+        }  
     }
 
     .groups-title {
