@@ -15,6 +15,10 @@
                 <label for="email" class="font-semibold w-24">Email</label>
                 <InputText id="email" class="flex-auto" autocomplete="off" />
             </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="some number" class="font-semibold w-24">Number</label>
+                <InputNumber  class="flex-auto" autocomplete="off" />
+            </div>
             <template #footer>
                 <div class="flex justify-end gap-2">
                     <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>

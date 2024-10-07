@@ -424,18 +424,19 @@ export const MyPreset = definePreset(Aura, {
         },
         formField: {
             paddingY: '0.45rem',
+            borderRadius: '1.875rem'
         }
     },
     components: {
         dialog: {
-            borderRadius: "30px",
+            borderRadius: "1.875rem",
             headerPadding: "2rem 2rem 0 2rem",
             contentPadding: "0 2rem",
             footerPadding: "0 2rem 2rem 2rem"
         },
         button: {
             rounded: {
-                borderRadius:"30px"
+                borderRadius:"1.875rem"
             }
             ,
             colorScheme: {
