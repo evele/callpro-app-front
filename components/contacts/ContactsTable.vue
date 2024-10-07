@@ -38,10 +38,16 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-6 selected-group-info rounded-4">
-                        <CheckSVG class="check-icon rounded-full" />
-                        <span>All</span>
-                    </div>
+                    <div class="flex items-center">
+                        <div class="flex items-center gap-6 selected-group-info rounded-4">
+                            <CheckSVG class="check-icon rounded-full" />
+                            <span>All</span>
+                        </div>
+                        <div class="ml-4">
+                            <Button @click="handle_group_action('move')" style="margin-right: 1rem;">Move to Group</Button>
+                            <Button @click="handle_group_action('add')">Add to Group</Button>
+                        </div>
+                </div>
                 </header>
             </template>
 
@@ -199,8 +205,12 @@
         type: OneToFour
     }
 
+    const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
+    const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups() 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
-    
+    const { mutate: moveNumberToGroup, isPending: MTGIsPending, isError: MTGIsError, isSuccess: MTGIsSuccess } = useMoveNumberToGroup()
+    const { mutate: addNumberToGroup, isPending: ATGIsPending, isError: ATGIIsError, isSuccess: ATGIIsSuccess } = useAddNumberToGroup()
+
     const contacts_data = computed(() => {
         if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }
         return all_contacts_data?.value
@@ -268,6 +278,44 @@
     const isRowExpanded = (id: string) => !!expandedRows.value[id];
 
     const get_number_groups = (groups: string) => groups === null ? [] : groups.trim().split(/\s*,\s*/);
+
+    const target_groups = computed(() => {
+        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
+            return CGData.value.custom_groups.map((group: CustomGroup) => group.id).slice(0, 2)
+        }
+    })
+
+    const hardcoded_contact_data = computed(() => {
+        if(all_contacts_data?.value?.result && all_contacts_data?.value?.contacts?.length) {
+            const contact = all_contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups?.length < 5)
+            console.log('contact', contact)
+            if(contact) return { number_id: contact.number_id, group_id: contact.number_groups }; 
+        }
+        return null
+    })
+
+    const handle_group_action = (action: string) => {
+        if(action === 'move') {
+            const data_to_send: MoveNumberToGroup = {
+                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
+                groups: target_groups?.value,
+                current_group_id: hardcoded_contact_data?.value?.group_id
+            }
+            console.log('move', data_to_send)
+
+            moveNumberToGroup(data_to_send)
+        } else if(action === 'add') {
+            const data_to_send: AddNumberToGroup = {
+                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
+                groups: target_groups?.value
+            }
+            console.log('add', data_to_send)
+
+            addNumberToGroup(data_to_send)
+        } else {
+            return 'Error';
+        }
+    }
 </script>
 
 <style scoped lang="scss">
