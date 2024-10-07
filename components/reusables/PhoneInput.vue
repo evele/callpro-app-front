@@ -1,15 +1,15 @@
 <template>
     <div v-if="!is_international" class="w-full">
-        <InputMask :v-model="phoneNumberModel" :invalid="phoneNumberError.length > 0" @focus="init_event" @blur="stop_event" @update:modelValue="updateValue"
-        mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 border border-[#D9D9D9] rounded-[30px] transition-colors" 
+        <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error" @focus="init_event" @blur="stop_event" @update:model-value="updateLocalPhoneNumberModel"
+        mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 rounded-[30px] transition-colors" 
         />
-        <span v-if="phoneNumberError.length > 0" class="text-red-500 text-sm">{{ phoneNumberError }}</span>
+        <span v-if="show_phone_number_error" class="text-red-500 text-sm">Invalid area code</span>
     </div>
     
     <div v-else class="w-full">
-        <InputText :v-model="IntPhoneNumberModel" :invalid="IntPhoneNumberError.length > 0" maxlength="20" @update:modelValue="updateValue"
-            class="w-full py-2 px-4 border border-[#D9D9D9] rounded-[30px] transition-colors" />
-        <span v-if="IntPhoneNumberError.length > 0" class="text-red-500 text-sm">{{ IntPhoneNumberError }}</span>
+        <InputText ref="intPhoneNumberRef" :model-value="localIntPhoneNumberModel" :invalid="show_int_phone_number_error" maxlength="20" @update:model-value="updateLocalIntPhoneNumberModel"
+            class="w-full py-2 px-4 rounded-[30px] transition-colors" />
+        <span v-if="show_int_phone_number_error" class="text-red-500 text-sm">Invalid phone number</span>
     </div>
 </template>
 
@@ -17,22 +17,36 @@
     import { useGeneralStore } from '@/stores';
 
     const props = defineProps({
-        phoneNumberModel: { type: String, default: '' },
-        phoneNumberError: { type: String, default: '' },
-        IntPhoneNumberModel: { type: String, default: '' },
-        IntPhoneNumberError: { type: String, default: '' },
+        modelValue: { type: String, default: '' },
     });
 
-    //TODO: ver como era el tema de las props que de momento son solo readonly
+    onMounted(() => {
+        if (props.modelValue.startsWith('+')) {
+            is_international.value = true;
+        }
+    });
 
     const generalStore = useGeneralStore();
-    const is_international = ref(false);
+    const phoneNumberRef = ref<any>(null);
+    const intPhoneNumberRef = ref<any>(null);
 
-    const handleKeydown = async (e: KeyboardEvent) => {
+    const localPhoneNumberModel = ref(props.modelValue);
+    const localIntPhoneNumberModel = ref(props.modelValue);
+    const is_international = ref(false);
+    const show_phone_number_error = ref(false);
+    const show_int_phone_number_error = ref(false);
+
+    const handleKeydown = (e: KeyboardEvent) => {
         if (e.key === '+') {
             is_international.value = true;
-            props.phoneNumberModel = '';
-            props.IntPhoneNumberModel = '+';
+            localPhoneNumberModel.value = '';
+            localIntPhoneNumberModel.value = e.key;
+            // Need to wait for the element to be rendered, otherwise is null
+            setTimeout(() => {
+                if(intPhoneNumberRef.value && intPhoneNumberRef.value.$el) {
+                    intPhoneNumberRef.value.$el.focus();
+                }
+            }, 0);
         }
     }
 
@@ -44,35 +58,37 @@
         document.removeEventListener('keydown', handleKeydown)
     }
 
-    watchEffect(() => {
-        if (props.IntPhoneNumberModel === '') {
+    const emit = defineEmits(["update:modelValue"])
+
+    const updateLocalPhoneNumberModel = (value: string) => {
+        localPhoneNumberModel.value = value
+
+        const number_area_code = localPhoneNumberModel.value.substring(1, 4)
+        if(localPhoneNumberModel.value === '') {
+            show_phone_number_error.value = false;
+        } else if(!number_area_code.split('').includes('_')) {
+            show_phone_number_error.value = !generalStore.area_codes.some((item: any) => item.area_code === number_area_code);
+        }
+        emit('update:modelValue', localPhoneNumberModel.value)
+    }
+
+    const updateLocalIntPhoneNumberModel = (value: string | undefined) => {
+        localIntPhoneNumberModel.value = value ?? '';
+
+        if (localIntPhoneNumberModel.value === '') {
+            localPhoneNumberModel.value = '';
             is_international.value = false;
-            props.IntPhoneNumberError = '';
+            show_int_phone_number_error.value = false;
+            // Need to wait for the element to be rendered, otherwise is null
+            setTimeout(() => {
+                if(phoneNumberRef.value && phoneNumberRef.value.$el) {
+                    phoneNumberRef.value.$el.focus();
+                }
+            }, 0);
         } else {
             const regex = /^\+?[0-9]*$/;
-            if (!regex.test(props.IntPhoneNumberModel)) {
-                props.IntPhoneNumberError = 'Invalid phone number';
-            } else {
-                props.IntPhoneNumberError = '';
-            }
+            show_int_phone_number_error.value = !regex.test(localIntPhoneNumberModel.value);
         }
-
-        if (props.phoneNumberModel === '') {
-            props.phoneNumberError = '';
-        } else {
-            const number_area_code = props.phoneNumberModel.substring(1, 4)
-            if(!number_area_code.split('').includes('_')) {
-                if (!generalStore.area_codes.some((item: any) => item.area_code === number_area_code)) {
-                    props.phoneNumberError = 'Invalid area code';
-                } else {
-                    props.phoneNumberError = '';
-                }
-            };
-        }
-    })
-
-    const emit = defineEmits(["update:modelValue"])
-    const updateValue = (value: string) => {
-        emit("update:modelValue", value)
+        emit('update:modelValue', localIntPhoneNumberModel.value)
     }
 </script>

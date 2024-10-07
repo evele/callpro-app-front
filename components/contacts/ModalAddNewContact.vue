@@ -25,7 +25,7 @@
                         <div class="form-block">
                             <div class="input-group">
                                 <label for="phone-1" class="block">Phone 1*</label>
-                                <PhoneInput :phone-number-model="phone_number" :phone-number-error="phone_number_error" :int-phone-number-model="int_phone_number" :int-phone-number-error="int_phone_number_error" />
+                                <PhoneInput :model-value="phone_number" @update:modelValue="show_value" />
                                 <p class="text-red absolute">{{ number_error }}</p>
                             </div>
 
@@ -78,11 +78,11 @@
     const number_error = ref('');
     const type_error = ref('');
 
-    //TODO: Continuar acá, tengo que tomar el evento del componente
+    // Lo dejo para testear
     const phone_number = ref('')
-    const phone_number_error = ref('')
-    const int_phone_number = ref('')
-    const int_phone_number_error = ref('')
+    const show_value = (value: string) => {
+        console.log('show value', value)
+    }
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact()
