@@ -48,6 +48,7 @@ const groupID = ref<number | null>(null);
 const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
 
 const save_new_group = () => {
+    console.log("save new group")
     if (!groupName.value || !launchID.value) {
         alert('Group Name and Phone Launch ID are required.');
         return;

@@ -88,19 +88,6 @@
             saveCustomGroupsRef.value.launchID = group.group_code;
         }
     }; 
-
-    const edit_group = ref('')
-
-    const emit = defineEmits(['editar_my_groups']);
-
-    const saveChanges = () => {
-        const editedGroup = {
-            edit_group: edit_group.value            
-        };
-        
-        // Emite el evento 'editar_my_groups' con los datos del grupo editado
-        emit('editar_my_groups', editedGroup);
-    };
 </script>
 
 <style scoped lang="scss">
