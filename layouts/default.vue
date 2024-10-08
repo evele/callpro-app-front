@@ -8,7 +8,6 @@
         <main class="item3">
             <slot></slot>
         </main>  
-        <div class="item5">Footer</div>
     </div>
 </template>
 
@@ -33,34 +32,38 @@
     .item1 { grid-area: header; }
     .item2 { grid-area: menu; }
     .item3 { grid-area: main; }
-    .item4 { grid-area: right; }
-    .item5 { grid-area: footer; }
 
-.grid-container {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-areas:
-        'menu header'
-        'menu main'
-        'menu footer';
-    gap: 10px;
-    height: 100vh;
-}
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            'menu header'
+            'menu main';
+        height: 100vh;
+    }
 
-.grid-container > div {
-  background-color: rgba(255, 255, 255, 0.99);
-}
+    .grid-container > div {
+    background-color: rgba(255, 255, 255, 0.99);
+    }
 
-.env-title {
-    color: white;
-    background-color: #f00;
-    font-weight: bold;
-    padding: 2px 10px;
-    letter-spacing: .8px;
-}
+    .env-title {
+        color: white;
+        background-color: #f00;
+        font-weight: bold;
+        padding: 2px 10px;
+        letter-spacing: .8px;
+    }
 
-.item1 {
-    padding: 10px 0;
-}
+    .item1 {
+        height:6.5rem;
+        padding: 10px 0;
+        border-bottom: 2px solid #DED8E1;
+    }
+
+    .item3 {
+        background-color: var(--p-purple-100);
+    }
+
 </style>
   

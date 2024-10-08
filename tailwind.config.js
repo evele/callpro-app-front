@@ -7,6 +7,13 @@ module.exports = {
         "./app.vue",
         "./error.vue",
       ],
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Roboto', 'sans-serif'], 
+        },
+      },
+    },
     plugins: [require('tailwindcss-primeui')]
 };
     
