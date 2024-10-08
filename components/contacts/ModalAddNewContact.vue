@@ -1,74 +1,71 @@
 <template>
-    <Dialog v-model:visible="visible" pt:root:class="modal">
-        <template #container>
-            <div class="modal-bg"></div>
-            <section class="modal-container">
-                <div class="modal-layout">
-                    <header class="modal-header">
-                        <h2 class="modal-header-title">Add new contact <ChevronDownSVG /></h2>
-                        <Button class="modal-header-close" @click="close"><CloseSVG/></Button>
-                    </header>
+    <Dialog v-model:visible="visible" modal :closable="false" class="w-full max-w-[850px] mx-4">
+        <template #header>
+            <header class="w-full flex justify-between pb-6">
+                <h2 class="flex items-center gap-4 font-bold text-lg">Add new contact <ChevronDownSVG class="mt-1" /></h2>
+                <Button @click="close" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
+            </header>
+            <Divider class="absolute left-0 top-[78px]" />
+        </template>
 
-                    <form @submit.prevent class="new-contact-form flex flex-col">
-                        <div class="form-block">
-                            <div class="input-group">
-                                <label for="name" class="block">Name</label>
-                                <InputText type="text" id="name" v-model="new_contact.first_name" placeholder="Enter Name" class="custom-input" />
-                            </div>
-
-                            <div class="input-group">
-                                <label for="surname" class="block">Surname</label>
-                                <InputText type="text" id="surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="custom-input" />
-                            </div>
-                        </div>
-
-                        <div class="form-block">
-                            <div class="input-group">
-                                <label for="phone-1" class="block">Phone 1*</label>
-                                <InputMask id="phone-1" :invalid="number_error.length > 0" v-model="new_contact.numbers[0].number" mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="custom-input" />
-                                <p class="text-red absolute">{{ number_error }}</p>
-                            </div>
-
-                            <div class="input-group">
-                                <label class="block">Type*</label>
-                                <Select v-model="new_contact.numbers[0].type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="custom-select" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
-                                <p class="text-red absolute">{{ type_error }}</p>
-                            </div>
-                        </div>
-
-                        <div class="form-block">
-                            <div class="input-group">
-                                <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
-                                <div v-if="CGIsSuccess">
-                                    <label class="block">Groups</label>
-                                    <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
-                                    <MultiSelect v-else v-model="new_contact.numbers[0].number_groups" :options="custom_groups_options" optionLabel="name" 
-                                        display="chip" class="custom-select" placeholder="-" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-block">
-                            <div class="input-group">
-                                <label for="notes-1" class="block">Notes</label>
-                                <Textarea v-model="new_contact.numbers[0].notes" id="notes-1" cols="50" rows="5" placeholder="Enter text" class="custom-textarea" />
-                                <p class="text-info">*This information is mandatory to create a new contact</p>
-                                <p v-if="isSuccess" class="text-green">All good :D</p>
-                                <p class="text-red" v-if="isError">Something went wrong.</p>
-                            </div>
-                        </div>
-                    </form>
-
-                    <footer class="modal-footer">
-                        <Button @click="add_new" class="modal-footer-btn btn-add-new">
-                            Add new phone
-                        </Button>
-                        <Button @click="save_contact" :disabled="isPending" class="modal-footer-btn btn-save">
-                            {{ isPending ? 'Saving...' : 'Save' }}
-                        </Button>
-                    </footer>
+        <form @submit.prevent class="new-contact-form flex flex-col gap-5 mt-5 sm:gap-6">
+            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
+                <div class="w-full">
+                    <label for="name" class="text-lg text-black">Name</label>
+                    <InputText type="text" id="name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
                 </div>
-            </section>
+
+                <div class="w-full">
+                    <label for="surname" class="text-lg text-black">Surname</label>
+                    <InputText type="text" id="surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
+                <div class="w-full">
+                    <label for="phone-1" class="text-lg text-black">Phone 1*</label>
+                    <InputMask id="phone-1" :invalid="number_error.length > 0" v-model="new_contact.numbers[0].number" mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full mt-1" />
+                    <p class="text-red absolute">{{ number_error }}</p>
+                </div>
+
+                <div class="w-full">
+                    <label cclass="text-lg text-black">Type*</label>
+                    <Select v-model="new_contact.numbers[0].type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
+                    <p class="text-red absolute">{{ type_error }}</p>
+                </div>
+            </div>
+
+            <div class="w-full">
+                <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
+                <div v-if="CGIsSuccess" class="w-full">
+                    <label class="text-lg text-black">Groups</label>
+                    <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
+                    <MultiSelect v-else v-model="new_contact.numbers[0].number_groups" :options="custom_groups_options" optionLabel="name" 
+                        display="chip" class="w-full mt-1" placeholder="-" />
+                </div>
+            </div>
+
+            <div class="w-full">
+                <div>
+                    <label for="notes-1" class="text-lg text-black">Notes</label>
+                    <Textarea v-model="new_contact.numbers[0].notes" id="notes-1" cols="50" rows="5" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
+                    <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
+                    <p v-if="isSuccess" class="text-green">All good :D</p>
+                    <p class="text-red" v-if="isError">Something went wrong.</p>
+                </div>
+            </div>
+        </form>
+        
+        
+        <template #footer>
+            <footer class="flex flex-col w-full justify-center gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
+                <Button @click="add_new" class="bg-[#F5F5F5] border text-black w-full max-w-[300px]">
+                    Add new phone
+                </Button>
+                <Button @click="save_contact" :disabled="isPending" class="bg-[#653494] border-white text-white w-full max-w-[300px]">
+                    {{ isPending ? 'Saving...' : 'Save' }}
+                </Button>
+            </footer>
         </template>
     </Dialog>
 </template>
@@ -202,194 +199,8 @@
     }
 </script>
 
-<style scoped lang="scss">
-    .modal-bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        background-color: #FFF;
-        padding-bottom: 38px;
-        border-radius: 30px;
-        width: 100%;
-    }
-
-    .modal-layout {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        gap: 38px;
-        width: 100%;
-    }
-
-    .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 90px;
-        padding: 0 20px;
-        border-bottom: 1px solid #CAC4D0;
-        @media (min-width: 400px) {
-            padding: 0 34px;
-        }
-
-        .modal-header-title {
-            color: #000;
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 140%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: auto 0;
-            @media (min-width: 400px) {
-                font-size: 23.8px;
-            }
-        }
-
-        .modal-header-close {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            border-radius: 100%;
-            padding: 6px;
-
-            &:hover {
-                background-color: #F5F5F5;
-            }
-        }
-    }
-
-    .new-contact-form {
-        width: 100%;
-        padding: 0 32px;
-        gap: 20px;
-
-        .form-block {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            gap: 25px;
-
-            @media (min-width: 600px) {
-                flex-direction: row;
-                gap: 40px;
-            }
-
-            .input-group {
-                width: 100%;
-                
-                label {
-                    color: #1E1E1E;
-                    font-size: 19px;
-                    margin-bottom: 6px;
-                }
-
-                .custom-input, .custom-select, .custom-textarea {
-                    width: 100%;
-                    border: 1px solid #D9D9D9;
-                    padding: 8px 16px;
-                    transition: border-color 0.5s;
-                }
-
-                .custom-input, .custom-select {
-                    border-radius: 30px;
-                }
-
-                .custom-textarea {
-                    border-radius: 10px;
-                    min-height: 98px;
-                }
-
-                [aria-invalid="true"], .invalid {
-                    border-color: red;
-                }
-            }
-        }
-
-        .text-info {
-            color: #757575;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-    }
-
-    .modal-footer {
-        width: 100%;
-        text-align: center;
-        padding: 0 26px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 10px;
-        @media (min-width: 370px) {
-            flex-direction: row;
-            gap: 20px;
-        }
-        @media (min-width: 500px) {
-            gap: 50px;
-        }
-
-        .modal-footer-btn {
-            border-radius: 30px;
-            max-width: 300px;
-            width: 100%;
-            height: 40px;
-            font-size: 16px;
-            font-weight: 700;
-            transition: background-color 0.3s;
-
-            &:hover {
-                cursor: pointer;
-            }
-        }
-
-        .btn-add-new {
-            background-color: #F5F5F5;
-            color: #000;
-            border: 1px solid #000;
-            &:hover {
-                background-color: #E5E5E5;
-            }
-        }
-
-        .btn-save {
-            background-color: #653494;
-            color: #FFF;
-            border: 1px solid #FFF;
-            &:hover {
-                background-color: #4A1D6E;
-            }
-            &:disabled {
-                opacity: 0.6;
-                background-color: rgba(101, 52, 148, 0.60);
-                color: #B3B3B3;
-                border: 1px solid #B3B3B3;
-            }
-        }
-    }
-
-    .text-red {
-        color: red;
-    }
-    .text-green {
-        color: green;
-    }
-
-    .absolute {
-        position: absolute;
+<style scoped>
+    .no-resize {
+        resize: none;
     }
 </style>
