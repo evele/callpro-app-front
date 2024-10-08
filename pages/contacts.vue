@@ -11,7 +11,8 @@
     </div>
 
     <Button label="Save Custom Groups" @click="open_modal" />
-    <SaveCustomGroups ref="saveCustomGroups" />
+   
+    <SaveCustomGroups ref="saveCustomGroups" @editar_my_groups="handleEditGroup"/>
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
     <ContactsActions />
@@ -25,6 +26,7 @@ const selected_tab = ref(CONTACTS_ALL)
 const saveCustomGroups = ref();
 
 const open_modal = () => {
+    console.log("abriendo")
     saveCustomGroups.value.open();
 }
 

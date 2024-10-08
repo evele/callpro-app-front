@@ -39,10 +39,10 @@
                     
                     <Button class="user-group-btn flex justify-between items-center" >
                         <div class="flex items-center user-group-data">
-                            {{  group.group_name }}                            
+                            {{  group.group_name }}                                                          
                             <span class="contacts-count">{{ group.count }}</span>
                         </div>
-                        <EditIconSVG />
+                        <EditIconSVG  @click="openEditDialog(group)"/>
                     </Button>
                 </li>
             </ul>
@@ -52,6 +52,7 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
+        <SaveCustomGroups ref="saveCustomGroupsRef"/>
     </section>
 </template>
 
@@ -75,7 +76,31 @@
     };
 
     const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
-    
+
+    const saveCustomGroupsRef = ref(null);
+
+    const openEditDialog = (group) => {    
+        if (saveCustomGroupsRef.value) {
+            console.log("mandando group", group);
+            saveCustomGroupsRef.value.open();
+            saveCustomGroupsRef.value.groupID = group.id;
+            saveCustomGroupsRef.value.groupName = group.group_name;
+            saveCustomGroupsRef.value.launchID = group.group_code;
+        }
+    }; 
+
+    const edit_group = ref('')
+
+    const emit = defineEmits(['editar_my_groups']);
+
+    const saveChanges = () => {
+        const editedGroup = {
+            edit_group: edit_group.value            
+        };
+        
+        // Emite el evento 'editar_my_groups' con los datos del grupo editado
+        emit('editar_my_groups', editedGroup);
+    };
 </script>
 
 <style scoped lang="scss">
