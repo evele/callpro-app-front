@@ -33,7 +33,6 @@ export const useAuthStore = defineStore("AuthStore", {
       this.user = null
       localStorage.removeItem("user")
       location.reload()
-      //router.push("/login")
     },
     
     async sendRecoveryPass(email) {
