@@ -1,8 +1,22 @@
 
+@import url('/assets/css/fonts.css');
+
 @layer tailwind-base, primevue, tailwind-utilities;
 
 @layer tailwind-base {
   @tailwind base;
+  body {
+    @apply font-sans; 
+  }
+
+  h1 {
+    font-size: 1.5rem;  /* Tamaño personalizado */
+    line-height: 2rem;  /* Line-height personalizado */
+  }
+
+  .page-container {
+    padding: 1.25rem 2.25rem;
+  }
 }
 
 @layer tailwind-utilities {
