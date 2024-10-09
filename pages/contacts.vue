@@ -8,10 +8,7 @@
             <ContactsActions />
             <ContactsGroupsPanel />
         </div>
-    </div>
-    <Button label="Save Custom Groups" @click="open_modal" />
-   
-    <SaveCustomGroups ref="saveCustomGroups" @editar_my_groups="handleEditGroup"/>
+    </div>    
 
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
@@ -23,27 +20,7 @@
 
 const selected_tab = ref(CONTACTS_ALL)
 
-const saveCustomGroups = ref();
-
-const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
-
-const save_new_group = () => {
-        const dataToSend = {
-            name: groupName.value,
-            id: groupID.value ? parseInt(groupID.value, 10) : null,
-            phone_launch_id: launchID.value ? parseInt(launchID.value, 10) : null
-        } 
-        saveGroupContacts(dataToSend)
-}
-
-
-const open_modal = () => {
-    console.log("abriendo")
-    saveCustomGroups.value.open();
-}
-
 const modalAddNewContact = ref()
-
 
 const open_new_contact_modal = () => {
     modalAddNewContact.value.open();
