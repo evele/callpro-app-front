@@ -15,6 +15,9 @@
         </div>
 
         <form @submit.prevent class="new-contact-form flex flex-col gap-5 sm:gap-6" :class="[{ 'mt-5': !contact_numbers.length}]">
+            <p v-if="isSuccess" class="text-green-500">Success!</p>
+            <p class="text-red-500" v-if="isError">Something went wrong.</p>
+
             <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                 <div class="w-full">
                     <label for="contact-name" class="text-lg text-black">Name</label>
@@ -56,8 +59,6 @@
                     <label for="contact-notes" class="text-lg text-black">Notes</label>
                     <Textarea v-model="new_contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
                     <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
-                    <p v-if="isSuccess" class="text-green">All good :D</p>
-                    <p class="text-red" v-if="isError">Something went wrong.</p>
                 </div>
             </div>
         </form>
@@ -65,10 +66,10 @@
         
         <template #footer>
             <footer class="flex flex-col w-full justify-center gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
-                <Button v-if="contact_numbers.length" @click="go_back" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+                <Button v-if="contact_numbers.length" :disabled="isPending" @click="go_back" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
                     Go back
                 </Button>
-                <Button @click="add_new" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+                <Button @click="add_new" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
                     Add new phone
                 </Button>
                 <Button @click="save_contact" :disabled="isPending" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
@@ -80,6 +81,10 @@
 </template>
 
 <script setup lang="ts">
+    import { useQueryClient } from '@tanstack/vue-query'
+
+    const queryClient = useQueryClient()
+
     const visible = ref(false);
     const number_error = ref('');
     const type_error = ref('');
@@ -137,6 +142,14 @@
 
     const close = () => {
         visible.value = false;
+        reset_contact()
+        number_error.value = ''
+        type_error.value = ''
+        contact_numbers.value = []
+        current_position.value = 0
+    }
+
+    const reset_contact = () => {
         Object.assign(new_contact, empty_contact)
         new_contact.numbers = {
             id: 'new',
@@ -145,10 +158,6 @@
             type: '',
             number_groups: []    
         }
-        number_error.value = ''
-        type_error.value = ''
-        contact_numbers.value = []
-        current_position.value = 0
     }
 
     defineExpose({ open });
@@ -158,10 +167,10 @@
         const regex = /^\(\d{3}\) \d{3}-\d{4}$/
         if(!regex.test(new_contact.numbers.number) || !new_contact.numbers.type) {
             if(!regex.test(new_contact.numbers.number)) {
-                number_error.value = 'This field is required'
+                number_error.value = 'The Number field is required.'
             }
             if(!new_contact.numbers.type) {
-                type_error.value = 'This field is required'
+                type_error.value = 'The Type field is required.'
             }
             is_invalid = true
         }
@@ -232,6 +241,8 @@
         saveContact(data_to_send, {
             onSuccess: (data: res_success | APIResponseError) => {
                 if(data.result) {
+                    reset_contact()
+                    queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
                     setTimeout(() => {
                         reset()
                         close()
