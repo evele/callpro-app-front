@@ -2,7 +2,7 @@
     <div>
         <p class="text-title">Contact page</p>     
     </div>
-    <div class="py-5 main-container px-10">
+    <div class="py-5 main-container gap-4 px-10">
         <ContactsTable :selected-tab="selected_tab" />
         <div>
             <ContactsActions />

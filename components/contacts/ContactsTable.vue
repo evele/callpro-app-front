@@ -1,10 +1,10 @@
 <template>
-    <div class="w-full table-container rounded-7 py-5 px-4">
+    <div class="w-full table-container max-w-[44rem] rounded-7 py-5 px-4 text-sm bg-white">
         <DataTable 
             :value="formatted_contacts"
             scrollable 
             tableStyle="min-width: 50rem"
-            class="table w-full flex flex-col gap-18" 
+            class="table" 
             :paginator="show_pagination" 
             :rows="10" 
             dataKey="id"
@@ -36,61 +36,65 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center">
-                        <div class="flex items-center gap-6 selected-group-info rounded-4">
-                            <CheckSVG class="check-icon rounded-full" />
-                            <span>All</span>
-                        </div>
-                        <div class="ml-4">
-                            <Button @click="handle_group_action('move')" style="margin-right: 1rem;">Move to Group</Button>
-                            <Button @click="handle_group_action('add')">Add to Group</Button>
-                        </div>
+                    <div class="flex items-center gap-2">
+                        <Button @click="handle_group_action('add')" class="rounded-md" disabled>
+                            <PlusRoundedSVG class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Add to Group</span>
+                        </Button>
+                        <Button @click="handle_group_action('move')" class="rounded-md" disabled>
+                            <MoveSVG class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Move to Group</span>
+                        </Button>
+                        <Button @click="handle_group_action('trash')" class="rounded-md" disabled>
+                            <TrashSVG class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Send to Trash</span>
+                        </Button>
                     </div>
                 </header>
             </template>
 
             <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
 
-            <Column field="name" header="Name" class="left-aligned-column">
+            <Column field="name" header="Name" class="text-left">
                 <template #body="slotProps">
-                    <span class="name-item">{{ slotProps.data.name }}</span>
+                    <span class="text-[#1D1B20]">{{ slotProps.data.name }}</span>
                 </template>
             </Column>
 
-            <Column field="number" header="Phone" class="center-aligned-column">
+            <Column field="number" header="Phone" class="text-center">
                 <template #body="slotProps">
-                    <div class="phone-data-container h-row">
-                        <span class="phone-item">{{ slotProps.data.number }}</span>
-                        <span v-if="slotProps.data.total_numbers > 1" class="extra-number-chip"> +{{ slotProps.data.total_numbers -1 }}</span>
+                    <div class="relative flex items-center justify-cente h-16">
+                        <span class="text-[#797676]">{{ slotProps.data.number }}</span>
+                        <span v-if="slotProps.data.total_numbers > 1" class="absolute right-[2px] top-6 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl"> + {{ slotProps.data.total_numbers -1 }}</span>
                     </div>
                 </template>
             </Column>
 
-            <Column field="groups" header="Groups" class="center-aligned-column">
+            <Column field="groups" header="Groups" class="text-center">
                 <template #body="slotProps">
-                    <span class="font-bold">{{ slotProps.data.total_groups }}</span>
+                    <span class="font-semibold">{{ slotProps.data.total_groups }}</span>
                 </template>
             </Column>
 
-            <Column field="dnc" header="" class="center-aligned-column">
+            <Column field="dnc" header="" class="text-center">
                 <template #header>
-                    <div class="dnc-header-container">
+                    <div class="flex justify-center pl-[14px]">
                         <span>DNC</span>
                         <ErrorIconSVG />
                     </div>
                 </template>
                 <template #body="slotProps">
-                    <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon w-full" />
+                    <DncSVG v-if="slotProps.data.dnc === '1'" class="text-[#751617] w-full" />
                     <PhoneSVG v-else class="w-full" />
                 </template>
             </Column>
 
             <Column expander>
                 <template #body="slotProps">
-                    <Button class="expand-btn" @click="toggleRow(slotProps.data.id)">
+                    <Button class="flex justify-center items-center bg-transparent border-none w-9 h-9" @click="toggleRow(slotProps.data.id)">
                         <template #icon>
-                            <ChevronUpSVG v-if="isRowExpanded(slotProps.data.id)" class="chevron-icon" />
-                            <ChevronDownSVG v-else class="chevron-icon" />
+                            <ChevronUpSVG v-if="isRowExpanded(slotProps.data.id)" class="text-[#302f31]" />
+                            <ChevronDownSVG v-else class="text-[#302f31]" />
                         </template>
                     </Button>
                 </template>
@@ -101,43 +105,43 @@
                 <DataTable 
                     :value="formatted_contact"
                     tableStyle="min-width: 35rem"
-                    class="contacts-expanded-row w-full"
+                    class="sub-table"
                 >
                     <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
-                    <Column field="name" header="" class="left-aligned-column" style="width: 35%;">
+                    <Column field="name" header="" class="text-left" style="width: 35%;">
                         <template #body="slotProps">
-                            <span class="name-item">
+                            <span class="text-[#1D1B20]">
                                 {{ format_contact_type(slotProps.data.type) }}
                             </span>
                         </template>
                     </Column>
 
-                    <Column field="number" header="" class="center-aligned-column" style="width: 20%;">
+                    <Column field="number" header="" class="text-center" style="width: 20%;">
                         <template #body="slotProps">
-                            <span class="phone-item">
+                            <span class="text-[#797676]">
                                 {{ slotProps.data.number }}
                             </span>
                         </template>
                     </Column>
 
-                    <Column field="groups" header="" class="center-aligned-column" style="width: 25%; padding-left: 0;">
+                    <Column field="groups" header="" class="text-center" style="width: 25%; padding-left: 0;">
                         <template #body="slotProps">
-                            <div class="group-container">
-                                <span class="rounded-4 group-chip" v-for="(group, g_i) in slotProps.data.group" :key="g_i">Group {{ g_i + 1 }}</span>
+                            <div class="flex justify-center gap-1">
+                                <span class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px]" v-for="(group, g_i) in slotProps.data.group" :key="g_i">Group {{ g_i + 1 }}</span>
                             </div>
                         </template>
                     </Column>
 
-                    <Column field="dnc" header="" class="center-aligned-column" style="width: 9%; padding-left: 12px;">
+                    <Column field="dnc" header="" class="text-center" style="width: 9%; padding-left: 12px;">
                         <template #body="slotProps">
                             <span>
-                                <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon" />
+                                <DncSVG v-if="slotProps.data.dnc === '1'" class="text-[#751617]" />
                                 <PhoneSVG v-else />
                             </span>
                         </template>
                     </Column>
 
-                    <Column field="empty" header="" class="center-aligned-column" style="width: 12%;">
+                    <Column field="empty" header="" class="text-center" style="width: 12%;">
                         <template body>
                             <span>
                             </span>
@@ -160,6 +164,20 @@
             </template>
 
             <template #paginatorstart>
+                <div class="flex gap-4">
+                    <Button type="button" :class="action_button_style">
+                        <UploadSVG class="w-5 h-5 text-[#757575]" />
+                        <span class="font-semibold">Upload file</span>
+                    </Button>
+
+                    <Button type="button" :class="action_button_style">
+                        <DownloadSVG class="text-[#757575]" />
+                        <span class="font-semibold">Download list</span>
+                    </Button>
+                </div>
+            </template>
+
+            <template #paginator>
                 <div class="flex gap-4">
                     <Button type="button" :class="action_button_style">
                         <UploadSVG class="w-5 h-5 text-[#757575]" />
@@ -291,6 +309,8 @@
     })
 
     const handle_group_action = (action: string) => {
+        console.log(action)
+        return
         if(action === 'move') {
             const data_to_send: MoveNumberToGroup = {
                 number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
@@ -317,11 +337,60 @@
 </script>
 
 <style scoped lang="scss">
+::v-deep(.table) {
+    .p-datatable-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .p-datatable-thead, .p-datatable-header-cell {
+        background-color: #9A83DB;
+        line-height: 28px;
+    
+        &:first-child {
+            border-top-left-radius: 6px;
+        }
+        &:last-child {
+            border-top-right-radius: 6px;
+        }
+
+        tr {
+            th:nth-child(n+3) {
+                .p-datatable-column-header-content {
+                    display: flex;
+                    justify-content: center;
+                }
+            }
+        }
+    }
+
+    .p-datatable-column-title {
+            text-align: center;
+        }
+
+    .p-datatable-row-expansion {
+        .p-datatable-thead, .p-datatable-header-cell {
+            display: none;
+        }
+
+        td {
+            padding: 0;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        .p-checkbox, .p-checkbox-box {
+            width: 12px;
+            height: 12px;
+            border-radius: 1px
+        }
+    }
+}
+    
+
+
     .table-container {
-        max-width: 700px;
-        background-color: white;
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-        font-size: 14px;
 
         @media (min-width: 980px) {
             max-width: 800px;
@@ -329,99 +398,5 @@
         @media (min-width: 1100px) {
             max-width: 850px;
         }
-    }
-
-    .selected-group-info {
-        background-color: #e1daf0;
-        padding: 4px 8px;
-        border-bottom: 1px solid #ccc;
-        width: fit-content;
-        color: black;
-    }
-
-    .check-icon {
-        background-color: #65558F;
-        color: white;
-        width: 16px;
-        height: 16px;
-        padding: 1px;
-    }
-
-    .dnc-icon {
-        color: #751617;
-    }
-
-    .font-bold {
-        font-weight: 600;
-    }
-
-    .phone-item {
-        color: #797676;
-        letter-spacing: 0.117px;
-    }
-
-    .name-item {
-        color: #1D1B20;
-        letter-spacing: 0.117px;
-    }
-
-    .expand-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: transparent;
-        border: none;
-        height: 35px;
-        width: 35px;
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
-
-    .chevron-icon {
-        color: #302f31;
-    }
-
-    .phone-data-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .extra-number-chip {
-            position: absolute;
-            right: 2px;
-            top: 25px;
-            background-color: #49454F;
-            color: #FFF;
-            font-size: 10px;
-            padding: 1.5px 7px;
-            border-radius: 10px;
-        }
-    }
-    
-    .dnc-header-container {
-        display: flex;
-        justify-content: center;
-        padding-left: 14px;
-    }
-
-    .group-container {
-        display: flex;
-        justify-content: center;
-        gap: 5px;
-
-        .group-chip {
-            background-color: #EBFFEE;
-            font-size: 12px;
-            font-weight: 600;
-            color: #49454F;
-            padding: 2px 8px 3px 8px;
-        }
-    }
-
-    .h-row {
-        height: 68px;
     }
 </style>
