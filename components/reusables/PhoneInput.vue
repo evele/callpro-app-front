@@ -1,6 +1,6 @@
 <template>
     <div v-if="!is_international" class="w-full">
-        <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error" @focus="init_event" @blur="stop_event" @update:model-value="updateLocalPhoneNumberModel"
+        <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error" @keyup="handleKeyup" @update:model-value="updateLocalPhoneNumberModel"
         mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 rounded-[30px] transition-colors" 
         />
         <span v-if="show_phone_number_error" class="text-red-500 text-sm">Invalid area code</span>
@@ -26,9 +26,10 @@
         }
     });
 
-    const generalStore = useGeneralStore();
-    const phoneNumberRef = ref<any>(null);
-    const intPhoneNumberRef = ref<any>(null);
+    
+    const generalStore = useGeneralStore()
+    const phoneNumberRef:Ref<HTMLInputElement | null> = ref(null)
+    const intPhoneNumberRef:Ref<HTMLInputElement | null> = ref(null)
 
     const localPhoneNumberModel = ref(props.modelValue);
     const localIntPhoneNumberModel = ref(props.modelValue);
@@ -36,26 +37,13 @@
     const show_phone_number_error = ref(false);
     const show_int_phone_number_error = ref(false);
 
-    const handleKeydown = (e: KeyboardEvent) => {
+    const handleKeyup = (e: KeyboardEvent) => {
         if (e.key === '+') {
             is_international.value = true;
             localPhoneNumberModel.value = '';
             localIntPhoneNumberModel.value = e.key;
-            // Need to wait for the element to be rendered, otherwise is null
-            setTimeout(() => {
-                if(intPhoneNumberRef.value && intPhoneNumberRef.value.$el) {
-                    intPhoneNumberRef.value.$el.focus();
-                }
-            }, 0);
+            useFocus(intPhoneNumberRef, {initialValue: true})
         }
-    }
-
-    const init_event = () => {
-        document.addEventListener('keydown', handleKeydown)
-    }
-
-    const stop_event = () => {
-        document.removeEventListener('keydown', handleKeydown)
     }
 
     const emit = defineEmits(["update:modelValue"])
@@ -79,12 +67,7 @@
             localPhoneNumberModel.value = '';
             is_international.value = false;
             show_int_phone_number_error.value = false;
-            // Need to wait for the element to be rendered, otherwise is null
-            setTimeout(() => {
-                if(phoneNumberRef.value && phoneNumberRef.value.$el) {
-                    phoneNumberRef.value.$el.focus();
-                }
-            }, 0);
+            useFocus(phoneNumberRef, {initialValue: true})
         } else {
             const regex = /^\+?[0-9]*$/;
             show_int_phone_number_error.value = !regex.test(localIntPhoneNumberModel.value);
