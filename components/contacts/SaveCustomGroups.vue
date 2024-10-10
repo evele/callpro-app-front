@@ -1,7 +1,10 @@
 <template>
+    <!-- TODO: text 2xl 3xl dont' function -->
     <Dialog v-model:visible="visible" modal header="Create new group"
-        class="text-2xl font-semibold leading-8 w-full max-w-[800px]">
-        <div class="flex flex-col items-start gap-2 w-full">
+        class="text-2xl w-full max-w-[850px] ">
+        <Divider class="max-w-[850px] mb-[38px]" />
+
+        <div class="flex flex-col items-start gap-2 w-full mb-[38px]">
             <label for="group-name" class="text-xl leading-6 text-left">Group
                 Name*</label>
             <InputText id="group-name"
@@ -9,19 +12,23 @@
                 placeholder="Enter Name" v-model="groupName" />
         </div>
 
-        <div class="flex flex-col items-start gap-2 w-full">
+        <div class="flex flex-col items-start gap-2 w-full mb-[38px]">
             <label for="group-name" class="text-xl leading-6 text-left">Phone
                 Launch ID</label>
             <InputText id="launch-id"
                 class="flex w-full text-sm px-3 py-4 border border-gray-300 rounded-[30px] bg-white" autocomplete="off"
-                placeholder="Enter a number ID" v-model="launchID" />
+                placeholder="Enter a number ID" v-model="launchIDString" />
         </div>
-        <span class="text-surface-500 dark:text-surface-400 block mb-8">*This information is mandatory
+
+        <span class="text-xs">*This information is mandatory
             to create a new group</span>
-        <div class="flex justify-center mt-4">
-            <Button type="button" label="Save" rounded class="flex justify-center items-center py-2 px-4 w-[300px]"
-                :disabled="props.isPending" @click="save_new_group" />
-        </div>
+        
+        <template #footer>
+            <Button type="button" class="flex justify-center items-center py-2 px-4 w-[300px] mx-auto m-[28px]"
+            :disabled="props.isPending" @click="save_new_group" >
+                {{ props.isPending ? 'Saving...' : 'Save' }}
+            </Button>
+        </template>
         <div style="margin-top: 10px;">
             <span v-if="props.isError" style="color: red;">Error: {{ props.errorMessage
                 }}</span>
@@ -31,6 +38,8 @@
 </template>
 
 <script setup lang="ts">
+
+
 const props = defineProps({
     selectedGroup: {
         type: Object,
