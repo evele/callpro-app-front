@@ -5,8 +5,7 @@ type SettingsAPIResponse = {
     max_retries: NumberOrNull,
     static_intro_enabled: BooleanOrNull,
     settings: Settings,
-    text_settings: TextSettings,
-    timezones: Timezone[],
+    text_settings: TextSettings,    
     user_admin_settings: UserAdminSettings
 }
 

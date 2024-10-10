@@ -53,6 +53,8 @@
     const { mutate: updateVoiceSettings, isPending, isError: updateVoiceIsError, error: updateVoiceError, isSuccess: updateVoiceIsSuccess } = useUpdateVoiceSettings()
     const { mutate: updateTextSettings, isPending: updateTextIsPending, isError: updateTextIsError, error: updateTextError, isSuccess: updateTextIsSuccess } = useUpdateTextSettings()
     
+    const generalStore = useGeneralStore()
+
     const load_settings = () => {
         refetch()
     }
@@ -60,14 +62,6 @@
     const format_value = (value: ZeroOrOne) => {
         return value == '1' ? ON : OFF;
     }
-
-    const time_zones = computed(() => {
-        if (settings.value && 'result' in settings.value && settings.value.result) {
-            return settings.value.timezones;
-        }
-        return [];
-    }
-    )
 
     const format_date_time = (time: string) => {
         const currentDate = new Date();
@@ -81,8 +75,8 @@
     }
 
     const format_tz = (value: OneToNine) => {
-        if(!time_zones?.value?.length) return '';
-        const tz = time_zones?.value?.find((tz: Timezone) => tz.zones_id == value)?.display;
+        if(!generalStore.timezones?.length) return '';
+        const tz = generalStore.timezones?.find((tz: Timezone) => tz.zones_id == value)?.display;
         return tz;
     }
 

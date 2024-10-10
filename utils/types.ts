@@ -28,7 +28,7 @@ export type PhoneNumber = {
   notes: string; // Notes associated with the number
   dnc: ZeroOrOne; // Do Not Call status
   type: OneToFour; // Type of the number
-  number_groups: string[]; // Array of group identifiers the number belongs to
+  number_groups: string[] | string; // Array of group identifiers the number belongs to
   in_trash: ZeroOrOne; // Indicates if the number is in trash
 }
   
@@ -61,8 +61,8 @@ export type ContactToSave = {
       id: 'new' | number,
       number: string,
       notes: string,
-      type: OneToFour,
-      number_groups: string[] | null
+      type: '' | OneToFour,
+      number_groups: string[]
   }[]
 }
 
@@ -194,6 +194,15 @@ export type CustomGroup = {
   count: number;
 }
 
+export type AddNumberToGroup = {
+  number_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+  groups: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+}
+
+export type MoveNumberToGroup = AddNumberToGroup & {
+  current_group_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+}
+
 /* ----- Packages ----- */
 export type PackageStep = {
   package_id: number;
@@ -233,6 +242,13 @@ export type Timezone = {
   offset: string;
   display: string;
   country_initials: 'CA' | 'US' | 'UK';
+}
+
+export type AreaCodes = {
+  id: number;
+  area_code: number;
+  area_description: string;
+  available: ZeroOrOne;
 }
 
 export type Settings = {

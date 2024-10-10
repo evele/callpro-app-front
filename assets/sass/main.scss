@@ -1,34 +1,8 @@
-// main.scss
-/*
-// Importar configuraciones y mixins
-@use 'utilities/functions' as *;
-@use 'utilities/mixins' as *;
-
-// Importar estilos base
-@use 'base/base';
-
-// Importar layouts
-@use 'layout/header';
-@use 'layout/footer';
-@use 'layout/grid';
-
-// Importar componentes
-@use 'components/buttons';
-@use 'components/forms';
-
-
-// Importar utilidades
-*/
-
 
 @use 'base/reset';
 @use 'base/typography';
 
 @use 'components/_select';
-
-@use 'utilities/colors'; 
-@use 'utilities/flex';
-@use 'utilities/spacing';
-
+@use 'components/_dataTable';
 
 

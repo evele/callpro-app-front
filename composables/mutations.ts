@@ -58,6 +58,28 @@ export const useSaveUploadedContact = () => {
   })
 }
 
+export const useMoveNumberToGroup = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: MoveNumberToGroup) => moveNumberToGroups(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+    }
+  })
+}
+
+export const useAddNumberToGroup = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: AddNumberToGroup) => addNumberToGroups(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+    }
+  })
+}
+
 /* ----- Settings ----- */
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()

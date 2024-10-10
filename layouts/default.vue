@@ -1,32 +1,69 @@
 <template>
     <div class="grid-container">
-        <div class="item1">Header</div>
+        <div class="item1">
+            Header
+            <span v-if="show_current_env() !== ''" class="env-title">{{ show_current_env() }}</span>
+        </div>
         <Navbar class="item2"></Navbar>
-        <div class="item3">
+        <main class="item3">
             <slot></slot>
-        </div>  
-        <div class="item5">Footer</div>
+        </main>  
     </div>
-</template>  
+</template>
+
+<script setup lang="ts">
+    const show_current_env = () => {
+        const runtimeConfig = useRuntimeConfig()
+        let env = '';
+
+        switch (runtimeConfig.public.ENVIRONMENT) {
+            case 'development':
+                env = 'Development'
+                break
+            case 'test':
+                env = 'Test'
+                break
+        }
+        return env
+    }
+</script>
+
 <style scoped>
     .item1 { grid-area: header; }
     .item2 { grid-area: menu; }
     .item3 { grid-area: main; }
-    .item4 { grid-area: right; }
-    .item5 { grid-area: footer; }
 
-.grid-container {
-    display: grid;
-    grid-template-areas:
-    'menu header header header header header'
-    'menu main main main main main'
-    'menu footer footer footer footer footer';
-    gap: 10px;
-    height: 100vh;
-}
+    .grid-container {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto 1fr;
+        grid-template-areas:
+            'menu header'
+            'menu main';
+        height: 100vh;
+    }
 
-.grid-container > div {
-  background-color: rgba(255, 255, 255, 0.99);
-}
+    .grid-container > div {
+    background-color: rgba(255, 255, 255, 0.99);
+    }
+
+    .env-title {
+        color: white;
+        background-color: #f00;
+        font-weight: bold;
+        padding: 2px 10px;
+        letter-spacing: .8px;
+    }
+
+    .item1 {
+        height:6.5rem;
+        padding: 10px 0;
+        border-bottom: 2px solid #DED8E1;
+    }
+
+    .item3 {
+        background-color: var(--p-purple-100);
+    }
+
 </style>
   
