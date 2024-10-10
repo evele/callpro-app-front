@@ -17,23 +17,21 @@
         >
 
             <template #header>
-                <header class="flex flex-col w-full gap-18">
+                <header class="flex flex-col w-full gap-5 mb-4">
                     <div class="flex justify-between items-center w-full">
-                        <div class="search-input-container">
-                            <SearchSVG class="search-icon" />
-                            <InputText type="text" placeholder="Search by Name, Phone or Group" class="search-input rounded-8" />
+                        <div class="relative inline-block">
+                            <SearchSVG class="absolute left-[10px] top-[11px]"/>
+                            <InputText type="text" placeholder="Search by Name, Phone or Group" class="w-72 h-10 py-2 pl-9 pr-[10px] rounded-8" />
                         </div>
 
                         <div class="flex gap-4">
-                            <Button class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6" label="Filter">
-                                <template #icon>
-                                    <FilterSVG class="table-action-icon" />
-                                </template>
+                            <Button :class="action_button_style">
+                                <FilterSVG class="text-[#757575]" />
+                                <span class="font-semibold">Filter</span>
                             </Button>
-                            <Button class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6" label="Sort by">
-                                <template #icon>
-                                    <SortBySVG class="table-action-icon" />
-                                </template>
+                            <Button :class="action_button_style">
+                                <SortBySVG class="text-[#757575]" />
+                                <span class="font-semibold">Sort by</span>
                             </Button>
                         </div>
                     </div>
@@ -47,7 +45,7 @@
                             <Button @click="handle_group_action('move')" style="margin-right: 1rem;">Move to Group</Button>
                             <Button @click="handle_group_action('add')">Add to Group</Button>
                         </div>
-                </div>
+                    </div>
                 </header>
             </template>
 
@@ -163,16 +161,14 @@
 
             <template #paginatorstart>
                 <div class="flex gap-4">
-                    <Button type="button" label="Upload file" class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6">
-                        <template #icon>
-                            <UploadSVG class="upload-icon" />
-                        </template>
+                    <Button type="button" :class="action_button_style">
+                        <UploadSVG class="w-5 h-5 text-[#757575]" />
+                        <span class="font-semibold">Upload file</span>
                     </Button>
 
-                    <Button type="button" label="Download list" class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6">
-                        <template #icon>
-                            <DownloadSVG />
-                        </template>
+                    <Button type="button" :class="action_button_style">
+                        <DownloadSVG class="text-[#757575]" />
+                        <span class="font-semibold">Download list</span>
                     </Button>
                 </div>
             </template>
@@ -316,6 +312,8 @@
             return 'Error';
         }
     }
+
+    const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none';
 </script>
 
 <style scoped lang="scss">
@@ -332,42 +330,6 @@
             max-width: 850px;
         }
     }
-    
-    .table-action-btn {
-        background-color: transparent;
-        border: none;
-        transition: background-color 0.3s;
-        font-weight: 600;
-
-        &:hover {
-            cursor: pointer;
-            background-color: #e6e2e2;
-        }
-    }
-
-    .table-action-icon {
-        color: #757575;
-    }
-
-    .search-input-container {
-        position: relative;
-        display: inline-block;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 10px; 
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-    }
-
-    .search-input {
-        border: 1px solid #DED8E1;
-        padding: 2px 10px 2px 35px;
-        width: 280px;
-        height: 38px;
-    }
 
     .selected-group-info {
         background-color: #e1daf0;
@@ -383,11 +345,6 @@
         width: 16px;
         height: 16px;
         padding: 1px;
-    }
-
-    .upload-icon {
-        width: 20px; 
-        height: 20px;
     }
 
     .dnc-icon {

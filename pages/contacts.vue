@@ -2,7 +2,7 @@
     <div>
         <p class="text-title">Contact page</p>     
     </div>
-    <div class="py-5 main-container">
+    <div class="py-5 main-container px-10">
         <ContactsTable :selected-tab="selected_tab" />
         <div>
             <ContactsActions />
@@ -29,7 +29,6 @@
     
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
-    <ContactsActions />
     <ModalAddNewContact ref="modalAddNewContact" />
 </template>
 
