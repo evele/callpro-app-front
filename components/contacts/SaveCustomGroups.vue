@@ -1,7 +1,7 @@
 <template>
     <!-- TODO: text 2xl 3xl dont' function -->
     <Dialog v-model:visible="visible" modal header="Create new group"
-        class="text-2xl w-full max-w-[850px] ">
+        class="text-2xl w-full max-w-[850px] "><ChevronDownSVG />
         <Divider class="max-w-[850px] mb-[38px]" />
 
         <div class="flex flex-col items-start gap-2 w-full mb-[38px]">
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-
+import ChevronDownSVG from '../svgs/ChevronDownSVG.vue';
 
 const props = defineProps({
     selectedGroup: {
