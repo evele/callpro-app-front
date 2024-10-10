@@ -64,7 +64,7 @@
                         </div>
                     </section>
 
-                    <p v-if="(showError && isError) || (showError && (uploadedSuccess && !uploadedData?.result))" class="text-no-contacts">Something went wrong!</p>
+                    <p v-if="isError || (uploadedSuccess && !uploadedData?.result)" class="text-no-contacts">Something went wrong!</p>
 
                     <div v-if="!has_uploaded" class="modal__info">
                         <p>Accepted format files: .csv, .xlsx</p>
@@ -94,8 +94,22 @@
         selectedGroup: { type: String, required: true }
     })
     
-    const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending, isError } = useUploadContact();
+    const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending, isError,reset } = useUploadContact();
     const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData, isPending: savedIsPending } = useSaveUploadedContact();
+
+    onMounted(() => {
+        window.addEventListener('keydown', handleEscapeKey);
+    });
+
+    onUnmounted(() => {
+        window.removeEventListener('keydown', handleEscapeKey);
+    });
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            close();
+        }
+    };
 
     const visible = ref(false);
     
@@ -106,36 +120,39 @@
     const showSuccess = ref(false);
 
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
-    const selectedContacts = ref([]);
+    const selectedContacts = ref<FormattedContact[]>([]);    
+    
     const is_disabled = computed(() => {
         return !selectedContacts.value || selectedContacts.value.length === 0;
-    });
+    });    
 
     const open = () => {
-        visible.value = true;
-        const body = document.body;
-        body.style.overflow = 'hidden';
+        visible.value = true;        
     }
 
     const close = () => {
-        visible.value = false;
-        const body = document.body;
-        body.style.overflow = 'auto';
+        visible.value = false;       
         has_uploaded.value = false;
-        formatted_contact.value = [];
+        reset();
+        formatted_contact.value = [];        
         contacts.value = [];
+        selectedContacts.value = [];
         showError.value = false;
-        showSuccess.value = false;
+        showSuccess.value = false;        
     }
 
     defineExpose({ open });
 
     type FormattedContact = {
-        selected: boolean;
+        selected?: boolean;
         name: string;
         number: number;
         status: boolean;
         result: string;
+        first_name?: string;
+        last_name?: string;
+        contact_id?: string;
+        disabled?: boolean;
     }
 
     type UploadContactData = {
@@ -180,14 +197,15 @@
             onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
                     has_uploaded.value = true;
-                    is_disabled.value = false;
+                    
                     data.contacts.forEach((contact, i) => {
                         contact.numbers.forEach(number => {
                             if(number.validation_desc === 'ok') {                                
-                                selectedContacts.value.push({                                    
+                                selectedContacts.value.push({     
+                                    selected:true,                               
                                     name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
-                                    first_name:contact.first_name,
-                                    last_name: contact.last_name,
+                                    first_name:contact.first_name || "",
+                                    last_name: contact.last_name || "",
                                     number: number?.number,
                                     contact_id: `fake-${i+1}`,
                                     status: contact?.valid,
@@ -242,9 +260,15 @@
     };
     
     const save_contact = () => {  
-        // TODO controlar el momento posterior al save, y anterior al cierre del modal, el boton save se muestra habilitado    
+        // TODO controlar el momento posterior al save, y anterior al cierre del modal, el boton save se muestra habilitado 
+        const formattedContacts = selectedContacts.value.map(contact => ({
+            ...contact,
+            first_name: contact.first_name || "", 
+            last_name: contact.last_name || "",   
+            contact_id: contact.contact_id || ""  
+        }));   
         const data_to_send: uploadedContactToSaveData = {
-            contacts: selectedContacts.value,
+            contacts: formattedContacts,
             group_id: group_id.value
         }
 
