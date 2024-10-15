@@ -33,14 +33,16 @@
             <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                 <div class="w-full">
                     <label for="contact-phone" class="text-lg text-black">Phone 1*</label>
-                    <InputMask id="contact-phone" :invalid="number_error.length > 0" v-model="new_contact.numbers.number" mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full mt-1" />
-                    <p class="text-red-500 absolute">{{ number_error }}</p>
+                    <PhoneInput class="mt-[2px]" :model-value="new_contact.numbers.number" @update:modelValue="(v: string) => new_contact.numbers.number = v" 
+                        :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
                 </div>
 
-                <div class="w-full">
-                    <label class="text-lg text-black">Type*</label>
-                    <Select v-model="new_contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
-                    <p class="text-red-500 absolute">{{ type_error }}</p>
+                <div class="relative w-full flex">
+                    <div class="w-full">
+                        <label class="text-lg text-black">Type*</label>
+                        <Select v-model="new_contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
+                    </div>
+                    <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
                 </div>
             </div>
 
@@ -88,13 +90,8 @@
     const visible = ref(false);
     const number_error = ref('');
     const type_error = ref('');
-
-    // Lo dejo para testear
-    const phone_number = ref('')
-    const show_value = (value: string) => {
-        console.log('show value', value)
-    }
-    // <PhoneInput :model-value="phone_number" @update:modelValue="show_value" />
+    const form_action = ref('')
+    const has_phone_number_error = ref(false)
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact() 
@@ -154,6 +151,7 @@
         type_error.value = ''
         contact_numbers.value = []
         current_position.value = 0
+        form_action.value = ''
     }
 
     const reset_contact = () => {
@@ -171,9 +169,9 @@
 
     const validate_number_and_type = () => {
         let is_invalid = false
-        const regex = /^\(\d{3}\) \d{3}-\d{4}$/
-        if(!regex.test(new_contact.numbers.number) || !new_contact.numbers.type) {
-            if(!regex.test(new_contact.numbers.number)) {
+
+        if(!new_contact.numbers.number || !new_contact.numbers.type || has_phone_number_error.value) {
+            if(!new_contact.numbers.number) {
                 number_error.value = 'The Number field is required.'
             }
             if(!new_contact.numbers.type) {
@@ -184,7 +182,8 @@
         return is_invalid
     }
 
-    const add_new = () => {
+    const add_new = async () => {
+        form_action.value = 'clear'
         if(validate_number_and_type()) return
         
         contact_numbers.value.push({
@@ -202,9 +201,12 @@
             number_groups: []    
         }
         current_position.value++
+        await nextTick();
+        form_action.value = ''
     }
 
-    const go_back = () => {
+    const go_back = async () => {
+        form_action.value = 'fill'
         new_contact.numbers = {
             id: 'new',
             number: contact_numbers.value[current_position.value - 1].number,
@@ -214,6 +216,8 @@
         }
         contact_numbers.value.pop()
         current_position.value--
+        await nextTick();
+        form_action.value = ''
     }
 
     type number_groups_option = { code: string, name: string }
@@ -249,6 +253,7 @@
             onSuccess: (data: res_success | APIResponseError) => {
                 if(data.result) {
                     reset_contact()
+                    form_action.value = 'clear'
                     queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
                     setTimeout(() => {
                         reset()
