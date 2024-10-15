@@ -29,7 +29,6 @@
     
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
-    <ContactsActions />
     <ModalAddNewContact ref="modalAddNewContact" />
 </template>
 

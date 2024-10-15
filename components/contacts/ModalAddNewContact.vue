@@ -89,6 +89,13 @@
     const number_error = ref('');
     const type_error = ref('');
 
+    // Lo dejo para testear
+    const phone_number = ref('')
+    const show_value = (value: string) => {
+        console.log('show value', value)
+    }
+    // <PhoneInput :model-value="phone_number" @update:modelValue="show_value" />
+
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact() 
 
