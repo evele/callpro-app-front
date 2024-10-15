@@ -3,7 +3,7 @@
         <p class="text-title">Contact page</p>     
     </div>
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable :selected-tab="selected_tab" />
+        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" />
         <div>
             <ContactsActions />
             <ContactsGroupsPanel />
@@ -30,6 +30,7 @@
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
     <ModalAddNewContact ref="modalAddNewContact" />
+    <ModalUploadContacts ref="modalUploadContacts" :selected-group="selected_tab" />
 </template>
 
 <script setup lang="ts">
@@ -40,6 +41,7 @@
     const groupID = ref('')
 
     const modalAddNewContact = ref()
+    const modalUploadContacts = ref()
 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
 

@@ -64,8 +64,8 @@
             <Column field="number" header="Phone" class="text-center">
                 <template #body="slotProps">
                     <div class="relative flex items-center justify-cente h-16">
-                        <span class="text-[#797676]">{{ slotProps.data.number }}</span>
-                        <span v-if="slotProps.data.total_numbers > 1" class="absolute right-[2px] top-6 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl"> + {{ slotProps.data.total_numbers -1 }}</span>
+                        <span class="text-[#797676] w-full">{{ slotProps.data.number }}</span>
+                        <span v-if="slotProps.data.total_numbers > 1" class="absolute -right-3 top-5 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> + {{ slotProps.data.total_numbers -1 }}</span>
                     </div>
                 </template>
             </Column>
@@ -78,13 +78,14 @@
 
             <Column field="dnc" header="" class="text-center">
                 <template #header>
-                    <div class="flex justify-center pl-[14px]">
+                    <div class="flex justify-center pl-[14px] text-white font-semibold">
                         <span>DNC</span>
                         <ErrorIconSVG />
                     </div>
                 </template>
                 <template #body="slotProps">
-                    <DncSVG v-if="slotProps.data.dnc === '1'" class="text-[#751617] w-full" />
+                    <span v-if="slotProps.data.dnc > 0 && slotProps.data.dnc != slotProps.data.total_numbers">-</span>
+                    <DncSVG v-else-if="slotProps.data.dnc > 0" class="text-[#751617] w-full" />
                     <PhoneSVG v-else class="w-full" />
                 </template>
             </Column>
@@ -165,26 +166,12 @@
 
             <template #paginatorstart>
                 <div class="flex gap-4">
-                    <Button type="button" :class="action_button_style">
+                    <Button type="button" :class="action_button_style" @click="emit('uploadFile', true)">
                         <UploadSVG class="w-5 h-5 text-[#757575]" />
                         <span class="font-semibold">Upload file</span>
                     </Button>
 
-                    <Button type="button" :class="action_button_style">
-                        <DownloadSVG class="text-[#757575]" />
-                        <span class="font-semibold">Download list</span>
-                    </Button>
-                </div>
-            </template>
-
-            <template #paginator>
-                <div class="flex gap-4">
-                    <Button type="button" :class="action_button_style">
-                        <UploadSVG class="w-5 h-5 text-[#757575]" />
-                        <span class="font-semibold">Upload file</span>
-                    </Button>
-
-                    <Button type="button" :class="action_button_style">
+                    <Button type="button" :class="action_button_style" @click="download_contacts">
                         <DownloadSVG class="text-[#757575]" />
                         <span class="font-semibold">Download list</span>
                     </Button>
@@ -212,6 +199,8 @@
     const expandedRows = ref<{ [key: string]: boolean }>({});
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
 
+    const emit = defineEmits(['uploadFile'])
+
     type FormattedContact = {
         dnc: ZeroOrOne,
         group: string[],
@@ -224,6 +213,7 @@
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
     const { mutate: moveNumberToGroup, isPending: MTGIsPending, isError: MTGIsError, isSuccess: MTGIsSuccess } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending, isError: ATGIIsError, isSuccess: ATGIIsSuccess } = useAddNumberToGroup()
+    const { refetch: download } = useFetchDownloadContacts(props.selectedTab, false)
 
     const contacts_data = computed(() => {
         if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }
@@ -239,6 +229,7 @@
         const groupedContacts = contacts_data.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
             if (acc[contact.id]) {
                 acc[contact.id].total_numbers += 1;
+                acc[contact.id].dnc += +contact.dnc 
                 if(typeof contact.number_groups === 'string') {
                     acc[contact.id].total_groups += get_number_groups(contact.number_groups).length;
                 }
@@ -248,8 +239,8 @@
                     name: show_full_name(contact.first_name, contact.last_name),
                     number: format_number_to_show(contact.number),
                     total_numbers: 1,
-                    total_groups: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups).length : '0',
-                    dnc: contact.dnc
+                    total_groups: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups).length : '',
+                    dnc: +contact.dnc
                 };
             }
 
@@ -302,7 +293,6 @@
     const hardcoded_contact_data = computed(() => {
         if(all_contacts_data?.value?.result && all_contacts_data?.value?.contacts?.length) {
             const contact = all_contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups?.length < 5)
-            console.log('contact', contact)
             if(contact) return { number_id: contact.number_id, group_id: contact.number_groups }; 
         }
         return null
@@ -333,6 +323,11 @@
         }
     }
 
+
+    const download_contacts = () => {
+        download();
+    };
+
     const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none';
 </script>
 
@@ -361,6 +356,11 @@
                     justify-content: center;
                 }
             }
+        }
+
+        .p-datatable-column-title {
+            color: white;
+            font-weight: 600;
         }
     }
 
