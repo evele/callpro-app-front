@@ -11,7 +11,7 @@ RUN npm install -g pnpm
 
 # Copia 'package.json' y 'pnpm-lock.yaml' (si existe)
 # COPY package.json ./
-COPY package.json ./ pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 # Instala dependencias 
 # RUN pnpm store clean && pnpm install --production --network-timeout 1000000
