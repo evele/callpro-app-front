@@ -58,11 +58,12 @@
 
             <Column headerStyle="width: 3rem">
                 <template #header>
-                    <Checkbox v-model="all_selected" :binary="true" @change="handle_select_all" />                                   
+                    <Checkbox v-model="all_selected" :binary="true" @change="handle_select_all" :indeterminate="indeterminate_all" />                                   
                 </template>
 
                 <template #body="slotProps">
-                    <Checkbox v-model="selected_contacts" :inputId="slotProps.data.id" :value="slotProps.data.id" @click.stop @change="handle_select_contact(slotProps.data.id, $event)" />                                  
+                    <Checkbox v-model="selected_contacts" :inputId="slotProps.data.id" :value="slotProps.data.id" 
+                        :indeterminate="indeterminate_contacts[slotProps.data.id]" @click.stop @change="handle_select_checkbox(slotProps.data.id, true)" />                                  
                 </template>
             </Column>
 
@@ -121,7 +122,7 @@
                     <Column headerStyle="width: 3rem">
                         <template #body="slotProps">
                             <div class="w-14 flex items-center justify-end">
-                                <Checkbox v-model="selected_numbers" :value="slotProps.data.number_id" @change="handle_select_number(slotProps.data.number_id, slotProps.data.id)" />
+                                <Checkbox v-model="selected_numbers" :value="slotProps.data.number_id" @change="handle_select_checkbox(slotProps.data.id, false)" />
                             </div>
                         </template>
                     </Column>
@@ -215,6 +216,9 @@
     const expandedRows = ref<{ [key: string]: boolean }>({});
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
     const associative_array = ref([])
+    const indeterminate_all = ref(false);
+    const indeterminate_contacts = ref([]);
+    const numbers_ids = ref([])
 
     const emit = defineEmits(['uploadFile'])
 
@@ -276,6 +280,7 @@
 
             if (!associative_array.value[contact.id]) {
                 associative_array.value[contact.id] = [];
+                indeterminate_contacts.value[contact.id] = false;
             }
     
             if (!associative_array.value[contact.id].includes(contact.number_id)) {
@@ -285,7 +290,7 @@
             return acc;
         }, {});
 
-        console.log(associative_array.value)
+        numbers_ids.value = Object.values(associative_array.value).flat();
         return Object.values(groupedContacts);
     });
 
@@ -383,31 +388,58 @@
 
     // To select all contacts
     const handle_select_all = () => {
-        selected_contacts.value = all_selected.value ? formatted_contacts.value.map((contact: ContactRow) => contact.id) : [];
-        console.log(selected_contacts.value)
+        selected_contacts.value = all_selected.value ? formatted_contacts.value.map((contact: ContactRow) =>  {
+            indeterminate_contacts.value[contact.id] = false;
+            return contact.id
+        }) : [];
+        selected_numbers.value = all_selected.value ? formatted_contacts.value.reduce((acc: string[], contact: ContactRow) => {
+            return acc.concat(associative_array.value[contact.id]);
+        }, []) : [];
     }
 
-    // To select a single contact
-    const handle_select_contact = (id: string, event: any) => {
-        if(selected_contacts.value.includes(id) || Object.keys(expandedRows.value)[0] === id) { // To close the expanded row
-            toggleRow(id)
-        }
+    // Here we handle the checkboxes of every contact and its numbers
+    const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
+        if(from_parent) {
+            const is_selected = selected_contacts.value.includes(contact_id);
+            const is_expanded = Object.keys(expandedRows.value)[0] === contact_id;
+            indeterminate_contacts.value[contact_id] = false;
 
-        //TODO: CONTINUAR ACÁ, TENGO QUE HACER LA DESSELECCIÓN DE LOS NÚMEROS
-        if(event.target.checked) {
-            associative_array.value[id].forEach((number_id: string) => {
-                selected_numbers.value.push(number_id);
+            associative_array.value[contact_id].forEach((number_id: string) => {
+                if(selected_contacts.value.includes(contact_id)) {
+                    if(!selected_numbers.value.includes(number_id)) {
+                        selected_numbers.value.push(number_id);
+                    }
+                } else {
+                    selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
+                }
             });
+            
+            if (!(is_selected && is_expanded)) { // Handle the row expansion
+                if (is_selected || is_expanded) {
+                    toggleRow(contact_id);
+                }
+            }
+        } else {
+            const is_some_selected = associative_array.value[contact_id].some((n_id: string) => selected_numbers.value.includes(n_id))
+            const is_all_selected = associative_array.value[contact_id].every((n_id: string) => selected_numbers.value.includes(n_id))
+            indeterminate_contacts.value[contact_id] = is_some_selected && !is_all_selected;
+
+            if(is_all_selected || is_some_selected) {
+                if(!selected_contacts.value.includes(contact_id)) {
+                    selected_contacts.value.push(contact_id);
+                }
+            } else {
+                selected_contacts.value = selected_contacts.value.filter((c_id: string) => c_id !== contact_id);
+            }
         }
         
-        console.log(selected_numbers.value)
-        all_selected.value = selected_contacts.value.length === formatted_contacts.value.length;
-    }
-
-    // To select a single number
-    const handle_select_number = (number_id: string, contact_id: string) => {
-        console.log(number_id, contact_id)
-        console.log(selected_numbers.value)
+        all_selected.value = selected_contacts.value.length + selected_numbers.value.length == formatted_contacts.value.length + numbers_ids.value.length;
+        if(all_selected.value) {
+            indeterminate_all.value = false;
+        } else {
+            //TODO: indeterminate is now alway being displayed, but this is workin good
+            indeterminate_all.value = selected_contacts.value.length > 0 || selected_numbers.value.length > 0;
+        }
     }
 
     // When a row is clicked, it expands
