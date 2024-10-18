@@ -2,6 +2,7 @@ import { MyPreset } from './my_theme';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: '2024-10-17',
   devServer: {
     port: 3001,
   },
@@ -9,7 +10,6 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt', '@vueuse/nuxt', '@primevue/nuxt-module'],
   primevue: {
     /* Configuration */
-    usePrimeVue: true,
     options: {
       theme: {
           preset: MyPreset,
