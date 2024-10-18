@@ -62,6 +62,36 @@
                             </DataTable>
                             <p v-else class="text-no-contacts">There is no contacts on your file</p>
                         </div>
+                        <div v-if="uploadedSuccess && uploadedData?.result">
+                            <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
+                                <thead class="bg-gray-100 border-b border-gray-300">
+                                    <tr>
+                                    <th class="px-4 py-2"> 
+                                        <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll($event)" />
+                                    </th>
+                                    <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
+                                    <th class="px-4 py-2 text-left text-gray-700">Phone</th>
+                                    <th class="px-4 py-2 text-left text-gray-700">Status</th>
+                                    <th class="px-4 py-2 text-left text-gray-700">Result</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Iterar sobre cada contacto -->
+                                    <template v-for="contact in contacts" :key="contact.contact_id">
+                                    <!-- Iterar sobre cada número de contacto -->
+                                    <tr v-for="number in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
+                                        <td class="px-4 py-2">
+                                        <input type="checkbox" />
+                                        </td>
+                                        <td class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
+                                        <td class="px-4 py-2">{{ number.number }}</td>
+                                        <td class="px-4 py-2">{{ number.valid ? 'Valid' : 'Invalid' }}</td>
+                                        <td class="px-4 py-2">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
+                                    </tr>
+                                    </template>
+                                </tbody>
+                            </table>
+                        </div>
                     </section>
 
                     <p v-if="isError || (uploadedSuccess && !uploadedData?.result)" class="text-no-contacts">Something went wrong!</p>
@@ -113,7 +143,12 @@
 
     const visible = ref(false);
     
-    const contacts: Ref<uploadedContactToSave[]> = ref([]);
+    const contacts: Ref<ContactUploadedData[]> = ref([]);
+    /*
+    const contacts_to_save = computed(()=>{
+        return contacts.map()
+    }) */
+
     const group_id = ref('');
     const has_uploaded = ref(false);
     const showError = ref(false);
@@ -197,7 +232,7 @@
             onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
                     has_uploaded.value = true;
-                    
+                    /*
                     data.contacts.forEach((contact, i) => {
                         contact.numbers.forEach(number => {
                             if(number.validation_desc === 'ok') {                                
@@ -222,8 +257,10 @@
                             });
                             
                         });
-                    })
+                        
+                    }) */
                     group_id.value = data.group_id || 'all';
+                    contacts.value = data.contacts
                 }
             }
         });
