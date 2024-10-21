@@ -188,7 +188,7 @@ export type SystemGroup = {
 }
 
 export type CustomGroup = {
-  id: number;
+  id: string;
   group_code: StringOrNumberOrNull;
   group_name: StringOrNumber;
   count: number;

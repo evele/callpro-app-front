@@ -40,13 +40,27 @@
                     </div>
                     
                     <div class="flex items-center gap-2">
-                        <Button @click="handle_group_action('add')" class="rounded-md" disabled>
-                            <PlusRoundedSVG class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Add to Group</span>
+                        <Button @click="handle_group_action('add')" class="rounded-md" :disabled="disabled_groups_action_btn">
+                            <div v-if="ATGIsPending" class="flex items-center gap-3">
+                                <ProgressSpinner class="w-4 h-4" strokeWidth="8" fill="transparent" 
+                                    animationDuration=".5s" aria-label="Adding number" />
+                                Adding... 
+                            </div>
+                            <div v-else class="flex items-center gap-2">
+                                <PlusRoundedSVG class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Add to Group</span>
+                            </div>
                         </Button>
-                        <Button @click="handle_group_action('move')" class="rounded-md" disabled>
-                            <MoveSVG class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Move to Group</span>
+                        <Button @click="handle_group_action('move')" class="rounded-md" :disabled="disabled_groups_action_btn">
+                            <div v-if="MTGIsPending" class="flex items-center gap-3">
+                                <ProgressSpinner class="w-4 h-4" strokeWidth="8" fill="transparent" 
+                                    animationDuration=".5s" aria-label="Moving number" />
+                                Moving... 
+                            </div>
+                            <div v-else class="flex items-center gap-2">
+                                <MoveSVG class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Move to Group</span>
+                            </div>
                         </Button>
                         <Button @click="handle_group_action('trash')" class="rounded-md" disabled>
                             <TrashSVG class="w-5 h-5" />
@@ -75,16 +89,23 @@
 
             <Column field="number" header="Phone" class="text-center">
                 <template #body="slotProps">
-                    <div class="relative flex items-center justify-cente h-16">
-                        <span class="text-[#797676] w-full">{{ slotProps.data.number }}</span>
-                        <span v-if="slotProps.data.total_numbers > 1" class="absolute -right-3 top-5 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> + {{ slotProps.data.total_numbers -1 }}</span>
+                    <div class="relative flex items-center h-16">
+                        <span class="text-[#797676] w-full">{{ hide_contact_data(slotProps.data.id) ? '' : slotProps.data.numbers[0] }}</span>
+                        <span v-if="slotProps.data.total_numbers > 1 && !hide_contact_data(slotProps.data.id)"
+                            v-tooltip.top="{
+                                value: slotProps.data.numbers.slice(1).join(', '),
+                                pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
+                            }"
+                            class="absolute -right-3 top-5 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> 
+                            + {{ slotProps.data.total_numbers -1 }}
+                        </span>
                     </div>
                 </template>
             </Column>
 
             <Column field="groups" header="Groups" class="text-center">
                 <template #body="slotProps">
-                    <span class="font-semibold">{{ slotProps.data.total_groups }}</span>
+                    <span class="font-semibold">{{ hide_contact_data(slotProps.data.id) ? '' : slotProps.data.total_groups }}</span>
                 </template>
             </Column>
 
@@ -96,7 +117,8 @@
                     </div>
                 </template>
                 <template #body="slotProps">
-                    <span v-if="slotProps.data.dnc > 0 && slotProps.data.dnc != slotProps.data.total_numbers">-</span>
+                    <span v-if="hide_contact_data(slotProps.data.id)"></span>
+                    <span v-else-if="slotProps.data.dnc > 0 && slotProps.data.dnc != slotProps.data.total_numbers">-</span>
                     <DncSVG v-else-if="slotProps.data.dnc > 0" class="text-[#751617] w-full" />
                     <PhoneSVG v-else class="w-full" />
                 </template>
@@ -144,8 +166,16 @@
 
                     <Column field="groups" header="" class="text-center" style="width: 25%; padding-left: 0;">
                         <template #body="slotProps">
-                            <div class="flex justify-center gap-1">
-                                <span class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px]" v-for="(group, g_i) in [slotProps.data.group]" :key="g_i">Group {{ g_i + 1 }}</span>
+                            <div class="relative flex justify-center gap-1 items-center">
+                                <span v-if="slotProps.data.group.length > 0" class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px]">{{ slotProps.data?.group[0] }}</span>
+                                <span v-if="slotProps.data.group.length > 1"
+                                    v-tooltip.top="{
+                                        value: get_number_group_name(slotProps.data.group.slice(1)).join(', '),
+                                        pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
+                                    }"
+                                    class="absolute right-10 bg-[#49454F] text-white px-2 rounded-xl font-medium leading-none h-4"> 
+                                    ...
+                                </span>
                             </div>
                         </template>
                     </Column>
@@ -215,26 +245,27 @@
 
     const expandedRows = ref<{ [key: string]: boolean }>({});
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
-    const associative_array = ref([])
+    const associative_array = ref<{ [key: string]: string[] }>({})
     const indeterminate_all = ref(false);
-    const indeterminate_contacts = ref([]);
-    const numbers_ids = ref([])
+    const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
+    const numbers_ids = ref<string[]>([])
 
     const emit = defineEmits(['uploadFile'])
 
+    /* ----- Types ----- */
     type FormattedContact = {
         dnc: ZeroOrOne,
         group: string[],
         number: string,
         type: OneToFour,
-        selected: boolean,
-        number_id: string
+        number_id: string,
+        id: number,
     }
 
     type ContactRow = {
         id: string,
         name: string,
-        number: string,
+        numbers: string[],
         total_numbers: number,
         total_groups: number,
         dnc: number,
@@ -262,7 +293,8 @@
         const groupedContacts: ContactRow[] = contacts_data.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
             if (acc[contact.id]) {
                 acc[contact.id].total_numbers += 1;
-                acc[contact.id].dnc += +contact.dnc 
+                acc[contact.id].dnc += +contact.dnc
+                acc[contact.id].numbers.push(format_number_to_show(contact.number));
                 if(typeof contact.number_groups === 'string') {
                     acc[contact.id].total_groups += get_number_groups(contact.number_groups).length;
                 }
@@ -270,7 +302,7 @@
                 acc[contact.id] = {
                     id: contact.id,
                     name: show_full_name(contact.first_name, contact.last_name),
-                    number: format_number_to_show(contact.number),
+                    numbers: [format_number_to_show(contact.number)],
                     total_numbers: 1,
                     total_groups: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups).length : 0,
                     dnc: +contact.dnc,
@@ -294,15 +326,22 @@
         return Object.values(groupedContacts);
     });
 
+    const reset_selected_contacts = () => {
+        all_selected.value = false;
+        selected_contacts.value = [];
+        selected_numbers.value = [];
+        expandedRows.value = {};
+        Object.keys(indeterminate_contacts.value).forEach((key) => indeterminate_contacts.value[key] = false);
+        indeterminate_all.value = false;
+    }
+
     // Handle pagination
     const onPageChange = (event: any) => {
         page.value = event.page + 1
-        all_selected.value = false;
-        selected_contacts.value = [];
-        expandedRows.value = {};
+        reset_selected_contacts()
     }
 
-    // When the expand button is clicked, it expands the row and shows the contact data
+    // When the expand button is clicked, it expands the row and shows the contact numbers and its data
     const toggleRow = (id: string) => {
         let is_same_row = false;
         if(Object.keys(expandedRows.value).length) {
@@ -313,6 +352,8 @@
         expandedRows.value[id] = true;
         format_expanded_contact(id);
     }
+
+    const hide_contact_data = (id: number) => (id === formatted_contact.value[0]?.id) && expandedRows.value[id];
 
     // Contact data that is shown in the expanded row
     const format_expanded_contact = (id: string | number) => {
@@ -344,17 +385,21 @@
     })
 
     const hardcoded_contact_data = computed(() => {
-        if(all_contacts_data?.value?.result && all_contacts_data?.value?.contacts?.length) {
-            const contact = all_contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups?.length < 5)
-            if(contact) return { number_id: contact.number_id, group_id: contact.number_groups }; 
-        }
-        return null
+        const contact = contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups !== null && c.number_groups?.length < 5)
+        if(contact) return { number_id: contact.number_id, group_id: contact.number_groups };
+        else return null;
     })
 
+    /* ----- Group actions ----- */
+    const disabled_groups_action_btn = computed(() => selected_contacts.value.length === 0 && selected_numbers.value.length === 0);
+
     const handle_group_action = (action: string) => {
-        console.log(action)
-        return
+        const numbers_id = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
+
         if(action === 'move') {
+            //TODO: Add functionality to move numbers to a group, need to work with the contact number groups
+            console.log('currently not working D:')
+            return
             const data_to_send: MoveNumberToGroup = {
                 number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
                 groups: target_groups?.value,
@@ -365,7 +410,7 @@
             moveNumberToGroup(data_to_send)
         } else if(action === 'add') {
             const data_to_send: AddNumberToGroup = {
-                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
+                number_id: numbers_id,
                 groups: target_groups?.value
             }
             console.log('add', data_to_send)
@@ -376,6 +421,19 @@
         }
     }
 
+    const get_number_group_name = (groups: string[]) => {
+        let groups_names: string[] = [];
+
+        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
+            groups_names = groups.map((group_id: string) => {
+                const group = CGData?.value?.custom_groups?.find((g: CustomGroup) => g.id === group_id);
+                return group?.group_name ? group.group_name : group_id;
+            });
+        }
+
+        return groups_names.length > 0 ? groups_names : groups;
+    }
+
 
     const download_contacts = () => {
         download();
@@ -383,8 +441,8 @@
 
     /* ----- Here we handle the all the checkboxes in the table ----- */
     const all_selected = ref(false);
-    const selected_contacts = ref([]);
-    const selected_numbers = ref([]);
+    const selected_contacts = ref<string[]>([]);
+    const selected_numbers = ref<string[]>([]);
 
     // To select all contacts
     const handle_select_all = () => {
@@ -437,7 +495,7 @@
         if(all_selected.value) {
             indeterminate_all.value = false;
         } else {
-            //TODO: indeterminate is now alway being displayed, but this is workin good
+            //TODO: indeterminate is not always being displayed, but this is workin good
             indeterminate_all.value = selected_contacts.value.length > 0 || selected_numbers.value.length > 0;
         }
     }
@@ -496,6 +554,10 @@
     }
 
     tr {
+        &:nth-child(even) {
+            background-color: rgba(121, 116, 126, 0.08);
+        }
+
         &:hover {
             cursor: pointer;
             background-color: #ebe5f7;
@@ -533,6 +595,14 @@
     .p-datatable-row-expansion {
         .p-datatable-thead, .p-datatable-header-cell {
             display: none;
+        }
+
+        tr {
+            background-color: #F3EDF7;
+
+            &:hover {
+                background-color: #ebe5f7;
+            }
         }
 
         td {
