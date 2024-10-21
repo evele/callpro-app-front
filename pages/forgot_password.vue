@@ -60,7 +60,7 @@
         </div>
     </div>
 </template>
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue"
 import { useAuthStore } from "@/stores"
 import CheckSVG from "~/components/svgs/CheckSVG.vue";
@@ -83,7 +83,7 @@ async function requestPasswordReset() {
     isSending.value = true
     try {
         const response = await authStore.sendRecoveryPass(email.value)
-        if (response.result) {
+        if ("result" in response && response.result) {
             showSuccessMessage.value = true
             email.value = ""
             // TODO 5 segundos antes de ocultar el mensaje y resetear el campo de email
@@ -92,7 +92,7 @@ async function requestPasswordReset() {
                 
             }, 5000)
         } else {
-            console.log("Error:", response.errors)
+            console.log("Error:", response.error)
         }
     } catch (error) {
         console.error("An error occurred:", error)

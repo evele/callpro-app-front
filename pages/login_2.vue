@@ -19,7 +19,7 @@
                             <label for="phonelaunch" class="text-xl leading-7 text-left text-[#1e1e1e]">Phone Launch Account</label>
                             <InputText id="phonelaunch"
                                 class="flex w-full text-sm px-4 py-3 border border-[#2c2c2c] rounded-[30px] bg-white"
-                                autocomplete="off" placeholder="Enter Phone Launch Account number" v-model="phonelaunch" />
+                                autocomplete="off" placeholder="Enter Phone Launch Account number"  />
                         </div>
 
                         <!-- Bloque de Pin -->
@@ -27,7 +27,7 @@
                             <label for="pin" class="text-xl leading-7 text-left text-[#1e1e1e]">Pin</label>
                             <InputText id="pin" type="text"
                                 class="flex w-full text-sm px-4 py-3 border border-[#2c2c2c] rounded-[30px] bg-white"
-                                autocomplete="off" placeholder="Enter Pin number" v-model="pin" />                            
+                                autocomplete="off" placeholder="Enter Pin number" />                            
                         </div>
                     </form>
                 </template>
@@ -54,7 +54,7 @@
     </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useAuthStore } from "@/stores"
 import SwitchSVG from '@/components/svgs/SwitchSVG.vue';
 definePageMeta({
@@ -73,11 +73,11 @@ const authStore = useAuthStore();
 function login() {
     console.log('data', email.value, password.value);
     isPending.value = true;
-    authStore.login({ email: email.value, password: password.value, rememberMe: rememberMe.value })
+    authStore.login({ email: email.value, password: password.value })
         .then((response) => {
             isPending.value = false;
             if (!response.result) {
-                console.log('Error en el login:', response.errors);
+                console.log('Error en el login:', response.error);
             }
         })
         .catch(() => {

@@ -70,7 +70,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { useAuthStore } from "@/stores"
 import SwitchSVG from '@/components/svgs/SwitchSVG.vue';
 definePageMeta({
@@ -88,12 +88,16 @@ const authStore = useAuthStore();
 function login() {
   console.log('data', email.value, password.value);
   isPending.value = true;
-  authStore.login({ email: email.value, password: password.value, rememberMe: rememberMe.value })
+  authStore.login({ email: email.value, password: password.value })
       .then((response) => {
           isPending.value = false;
-          if (!response.result) {
-              console.log('Error en el login:', response.errors);
-          }
+          if ("result" in response && !response.result) {              
+              console.log('Error en el login:', response.error || response.validation_error);
+          }else if ("result" in response && response.result) {
+            
+            console.log('Login exitoso:');
+            }
+
       })
       .catch(() => {
           isPending.value = false;
