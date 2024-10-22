@@ -26,7 +26,7 @@
             <span class="text-xs">*This information is mandatory
                 to create a new group</span>
             
-            <div style="margin-top: 10px;">
+            <div>
                 <span v-if="props.isError" style="color: red;">Error: {{ props.errorMessage
                     }}</span>
                 <span v-if="props.isSuccess" style="color: green;">Group successfully created!</span>
