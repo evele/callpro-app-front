@@ -20,6 +20,23 @@ export type PasswordRecoveryResponse = {
   
 };
 
+export type UserRegister = {
+  firstName: string;
+  lastName: string;
+  address: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  timezone: string;
+  agreeToTerms: boolean;
+}
+
+export type APIResponseSuccess = {
+  result: true;
+  message: string;
+};
+
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
     return {
@@ -59,6 +76,9 @@ export const useAuthStore = defineStore("AuthStore", {
     },    
     async resetPassword(new_password: string, new_password_confirm: string, token: string) {
       return await fetchWrapper.post(RESET_PASSWORD_URL, { new_password, new_password_confirm, token })
+    },
+    async registerUser(dataToSend:UserRegister): Promise<APIResponseSuccess | APIResponseError> {
+        return await fetchWrapper.post(CREATE_USER_URL, dataToSend) as APIResponseSuccess | APIResponseError;        
     },
   },
 })

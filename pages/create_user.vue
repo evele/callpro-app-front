@@ -165,12 +165,47 @@ const notRobot = ref(false);
 const canRegister = computed(() => {
     return agreeToTerms.value && notRobot.value && firstName.value && lastName.value && password.value && confirmPassword.value && password.value === confirmPassword.value;
 });
+const isPending = ref(false);
 
 const authStore = useAuthStore();
 
-function register() {
+async function register() {
     console.log('Registering user', { firstName, lastName, address, phone, email, password });
-    // Aquí podrías enviar los datos a tu store o a un API.
-}
+    isPending.value = true;
+    const dataToSend = {
+        firstName: firstName.value,
+        lastName: lastName.value,
+        address: address.value,
+        phone: phone.value,
+        email: email.value,
+        password: password.value,
+        confirmPassword: confirmPassword.value,
+        timezone: timezone.value,
+        agreeToTerms: agreeToTerms.value, // Asegúrate de que agreeToTerms sea un Ref
+    };
+    try {
+        const response = await authStore.registerUser(dataToSend)
 
+        if ('result' in response && response.result) {
+        // Mostrar un mensaje de éxito o redirigir
+        console.log('User registered successfully');
+        } else {
+        // Mostrar un mensaje de error
+        if (response.error) {
+        showError(response.error); // Solo llamar si error está definido
+        } else {
+        console.error('Error during registration, but no message was provided.');
+        }
+        }
+    } catch (error) {
+        console.error('An error occurred during registration:', error);
+        showError('An unexpected error occurred.');
+    }
+
+}
+function showError(message:string) {
+    // Puedes usar un sistema de notificaciones, un modal o una alerta simple
+    alert(message); // Simplemente muestra una alerta
+    // Si estás utilizando un componente de notificación o un modal, puedes integrarlo aquí.
+}
 </script>
