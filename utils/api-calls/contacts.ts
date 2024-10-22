@@ -102,3 +102,20 @@ export async function downloadContactsFile(data: data_string): Promise<null> {
     }
     return null;// TODO me tiraba error, busque y encontre esta solucion    
 }
+
+/* ----- Get DNC Contacts ----- */
+type DNCContactFilter = {
+    page: number,
+    limit: number,
+    filter: string,
+}
+
+export type GetDNCContactsAPIResponse = {
+    result: true;
+    dnc_contacts: ContactDNC[];
+    dnc_total_contacts: number; 
+}
+
+export async function getDNCContacts(data: DNCContactFilter): Promise<GetDNCContactsAPIResponse | APIResponseError> {
+    return await fetchWrapper.post(GET_DNC_CONTACTS_FILTERED_URL, data) as GetDNCContactsAPIResponse | APIResponseError
+}

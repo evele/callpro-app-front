@@ -5,7 +5,7 @@
     <div class="py-5 main-container">
         <ContactsTable :selected-tab="selected_tab" />
         <div>
-            <ContactsActions />
+            <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_contacts_data" />
             <ContactsGroupsPanel />
         </div>
     </div>
@@ -30,6 +30,7 @@
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
     <ModalAddNewContact ref="modalAddNewContact" />
+    <ModalDNCContacts ref="modalDNCContacts" />
 </template>
 
 <script setup lang="ts">
@@ -40,8 +41,22 @@
     const groupID = ref('')
 
     const modalAddNewContact = ref()
+    const modalDNCContacts = ref()
 
     const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
+
+    /* ----- DNC Contacts ----- */
+    const page = ref(1)
+    const show = ref(10)
+    const search = ref('')
+
+    const { data: dnc_contacts, isLoading: dnc_is_loading, isSuccess: dnc_is_success, refetch: dnc_refetch } = useFetchDNCContacts(page,show,search)
+
+    const dnc_contacts_data = computed(() => {
+        if(!dnc_contacts?.value?.result) return -1;
+        return dnc_contacts?.value.dnc_total_contacts
+    })
+    /* ----- DNC Contacts ----- */
 
     const save_new_group = () => {
         const dataToSend = {
@@ -54,6 +69,16 @@
 
     const open_new_contact_modal = () => {
         modalAddNewContact.value.open();
+    }
+
+    const handle_select_contact_action = (action: string) => {
+        switch (action) {
+            case 'dnc':
+                modalDNCContacts.value.open()
+                break;
+            default:
+                break;
+        }
     }
 </script>
 

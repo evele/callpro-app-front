@@ -1,6 +1,6 @@
 <template>
     <div class="option" @mouseover="is_hovering = true" @mouseleave="is_hovering = false">
-        <Button class="button" :class="[ { visible: is_hovering }, bgGradient ]">
+        <Button class="button" @click="handle_btn_action(text)" :class="[ { visible: is_hovering }, bgGradient ]">
             <component :is="iconOnHover !== null ? iconOnHover : icon" :style="{ color: iconOnHoverColor}"/>
         </Button>
 
@@ -27,6 +27,19 @@
     });
 
     const is_hovering = ref(false);
+
+    const emit = defineEmits(['click']);
+
+    const handle_btn_action = (text: string) => {
+        // Dejo creado el switch para agregar luego el resto de las acciones
+        switch (text) {
+            case 'DNC':
+                emit('click', 'dnc');
+                break;
+            default:
+                break;
+        }
+    }
 </script>
 
 <style scoped>

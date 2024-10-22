@@ -2,11 +2,18 @@
     <section class="container">
         <ContactsActionBtn v-for="option in OPTIONS" :key="option.text" :text="option.text" :count="option.count" :icon="option.icon" :icon-color="option.iconColor"
             :icon-bg="option.iconBG" :bg-gradient="option.bgGradient" :icon-on-hover="option.iconOnHover" :icon-on-hover-color="option.iconOnHoverColor"
+            @click="handle_btn_action"
         />
     </section>
+    <Button @click="console.log(dncTotalNumbers)">Acá</Button>
 </template>
 
 <script setup lang="ts">
+    //TODO: Declare props here
+    const props = defineProps({
+        dncTotalNumbers: { type: Number, required: true },
+    })
+
     import ContactsSVG from "@/components/svgs/ContactsSVG.vue"
     import GroupsSVG from "@/components/svgs/GroupsSVG.vue"
     import DncSVG from "@/components/svgs/DncSVG.vue"
@@ -16,9 +23,12 @@
     const OPTIONS = [
         { text: "Contacts", count: 123, icon: ContactsSVG, iconColor: "#4F378B", iconBG: "#E8DEF8", bgGradient: "bg-contacts", iconOnHover: PlusSVG },
         { text: "Groups", count: 23, icon: GroupsSVG, iconColor: "#009951", iconBG: "#CFF7D3", bgGradient: "bg-groups", iconOnHover: PlusSVG },
-        { text: "DNC", count: 12, icon: DncSVG, iconColor: "#E5A000", iconBG: "#FFF1C2", bgGradient: "bg-dnc", iconOnHover: PlusSVG },
+        { text: "DNC", count: props.dncTotalNumbers, icon: DncSVG, iconColor: "#E5A000", iconBG: "#FFF1C2", bgGradient: "bg-dnc", iconOnHover: PlusSVG },
         { text: "Upload a new file", icon: UploadSVG, iconColor: "#1D1B20", iconBG: "#E8DEF8", iconOnHoverColor: "#1D1B20" },
     ]
+
+    const emit = defineEmits(['click']);
+    const handle_btn_action = (text: string) => emit('click', text);
 </script>
 
 <style scoped>

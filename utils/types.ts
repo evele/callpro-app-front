@@ -47,6 +47,14 @@ export type ContactPhoneNumber = PhoneNumber & {
   is_deleted: ZeroOrOne;
 }
 
+export type ContactDNC = {
+  dnc: number;
+  first_name: StringOrNull;
+  last_name: StringOrNull;
+  number: string;
+  number_id: NumberOrNull;
+}
+
 // Type for Group Contacts
 export type ContactGroup = {
   name: string;

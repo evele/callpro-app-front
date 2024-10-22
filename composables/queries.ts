@@ -142,6 +142,18 @@ export const useFetchContact = (contact_id:Ref<string>) => {
   })
 }
 
+export const useFetchDNCContacts = (page:Ref<number>, limit:Ref<number>, filter:Ref<string>) => {
+  const dataToSend = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    filter: filter.value,
+  }))
+  return useQuery({
+    queryKey: ['dnc_contacts_filtered', dataToSend],
+    queryFn: () => getDNCContacts(dataToSend.value)
+  })
+}
+
 export const useFetchUserCustomGrups = () => {
   return useQuery({
     queryKey: ['user_custom_groups'],
