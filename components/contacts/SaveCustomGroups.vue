@@ -1,39 +1,43 @@
 <template>
     <!-- TODO: text 2xl 3xl dont' function -->
     <Dialog v-model:visible="visible" modal header="Create new group"
-        class="text-2xl w-full max-w-[850px] "><ChevronDownSVG />
-        <Divider class="max-w-[850px] mb-[38px]" />
+        class="text-2xl w-full max-w-[850px]">
+        <Divider class="max-w-[850px]" />
 
-        <div class="flex flex-col items-start gap-2 w-full mb-[38px]">
-            <label for="group-name" class="text-xl leading-6 text-left">Group
-                Name*</label>
-            <InputText id="group-name"
-                class="flex w-full text-sm px-3 py-4 border border-gray-300 rounded-[30px] bg-white" autocomplete="off"
-                placeholder="Enter Name" v-model="groupName" />
+        <!-- Agrupamos en un contenedor con flex y gap-->
+        <div class="flex flex-col gap-[38px] mt-9">
+
+            <div class="gap-2 w-full ">
+                <label for="group-name" class="text-xl leading-6 text-left">Group
+                    Name*</label>
+                <InputText id="group-name"
+                    class="w-full text-sm border border-gray-300  bg-white" autocomplete="off"
+                    placeholder="Enter Name" v-model="groupName" />
+            </div>
+
+            <div class="gap-2 w-full ">
+                <label for="group-name" class="text-xl leading-6 text-left">Phone
+                    Launch ID</label>
+                <InputText id="launch-id"
+                    class="w-full text-sm border border-gray-300 bg-white" autocomplete="off"
+                    placeholder="Enter a number ID" v-model="launchIDString" />
+            </div>
+
+            <span class="text-xs">*This information is mandatory
+                to create a new group</span>
+            
+            <div style="margin-top: 10px;">
+                <span v-if="props.isError" style="color: red;">Error: {{ props.errorMessage
+                    }}</span>
+                <span v-if="props.isSuccess" style="color: green;">Group successfully created!</span>
+            </div>            
         </div>
-
-        <div class="flex flex-col items-start gap-2 w-full mb-[38px]">
-            <label for="group-name" class="text-xl leading-6 text-left">Phone
-                Launch ID</label>
-            <InputText id="launch-id"
-                class="flex w-full text-sm px-3 py-4 border border-gray-300 rounded-[30px] bg-white" autocomplete="off"
-                placeholder="Enter a number ID" v-model="launchIDString" />
-        </div>
-
-        <span class="text-xs">*This information is mandatory
-            to create a new group</span>
-        
         <template #footer>
-            <Button type="button" class="flex justify-center items-center py-2 px-4 w-[300px] mx-auto m-[28px]"
-            :disabled="props.isPending" @click="save_new_group" >
-                {{ props.isPending ? 'Saving...' : 'Save' }}
-            </Button>
-        </template>
-        <div style="margin-top: 10px;">
-            <span v-if="props.isError" style="color: red;">Error: {{ props.errorMessage
-                }}</span>
-            <span v-if="props.isSuccess" style="color: green;">Group successfully created!</span>
-        </div>
+                <Button type="button" class="justify-center items-center w-[300px] mx-auto"
+                :disabled="props.isPending" @click="save_new_group" >
+                    {{ props.isPending ? 'Saving...' : 'Save' }}
+                </Button>
+            </template>
     </Dialog>
 </template>
 
