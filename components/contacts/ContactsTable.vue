@@ -230,8 +230,6 @@
 </template>
 
 <script setup lang="ts">
-    import { format_contact_type } from '@/utils/functions';
-
     const props = defineProps({
         selectedTab: { type: String, required: true }
     })
@@ -253,7 +251,7 @@
     const emit = defineEmits(['uploadFile'])
 
     /* ----- Types ----- */
-    type FormattedContact = {
+    type FormattedContact = { // This is the data that is shown in the expanded row
         dnc: ZeroOrOne,
         group: string[],
         number: string,
@@ -262,13 +260,17 @@
         id: number,
     }
 
-    type ContactRow = {
+    type ContactRow = { // This is the data that is shown in the main table
         id: string,
-        name: string,
+        name: string | null,
         numbers: string[],
         total_numbers: number,
         total_groups: number,
         dnc: number,
+    }
+
+    type GroupedContacts = {
+        [key: string]: ContactRow;
     }
 
     const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
@@ -283,6 +285,11 @@
         return all_contacts_data?.value
     })
 
+    const custom_groups = computed(() => {
+        if(!CGData?.value?.result) return []
+        return CGData?.value.custom_groups
+    })
+
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
 
     // Contacts that are shown in the main table
@@ -290,7 +297,7 @@
         total_records.value = contacts_data.value.total_numbers;
         if(!contacts_data.value.contacts) return []
 
-        const groupedContacts: ContactRow[] = contacts_data.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
+        const groupedContacts: GroupedContacts = contacts_data.value?.contacts?.reduce((acc: GroupedContacts, contact: ContactPhoneNumber) => {
             if (acc[contact.id]) {
                 acc[contact.id].total_numbers += 1;
                 acc[contact.id].dnc += +contact.dnc
@@ -300,7 +307,7 @@
                 }
             } else {
                 acc[contact.id] = {
-                    id: contact.id,
+                    id: String(contact.id),
                     name: show_full_name(contact.first_name, contact.last_name),
                     numbers: [format_number_to_show(contact.number)],
                     total_numbers: 1,
@@ -310,6 +317,7 @@
 
             }
 
+            // Create an associative array to store the numbers of each contact
             if (!associative_array.value[contact.id]) {
                 associative_array.value[contact.id] = [];
                 indeterminate_contacts.value[contact.id] = false;
@@ -326,6 +334,7 @@
         return Object.values(groupedContacts);
     });
 
+    // Reset checkboxes and expanded row
     const reset_selected_contacts = () => {
         all_selected.value = false;
         selected_contacts.value = [];
@@ -379,8 +388,8 @@
 
     // These next 2 functions will be deleted in the future
     const target_groups = computed(() => {
-        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
-            return CGData.value.custom_groups.map((group: CustomGroup) => group.id).slice(0, 2)
+        if(custom_groups.value.length) {
+            return custom_groups.value.map((group: CustomGroup) => group.id).slice(0, 2)
         }
     })
 
@@ -405,7 +414,6 @@
                 groups: target_groups?.value,
                 current_group_id: hardcoded_contact_data?.value?.group_id
             }
-            console.log('move', data_to_send)
 
             moveNumberToGroup(data_to_send)
         } else if(action === 'add') {
@@ -413,7 +421,6 @@
                 number_id: numbers_id,
                 groups: target_groups?.value
             }
-            console.log('add', data_to_send)
 
             addNumberToGroup(data_to_send)
         } else {
@@ -421,12 +428,13 @@
         }
     }
 
+    // It's used in the tooltip
     const get_number_group_name = (groups: string[]) => {
-        let groups_names: string[] = [];
+        let groups_names: StringOrNumber[] = [];
 
-        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
+        if(custom_groups.value.length) {
             groups_names = groups.map((group_id: string) => {
-                const group = CGData?.value?.custom_groups?.find((g: CustomGroup) => g.id === group_id);
+                const group = custom_groups.value.find((g: CustomGroup) => g.id === group_id);
                 return group?.group_name ? group.group_name : group_id;
             });
         }
@@ -457,7 +465,7 @@
 
     // Here we handle the checkboxes of every contact and its numbers
     const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
-        if(from_parent) {
+        if(from_parent) { // Contact checkbox
             const is_selected = selected_contacts.value.includes(contact_id);
             const is_expanded = Object.keys(expandedRows.value)[0] === contact_id;
             indeterminate_contacts.value[contact_id] = false;
@@ -477,7 +485,7 @@
                     toggleRow(contact_id);
                 }
             }
-        } else {
+        } else { // Number checkbox
             const is_some_selected = associative_array.value[contact_id].some((n_id: string) => selected_numbers.value.includes(n_id))
             const is_all_selected = associative_array.value[contact_id].every((n_id: string) => selected_numbers.value.includes(n_id))
             indeterminate_contacts.value[contact_id] = is_some_selected && !is_all_selected;
