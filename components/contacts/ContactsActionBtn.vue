@@ -9,7 +9,8 @@
                 <component :is="icon"/>
             </div>
             <span :class="[ count ? 'option-title' : 'option-only-title' ]">{{ text }}</span>
-            <span class="option-amount" v-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
+            <Skeleton v-if="count === null" shape="circle" size="1.5rem"></Skeleton>
+            <span class="option-amount" v-else-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
         </div>
     </div>
 </template>
@@ -17,7 +18,7 @@
 <script setup lang="ts">
     const props = defineProps({
         text: { type: String, required: true },
-        count: { type: Number, required: false, default: null },
+        count: { type: Number, required: false, default: undefined },
         icon: { type: Object, required: true },
         iconColor: { type: String, required: true },
         iconBg: { type: String, required: true },

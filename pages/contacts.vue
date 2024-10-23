@@ -5,7 +5,7 @@
     <div class="py-5 main-container">
         <ContactsTable :selected-tab="selected_tab" />
         <div>
-            <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_contacts_data" />
+            <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_total_contacts" />
             <ContactsGroupsPanel />
         </div>
     </div>
@@ -49,13 +49,17 @@
     const page = ref(1)
     const show = ref(10)
     const search = ref('')
+    const dnc_total_contacts = ref<number | null>(null)
 
     const { data: dnc_contacts, isLoading: dnc_is_loading, isSuccess: dnc_is_success, refetch: dnc_refetch } = useFetchDNCContacts(page,show,search)
 
-    const dnc_contacts_data = computed(() => {
-        if(!dnc_contacts?.value?.result) return -1;
-        return dnc_contacts?.value.dnc_total_contacts
-    })
+    watch(dnc_contacts, (updated_data: GetDNCContactsAPIResponse | APIResponseError) => {
+        if(!updated_data?.result) {
+            dnc_total_contacts.value = -1
+        } else {
+            dnc_total_contacts.value = updated_data?.dnc_total_contacts
+        }
+    });
     /* ----- DNC Contacts ----- */
 
     const save_new_group = () => {
