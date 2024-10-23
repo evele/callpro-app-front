@@ -71,8 +71,8 @@
                                     </th>
                                     <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
                                     <th class="px-4 py-2 text-left text-gray-700">Phone</th>
-                                    <th class="px-4 py-2 text-left text-gray-700">Status</th>
-                                    <th class="px-4 py-2 text-left text-gray-700">Result</th>
+                                    <th class="px-4 py-2 text-left text-gray-700 text-center">Status</th>
+                                    <th class="px-4 py-2 text-left text-gray-700 text-center">Result</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -81,12 +81,16 @@
                                     <!-- Iterar sobre cada número de contacto -->
                                     <tr v-for="number in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
                                         <td class="px-4 py-2">
-                                        <input type="checkbox" />
+                                        <input type="checkbox"/>
+                                        <Checkbox v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
                                         </td>
                                         <td class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
                                         <td class="px-4 py-2">{{ number.number }}</td>
-                                        <td class="px-4 py-2">{{ number.valid ? 'Valid' : 'Invalid' }}</td>
-                                        <td class="px-4 py-2">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
+                                        <td class="px-4 py-2">
+                                            <CheckSVG v-if="number.valid" class="m-auto" color="green"/>
+                                            <ErrorIconSVG v-else class="m-auto"/>
+                                        </td>
+                                        <td class="px-4 py-2 text-center">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
                                     </tr>
                                     </template>
                                 </tbody>
@@ -120,6 +124,10 @@
 </template>
 
 <script setup lang="ts">
+
+import CheckSVG from '../svgs/CheckSVG.vue';
+import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
+
     const props = defineProps({
         selectedGroup: { type: String, required: true }
     })
@@ -155,7 +163,11 @@
     const showSuccess = ref(false);
 
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
+    const selected_contacts_ids:Ref<number[]> = ref([]) 
+    // const selected_contacts_ids= ref() 
+    
     const selectedContacts = ref<FormattedContact[]>([]);    
+
     
     const is_disabled = computed(() => {
         return !selectedContacts.value || selectedContacts.value.length === 0;
