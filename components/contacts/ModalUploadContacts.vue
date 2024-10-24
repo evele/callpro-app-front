@@ -12,9 +12,7 @@
 
                     <section v-if="!has_uploaded" class="modal__dropfile special-input">
                         <FileUpload name="file" :multiple="false" class="special-input" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
-                            <template #header="{ files }">
-                                <Button @click="uploadEvent(files)" class="is-hidden" />
-                            </template>
+                            
 
                             <template #content>
                                 <span style="display: none;"></span>
@@ -23,7 +21,7 @@
                             <template #empty>
                                     <div class="modal__dropfile--container">
                                         <CircleSVG style="color: #E8DEF8;" />
-                                        <p class="modal__dropfile--content">Drop files here to upload</p>
+                                        <p class="modal__dropfile--content">Drop files here or select <span >here</span> to upload</p>
                                     </div>
                             </template>
                         </FileUpload>
@@ -33,41 +31,11 @@
 
                     <section v-if="has_uploaded">
                         <div v-if="uploadedSuccess && uploadedData?.result">
-                            <DataTable 
-                            v-if="uploadedData?.contacts?.length" 
-                            v-model:selection="selectedContacts" 
-                            :value="formatted_contact" 
-                            dataKey="name" 
-                            tableStyle="min-width: 40rem" 
-                            scrollable scrollHeight="350px" 
-                            class="uploaded-contacts-table">
-                                <Column headerStyle="width: 3rem">
-                                    <template #header="headerSlot">
-                                        <input 
-                                            type="checkbox" 
-                                            :checked="isAllSelected" 
-                                            @change="toggleSelectAll($event)" 
-                                        />                                        
-                                    </template>
-                                    <template #body="slotProps">                                        
-                                        <input 
-                                        type="checkbox" 
-                                        :disabled="slotProps.data.disabled"  
-                                        :checked="isSelected(slotProps.data)"
-                                        @change="toggleSelection(slotProps.data, $event)"
-                                        />
-                                    </template>
-                                </Column>
-                                <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"></Column>                                
-                            </DataTable>
-                            <p v-else class="text-no-contacts">There is no contacts on your file</p>
-                        </div>
-                        <div v-if="uploadedSuccess && uploadedData?.result">
                             <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
                                 <thead class="bg-gray-100 border-b border-gray-300">
                                     <tr>
                                     <th class="px-4 py-2"> 
-                                        <input type="checkbox" :checked="isAllSelected" @change="toggleSelectAll($event)" />
+                                        <Checkbox :modelValue="all_selected" :indeterminate="some_selected" @change="toggle_select_all" binary/>
                                     </th>
                                     <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
                                     <th class="px-4 py-2 text-left text-gray-700">Phone</th>
@@ -76,19 +44,16 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <!-- Iterar sobre cada contacto -->
                                     <template v-for="contact in contacts" :key="contact.contact_id">
-                                    <!-- Iterar sobre cada número de contacto -->
-                                    <tr v-for="number in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
-                                        <td class="px-4 py-2">
-                                        <input type="checkbox"/>
-                                        <Checkbox v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
+                                    <tr v-for="(number,index) in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
+                                        <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">
+                                            <Checkbox v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
                                         </td>
-                                        <td class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
+                                        <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
                                         <td class="px-4 py-2">{{ number.number }}</td>
                                         <td class="px-4 py-2">
-                                            <CheckSVG v-if="number.valid" class="m-auto" color="green"/>
-                                            <ErrorIconSVG v-else class="m-auto"/>
+                                            <CheckSVG v-if="number.valid" class="m-auto text-success"/>
+                                            <ErrorIconSVG v-else class="m-auto text-danger"/>
                                         </td>
                                         <td class="px-4 py-2 text-center">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
                                     </tr>
@@ -113,7 +78,7 @@
 
                     <p v-if="savedSuccess && showSuccess" class="text-success">Contacts Saved!</p>
                     <footer class="modal__footer">
-                        <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || is_disabled">
+                        <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending ">
                             {{ !savedIsPending ? 'Save' : 'Saving...' }}
                         </Button>
                     </footer>
@@ -125,8 +90,8 @@
 
 <script setup lang="ts">
 
-import CheckSVG from '../svgs/CheckSVG.vue';
-import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
+    import CheckSVG from '../svgs/CheckSVG.vue';
+    import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
 
     const props = defineProps({
         selectedGroup: { type: String, required: true }
@@ -146,33 +111,21 @@ import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
     const handleEscapeKey = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
             close();
+            // TODO: change this
         }
     };
 
     const visible = ref(false);
     
     const contacts: Ref<ContactUploadedData[]> = ref([]);
-    /*
-    const contacts_to_save = computed(()=>{
-        return contacts.map()
-    }) */
-
+   
     const group_id = ref('');
     const has_uploaded = ref(false);
     const showError = ref(false);
     const showSuccess = ref(false);
 
-    const formatted_contact: Ref<FormattedContact[]> = ref([]);
     const selected_contacts_ids:Ref<number[]> = ref([]) 
-    // const selected_contacts_ids= ref() 
-    
-    const selectedContacts = ref<FormattedContact[]>([]);    
-
-    
-    const is_disabled = computed(() => {
-        return !selectedContacts.value || selectedContacts.value.length === 0;
-    });    
-
+   
     const open = () => {
         visible.value = true;        
     }
@@ -180,27 +133,14 @@ import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
     const close = () => {
         visible.value = false;       
         has_uploaded.value = false;
-        reset();
-        formatted_contact.value = [];        
+        reset();   
         contacts.value = [];
-        selectedContacts.value = [];
+        selected_contacts_ids.value = [];
         showError.value = false;
         showSuccess.value = false;        
     }
 
     defineExpose({ open });
-
-    type FormattedContact = {
-        selected?: boolean;
-        name: string;
-        number: number;
-        status: boolean;
-        result: string;
-        first_name?: string;
-        last_name?: string;
-        contact_id?: string;
-        disabled?: boolean;
-    }
 
     type UploadContactData = {
         file: File;
@@ -244,33 +184,7 @@ import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
             onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
                     has_uploaded.value = true;
-                    /*
-                    data.contacts.forEach((contact, i) => {
-                        contact.numbers.forEach(number => {
-                            if(number.validation_desc === 'ok') {                                
-                                selectedContacts.value.push({     
-                                    selected:true,                               
-                                    name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
-                                    first_name:contact.first_name || "",
-                                    last_name: contact.last_name || "",
-                                    number: number?.number,
-                                    contact_id: `fake-${i+1}`,
-                                    status: contact?.valid,
-                                    result: contact?.validation_desc
-                                })
-                            }
-
-                            formatted_contact.value.push({                                
-                                name: contact?.first_name === "" && contact?.last_name === "" ? "" : `${contact?.last_name}, ${contact?.first_name}`,
-                                number: number?.number,
-                                status: contact?.valid,
-                                result: contact?.validation_desc === "Valid and inserted" ? 'Ok' : contact?.validation_desc,
-                                disabled: number.validation_desc != 'ok' ? true : false
-                            });
-                            
-                        });
-                        
-                    }) */
+                    /* TODO: check if belongs to group or not (not here probbly before upload */
                     group_id.value = data.group_id || 'all';
                     contacts.value = data.contacts
                 }
@@ -278,49 +192,43 @@ import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
         });
     };    
 
-    const isSelected = (contact: FormattedContact) => {
-        return selectedContacts.value.some(selected => selected.name === contact.name && selected.number === contact.number);
-    }
+    const all_selected = computed(() => selected_contacts_ids.value.length === contacts.value.length);
+    const some_selected = computed(()=> selected_contacts_ids.value.length >0 && selected_contacts_ids.value.length < contacts.value.length)
 
-    const toggleSelection = (contact: FormattedContact, event: Event) => {
-        const target = event.target as HTMLInputElement;
-        if (target.checked) {            
-            selectedContacts.value.push(contact);
-        } else {            
-            selectedContacts.value = selectedContacts.value.filter(selected => selected.name !== contact.name || selected.number !== contact.number);
-        }
-    }
 
-    const isAllSelected = computed(() => {        
-        return formatted_contact.value.every(contact => contact.disabled || isSelected(contact));
-    });
-
-    const toggleSelectAll = (event: Event) => {
-        const target = event.target as HTMLInputElement;
-        if (target.checked) {            
-            formatted_contact.value.forEach(contact => {
-                if (!contact.disabled && !isSelected(contact)) {
-                    selectedContacts.value.push(contact);
-                }
-            });
-        } else {            
-            selectedContacts.value = selectedContacts.value.filter(contact => contact.disabled);
+    const toggle_select_all = () => {
+        if (all_selected.value) {
+            selected_contacts_ids.value = [];
+        } else {
+            selected_contacts_ids.value = contacts.value.map(contact => contact.contact_id);
         }
     };
+
+    const get_selected_contacts_in_flat_format = () => {
+            return contacts.value
+                .filter(contact => selected_contacts_ids.value.includes(contact.contact_id))
+                .flatMap(contact => 
+                contact.numbers.map(number => ({
+                    number: number.number,
+                    first_name: contact.first_name || '',
+                    last_name: contact.last_name || '',
+                    contact_id: contact.contact_id,
+                    number_id: number.number_id
+                }))
+            );
+        };  
     
     const save_contact = () => {  
         // TODO controlar el momento posterior al save, y anterior al cierre del modal, el boton save se muestra habilitado 
-        const formattedContacts = selectedContacts.value.map(contact => ({
-            ...contact,
-            first_name: contact.first_name || "", 
-            last_name: contact.last_name || "",   
-            contact_id: contact.contact_id || ""  
-        }));   
+       
+        const contacts_in_flat_format = get_selected_contacts_in_flat_format()
+        console.log("ciff",contacts_in_flat_format)
+    
         const data_to_send: uploadedContactToSaveData = {
-            contacts: formattedContacts,
+            contacts: contacts_in_flat_format,
             group_id: group_id.value
         }
-
+        
         saveUploadedContact(data_to_send, {
             onSuccess: () => {
                 // Should be a toast
@@ -332,12 +240,6 @@ import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
         })
     }
 
-    const columns = [        
-        { field: 'name', header: 'Last, First' },
-        { field: 'number', header: 'Phone' },
-        { field: 'status', header: 'Status' },
-        { field: 'result', header: 'Result' },        
-    ];
 </script>
 
 <style scoped lang="scss">
