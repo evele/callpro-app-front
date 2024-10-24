@@ -46,7 +46,7 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
-        <SaveCustomGroups ref="saveCustomGroupsRef" @update:saveGroup="handlerSaveGroup" :selected-group="selectedGroup"
+        <SaveCustomGroups ref="saveCustomGroupsRef" @update:saveGroup="handlerSaveGroup" :selected-group="selectedGroup" @update:selectedGroup="handlerSelectedGroup"
             :is-pending="saveGroupContactsIsPending" :is-error="saveGroupContactsIsError"
             :error-message="saveGroupContactsError?.message" :is-success="saveGroupContactsIsSuccess" />
     </section>
@@ -71,13 +71,17 @@ const setActiveButton = (name: string) => {
     activeButton.value = name;
 };
 
-const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
+const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG, refetch: refetchGroupData } = useFetchGetCustomGroups()
 const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
 
 const saveCustomGroupsRef = ref();
 
 const open_modal = () => {
-    console.log("abriendo")
+    Object.assign(selectedGroup, {
+        groupID: "",
+        groupName:null,
+        launchID: null
+    });    
     saveCustomGroupsRef?.value?.open();
 }
 
@@ -105,11 +109,19 @@ const handlerSaveGroup = (dataToSend: ContactGroup) => {
                 name: dataToSend.name,
                 launchID: dataToSend.phone_launch_id
             });
+            fetch_groups_data();
 
         }
     });
 
 }
+const handlerSelectedGroup =(e: CustomGroup| null) =>{
+
+}
+
+const fetch_groups_data = () => {
+        refetchGroupData()
+    }
 </script>
 
 <style scoped lang="scss">

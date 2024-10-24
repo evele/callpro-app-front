@@ -29,7 +29,6 @@
             <div>
                 <span v-if="props.isError" style="color: red;">Error: {{ props.errorMessage
                     }}</span>
-                <span v-if="props.isSuccess" style="color: green;">Group successfully created!</span>
             </div>            
         </div>
         <template #footer>
@@ -91,11 +90,9 @@ const open = () => {
 }
 
 
-const emit = defineEmits(['update:saveGroup'])
+const emit = defineEmits(['update:saveGroup','update:selectedGroup'])
 
 const save_new_group = () => {
-    console.log(props.selectedGroup)
-    console.log("save new group")
     if (!groupName.value || !launchID.value) {
         alert('Group Name and Phone Launch ID are required.');
         return;
@@ -108,6 +105,17 @@ const save_new_group = () => {
 
     }
     emit('update:saveGroup', dataToSend);
+    setTimeout(() => {
+        close();        
+    }, 2000); 
+    
+}
+
+const close = () => {    
+    visible.value = false;
+    groupName.value = '';
+    launchID.value = null;
+    groupID.value = null;        
 }
 
 
