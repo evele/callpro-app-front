@@ -119,3 +119,18 @@ export type GetDNCContactsAPIResponse = {
 export async function getDNCContacts(data: DNCContactFilter): Promise<GetDNCContactsAPIResponse | APIResponseError> {
     return await fetchWrapper.post(GET_DNC_CONTACTS_FILTERED_URL, data) as GetDNCContactsAPIResponse | APIResponseError
 }
+
+/* ----- Add DNC Contact ----- */
+export async function addDNCContact(data: string): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(ADD_DNC_CONTACT_URL, data) as AddDNCContactAPIResponse | APIResponseError
+}
+
+/* ----- Send conctact to trash ----- */
+export async function sendContactToTrash(data: string[]): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(SEND_CONTACT_TO_TRASH_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Remove number from DNC ----- */
+export async function removeNumberFromDNC(data: string[]): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(REMOVE_NUMBER_FROM_DNC_URL, data) as APIResponseSuccess | APIResponseError
+}

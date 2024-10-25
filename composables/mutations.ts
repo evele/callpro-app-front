@@ -80,6 +80,37 @@ export const useAddNumberToGroup = () => {
   })
 }
 
+export const useAddDNCContact = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: string) => addDNCContact(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+    }
+  })
+}
+
+export const useSendContactToTrash = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: string[]) => sendContactToTrash(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
+export const useRemoveNumberFromDNC = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: string[]) => removeNumberFromDNC(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+    }
+  })
+}
+
 /* ----- Settings ----- */
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()

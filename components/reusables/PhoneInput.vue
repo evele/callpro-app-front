@@ -1,15 +1,15 @@
 <template>
-    <div v-if="!is_international" class="w-full">
+    <div v-if="!is_international" class="relative w-full flex">
         <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error" @keyup="handleKeyup" @update:model-value="updateLocalPhoneNumberModel"
         mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 rounded-[30px] transition-colors" 
         />
-        <span v-if="show_phone_number_error" class="text-red-500 text-sm">Invalid area code</span>
+        <span v-if="show_phone_number_error" class="text-red-500 absolute left-0 top-full">Invalid area code</span>
     </div>
     
-    <div v-else class="w-full">
+    <div v-else class="relative w-full flex">
         <InputText ref="intPhoneNumberRef" :model-value="localIntPhoneNumberModel" :invalid="show_int_phone_number_error" maxlength="20" @update:model-value="updateLocalIntPhoneNumberModel"
             class="w-full py-2 px-4 rounded-[30px] transition-colors" />
-        <span v-if="show_int_phone_number_error" class="text-red-500 text-sm">Invalid phone number</span>
+        <span v-if="show_int_phone_number_error" class="text-red-500 absolute left-0 top-full">Invalid phone number</span>
     </div>
 </template>
 

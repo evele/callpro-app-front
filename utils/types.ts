@@ -21,6 +21,10 @@ export type APIResponseError = {
   validation_error?: Record<string, string>
 }
 
+export type APIResponseSuccess = {
+  result: true
+}
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number
