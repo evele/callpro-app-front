@@ -41,7 +41,6 @@
                         </div>
                     </section>
 
-                    <p v-if="(showError && isError) || (showError && (uploadedSuccess && !uploadedData?.result))" class="text-no-contacts">Something went wrong!</p>
 
                     <div v-if="!has_uploaded" class="modal__info">
                         <p>Accepted format files: .csv, .xlsx</p>

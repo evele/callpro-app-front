@@ -52,11 +52,11 @@ export type ContactPhoneNumber = PhoneNumber & {
 }
 
 export type ContactDNC = {
-  dnc: number;
+  dnc: '1' | '2';
   first_name: StringOrNull;
   last_name: StringOrNull;
   number: string;
-  number_id: NumberOrNull;
+  number_id: StringOrNull;
 }
 
 // Type for Group Contacts

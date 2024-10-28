@@ -175,6 +175,26 @@ export const useFetchGetCustomGroups = () => {
   })
 }
 
+export function useFetchDownloadContacts(group_id:Ref<string>,enabled: boolean = true) {  
+  const dataToSend = computed(() => ({
+    group_id: group_id.value
+  }));
+
+  return useQuery({
+    queryKey: ['download_contacts_file', dataToSend.value],
+    queryFn: () => downloadContactsFile(dataToSend.value),
+    enabled,
+  });
+}
+
+export function useFetchDownloadDNCContacts() {  
+  return useQuery({
+    queryKey: ['download_dnc_contacts_file'],
+    queryFn: () => downloadDNCContactsFile(),
+    enabled: false,
+  });
+}
+
 /* ----- Did numbers ----- */
 export const useFetchDidAndTollFreeNumbers = () => {
   return useQuery({
@@ -221,17 +241,4 @@ export const useFetchSms = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerP
     queryFn: () => getSmsList(dataToSend.value), 
 
   })
-}
-
-
-export function useFetchDownloadContacts(group_id:Ref<string>,enabled: boolean = true) {  
-  const dataToSend = computed(() => ({
-    group_id: group_id.value
-  }));
-
-  return useQuery({
-    queryKey: ['download_contacts_file', dataToSend.value],
-    queryFn: () => downloadContactsFile(dataToSend.value),
-    enabled,
-  });
 }

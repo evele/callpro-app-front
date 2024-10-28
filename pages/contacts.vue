@@ -53,11 +53,13 @@
 
     const { data: dnc_contacts, isLoading: dnc_is_loading, isSuccess: dnc_is_success, refetch: dnc_refetch } = useFetchDNCContacts(page,show,search)
 
-    watch(dnc_contacts, (updated_data: GetDNCContactsAPIResponse | APIResponseError) => {
-        if(!updated_data?.result) {
-            dnc_total_contacts.value = -1
+    const dnc_contacts_value = computed(() => dnc_contacts.value);
+
+    watch(dnc_contacts_value, (updated_data: GetDNCContactsAPIResponse | APIResponseError | undefined) => {
+        if (updated_data && updated_data?.result) {
+            dnc_total_contacts.value = updated_data.dnc_total_contacts;
         } else {
-            dnc_total_contacts.value = updated_data?.dnc_total_contacts
+            dnc_total_contacts.value = -1;
         }
     });
     /* ----- DNC Contacts ----- */

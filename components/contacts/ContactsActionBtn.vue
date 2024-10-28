@@ -18,7 +18,7 @@
 <script setup lang="ts">
     const props = defineProps({
         text: { type: String, required: true },
-        count: { type: Number, required: false, default: undefined },
+        count: { type: [Number, null], required: false, default: undefined },
         icon: { type: Object, required: true },
         iconColor: { type: String, required: true },
         iconBg: { type: String, required: true },

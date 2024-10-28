@@ -16,14 +16,17 @@
                 </div>
 
                 <div class="flex gap-2 md:gap-4">
-                    <Button type="button" class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none" @click="console.log('upload')">
+                    <Button type="button" class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none" @click="open_upload_dnc_contact">
                         <UploadSVG class="w-5 h-5 text-[#757575]" />
                         <span class="font-semibold text-sm md:text-base">Upload file</span>
                     </Button>
 
-                    <Button type="button"class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none" @click="download()">
-                        <DownloadSVG class="text-[#757575]" />
-                        <span class="font-semibold text-sm md:text-base">Download list</span>
+                    <Button type="button"class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none" @click="download_list">
+                        <ProgressSpinner v-if="is_downloading" strokeWidth="8" fill="transparent" class="h-5 w-5 dark-spinner"
+                            animationDuration=".5s" aria-label="Adding contact to DNC"                             
+                        />
+                        <DownloadSVG v-else class="text-[#757575]" />
+                        <span class="font-semibold text-sm md:text-base">{{ is_downloading ? 'Downloading' : 'Download list' }}</span>
                     </Button>
                 </div>
             </div>
@@ -69,7 +72,7 @@
                                         value: 'This number belongs to a contact',
                                         pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
                                     }"
-                                    class="absolute -right-4 text-xs bg-[#49454F] text-white py-[1px] px-[4px] rounded-xl font-medium leading-none"> 
+                                    class="absolute -right-4 text-xs bg-[#49454F] text-white pt-[2px] pb-[1px] px-[4px] rounded-xl font-medium leading-none"> 
                                     ?
                                 </span>
                             </div>
@@ -109,7 +112,7 @@
                         <Button @click="add_new_number" :class="[ add_is_pending ? 'w-32' : 'w-28']" class="bg-[#1D192B] border-none rounded-xl text-white hover:bg-[#322F35] disabled:bg-[#848287]"
                             :disabled="disabled_add_new_btn">
                             <div class="flex items-center gap-2" v-if="add_is_pending">
-                                <ProgressSpinner strokeWidth="8" fill="transparent" class="h-5 w-5"
+                                <ProgressSpinner strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner"
                                  animationDuration=".5s" aria-label="Adding contact to DNC"                             
                                 />
                                 Adding
@@ -129,18 +132,22 @@
                 </footer>
             </div>
         </template>
+
         <ConfirmDialog class="confirm-dialog">
             <template #message>
-                <p class="my-4 text-lg font-semibold">{{ message_text }}</p>
+                <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
             </template>
         </ConfirmDialog>
         <Toast />
+
+        <ModalUploadDNCContacts ref="uploadDNCContactModal" />
     </Dialog>
 </template>
 
 <script setup lang="ts">
     import { useConfirm } from "primevue/useconfirm";
     import { useToast } from 'primevue/usetoast';
+    import type { QueryObserverResult } from '@tanstack/vue-query'
 
     const confirm = useConfirm();
     const toast = useToast();
@@ -152,20 +159,18 @@
     const search = ref('')
 
     const selected_contacts = ref([])
-    const selected_group = ref('dnc') // TODO: PREGUNTAR POR ESTO
-
     const new_number = ref('')
 
     const { data: dnc_contacts, isLoading: dnc_is_loading } = useFetchDNCContacts(page,show,search)
     const { mutate: add_dnc_contact, isPending: add_is_pending } = useAddDNCContact()
     const { mutate: send_to_trash, isPending: trash_is_pending } = useSendContactToTrash()
     const { mutate: remove_from_dnc, isPending: remove_is_pending } = useRemoveNumberFromDNC()
-    const { refetch: download } = useFetchDownloadContacts(selected_group.value, false) //TODO: REEMPLAZAR ESTO CON FUNCION NUEVA PARA DNC
+    const { refetch: download, isFetching: is_downloading } = useFetchDownloadDNCContacts()
 
     type FormatedContact = {
-        name: string,
+        name: StringOrNull,
         number: string,
-        number_id: string | null,
+        number_id: StringOrNull,
         dnc: '1' | '2'
     }
 
@@ -173,7 +178,7 @@
     const dnc_contacts_data = computed(() => {
         if(!dnc_contacts?.value?.result) return { dnc_contacts: [], dnc_total_contacts: 0 }
 
-        const formatted_contacts: FormatedContact = dnc_contacts?.value?.dnc_contacts.map((contact: ContactDNC) => {
+        const formatted_contacts: FormatedContact[] = dnc_contacts?.value?.dnc_contacts.map((contact: ContactDNC) => {
             const { first_name, last_name, number, ...rest } = contact;
             return {
                 name: show_full_name(first_name, last_name),
@@ -296,12 +301,31 @@
         })
     }
 
+    const download_list = () => {
+        download()
+            .then((result: QueryObserverResult) => {
+                if (result.data) {
+                    show_success_toast('Success!', 'List successfully downloaded!');
+                } else {
+                    show_error_toast('Oops...', 'Error downloading list...');
+                }
+            })
+            .catch(() => {
+                show_error_toast('Oops...', 'Error downloading list...');
+            });
+    }
+
+    const uploadDNCContactModal = ref(false);
+    const open_upload_dnc_contact = () => uploadDNCContactModal.value.open();
+
     const open = () => {
         visible.value = true;
     }
 
     const close = () => {
         visible.value = false;
+        selected_contacts.value = []
+        search.value = ''
     }
 
     defineExpose({ open });
@@ -332,9 +356,15 @@
         height: 60px;
     }
 }
-::v-deep(.p-progressspinner) {
+::v-deep(.light-spinner) {
     .p-progressspinner-circle {
         stroke: white!important;
+    }
+}
+
+::v-deep(.dark-spinner) {
+    .p-progressspinner-circle {
+        stroke: #757575!important;
     }
 }
 </style>
