@@ -53,11 +53,14 @@
 </template>
 
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query';
 import EditIconSVG from "@/components/svgs/EditIconSVG.vue"
 import AllSVG from "@/components/svgs/AllSVG.vue";
 import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
 import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
+
+const queryClient = useQueryClient();
 
 const DefaultGroupsButtons = [
     { text: 'ALL', value: Math.floor(Math.random() * 100), icon: AllSVG },
@@ -109,7 +112,7 @@ const handlerSaveGroup = (dataToSend: ContactGroup) => {
                 name: dataToSend.name,
                 launchID: dataToSend.phone_launch_id
             });
-            fetch_groups_data();
+            queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
 
         }
     });
