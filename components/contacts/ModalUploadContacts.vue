@@ -47,7 +47,7 @@
                                     <template v-for="contact in contacts" :key="contact.contact_id">
                                     <tr v-for="(number,index) in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
                                         <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">
-                                            <Checkbox v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
+                                            <Checkbox v-if="contact.valid"  v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
                                         </td>
                                         <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
                                         <td class="px-4 py-2">{{ number.number }}</td>
@@ -78,7 +78,7 @@
 
                     <p v-if="savedSuccess && showSuccess" class="text-success">Contacts Saved!</p>
                     <footer class="modal__footer">
-                        <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending ">
+                        <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || selected_contacts_ids.length == 0">
                             {{ !savedIsPending ? 'Save' : 'Saving...' }}
                         </Button>
                     </footer>
@@ -208,13 +208,15 @@
             return contacts.value
                 .filter(contact => selected_contacts_ids.value.includes(contact.contact_id))
                 .flatMap(contact => 
-                contact.numbers.map(number => ({
-                    number: number.number,
-                    first_name: contact.first_name || '',
-                    last_name: contact.last_name || '',
-                    contact_id: contact.contact_id,
-                    number_id: number.number_id
-                }))
+                    contact.numbers
+                    .filter(number => number.valid === true)
+                    .map(number => ({
+                        number: number.number,
+                        first_name: contact.first_name || '',
+                        last_name: contact.last_name || '', 
+                        contact_id: contact.contact_id,
+                        number_id: number.number_id
+                    }))
             );
         };  
     
