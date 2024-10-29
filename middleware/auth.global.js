@@ -11,7 +11,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   }
 
   if(authStore.isLoggedIn && isPublicPage){
-    return navigateTo("/")
+    return navigateTo("/dashboard")
   }
 })
 
