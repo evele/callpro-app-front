@@ -47,7 +47,7 @@
 
     /* ----- DNC Contacts ----- */
     const page = ref(1)
-    const show = ref(10)
+    const show = ref(0)
     const search = ref('')
     const dnc_total_contacts = ref<number | null>(null)
 

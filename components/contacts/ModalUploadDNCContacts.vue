@@ -1,9 +1,9 @@
 <template>
-    <Dialog v-model:visible="show_modal" :closable="false" class="w-full max-w-[850px] mx-4 flex flex-col gap-4 md:gap-7">
+    <Dialog v-model:visible="show_upload_dnc_modal" modal :draggable="false" :closable="false" class="w-full max-w-[850px] mx-4 flex flex-col gap-4 md:gap-7">
         <template #header>
             <header class="w-full flex justify-between pb-5">
                 <h2 class="flex items-center gap-4 font-bold text-lg text-black">Upload new file <ChevronDownSVG /></h2>
-                <Button @click="close = false" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
+                <Button @click="close_upload_dnc_modal" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
             </header>
             <Divider class="absolute left-0 top-[75px]" />
         </template>
@@ -43,17 +43,18 @@
 <script setup lang="ts">
     const { mutate: uploadContact, isPending } = useUploadDNCContact();
 
-    const show_modal = ref(false);
+    const show_upload_dnc_modal = ref(false);
 
-    const open = () => {
-        show_modal.value = true;
+    const open_upload_dnc_modal = () => {
+        show_upload_dnc_modal.value = true;
     }
 
-    const close = () => {
-        show_modal.value = false;
+    const close_upload_dnc_modal = () => {
+        show_upload_dnc_modal.value = false;
     }
 
-    defineExpose({ open });
+    defineExpose({ open_upload_dnc_modal });
+    const emit = defineEmits(['show_toast']);
 
     type UploadContactData = {
         file: File;
@@ -81,13 +82,24 @@
  
         const data_to_send = createFormData(data);
 
-        // TODO: ESTÁ ANDANDO, TENGO QUE AGREGAR TOAST Y CLOSE IF SUCCESS
-        uploadContact(data_to_send);
+        uploadContact(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                response.result ? emit('show_toast', 'success') : emit('show_toast', 'error')
+                close_upload_dnc_modal()
+            },
+            onError: () => {
+                close_upload_dnc_modal()
+                emit('show_toast', 'error')
+            }
+        });
     };
 
 </script>
 
 <style scoped lang="scss">
+::v-deep(.p-fileupload-file-list) {
+    display: none;
+}
    
     .modal__dropfile {
         padding: 0 26px;

@@ -46,8 +46,12 @@ export const useUploadContact = () => {
 }
 
 export const useUploadDNCContact = () => {
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: FormData) => uploadDNCContactCSV(data)
+    mutationFn: (data: FormData) => uploadDNCContactCSV(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+    }
   })
 }
 

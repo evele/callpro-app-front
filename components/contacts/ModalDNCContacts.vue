@@ -1,5 +1,5 @@
 <template>
-   <Dialog v-model:visible="visible" modal :closable="false" contentStyle="overflow: hidden;" class="w-full max-w-[850px] mx-4 flex flex-col gap-4 md:gap-7 dnc-modal">
+   <Dialog v-model:visible="show_dnc_modal" modal :draggable="false" :closable="false" contentStyle="overflow: hidden;" class="w-full max-w-[850px] mx-4 flex flex-col gap-4 md:gap-7 dnc-modal">
         <template #header>
             <header class="w-full flex justify-between pb-5">
                 <h2 class="flex items-center gap-4 font-bold text-lg text-black">Add new contact <ChevronDownSVG /></h2>
@@ -8,7 +8,7 @@
             <Divider class="absolute left-0 top-[75px]" />
         </template>
 
-        <section class="flex flex-col gap-4 md:gap-7 overflow-hidden">
+        <section class="flex flex-col gap-4 md:gap-7 overflow-hidden flex-grow">
             <div class="flex flex-col gap-4 sm:flex-row sm:gap-0 justify-between">
                 <div class="relative inline-block">
                     <SearchSVG class="absolute left-[10px] top-[11px]"/>
@@ -46,15 +46,15 @@
                 </Button>
             </div>
             
-            <div>
+            <div class="flex-grow overflow-hidden">
+                <ProgressBar v-if="is_fetching_dnc" mode="indeterminate" style="height: 6px"></ProgressBar>
                 <DataTable
                     v-model:selection="selected_contacts" 
                     :value="dnc_contacts_data.dnc_contacts" 
-                    scrollable 
-                    scrollHeight="500px"
-                    scrollDirection="both"
+                    scrollable
+                    scrollHeight="calc(70vh - 280px)"
                     dataKey="number" 
-                    class="dnc-table pb-20 mb-20"
+                    class="dnc-table"
                     stripedRows
                     :rowClass="rowClass"
                     selectionMode="multiple"
@@ -104,10 +104,12 @@
         </section>
 
         <template #footer>
-            <div class="flex flex-col w-full">
+            <div class="flex flex-col justify-between w-full h-28">
                 <form @submit.prevent class="flex justify-end items-center gap-4 w-full">
                     <div class="flex gap-4">
-                        <PhoneInput :model-value="new_number" @update:modelValue="(v: string) => new_number = v" />
+                        <PhoneInput :model-value="new_number" @update:modelValue="(v: string) => new_number = v" 
+                            :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val"   
+                        />
                         
                         <Button @click="add_new_number" :class="[ add_is_pending ? 'w-32' : 'w-28']" class="bg-[#1D192B] border-none rounded-xl text-white hover:bg-[#322F35] disabled:bg-[#848287]"
                             :disabled="disabled_add_new_btn">
@@ -125,7 +127,7 @@
                     </div>
                 </form>
 
-                <footer class="flex justify-center w-full font-bold mt-7">
+                <footer class="flex justify-center w-full font-bold">
                     <Button @click="close" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
                         Ready
                     </Button>
@@ -140,7 +142,7 @@
         </ConfirmDialog>
         <Toast />
 
-        <ModalUploadDNCContacts ref="uploadDNCContactModal" />
+        <ModalUploadDNCContacts ref="uploadDNCContactModal" @show_toast="handle_show_upload_toast" />
     </Dialog>
 </template>
 
@@ -153,15 +155,17 @@
     const toast = useToast();
     const message_text = ref('')
 
-    const visible = ref(false);
+    const show_dnc_modal= ref(false);
     const page = ref(1)
-    const show = ref(10)
+    const show = ref(0)
     const search = ref('')
 
     const selected_contacts = ref([])
     const new_number = ref('')
+    const form_action = ref('')
+    const has_phone_number_error = ref(false)
 
-    const { data: dnc_contacts, isLoading: dnc_is_loading } = useFetchDNCContacts(page,show,search)
+    const { data: dnc_contacts, isLoading: dnc_is_loading, isFetching: is_fetching_dnc } = useFetchDNCContacts(page,show,search)
     const { mutate: add_dnc_contact, isPending: add_is_pending } = useAddDNCContact()
     const { mutate: send_to_trash, isPending: trash_is_pending } = useSendContactToTrash()
     const { mutate: remove_from_dnc, isPending: remove_is_pending } = useRemoveNumberFromDNC()
@@ -176,6 +180,7 @@
 
     // Format the number to show in the table
     const dnc_contacts_data = computed(() => {
+        selected_contacts.value = []
         if(!dnc_contacts?.value?.result) return { dnc_contacts: [], dnc_total_contacts: 0 }
 
         const formatted_contacts: FormatedContact[] = dnc_contacts?.value?.dnc_contacts.map((contact: ContactDNC) => {
@@ -187,7 +192,7 @@
             }
         })
 
-        return { dnc_contacts: formatted_contacts, dnc_total_contacts: dnc_contacts?.value?.dnc_total_contacts }
+        return { dnc_contacts: formatted_contacts.reverse(), dnc_total_contacts: dnc_contacts?.value?.dnc_total_contacts }
     })
     
     // Debounce the search input
@@ -202,7 +207,7 @@
 
     const disabled_remove_from_dnc_btn = computed(() => selected_contacts.value.length && selected_contacts.value.some((contact: FormatedContact) => contact.dnc !== '2'))
     const disabled_send_to_trash_btn = computed(() => selected_contacts.value.length && selected_contacts.value.some((contact: FormatedContact) => contact.number_id !== null))
-    const disabled_add_new_btn = computed(() => !new_number.value)
+    const disabled_add_new_btn = computed(() => !new_number.value || has_phone_number_error.value)
 
     const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 });
     const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 });
@@ -284,6 +289,7 @@
 
     // Add new number to DNC list
     const add_new_number = () => {
+        form_action.value = ''
         const data_to_send = {
             number: format_number_to_send(new_number.value)
         }
@@ -292,6 +298,7 @@
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
                     new_number.value = ''
+                    form_action.value = 'clear'
                     show_success_toast('Success!', 'Number successfully added!')
                 } else {
                     show_error_toast('Oops...', 'Error adding number...')
@@ -315,17 +322,28 @@
             });
     }
 
-    const uploadDNCContactModal = ref(false);
-    const open_upload_dnc_contact = () => uploadDNCContactModal.value.open();
+    const uploadDNCContactModal = ref();
+    const open_upload_dnc_contact = () => uploadDNCContactModal.value.open_upload_dnc_modal();
+
+    const handle_show_upload_toast = (type: 'success' | 'error') => {
+        if(type === 'success') {
+            show_success_toast('Success!', 'File successfully uploaded!');
+        } else {
+            show_error_toast('Oops...', 'Error uploading file...');
+        }
+    }
 
     const open = () => {
-        visible.value = true;
+        show_dnc_modal.value = true;
+        form_action.value = ''
     }
 
     const close = () => {
-        visible.value = false;
+        show_dnc_modal.value = false;
         selected_contacts.value = []
         search.value = ''
+        new_number.value = ''
+        form_action.value = 'clear'
     }
 
     defineExpose({ open });
