@@ -1,15 +1,15 @@
 <template>
-    <div v-if="!is_international" class="w-full">
-        <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error" @keyup="handleKeyup" @update:model-value="updateLocalPhoneNumberModel"
+    <div v-if="!is_international" class="relative w-full flex">
+        <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error || numberError.length > 0" @keyup="handleKeyup" @update:model-value="updateLocalPhoneNumberModel"
         mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 rounded-[30px] transition-colors" 
         />
-        <span v-if="show_phone_number_error" class="text-red-500 text-sm">Invalid area code</span>
+        <span v-if="show_phone_number_error || numberError.length" class="text-red-500 absolute left-0 top-full">{{ numberError.length ? numberError : 'Invalid area code' }}</span>
     </div>
     
-    <div v-else class="w-full">
-        <InputText ref="intPhoneNumberRef" :model-value="localIntPhoneNumberModel" :invalid="show_int_phone_number_error" maxlength="20" @update:model-value="updateLocalIntPhoneNumberModel"
+    <div v-else class="relative w-full flex">
+        <InputText ref="intPhoneNumberRef" :model-value="localIntPhoneNumberModel" :invalid="show_int_phone_number_error || numberError.length > 0" maxlength="20" @update:model-value="updateLocalIntPhoneNumberModel"
             class="w-full py-2 px-4 rounded-[30px] transition-colors" />
-        <span v-if="show_int_phone_number_error" class="text-red-500 text-sm">Invalid phone number</span>
+        <span v-if="show_int_phone_number_error || numberError.length" class="text-red-500 absolute left-0 top-full">{{ numberError.length ? numberError : 'Invalid phone number' }}</span>
     </div>
 </template>
 
@@ -18,6 +18,8 @@
 
     const props = defineProps({
         modelValue: { type: String, default: '' },
+        numberError: { type: String, required: false, default: '' },
+        formAction: { type: String, required: false, default: '' }
     });
 
     onMounted(() => {
@@ -26,7 +28,6 @@
         }
     });
 
-    
     const generalStore = useGeneralStore()
     const phoneNumberRef:Ref<HTMLInputElement | null> = ref(null)
     const intPhoneNumberRef:Ref<HTMLInputElement | null> = ref(null)
@@ -37,6 +38,24 @@
     const show_phone_number_error = ref(false);
     const show_int_phone_number_error = ref(false);
 
+    watch(() => props.formAction, (action: string) => {
+        if(action === 'clear') {
+            is_international.value = false;
+            localIntPhoneNumberModel.value = props.modelValue;
+            localPhoneNumberModel.value = props.modelValue;
+        }
+
+        if(action === 'fill') {
+            if (props.modelValue.startsWith('+')) {
+                is_international.value = true;
+                localIntPhoneNumberModel.value = props.modelValue;
+            } else {
+                is_international.value = false;
+                localPhoneNumberModel.value = props.modelValue;
+            }
+        }
+    });
+
     const handleKeyup = (e: KeyboardEvent) => {
         if (e.key === '+') {
             is_international.value = true;
@@ -46,7 +65,7 @@
         }
     }
 
-    const emit = defineEmits(["update:modelValue"])
+    const emit = defineEmits(["update:modelValue", "hasError"]);
 
     const updateLocalPhoneNumberModel = (value: string) => {
         localPhoneNumberModel.value = value
@@ -58,6 +77,7 @@
             show_phone_number_error.value = !generalStore.area_codes.some((item: any) => item.area_code === number_area_code);
         }
         emit('update:modelValue', localPhoneNumberModel.value)
+        emit('hasError', show_phone_number_error.value)
     }
 
     const updateLocalIntPhoneNumberModel = (value: string | undefined) => {
@@ -73,5 +93,6 @@
             show_int_phone_number_error.value = !regex.test(localIntPhoneNumberModel.value);
         }
         emit('update:modelValue', localIntPhoneNumberModel.value)
+        emit('hasError', show_int_phone_number_error.value)
     }
 </script>
