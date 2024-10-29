@@ -15,14 +15,14 @@
             </div>
         </div>
         <!-- Popover desplegable -->
-        <Popover ref="popover">
+        <Popover ref="popover" className="flex w-[200px] p-0 border-1 m-0 bg-white rounded-xl ">
             
-            <ul class="list-none  min-w-min w-full">
-                <template v-for="(item, index) in options">
+            <ul className="list-none  min-w-min w-full p-0 m-0">
+                <template v-for="(item, index) in options" className="m-0">
                     <li v-if="item.id != selectedOption" :key="index"
-                        class="cursor-pointer hover:bg-black hover:text-white transition-all duration-200 rounded-md p-0"
+                        className="cursor-pointer hover:bg-black hover:text-white transition-all duration-200 p-0 m-0 "
                         @click="handleOptionClick(item.id)">
-                        <div> 
+                        <div className="w-full py-0 my-0"> 
                             {{ item.texto }}
                         </div>
                     </li>
@@ -71,11 +71,11 @@ const handleOptionClick = (item_id) => {
 
 li {
     height: 100%; 
-    width: 100%;  
+    width: 100%;        
 }
 
 li:hover {
     background-color: black;
-    color: white; 
+    color: white;     
 }
 </style>
