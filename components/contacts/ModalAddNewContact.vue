@@ -9,30 +9,30 @@
         </template>
 
         <div v-if="contact_numbers.length" class="flex flex-wrap gap-2 mt-4 mb-2">
-            <div v-for="(number, i) in contact_numbers" :key="i" class="px-3 pb-1 pt-[5px] text-sm rounded-full bg-[#1D192B] w-fit text-white">
-                <p><span class="rounded-full py-[2px] px-[5px] bg-white text-black text-xs mr-1">{{ i + 1 }}</span> {{ number.number }}</p>            
-            </div>
+            <Chip v-for="(number, i) in contact_numbers" :key="i" class="bg-[#1D192B] text-white text-sm">
+                <template #default>
+                    <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1">{{ i + 1 }}</span>
+                    {{ number.number }}
+                </template>
+            </Chip>
         </div>
 
         <form @submit.prevent class="new-contact-form flex flex-col gap-5 sm:gap-6" :class="[{ 'mt-5': !contact_numbers.length}]">
-            <p v-if="isSuccess" class="text-green-500">Success!</p>
-            <p class="text-red-500" v-if="isError">Something went wrong.</p>
-
             <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                 <div class="w-full">
                     <label for="contact-name" class="text-lg text-black">Name</label>
-                    <InputText type="text" id="contact-name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" :disabled="current_position > 0" />
+                    <InputText type="text" id="contact-name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
                 </div>
 
                 <div class="w-full">
                     <label for="contact-surname" class="text-lg text-black">Surname</label>
-                    <InputText type="text" id="contact-surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" :disabled="current_position > 0" />
+                    <InputText type="text" id="contact-surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
                 </div>
             </div>
 
             <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                 <div class="w-full">
-                    <label for="contact-phone" class="text-lg text-black">Phone 1*</label>
+                    <label for="contact-phone" class="text-lg text-black">Phone {{current_position + 1}}*</label>
                     <PhoneInput class="mt-[2px]" :model-value="new_contact.numbers.number" @update:modelValue="(v: string) => new_contact.numbers.number = v" 
                         :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
                 </div>
@@ -79,13 +79,16 @@
                 </Button>
             </footer>
         </template>
+        <Toast />
     </Dialog>
 </template>
 
 <script setup lang="ts">
     import { useQueryClient } from '@tanstack/vue-query'
+    import { useToast } from 'primevue/usetoast';
 
     const queryClient = useQueryClient()
+    const toast = useToast()
 
     const visible = ref(false);
     const number_error = ref('');
@@ -94,7 +97,7 @@
     const has_phone_number_error = ref(false)
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
-    const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact() 
+    const { mutate: saveContact, isPending, reset } = useSaveContact() 
 
     const empty_contact: ContactBeforeToSave = {
         first_name: '',
@@ -170,6 +173,12 @@
     const validate_number_and_type = () => {
         let is_invalid = false
 
+        if(contact_numbers.value.some((number: ContactNumber) => number.number === new_contact.numbers.number)) {
+            number_error.value = 'This number is already added.'
+            is_invalid = true
+            return is_invalid
+        }
+
         if(!new_contact.numbers.number || !new_contact.numbers.type || has_phone_number_error.value) {
             if(!new_contact.numbers.number) {
                 number_error.value = 'The Number field is required.'
@@ -183,8 +192,9 @@
     }
 
     const add_new = async () => {
-        form_action.value = 'clear'
         if(validate_number_and_type()) return
+
+        form_action.value = 'clear'
         
         contact_numbers.value.push({
             id: 'new',
@@ -255,26 +265,17 @@
                     reset_contact()
                     form_action.value = 'clear'
                     queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+                    toast.add({ severity: 'success', summary: 'Success', detail: 'Contact saved successfully.', life: 3000 })
                     setTimeout(() => {
-                        reset()
                         close()
                     }, 2000);
+                } else if(data.validation_error) {
+                    toast.add({ severity: 'error', summary: 'Error', detail: data.validation_error ?? 'Something failed, please try again.', life: 3000 })
                 } else {
-                    if(data.validation_error && Object.keys(data.validation_error).length > 0) {
-                        const errors = Object.entries(data.validation_error)
-
-                        errors.forEach(([key, value]) => {
-                            if(key === 'contact_info[numbers][0][number]') {
-                                number_error.value = value
-                            }
-                            if(key === 'contact_info[numbers][0][type]') {
-                                type_error.value = value
-                            }
-                        })
-                        reset()
-                    }
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed, please try again.', life: 3000 })
                 }
-            }
+            },
+            onError: () => toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed, please try again.', life: 3000 })
         })
     }
 </script>
