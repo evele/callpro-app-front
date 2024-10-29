@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-    //TODO: Declare props here
     const props = defineProps({
         dncTotalNumbers: { type: [Number, null], required: true },
     })
