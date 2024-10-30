@@ -407,12 +407,12 @@ export const MyPreset = definePreset(Aura, {
           },
           slate: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 400: '#94a3b8', 500: '#64748b', 600: '#475569', 700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617' },
           purple: {
-            50:  '#f1edf4',  // Un tono más claro que purple 100
+            50:  '#EADDFF',  // Un tono más claro que purple 100
             100: '#E6E0E9',  // Este es el color base que mencionaste
             200: '#cfc2d7',  // Un poco más oscuro
             300: '#b8a4c5',  // Aún más oscuro, pero manteniendo el balance
             400: '#a085b3',  // Oscureciendo hacia tonos lavanda más intensos
-            500: '#8768a1',  // Un tono intermedio que empieza a ganar más presencia
+            500: '#6750A4',  // Un tono intermedio que empieza a ganar más presencia
             600: '#6f4b8f',  // Se acerca más a un púrpura vibrante
             700: '#58307d',  // Un púrpura fuerte y marcado
             800: '#42206b',  // Un púrpura oscuro y más intenso
@@ -435,6 +435,7 @@ export const MyPreset = definePreset(Aura, {
             950: '{violet.950}'
         },
         formField: {
+            paddingX: '1rem',
             paddingY: '0.45rem',
             borderRadius: '1.875rem'
         }
@@ -459,6 +460,18 @@ export const MyPreset = definePreset(Aura, {
         },
         popover: {
             contentPadding: 0
+        },
+        multiselect: {
+                chipBorderRadius: "0.375rem",
+            },
+        chip:{
+            colorScheme: {
+                light:{
+                    background: '{purple.50}',
+                    color: '{purple.500}'
+                }
+            } 
         }
     }
+    
 });
