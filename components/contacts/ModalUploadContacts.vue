@@ -1,5 +1,17 @@
 <template>
-    <Dialog v-model:visible="visible" pt:root:class="modal">
+    <Dialog v-model:visible="visible">
+        <template #header>
+            <h2 v-if="has_uploaded" class="modal__header--title">Upload Summary</h2>
+            <h2 v-else class="modal__header--title">Upload new file <ChevronDownSVG /></h2>        
+        </template>
+       
+        <template #footer>
+            <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || selected_contacts_ids.length == 0">
+                            {{ !savedIsPending ? 'Save' : 'Saving...' }}
+                        </Button>
+        </template>
+    </Dialog>
+    <Dialog :visible="false" pt:root:class="modal">
         <template #container>
             <div class="modal__bg"></div>
             <section class="modal__container">
