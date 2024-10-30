@@ -456,6 +456,9 @@ export const MyPreset = definePreset(Aura, {
                     textPrimaryColor: '{surface.0}'
                 }
             } 
+        },
+        popover: {
+            contentPadding: 0
         }
     }
 });
