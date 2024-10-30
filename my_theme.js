@@ -435,6 +435,7 @@ export const MyPreset = definePreset(Aura, {
             950: '{violet.950}'
         },
         formField: {
+            paddingX: '1rem',
             paddingY: '0.45rem',
             borderRadius: '1.875rem'
         }
