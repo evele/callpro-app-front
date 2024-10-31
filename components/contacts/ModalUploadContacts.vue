@@ -1,12 +1,79 @@
 <template>
-    <Dialog v-model:visible="visible">
+    <Dialog v-model:visible="visible" :draggable="false" @hide="close">
         <template #header>
-            <h2 v-if="has_uploaded" class="modal__header--title">Upload Summary</h2>
-            <h2 v-else class="modal__header--title">Upload new file <ChevronDownSVG /></h2>        
-        </template>
-       
+            <h2 v-if="has_uploaded" >Upload Summary</h2>
+            <h2 v-else >Upload new file <ChevronDownSVG /></h2>
+        </template>      
+        <section>
+                  
+            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
+                <template #content>
+                    <div v-if="has_uploaded">
+                        <div class="p-7 border border-black"><FileSVG class="text-black w-7 m-7 border border black"/></div>
+                        <div>
+                            <div>File Name</div>
+                            <ProgressBar :value="total_size_percent">
+                                
+                            </ProgressBar>
+                            <div>12%</div>
+                        </div>
+                    </div>
+                </template>
+                <template #empty>
+                        <div >
+                            <CircleSVG style="color: #E8DEF8;" />
+                            <p>Drop files here or select <span >here</span> to upload</p>
+                        </div>
+                </template>
+            </FileUpload>
+        </section>
+        <section v-if="has_uploaded">
+            <div v-if="uploadedSuccess && uploadedData?.result">
+                <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
+                    <thead class="bg-gray-100 border-b border-gray-300">
+                        <tr>
+                        <th class="px-4 py-2"> 
+                            <Checkbox :modelValue="all_selected" :indeterminate="some_selected" @change="toggle_select_all" binary/>
+                        </th>
+                        <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
+                        <th class="px-4 py-2 text-left text-gray-700">Phone</th>
+                        <th class="px-4 py-2 text-left text-gray-700 text-center">Status</th>
+                        <th class="px-4 py-2 text-left text-gray-700 text-center">Result</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template v-for="contact in contacts" :key="contact.contact_id">
+                        <tr v-for="(number,index) in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
+                            <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">
+                                <Checkbox v-if="contact.valid"  v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
+                            </td>
+                            <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
+                            <td class="px-4 py-2">{{ number.number }}</td>
+                            <td class="px-4 py-2">
+                                <CheckSVG v-if="number.valid" class="m-auto text-success"/>
+                                <ErrorIconSVG v-else class="m-auto text-danger"/>
+                            </td>
+                            <td class="px-4 py-2 text-center">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
+                        </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <p v-if="isError || (uploadedSuccess && !uploadedData?.result)">Something went wrong!</p>
+        <div v-if="!has_uploaded">
+            <p>Accepted format files: .csv, .xlsx</p>
+            <p>Your data should be in this order:</p>
+            <ul>
+                <li>Column A: First Name (optional)</li>
+                <li>Column B: Last Name (optional)</li>
+                <li>Column C: Number (required)</li>
+                <li>Column D, E, F...: Number (optional)</li>
+            </ul>
+        </div>
         <template #footer>
-            <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || selected_contacts_ids.length == 0">
+            <ProgressBar :value="total_size_percent" class="w-full"></ProgressBar>
+            <Button @click="save_contact" :disabled="savedIsPending || selected_contacts_ids.length == 0">
                             {{ !savedIsPending ? 'Save' : 'Saving...' }}
                         </Button>
         </template>
@@ -112,21 +179,6 @@
     const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending, isError,reset } = useUploadContact();
     const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData, isPending: savedIsPending } = useSaveUploadedContact();
 
-    onMounted(() => {
-        window.addEventListener('keydown', handleEscapeKey);
-    });
-
-    onUnmounted(() => {
-        window.removeEventListener('keydown', handleEscapeKey);
-    });
-
-    const handleEscapeKey = (event: KeyboardEvent) => {
-        if (event.key === 'Escape') {
-            close();
-            // TODO: change this
-        }
-    };
-
     const visible = ref(false);
     
     const contacts: Ref<ContactUploadedData[]> = ref([]);
@@ -142,14 +194,17 @@
         visible.value = true;        
     }
 
+    const total_size_percent:Ref<number> = ref(0)
+
     const close = () => {
-        visible.value = false;       
-        has_uploaded.value = false;
-        reset();   
-        contacts.value = [];
-        selected_contacts_ids.value = [];
-        showError.value = false;
-        showSuccess.value = false;        
+        visible.value = false   
+        has_uploaded.value = false
+        total_size_percent.value = 0
+        reset()
+        contacts.value = []
+        selected_contacts_ids.value = []
+        showError.value = false
+        showSuccess.value = false        
     }
 
     defineExpose({ open });
@@ -191,14 +246,17 @@
         };
         showError.value = true;
         const data_to_send = createFormData(data);
-
+        total_size_percent.value = 50
         uploadContact(data_to_send, {
             onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
-                    has_uploaded.value = true;
                     /* TODO: check if belongs to group or not (not here probbly before upload */
                     group_id.value = data.group_id || 'all';
                     contacts.value = data.contacts
+                    total_size_percent.value = 100
+                    setTimeout(() => {
+                        has_uploaded.value = true;
+                    }, 1000);
                 }
             }
         });
