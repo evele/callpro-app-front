@@ -458,6 +458,9 @@ export const MyPreset = definePreset(Aura, {
                 }
             } 
         },
+        popover: {
+            contentPadding: 0
+        },
         multiselect: {
                 chipBorderRadius: "0.375rem",
             },
