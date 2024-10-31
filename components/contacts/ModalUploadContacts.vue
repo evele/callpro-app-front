@@ -9,10 +9,16 @@
             <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
                 <template #content>
                     <div v-if="has_uploaded">
-                        <div class="p-7 border border-black"><FileSVG class="text-black w-7 m-7 border border black"/></div>
                         <div>
+                            <Avatar class="bg-white border border-black" size="xlarge" shape="circle">
+                                <template #icon>
+                                    <FileSVG class="text-black w-7"/>
+                                </template>
+                            </Avatar>
+                        </div>
+                        <div class="flex">
                             <div>File Name</div>
-                            <ProgressBar :value="total_size_percent">
+                            <ProgressBar class="w-full" :value="total_size_percent">
                                 
                             </ProgressBar>
                             <div>12%</div>
