@@ -347,7 +347,7 @@ export type Tts_Convert = {
 }
 // TODO: Ver Audio y AudioAUX para extender o algo similar
 export type Audio = {
-  id: number;
+  id: string;
   user_id: number;
   name: string;
   created_at: string;

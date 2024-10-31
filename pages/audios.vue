@@ -2,13 +2,11 @@
     <div>
         <p class="text-title">Audios Page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
-        <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
-            <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
-                <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
-                <AudioPlayer :audioUrl="audio?.full_file_url" />
-            </li>
-        </ul>
-        <div class="container-div">
+        <div v-if="isSuccess && user_audios.length">
+            <AudioPlayer :audios="user_audios" />
+        </div>
+
+        <div class="container-div mt-10">
             <label>Show older audios
                 <input type="checkbox" v-model="show_older">
             </label>
@@ -30,23 +28,24 @@
 </template>
 
 <script setup lang="ts">
-    import { useQueryClient, useQuery } from '@tanstack/vue-query'
-
-    const queryClient = useQueryClient()
-
-    
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
     const audio_id: Ref<string | null> = ref(null);
     const audio_url: Ref<string | null> = ref(null);    
     
-    
     const show_older = ref(false)
     
     const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
     const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
     const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, CALLPRO_APP_FRONT)
+
+    /* ----- Audio Player ----- */
+    const user_audios = computed(() => {
+        if(allAudiosData.value && allAudiosData.value.result) return allAudiosData.value.audios
+        return []
+    })
+    /* ----- Audio Player ----- */
 
     const convert_Text = async () => {
         audio_id.value = null
