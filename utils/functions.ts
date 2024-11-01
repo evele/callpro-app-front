@@ -73,3 +73,20 @@ export const format_contact_type = (type: OneToFour) => {
       return "";
   }
 }
+
+
+export const formatFileSize = (bytes:number) => {
+
+  const k = 1024;
+  const dm = 3;
+  const sizes = FILE_SIZES_TYPES;
+  
+  if (!bytes || bytes === 0) {
+      return `0 ${sizes[0]}`;
+  }
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+
+  return `${formattedSize} ${sizes[i]}`;
+}; 

@@ -102,7 +102,7 @@ const formatSize = (bytes) => {
     const k = 1024;
     const dm = 3;
     const sizes = $primevue.config.locale.fileSizeTypes;
-
+    console.log("sizes", sizes)
     if (bytes === 0) {
         return `0 ${sizes[0]}`;
     }

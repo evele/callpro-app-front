@@ -1,27 +1,33 @@
 <template>
-    <Dialog v-model:visible="visible" :draggable="false" @hide="close">
+    <Dialog v-model:visible="visible" :draggable="false" @hide="close" class="max-w-[850px] w-[90vw]">
         <template #header>
             <h2 v-if="has_uploaded" >Upload Summary</h2>
             <h2 v-else >Upload new file <ChevronDownSVG /></h2>
         </template>      
         <section>
-                  
             <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
-                <template #content>
-                    <div v-if="has_uploaded">
+                <template #content="{files}">
+                    <div class="flex items-center gap-16">
                         <div>
-                            <Avatar class="bg-white border border-black" size="xlarge" shape="circle">
+                            <Avatar v-if="!upload_error" class="bg-white border border-black" size="xlarge" shape="circle">
                                 <template #icon>
-                                    <FileSVG class="text-black w-7"/>
+                                    <FileSVG  class="text-black w-7"/>
+                                </template>
+                            </Avatar>
+                            <Avatar v-else class="bg-white border border-danger" size="xlarge" shape="circle">
+                                <template #icon>
+                                    <CloseSVG class="text-danger w-7"/>
                                 </template>
                             </Avatar>
                         </div>
-                        <div class="flex">
-                            <div>File Name</div>
-                            <ProgressBar class="w-full" :value="total_size_percent">
+                        <div class="w-full flex flex-col gap-4">
+                            <div class="text-xl font-light"><span class="font-medium mr-4">{{ files[0]?.name??"" }}</span>{{ formatFileSize(files[0]?.size)}} </div>
+                            <div>
+                                <ProgressBar :show-value="false" :value="total_size_percent" :pt="{value: ()=>[{'bg-danger':upload_error}]}">
+                                </ProgressBar>
+                            </div>
                                 
-                            </ProgressBar>
-                            <div>12%</div>
+                            <div class="text-lg">{{total_size_percent}}% Uploaded</div>
                         </div>
                     </div>
                 </template>
@@ -241,6 +247,8 @@
         uploadEvent(files.files);
     };
 
+    const upload_error:Ref<boolean> = ref(false)
+
     const uploadEvent = (file: File[]) => {
         contacts.value = [];
 
@@ -261,8 +269,11 @@
                     contacts.value = data.contacts
                     total_size_percent.value = 100
                     setTimeout(() => {
-                        has_uploaded.value = true;
+                        has_uploaded.value = true
                     }, 1000);
+                } else {
+                    total_size_percent.value = 99
+                    upload_error.value = true
                 }
             }
         });
@@ -317,10 +328,18 @@
             }
         })
     }
-
 </script>
 
 <style scoped lang="scss">
+
+    :deep(.p-progressbar) {
+        width: unset;
+        position: relative;
+        top: unset;
+        left: unset;
+        height: 1rem;
+    }
+
     .modal__bg {
         position: absolute;
         left: 0;
