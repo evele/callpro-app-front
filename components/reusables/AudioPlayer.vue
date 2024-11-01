@@ -8,7 +8,8 @@
                 </Button>
                 <span v-if="is_loading && selected_audio?.full_file_url === audio.full_file_url">Loading...</span>
                 <span v-else-if="is_error && selected_audio?.full_file_url === audio.full_file_url">This audio can't be played</span>
-                <span v-if="is_playing && selected_audio?.full_file_url === audio.full_file_url">Playing...</span>
+                <span v-else-if="is_playing && selected_audio?.full_file_url === audio.full_file_url">Playing...</span>
+                <span v-else-if="!is_playing && selected_audio?.full_file_url === audio.full_file_url">Paused</span>
             </li>
         </ul>
 
@@ -22,46 +23,46 @@
                 <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                     <MusicSVG class="w-5 h-5" />
                 </div>
-                <span v-if="!is_error">{{ selected_audio?.name }}</span>
-                <span v-else>Error!</span>
+                <span class="font-semibold text-[#3B383E] text-sm">{{ selected_audio?.name }}</span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-2 w-[70%]">
                 <div class="flex items-center jusity-center gap-1">
-                    <Button class="bg-transparent border-none hover:bg-gray-200">
+                    <Button class="bg-transparent border-none">
                         <template #icon>
-                            <PreviousSVG class="text-[#49454F]" @click="handle_prev_song" />
+                            <PreviousSVG class="text-[#49454F] scale-110 hover:scale-125 hover:text-[#636262] transition-all" @click="handle_prev_song" />
                         </template>
                     </Button>
-                    <Button class="bg-[#2C2C2C] border-none hover:bg-[#4d4c4c]" @click="toggle_play_pause">
-                        <template v-if="is_playing" #icon >
+                    <Button class="bg-[#2C2C2C] border-none hover:bg-[#636262] hover:scale-105 transition-all" @click="toggle_play_pause">
+                        <template v-if="!is_playing" #icon>
                             <PlaySVG class="pl-[2px] w-4 h-4 text-white" />
                         </template>
                         <template v-else #icon>
-                            <PauseSVG class="pl-[2px] w-5 h-5 text-white" />
+                            <PauseSVG class="w-5 h-5 text-white" />
                         </template>
                     </Button>
-                    <Button class="bg-transparent border-none hover:bg-gray-200">
+                    <Button class="bg-transparent border-none">
                         <template #icon>
-                            <NextSVG class="text-[#49454F]" @click="handle_next_song" />
+                            <NextSVG class="text-[#49454F] scale-110 hover:scale-125 hover:text-[#636262] transition-all" @click="handle_next_song" />
                         </template>
                     </Button>
                 </div>
 
                 <div class="flex items-center w-full gap-6">
                     <span>{{ format_seconds(current_time) }}</span>
-                    <Slider v-model="track_progress" @change="handle_track_progress" class="w-full" />
+                    <Slider v-model="track_progress" @change="handle_track_progress" class="w-full h-2" />
                     <span>{{ format_seconds(selected_audio.length) }}</span>
                 </div>
             </div>
 
             <div class="flex items-center justify-center w-[15%]">
-                <Button class="bg-transparent border-none hover:bg-gray-200">
+                <Button class="bg-transparent border-none hover:bg-gray-200" @click="toggle_mute_unmute">
                     <template #icon>
-                        <AudioSVG class="w-5 h-5 text-black" />
+                        <AudioMutedSVG v-show="volume === 0" class="w-5 h-5 text-black" />
+                        <AudioSVG v-show="volume > 0" class="w-5 h-5 text-black" />
                     </template>
                 </Button>
-                <Slider v-model="volume" class="w-24" />
+                <Slider v-model="volume" class="w-24 h-[5px]" @change="handle_change_volume" />
             </div>
         </section>
     </div>
@@ -87,6 +88,7 @@
     const show_controls = ref(false);
 
     const volume = ref(50);
+    const last_volume = ref(volume.value);
     const track_progress = ref(0);
     const current_time = ref(0);
     const is_playing = ref(false);
@@ -146,12 +148,6 @@
         }
     };
 
-    watch(volume, (newVolume: number) => {
-        if (audio.value) {
-            audio.value.volume = newVolume / 100;
-        }
-    });
-
     const update_track_progress = () => {
         if (audio.value) {
             current_time.value = audio.value.currentTime;
@@ -164,4 +160,42 @@
             audio.value.currentTime = (value / 100) * audio.value.duration;
         }
     };
+
+    const toggle_mute_unmute = () => {
+        if (audio.value) {
+            if (audio.value.volume === 0) {
+                audio.value.volume = last_volume.value / 100;
+                volume.value = last_volume.value;
+            } else {
+                last_volume.value = volume.value;
+                audio.value.volume = 0;
+                volume.value = 0;
+            }
+        }
+    };
+
+    const handle_change_volume = () => {
+        if (audio.value) {
+            audio.value.volume = volume.value / 100;
+        }
+    };
 </script>
+
+<style scoped lang="scss">
+::v-deep(.p-slider) {
+    background-color: #B2B2B2;
+
+    .p-slider-range {
+        background-color: #2C2C2C;
+        border-radius: 6px;
+    }
+
+    .p-slider-handle {
+        opacity: 0;
+    }
+
+    &:hover .p-slider-handle {
+        opacity: 1;
+    }
+}
+</style>
