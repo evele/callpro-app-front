@@ -6,6 +6,21 @@
             <AudioPlayer :audios="user_audios" />
         </div>
 
+        <ul v-if="isSuccess && user_audios.length" class="ml-2">
+            <li v-for="audio in user_audios" :key="audio.id" class="mb-2 flex gap-2 items-center">
+                <span>{{ audio.name }}</span>
+                <Button @click="select_audio(audio)" class="bg-transparent border-none text-black p-1 hover:bg-gray-300">
+                    <AudioSVG />            
+                </Button>
+                <span v-if="selected_audio && is_audio_loading && selected_audio.id === audio.id">Loading...</span>
+                <span v-else-if="selected_audio && is_audio_error && selected_audio.id === audio.id">This track can't be played</span>
+                <span v-else-if="selected_audio && is_audio_playing && selected_audio.id === audio.id">Playing...</span>
+                <span v-else-if="selected_audio && is_audio_paused && selected_audio.id === audio.id">Paused</span>
+            </li>
+        </ul>
+
+        <AudioPlayer :current-audio="selected_audio" @action="handle_player_action" />
+
         <div class="container-div mt-10">
             <label>Show older audios
                 <input type="checkbox" v-model="show_older">
@@ -45,6 +60,64 @@
         if(allAudiosData.value && allAudiosData.value.result) return allAudiosData.value.audios
         return []
     })
+
+    const selected_audio = ref<Audio | null>(null)
+    const is_audio_playing = ref(false)
+    const is_audio_loading = ref(false)
+    const is_audio_paused = ref(false)
+    const is_audio_error = ref(false)
+
+    const reset_states = () => {
+        is_audio_playing.value = false
+        is_audio_loading.value = false
+        is_audio_paused.value = false
+        is_audio_error.value = false
+    }
+
+    const select_audio = (audio: Audio) => {
+        reset_states()
+        selected_audio.value = audio
+    }
+
+    const select_previous_audio = () => {
+        if(!selected_audio.value) return
+        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === selected_audio?.value?.id)
+        const new_position = (current_position === 0) ? user_audios.value.length - 1 : current_position - 1
+        selected_audio.value = user_audios.value[new_position]
+    }
+
+    const select_next_audio = () => {
+        if(!selected_audio.value) return
+        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === selected_audio?.value?.id)
+        const new_position = (current_position === user_audios.value.length - 1) ? 0 : current_position + 1
+        selected_audio.value = user_audios.value[new_position]
+    }
+
+    const handle_player_action = (action: string) => {
+        reset_states()
+        switch(action) {
+            case 'loading':
+                is_audio_loading.value = true
+                break
+            case 'play':
+                is_audio_playing.value = true
+                break
+            case 'pause':
+                is_audio_paused.value = true
+                break
+            case 'error':
+                is_audio_error.value = true
+                break
+            case 'prev':
+                select_previous_audio()
+                break
+            case 'next':
+                select_next_audio()
+                break
+            default:
+                break
+        }
+    }
     /* ----- Audio Player ----- */
 
     const convert_Text = async () => {

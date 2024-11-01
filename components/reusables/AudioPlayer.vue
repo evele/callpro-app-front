@@ -1,19 +1,5 @@
 <template>
     <div>
-        <ul v-if="audios.length" class="ml-2">
-            <li v-for="audio in audios" :key="audio.id" class="mb-2 flex gap-2 items-center">
-                <span>{{ audio.name }}</span>
-                <Button @click="select_audio(audio.id)" class="bg-transparent border-none text-black p-1 hover:bg-gray-300">
-                    <AudioSVG />            
-                </Button>
-                
-                <span v-if="is_loading && selected_audio?.full_file_url === audio.full_file_url">Loading...</span>
-                <span v-else-if="is_error && selected_audio?.full_file_url === audio.full_file_url">This audio can't be played</span>
-                <span v-else-if="is_playing && selected_audio?.full_file_url === audio.full_file_url">Playing...</span>
-                <span v-else-if="!is_playing && selected_audio?.full_file_url === audio.full_file_url">Paused</span>
-            </li>
-        </ul>
-
         <audio ref="audio" type="audio/wav" @timeupdate="update_track_progress">
             Your browser does not support the audio element.
         </audio>
@@ -24,14 +10,14 @@
                 <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                     <MusicSVG class="w-5 h-5" />
                 </div>
-                <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ selected_audio?.name }}</span>
+                <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ currentAudio?.name }}</span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-2 sm:w-[70%] order-3 sm:order-2">
                 <div class="flex items-center jusity-center gap-1">
-                    <Button class="bg-transparent border-none">
+                    <Button class="bg-transparent border-none" @click="emit('action', 'prev')" :disabled="disabledNextPrev">
                         <template #icon>
-                            <PreviousSVG class="text-[#49454F] scale-110 hover:scale-125 hover:text-[#636262] transition-all" @click="handle_prev_song" />
+                            <PreviousSVG class="text-[#49454F] scale-110 hover:scale-125 hover:text-[#636262] transition-all" />
                         </template>
                     </Button>
                     <Button class="bg-[#2C2C2C] border-none hover:bg-[#636262] hover:scale-105 transition-all" @click="toggle_play_pause">
@@ -42,9 +28,9 @@
                             <PauseSVG class="w-5 h-5 text-white" />
                         </template>
                     </Button>
-                    <Button class="bg-transparent border-none">
+                    <Button class="bg-transparent border-none" @click="emit('action', 'next')" :disabled="disabledNextPrev">
                         <template #icon>
-                            <NextSVG class="text-[#49454F] scale-110 hover:scale-125 hover:text-[#636262] transition-all" @click="handle_next_song" />
+                            <NextSVG class="text-[#49454F] scale-110 hover:scale-125 hover:text-[#636262] transition-all" />
                         </template>
                     </Button>
                 </div>
@@ -52,7 +38,7 @@
                 <div class="flex items-center w-full gap-6">
                     <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(current_time) }}</span>
                     <Slider v-model="track_progress" @change="handle_track_progress" class="w-full h-2" />
-                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(selected_audio.length) }}</span>
+                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(currentAudio?.length) }}</span>
                 </div>
             </div>
 
@@ -61,7 +47,7 @@
                     <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                         <MusicSVG class="w-5 h-5" />
                     </div>
-                    <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ selected_audio?.name }}</span>
+                    <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ currentAudio?.name }}</span>
                 </div>
 
                 <Button class="bg-transparent border-none hover:bg-gray-200" @click="toggle_mute_unmute">
@@ -83,16 +69,21 @@
     import NextSVG from '~/components/svgs/NextSVG.vue';
 
     const props = defineProps({
-        audios: {
-            type: Array as PropType<Audio[]>,
-            required: true
+        currentAudio: {
+            type: Object as PropType<Audio | null>,
+            required: false,
+            default: null
+        },
+        disabledNextPrev: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     });
 
+    const emit = defineEmits(['action']);
+
     const audio = ref<HTMLAudioElement | null>(null);
-    const selected_audio = ref<Audio | undefined>(undefined);
-    const is_error = ref(false);
-    const is_loading = ref(false);
     const show_controls = ref(false);
 
     const volume = ref(50);
@@ -101,59 +92,37 @@
     const current_time = ref(0);
     const is_playing = ref(false);
 
-    const select_audio = async (id: string) => {
-        if (audio.value) {
-            selected_audio.value = props.audios.find((audio: Audio) => audio.id === id);
-            if (!selected_audio.value) {
-                is_error.value = true;
-                is_playing.value = false;
-                return
-            }
-            show_controls.value = true;
-            is_playing.value = false;
-            is_loading.value = true;
-            is_error.value = false;
+    watch(() => props.currentAudio, async (newAudio: Audio | null) => {
 
-            audio.value.src = selected_audio.value.full_file_url;
+        if (newAudio && audio.value) {
+            emit('action', 'loading')
+            audio.value.src = newAudio.full_file_url;
+            is_playing.value = false;
+
             try {
                 await audio.value.play();
                 is_playing.value = true;
-            } catch (error) {
-                is_error.value = true;
+                show_controls.value = true;
+                emit('action', 'play')
+            } catch {
                 is_playing.value = false;
                 show_controls.value = false;
+                emit('action', 'error');
             }
         }
-        is_loading.value = false;
-    }
+    });
 
     const toggle_play_pause = () => {
         if(audio.value === null) return;
 
-        if (is_playing.value) {
-            audio.value.pause();
+        if(is_playing.value) {
+            audio.value.pause() 
+            emit('action', 'pause')
         } else {
-            audio.value.play();
+            audio.value.play()
+            emit('action', 'play')
         }
         is_playing.value = !is_playing.value;
-    };
-
-    const handle_prev_song = () => {
-        const current_index = props.audios.findIndex((audio: Audio) => audio.id === selected_audio.value?.id);
-        if (current_index === 0) {
-            select_audio(props.audios[props.audios.length - 1].id);
-        } else {
-            select_audio(props.audios[current_index - 1].id);
-        }
-    };
-
-    const handle_next_song = () => {
-        const current_index = props.audios.findIndex((audio: Audio) => audio.id === selected_audio.value?.id);
-        if (current_index === props.audios.length - 1) {
-            select_audio(props.audios[0].id);
-        } else {
-            select_audio(props.audios[current_index + 1].id);
-        }
     };
 
     const update_track_progress = () => {
