@@ -6,6 +6,7 @@
                 <Button @click="select_audio(audio.id)" class="bg-transparent border-none text-black p-1 hover:bg-gray-300">
                     <AudioSVG />            
                 </Button>
+                
                 <span v-if="is_loading && selected_audio?.full_file_url === audio.full_file_url">Loading...</span>
                 <span v-else-if="is_error && selected_audio?.full_file_url === audio.full_file_url">This audio can't be played</span>
                 <span v-else-if="is_playing && selected_audio?.full_file_url === audio.full_file_url">Playing...</span>
@@ -18,15 +19,15 @@
         </audio>
         
 
-        <section v-if="show_controls" class="w-full bg-[#F5EFF7] fixed bottom-0 left-0 h-28 flex justify-between px-6 py-4 gap-10">
-            <div class="flex gap-2 items-center w-[15%]">
+        <section v-if="show_controls" class="w-full bg-[#F5EFF7] fixed bottom-0 left-0  flex flex-col sm:flex-row sm:justify-between px-6 py-4 sm:gap-10">
+            <div class="hidden sm:flex gap-2 items-center sm:w-[15%] order-1">
                 <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                     <MusicSVG class="w-5 h-5" />
                 </div>
-                <span class="font-semibold text-[#3B383E] text-sm">{{ selected_audio?.name }}</span>
+                <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ selected_audio?.name }}</span>
             </div>
 
-            <div class="flex flex-col items-center justify-center gap-2 w-[70%]">
+            <div class="flex flex-col items-center justify-center gap-2 sm:w-[70%] order-3 sm:order-2">
                 <div class="flex items-center jusity-center gap-1">
                     <Button class="bg-transparent border-none">
                         <template #icon>
@@ -49,13 +50,20 @@
                 </div>
 
                 <div class="flex items-center w-full gap-6">
-                    <span>{{ format_seconds(current_time) }}</span>
+                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(current_time) }}</span>
                     <Slider v-model="track_progress" @change="handle_track_progress" class="w-full h-2" />
-                    <span>{{ format_seconds(selected_audio.length) }}</span>
+                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(selected_audio.length) }}</span>
                 </div>
             </div>
 
-            <div class="flex items-center justify-center w-[15%]">
+            <div class="flex items-center justify-between sm:justify-center sm:w-[15%] order-2 sm:order-3">
+                <div class="flex flex-grow sm:hidden gap-2 items-center">
+                    <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
+                        <MusicSVG class="w-5 h-5" />
+                    </div>
+                    <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ selected_audio?.name }}</span>
+                </div>
+
                 <Button class="bg-transparent border-none hover:bg-gray-200" @click="toggle_mute_unmute">
                     <template #icon>
                         <AudioMutedSVG v-show="volume === 0" class="w-5 h-5 text-black" />
