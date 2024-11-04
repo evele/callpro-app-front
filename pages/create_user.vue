@@ -139,7 +139,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import { useAuthStore } from "@/stores"
-import SwitchSVG from '@/components/svgs/SwitchSVG.vue';
+
 
 const generalStore = useGeneralStore()
 const format_tz = (value: OneToNine) => {

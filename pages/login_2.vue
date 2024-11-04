@@ -56,7 +56,7 @@
 
 <script setup lang="ts">
 import { useAuthStore } from "@/stores"
-import SwitchSVG from '@/components/svgs/SwitchSVG.vue';
+
 definePageMeta({
     layout: false,
 })
