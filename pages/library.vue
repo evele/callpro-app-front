@@ -7,7 +7,7 @@
             <Button class="add-new-btn mx-auto" @click="open_modal">            
                 <span class="add-new-text">Modal Add Audio TTS</span>
             </Button>                       
-            <ModalAddAudioTTS ref="isModalOpen" @update:convert_text="handlerConvertText" />
+            <ModalAddAudioTTS ref="isModalOpen"/>
         </template>
     </Page>
 </template>
@@ -20,8 +20,8 @@ const open_modal = () => {
     isModalOpen.value?.open();
 };
 
-const handlerConvertText = (dataToSend: TextToConvert) => {
+// const handlerConvertText = (dataToSend: TextToConvert) => {
 
-console.log("llegando desde componente", dataToSend)
-}
+// console.log("llegando desde componente", dataToSend)
+// }
 </script>
