@@ -5,7 +5,7 @@
                 <!-- Bloque de logo y texto -->
                 <template #header>
                     <div class="mt-14 flex flex-col items-center">
-                        <img alt="user header" src="@/assets/png/logo-footer 1.png"
+                        <img alt="user header" src="@/assets/png/thecallpro.png"
                             class="git pull w-[196.97px] h-[58.924px] flex-shrink-0 bg-cover bg-center" />
                         <p class="text-xl text-[#4F378B] leading-7 mt-4">Enter your email to receive a password reset
                             link</p>
