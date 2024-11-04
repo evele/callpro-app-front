@@ -127,6 +127,11 @@ const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id
 const close = () => {
     visible.value = false;
     text_to_convert.value = "";
+    audio_id.value = null;
+    audio_url.value = null;
+    convertedAudios.value = [];
+    editingIndex.value = null;
+    audioNameTemp.value = "";
 };
 
 
@@ -160,7 +165,7 @@ const convert_Text = async () => {
 }
 
 // Función para iniciar edición
-function startEditing(index: number, currentName: string) {
+const startEditing = (index: number, currentName: string) => {
     editingIndex.value = index;
     audioNameTemp.value = currentName;
 
@@ -170,7 +175,7 @@ function startEditing(index: number, currentName: string) {
 }
 
 // Función para guardar el nombre editado
-function saveAudioName(index: number) {
+const saveAudioName = (index: number) => {
     if (!audioNameTemp.value.trim()) {
         alert("The name cannot be empty.");
         return;
@@ -191,7 +196,7 @@ function saveAudioName(index: number) {
     editingIndex.value = null;
 }
 
-function cancelEditing() {
+const cancelEditing = () => {
     editingIndex.value = null; // Restablece el índice de edición
     audioNameTemp.value = ''; // Limpia el nombre temporal si es necesario
 }
