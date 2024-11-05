@@ -41,7 +41,6 @@
                         </div>
                     </section>
 
-
                     <div v-if="!has_uploaded" class="modal__info">
                         <p>Accepted format files: .csv, .xlsx</p>
                         <p>Your data should be in this order:</p>

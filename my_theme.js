@@ -435,6 +435,7 @@ export const MyPreset = definePreset(Aura, {
             950: '{violet.950}'
         },
         formField: {
+            paddingX: '1rem',
             paddingY: '0.45rem',
             borderRadius: '1.875rem'
         }
@@ -456,6 +457,9 @@ export const MyPreset = definePreset(Aura, {
                     textPrimaryColor: '{surface.0}'
                 }
             } 
+        },
+        popover: {
+            contentPadding: 0
         },
         multiselect: {
                 chipBorderRadius: "0.375rem",
