@@ -272,7 +272,7 @@
                         has_uploaded.value = true
                     }, 1000);
                 } else {
-                    total_size_percent.value = 99
+                    total_size_percent.value = 99 
                     upload_error.value = true
                 }
             }
