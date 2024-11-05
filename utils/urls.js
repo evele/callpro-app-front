@@ -2,6 +2,8 @@
 export const GET_AUDIOS_URL = "/audios/get_audios"
 export const GET_AUDIO_URL = "/audios/get_audio"
 export const CONVERT_TEXT_TO_SPEECH_URL = "/audios/tts_convertion"
+export const SAVE_AUDIO_URL = "/audios/save_audio"
+export const DELETE_AUDIO_URL = "/audios/delete_audio"
 
 /* ----- Auth Store ----- */
 export const LOGIN_URL = "/jwtauth/login"

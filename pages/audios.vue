@@ -1,19 +1,14 @@
 <template>
-    <div>
-        <p class="text-title">Audios Page</p>        
-        <span v-if="loadingAllAudios">Loading audios...</span>
-        <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
-            <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
-                <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
-                <AudioPlayer :audioUrl="audio?.full_file_url" />
-            </li>
-        </ul>
-        <div class="container-div">
-            <label>Show older audios
-                <input type="checkbox" v-model="show_older">
-            </label>
-        </div>
-        <div>
+    <div class="p-6">
+        <p class="text-center text-2xl font-bold">Audios Page</p>     
+        <Card class="bg-white">
+            <template #content>
+                <main>
+                    <AudiosTable />
+                </main>
+            </template>  
+        </Card>
+        <div class="mt-20">
             <h3>Write some text and convert it to speech.</h3>
             <textarea cols="50" rows="10" v-model="text_to_convert" />
             <button type="button" @click="convert_Text" class="btn-convert" :disabled="isConverting">
@@ -30,21 +25,12 @@
 </template>
 
 <script setup lang="ts">
-    import { useQueryClient, useQuery } from '@tanstack/vue-query'
-
-    const queryClient = useQueryClient()
-
-    
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
     const audio_id: Ref<string | null> = ref(null);
     const audio_url: Ref<string | null> = ref(null);    
     
-    
-    const show_older = ref(false)
-    
-    const { data: allAudiosData, isLoading: loadingAllAudios, isSuccess, refetch } = useFetchGetAllAudios(show_older)
     const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
     const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, CALLPRO_APP_FRONT)
 
@@ -77,16 +63,6 @@
 </script>
 
 <style scoped>
-    .text-title {
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-    }
-    .container-div {
-        display: flex;
-        align-items: center;
-        font-size: 18px;
-    }
     .btn-convert {
         padding: .7rem 1.2rem;
         background-color: #007bff;

@@ -375,3 +375,17 @@ export type TextToConvert = {
   text: string, 
   temp: boolean    
 }
+
+export type AudioToSave = {
+  action: 'create' | 'update',
+  audio_info: {
+    audio_id: number;
+    file_name: string;
+    length: number;
+    name: string;
+  },
+}
+
+export type AudioToDelete = {
+  audio_id: number;
+}

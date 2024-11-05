@@ -10,6 +10,26 @@ export const useConvertTextToSpeech = () => {
   });
 }
 
+export const useSaveAudio = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (audio_data: AudioToSave) => saveAudio(audio_data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_all_audios'] })
+    },
+  })
+}
+
+export const useDeleteAudio = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (audio_data: AudioToDelete) => deleteAudio(audio_data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_all_audios'] })
+    },
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
