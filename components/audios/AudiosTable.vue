@@ -1,10 +1,12 @@
 <template>
     <div class="flex flex-col gap-10">
         <div class="flex justify-between w-full">
-            <div class="relative inline-block">
-                <SearchSVG class="absolute left-[10px] top-[11px]"/>
-                <InputText type="text" placeholder="Search by Name or Type" class="w-72 h-10 py-2 pl-9 pr-[10px] rounded-8" v-model="search" />
-            </div>
+            <IconField>
+                <InputIcon>
+                    <SearchSVG class="text-[#757575]" />
+                </InputIcon>
+                <InputText v-model="search" placeholder="Search by Name or Type" />
+            </IconField>
 
             <Button class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none">
                 <SortBySVG class="text-[#757575]" />
