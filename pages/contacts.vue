@@ -19,6 +19,7 @@
 <script setup lang="ts">
     const modalAddNewContact = ref()
     const modalDNCContacts = ref()
+    const selected_tab = ref(CONTACTS_ALL)
 
     /* ----- DNC Contacts ----- */
     const page = ref(1)
