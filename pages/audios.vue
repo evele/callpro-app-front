@@ -1,13 +1,42 @@
 <template>
-    <div>
+    <div class="p-6">
         <p class="text-title">Audios Page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
-        <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
-            <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
-                <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
-                <AudioPlayer :audioUrl="audio?.full_file_url" />
-            </li>
-        </ul>
+        <Card class="bg-white">
+            <template #content>
+                <section class="flex flex-wrap gap-10">
+                    <ButtonLibrary @click="handle_lbry_btn_action('upload')">
+                        <Avatar class="bg-[#E8DEF8] mb-2" size="xlarge" shape="circle">
+                            <UploadAudioSVG class="w-8 h-8 text-gray-500 text-[#4F378B]" />
+                        </Avatar>
+                        <p>Upload</p>
+                        <p>an audio</p>
+                    </ButtonLibrary>
+                    <ButtonLibrary @click="handle_lbry_btn_action('tts')">
+                        <Avatar class="bg-[#CFF7D3] mb-2" size="xlarge" shape="circle">
+                            <TextSVG class="w-8 h-8 text-gray-500 text-[#009951]" />
+                        </Avatar>
+                        <p>Add Text to</p>
+                        <p>Speech (TTS)</p>
+                    </ButtonLibrary>
+                    <ButtonLibrary @click="handle_lbry_btn_action('call')">
+                        <Avatar class="bg-[#fff1c2] mb-2" size="xlarge" shape="circle">
+                            <CallInSVG class="w-7 h-7 text-gray-500 text-[#E5A000]" />
+                        </Avatar>
+                        <p>Call In</p>
+                        <p>audio</p>
+                    </ButtonLibrary>
+                </section>
+                <main>
+                    <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
+                        <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">
+                            <span class="mt-3 has-text-weight-semibold has-text-primary is-size-5">{{ audio?.name }}</span>
+                            <AudioPlayer :audioUrl="audio?.full_file_url" />
+                        </li>
+                    </ul>
+                </main>
+            </template>  
+        </Card>
         <div class="container-div">
             <label>Show older audios
                 <input type="checkbox" v-model="show_older">
@@ -34,7 +63,6 @@
 
     const queryClient = useQueryClient()
 
-    
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
@@ -73,6 +101,20 @@
 
     const fetch_audio_data = () => {
         refetchAudioData()
+    }
+
+    const handle_lbry_btn_action = (action: string) => {
+        switch(action) {
+            case 'upload':
+                console.log('upload')
+                break
+            case 'tts':
+                console.log('tts')
+                break
+            case 'call':
+                console.log('call')
+                break
+        }
     }
 </script>
 
