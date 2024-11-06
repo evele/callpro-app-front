@@ -4,10 +4,7 @@
         <span v-if="loadingAllAudios">Loading audios...</span>
         <Card class="bg-white">
             <template #content>
-                <section class="flex flex-wrap">
-                    <InfoCardLibrary />
-                    <ButtonsLibraryContainer />
-                </section>
+                <ButtonsLibraryContainer />
                 <main>
                     <ul v-if="isSuccess  && allAudiosData && 'audios' in allAudiosData" class="ml-2 is-flex is-flex-direction-column is-gap-1">
                         <li v-if="allAudiosData?.audios?.length" v-for="audio in allAudiosData?.audios" :key="audio?.id" class="is-flex is-gap-2">

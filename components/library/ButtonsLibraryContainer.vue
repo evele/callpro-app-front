@@ -1,5 +1,6 @@
 <template>
-    <section class="flex flex-wrap gap-10">
+    <section class="flex flex-wrap gap-x-10 gap-y-6">
+        <InfoCardLibrary />
         <ButtonLibrary @click="handle_lbry_btn_action('upload')">
             <Avatar class="bg-[#E8DEF8] mb-2" size="xlarge" shape="circle">
                 <UploadAudioSVG class="w-8 h-8 text-[#4F378B]" />
