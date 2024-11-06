@@ -211,6 +211,10 @@ export type MoveNumberToGroup = AddNumberToGroup & {
   current_group_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
 }
 
+export type SendNumberToTrash = {
+  number_ids: string[]; 
+}
+
 /* ----- Packages ----- */
 export type PackageStep = {
   package_id: number;

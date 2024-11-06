@@ -32,6 +32,7 @@ export const GET_USER_CUSTOM_GROUPS_URL = "/contacts/get_user_custom_groups"
 export const UPLOAD_CONTACT_CSV_URL = "/contacts/upload_contact_csv"
 export const SAVE_UPLOADED_CONTACT_URL = "/contacts/save_uploaded_contact"
 export const DOWNLOAD_CONTACTS_FILE = "/contacts/download_contacts_as_csv"
+export const SEND_NUMBER_TO_TRASH_URL = "/contacts/delete_numbers_contacts"
 
 /* ----- Dashboard Store ----- */
 export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"

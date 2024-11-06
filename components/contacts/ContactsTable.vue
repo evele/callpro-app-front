@@ -22,10 +22,13 @@
             <template #header>
                 <header class="flex flex-col w-full gap-5 mb-4">
                     <div class="flex justify-between items-center w-full">
-                        <div class="relative inline-block">
-                            <SearchSVG class="absolute left-[10px] top-[11px]"/>
-                            <InputText type="text" placeholder="Search by Name, Phone or Group" class="w-72 h-10 py-2 pl-9 pr-[10px] rounded-8" />
-                        </div>
+
+                        <IconField class="w-full max-w-[300px]">
+                            <InputIcon>
+                                <SearchSVG class="text-[#757575]" />
+                            </InputIcon>
+                            <InputText class="py-2 w-full" placeholder="Search by Name, Phone or Group" />
+                        </IconField>
 
                         <div class="flex gap-4">
                             <Button :class="action_button_style">
@@ -40,31 +43,22 @@
                     </div>
                     
                     <div class="flex items-center gap-2">
-                        <Button @click="handle_group_action('add')" class="rounded-md" :disabled="disabled_groups_action_btn">
-                            <div v-if="ATGIsPending" class="flex items-center gap-3">
-                                <ProgressSpinner class="w-4 h-4" strokeWidth="8" fill="transparent" 
-                                    animationDuration=".5s" aria-label="Adding number" />
-                                Adding... 
-                            </div>
-                            <div v-else class="flex items-center gap-2">
-                                <PlusRoundedSVG class="w-5 h-5" />
-                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Add to Group</span>
-                            </div>
+                        <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                            <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
+                            <PlusRoundedSVG v-else class="w-5 h-5" />
+                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
                         </Button>
-                        <Button @click="handle_group_action('move')" class="rounded-md" :disabled="disabled_groups_action_btn">
-                            <div v-if="MTGIsPending" class="flex items-center gap-3">
-                                <ProgressSpinner class="w-4 h-4" strokeWidth="8" fill="transparent" 
-                                    animationDuration=".5s" aria-label="Moving number" />
-                                Moving... 
-                            </div>
-                            <div v-else class="flex items-center gap-2">
-                                <MoveSVG class="w-5 h-5" />
-                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Move to Group</span>
-                            </div>
+
+                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                            <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                            <MoveSVG v-else class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
                         </Button>
-                        <Button @click="handle_group_action('trash')" class="rounded-md" disabled>
-                            <TrashSVG class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Send to Trash</span>
+
+                        <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                            <ProgressSpinner v-if="STTIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                            <TrashSVG v-else class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
                         </Button>
                     </div>
                 </header>
@@ -83,13 +77,23 @@
 
             <Column field="name" header="Name" class="text-left">
                 <template #body="slotProps">
-                    <span class="text-[#1D1B20]">{{ slotProps.data.name }}</span>
+                    <div class="text-[#1D1B20] relative w-fit">
+                        {{ slotProps.data.name }}
+                        <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
+                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                                <EditIconSVG class="w-3 h-4" />
+                            </Button>
+                            <Button class="bg-gray-200 py-1 px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                                <TrashSVG class="w-4 h-4" />
+                            </Button>
+                        </div>
+                    </div>
                 </template>
             </Column>
 
             <Column field="number" header="Phone" class="text-center">
                 <template #body="slotProps">
-                    <div class="relative flex items-center h-16">
+                    <div class="relative flex items-center" :class="[ Object.keys(expandedRows) == slotProps.data.id ? '' : 'h-11']">
                         <span class="text-[#797676] w-full">{{ hide_contact_data(slotProps.data.id) ? '' : slotProps.data.numbers[0] }}</span>
                         <span v-if="slotProps.data.total_numbers > 1 && !hide_contact_data(slotProps.data.id)"
                             v-tooltip.top="{
@@ -225,14 +229,23 @@
                 </div>
             </template>
         </DataTable>
+
+        <ConfirmDialog>
+            <template #message>
+                <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
+            </template>
+        </ConfirmDialog>
+        <Toast />
     </div>
-    
 </template>
 
 <script setup lang="ts">
     const props = defineProps({
         selectedTab: { type: String, required: true }
     })
+
+    const confirm = useConfirm()
+    const toast = useToast()
 
     const page = ref(1)    
     const show = ref(10)
@@ -276,8 +289,9 @@
     const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
     const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups() 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
-    const { mutate: moveNumberToGroup, isPending: MTGIsPending, isError: MTGIsError, isSuccess: MTGIsSuccess } = useMoveNumberToGroup()
-    const { mutate: addNumberToGroup, isPending: ATGIsPending, isError: ATGIIsError, isSuccess: ATGIIsSuccess } = useAddNumberToGroup()
+    const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
+    const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
+    const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { refetch: download } = useFetchDownloadContacts(props.selectedTab, false)
 
     const contacts_data = computed(() => {
@@ -399,11 +413,46 @@
         else return null;
     })
 
+    // Show confirmation modal
+    const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 });
+    const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 });
+
+    const message_text = ref('');
+    const confirm_modal = (data_to_send: SendNumberToTrash) => {
+        const many_numbers = data_to_send.number_ids.length > 1;
+        message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
+                                          : 'Are you sure you want to send this number to Trash?';
+
+        confirm.require({
+            header: 'Confirmation',
+            rejectProps: {
+                label: 'No',
+                severity: 'secondary'
+            },
+            acceptProps: {
+                label: 'Yes'
+            },
+            accept: () => {
+                sendNumberToTrash(data_to_send, {
+                    onSuccess: (response: { result: true } | APIResponseError) => {
+                        if(response.result) {
+                            reset_selected_contacts();
+                            show_success_toast('Success!', many_numbers ? 'Numbers removed!' : 'Number removed!')
+                        } else {
+                            show_error_toast('Oops...', 'Something went wrong...')
+                        }
+                    },
+                    onError: () => show_error_toast('Oops...', 'Something went wrong...')
+                })
+            }
+        });
+    };
+
     /* ----- Group actions ----- */
     const disabled_groups_action_btn = computed(() => selected_contacts.value.length === 0 && selected_numbers.value.length === 0);
 
-    const handle_group_action = (action: string) => {
-        const numbers_id = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
+    const handle_group_action = (action: 'add' | 'move' | 'trash') => {
+        const numbers_id: { number_id: string }[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
 
         if(action === 'move') {
             //TODO: Add functionality to move numbers to a group, need to work with the contact number groups
@@ -424,7 +473,11 @@
 
             addNumberToGroup(data_to_send)
         } else {
-            return 'Error';
+            const data_to_send: SendNumberToTrash = {
+                number_ids: numbers_id.map((number) => number.number_id)
+            }
+
+            confirm_modal(data_to_send)
         }
     }
 

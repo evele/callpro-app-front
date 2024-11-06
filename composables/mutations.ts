@@ -79,6 +79,18 @@ export const useAddNumberToGroup = () => {
   })
 }
 
+export const useSendNumberToTrash = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SendNumberToTrash) => sendNumberToTrash(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
 /* ----- Settings ----- */
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()
