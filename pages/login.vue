@@ -54,7 +54,7 @@
                               Sign up today
                           </router-link>
                           <!-- <span class="right-text">Bind your Phone Launch Account</span> -->
-                          <router-link to="/login_2">
+                          <router-link to="/bind_phone_launch_account">
                               Bind your Phone Launch Account
                           </router-link>
                       </div>
