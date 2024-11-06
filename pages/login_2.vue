@@ -1,47 +1,53 @@
 <template>
     <div class="bg-[#E6E0E9] flex items-center justify-center min-h-screen rounded-3xl">
-        <div class="w-[850px] px-auto justify-items-center">
-            <Card class="w-full flex flex-col items-center justify-center font-normal">
+        <div class="max-w-[850px] w-[90vw] px-auto justify-items-center">
+            <Card class="w-full flex flex-col items-center justify-center font-normal gap-10">
                 <!-- Bloque de logo y texto -->
                 <template #header>
                     <div class="mt-14 flex flex-col items-center">
                         <img alt="user header" src="@/assets/png/thecallpro.png"
-                            class="w-[196.97px] h-[58.924px] flex-shrink-0 bg-cover bg-center" />
-                        <p class="text-xl text-[#4f378b]  leading-7 mt-4">Log in to your Phone Launch Account</p>
+                            class="w-[196px] flex-shrink-0 bg-cover bg-center" />
+                        <p class="text-xl font-semibold text-[#4f378b] mt-6">Log in to your Phone Launch Account</p>
                     </div>
                 </template>
 
                 <template #content>
                     <!-- Formulario de Login -->
-                    <form @keydown.enter.prevent="login" class="flex flex-col gap-9 w-[520px]">
+                    <form @keydown.enter.prevent="login"
+                        class="flex flex-col gap-10 w-full max-w-[520px] sm:w-[90vw] mx-auto">
                         <!-- Bloque de Phone Launch Account -->
                         <div class="flex flex-col items-start gap-2 w-full">
-                            <label for="phonelaunch" class="text-xl leading-7 text-left text-[#1e1e1e]">Phone Launch Account</label>
-                            <InputText id="phonelaunch"
-                                class="flex w-full text-sm px-4 py-3 border border-[#2c2c2c] rounded-[30px] bg-white"
-                                autocomplete="off" placeholder="Enter Phone Launch Account number"  />
+                            <label for="phonelaunch">Phone Launch Account</label>
+                            <InputText id="phonelaunch" 
+                                class="flex w-full py-3 border" 
+                                autocomplete="off" placeholder="Enter Phone Launch Account number" />
                         </div>
 
                         <!-- Bloque de Pin -->
                         <div class="flex flex-col items-start gap-2 w-full">
-                            <label for="pin" class="text-xl leading-7 text-left text-[#1e1e1e]">Pin</label>
-                            <InputText id="pin" type="text"
-                                class="flex w-full text-sm px-4 py-3 border border-[#2c2c2c] rounded-[30px] bg-white"
-                                autocomplete="off" placeholder="Enter Pin number" />                            
-                        </div>
+                            <label for="pin">Pin</label>
+                            <InputText id="pin" type="text" 
+                                class="flex w-full py-3 border" 
+                                autocomplete="off"
+                                placeholder="Enter Pin number" />
+                            <span id="error-message" class="text-[#b3261e] text-xs mt-3" >                                
+                            </span>
+                        </div>                       
+                        
                     </form>
                 </template>
 
                 <template #footer>
                     <div class="flex flex-col gap-4 mt-14">
-                        <Button type="button" class="flex justify-center items-center py-2 px-4 w-[300px] mx-auto"
+                        <Button type="button" 
+                            class="flex justify-center items-center py-2 w-[300px] mx-auto"
                             :disabled="isPending" @click.prevent="login">
                             {{ isPending ? 'Logging in...' : 'Next' }}
                         </Button>
                         <div
-                            class="flex justify-between w-full max-w-[600px] mx-auto text-[#4f378b] text-xs font-['Inter'] leading-4 gap-4 mt-14 mb-14">                            
-                            <span class="right-text">Do you already have an account?</span>
-                            <router-link to="/login" class="text-[#4f378b] text-xs font-['Inter'] leading-4">
+                            class="flex justify-center items-start gap-1.5  w-full max-w-[600px] mx-auto text-[#4f378b] text-xs font-semibold gap-4 mt-14 mb-14">
+                            <span>Do you already have an account?</span>
+                            <router-link to="/login">
                                 Take me to Login
                             </router-link>
                         </div>

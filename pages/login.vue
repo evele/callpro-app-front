@@ -1,63 +1,60 @@
 <template>
   <div class="bg-[#E6E0E9] flex items-center justify-center min-h-screen rounded-3xl">
-      <div class="w-[850px] px-auto justify-items-center">
-          <Card class="w-full flex flex-col items-center justify-center font-normal">
+      <div class="max-w-[850px] w-[90vw] px-auto justify-items-center">
+          <Card class="w-full flex flex-col items-center justify-center font-normal gap-10">
               <!-- Bloque de logo y texto -->
               <template #header>
                   <div class="mt-14 flex flex-col items-center">
                       <img alt="user header" src="@/assets/png/thecallpro.png"
-                          class="w-[196.97px] h-[58.924px] flex-shrink-0 bg-cover bg-center" />
-                      <p class="text-xl text-[#4f378b]  leading-7 mt-4">Log in to your dashboard</p>
+                          class="flex-shrink-0 bg-cover bg-center" />
+                      <p class="text-xl text-[#4f378b] mt-6">Log in to your dashboard</p>
                   </div>
               </template>
 
               <template #content>
                   <!-- Formulario de Login -->
-                  <form @keydown.enter.prevent="login" class="flex flex-col gap-9 w-[520px]">
+                  <form @keydown.enter.prevent="login" 
+                  class="flex flex-col gap-10 w-full max-w-[520px] sm:w-[90vw] mx-auto">
                       <!-- Bloque de Email -->
                       <div class="flex flex-col items-start gap-2 w-full">
-                          <label for="email" class="text-xl leading-7 text-left text-[#1e1e1e]">Email</label>
+                          <label for="email">Email</label>
                           <InputText id="email"
-                              class="flex w-full text-sm px-4 py-3 border border-[#2c2c2c] rounded-[30px] bg-white"
+                              class="flex w-full py-3 border"
                               autocomplete="off" placeholder="Enter your email" v-model="email" />
                       </div>
 
                       <!-- Bloque de Password -->
                       <div class="flex flex-col items-start gap-2 w-full">
-                          <label for="password" class="text-xl leading-7 text-left text-[#1e1e1e]">Password</label>
+                          <label for="password">Password</label>
                           <InputText id="password" type="password"
-                              class="flex w-full text-sm px-4 py-3 border border-[#2c2c2c] rounded-[30px] bg-white"
-                              autocomplete="off" placeholder="Enter your password" v-model="password" />
-                          <router-link to="/forgot_password" class="text-[#4f378b] text-xs font-['Inter'] leading-4">
-                              Forgot your Password
-                          </router-link>
-                          <!-- <div class="text-[#4f378b] text-xs gap-2 font-['Inter'] leading-4">
-                              Forgot your Password
-                          </div> -->
+                              class="flex w-full py-3 border"
+                              autocomplete="off" 
+                              placeholder="Enter your password" v-model="password" />                                                   
                       </div>
-
-                      <!-- Bloque de "Remember me" -->
-                      <div class="card flex justify-center">
-                          <span>Remember me</span>
-                          <ToggleSwitch v-model="rememberMe" />
+                      <!-- Bloque de "Forgot your Password" -->
+                      <div class="flex justify-center text-[#4f378b] font-semibold">
+                        <router-link to="/forgot_password" >
+                              Forgot your Password?
+                          </router-link>                           
                       </div>
                   </form>
               </template>
 
               <template #footer>
                   <div class="flex flex-col gap-4 mt-14">
-                      <Button type="button" class="flex justify-center items-center py-2 px-4 w-[300px] mx-auto"
+                      <Button type="button" 
+                        class="flex justify-center items-center py-2 w-[300px] mx-auto"
                           :disabled="isPending" @click.prevent="login">
                           {{ isPending ? 'Logging in...' : 'Login' }}
                       </Button>
                       <div
-                          class="flex justify-between w-full max-w-[600px] mx-auto text-[#4f378b] text-xs font-['Inter'] leading-4 gap-4 mt-14 mb-14">
+                          class="flex justify-between w-full max-w-[600px] mx-auto text-[#4f378b] text-xs font-semibold gap-4 mt-14 mb-14">
                           <!-- <span class="left-text">Sign up today</span> -->
-                          <router-link to="/create_user" class="text-[#4f378b] text-xs font-['Inter'] leading-4">
+                          <router-link to="/create_user">
                               Sign up today
                           </router-link>
                           <!-- <span class="right-text">Bind your Phone Launch Account</span> -->
-                          <router-link to="/login_2" class="text-[#4f378b] text-xs font-['Inter'] leading-4">
+                          <router-link to="/login_2">
                               Bind your Phone Launch Account
                           </router-link>
                       </div>
@@ -79,7 +76,7 @@ definePageMeta({
 
 const email = ref('');
 const password = ref('');
-const rememberMe = ref(true);
+
 const isPending = ref(false);
 
 const authStore = useAuthStore();
