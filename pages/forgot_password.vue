@@ -114,26 +114,4 @@ async function requestPasswordReset() {
         padding: 0 34px;
     }
 }
-
-.new-contact-form {
-    width: 100%;
-    padding: 0 32px;
-    gap: 24px;
-
-    .form-block {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        gap: 24px;
-
-        @media (min-width: 600px) {
-            flex-direction: row;
-            gap: 40px;
-        }
-
-        .input-group {
-            width: 100%;
-        }
-    }
-}
 </style>

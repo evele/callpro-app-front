@@ -10,7 +10,6 @@
                         <p class="text-xl font-semibold text-[#4f378b] mt-6">Log in to your Phone Launch Account</p>
                     </div>
                 </template>
-
                 <template #content>
                     <!-- Formulario de Login -->
                     <form @keydown.enter.prevent="login"
@@ -22,7 +21,6 @@
                                 class="flex w-full py-3 border" 
                                 autocomplete="off" placeholder="Enter Phone Launch Account number" />
                         </div>
-
                         <!-- Bloque de Pin -->
                         <div class="flex flex-col items-start gap-2 w-full">
                             <label for="pin">Pin</label>
@@ -53,8 +51,6 @@
                         </div>
                     </div>
                 </template>
-                <!-- Contenedor de los textos -->
-
             </Card>
         </div>
     </div>

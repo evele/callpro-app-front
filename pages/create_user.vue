@@ -201,19 +201,6 @@ function showError(message: string) {
 }
 </script>
 <style scoped lang="scss">
-.modal-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    height: 90px;
-    padding: 0 20px;
-    border-bottom: 1px solid #CAC4D0;
-
-    @media (min-width: 400px) {
-        padding: 0 34px;
-    }
-}
 
 .new-contact-form {
     width: 100%;
@@ -237,63 +224,5 @@ function showError(message: string) {
     }
 }
 
-.modal-footer {
-    width: 100%;
-    text-align: center;
-    padding: 0 26px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 10px;
 
-    @media (min-width: 370px) {
-        flex-direction: row;
-        gap: 20px;
-    }
-
-    @media (min-width: 500px) {
-        gap: 50px;
-    }
-
-    .modal-footer-btn {
-        border-radius: 30px;
-        max-width: 300px;
-        width: 100%;
-        height: 40px;
-        font-size: 16px;
-        font-weight: 700;
-        transition: background-color 0.3s;
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
-
-    .btn-add-new {
-        background-color: #F5F5F5;
-        color: #000;
-        border: 1px solid #000;
-
-        &:hover {
-            background-color: #E5E5E5;
-        }
-    }
-
-    .btn-save {
-        background-color: #653494;
-        color: #FFF;
-        border: 1px solid #FFF;
-
-        &:hover {
-            background-color: #4A1D6E;
-        }
-
-        &:disabled {
-            opacity: 0.6;
-            background-color: rgba(101, 52, 148, 0.60);
-            color: #B3B3B3;
-            border: 1px solid #B3B3B3;
-        }
-    }
-}
 </style>
