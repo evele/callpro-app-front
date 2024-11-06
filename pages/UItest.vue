@@ -1,47 +1,58 @@
 
 <template>
-
-    <Card>
-        <template #title>Simple Card</template>
-        <template #content>
-            <p class="m-0">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Inventore sed consequuntur error repudiandae numquam deserunt quisquam repellat libero asperiores earum nam nobis, culpa ratione quam perferendis esse, cupiditate neque
-                quas!
-            </p>
-        </template>
-    </Card>
-
     <div class="card flex justify-center">
-        <Button label="Show" @click="visible = true" />
-        <Dialog v-model:visible="visible" modal header="Edit Profile" :style="{ width: '25rem' }">
-            <template #header>
-                <p>el header</p>
-            </template>
-            <span class="text-surface-500 dark:text-surface-400 block mb-8">Update your information.</span>
-            <div class="flex items-center gap-4 mb-4">
-                <label for="username" class="font-semibold w-24">Username</label>
-                <InputText id="username" class="flex-auto" autocomplete="off" />
-            </div>
-            <div class="flex items-center gap-4 mb-8">
-                <label for="email" class="font-semibold w-24">Email</label>
-                <InputText id="email" class="flex-auto" autocomplete="off" />
-            </div>
-            <div class="flex items-center gap-4 mb-8">
-                <label for="some number" class="font-semibold w-24">Number</label>
-                <InputNumber  class="flex-auto" autocomplete="off" />
-            </div>
-            <template #footer>
-                <div class="flex justify-end gap-2">
-                    <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-                    <Button type="button" label="Save" @click="visible = false"></Button>
+        <Button type="button" icon="pi pi-share-alt" label="Share" @click="toggle" />
+
+        <Popover ref="op">
+            <div class="flex flex-col gap-4 w-[25rem]">
+                <div>
+                    <span class="font-medium block mb-2">Share this document</span>
+                    <InputGroup>
+                        <InputText value="https://primevue.org/12323ff26t2g243g423g234gg52hy25XADXAG3" readonly class="w-[25rem]"></InputText>
+                        <InputGroupAddon>
+                            <i class="pi pi-copy"></i>
+                        </InputGroupAddon>
+                    </InputGroup>
                 </div>
-            </template>
-        </Dialog>
+                <div>
+                    <span class="font-medium block mb-2">Invite Member</span>
+                    <InputGroup>
+                        <InputText disabled />
+                        <Button label="Invite" icon="pi pi-users"></Button>
+                    </InputGroup>
+                </div>
+                <div>
+                    <span class="font-medium block mb-2">Team Members</span>
+                    <ul class="list-none p-0 m-0 flex flex-col gap-4">
+                        <li v-for="member in members" :key="member.name" class="flex items-center gap-2">
+                            <img :src="`https://primefaces.org/cdn/primevue/images/avatar/${member.image}`" style="width: 32px" />
+                            <div>
+                                <span class="font-medium">{{ member.name }}</span>
+                                <div class="text-sm text-surface-500 dark:text-surface-400">{{ member.email }}</div>
+                            </div>
+                            <div class="flex items-center gap-2 text-surface-500 dark:text-surface-400 ml-auto text-sm">
+                                <span>{{ member.role }}</span>
+                                <i class="pi pi-angle-down"></i>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </Popover>
     </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
 
-const visible = ref(false);
+const op = ref();
+const members = ref([
+    { name: 'Amy Elsner', image: 'amyelsner.png', email: 'amy@email.com', role: 'Owner' },
+    { name: 'Bernardo Dominic', image: 'bernardodominic.png', email: 'bernardo@email.com', role: 'Editor' },
+    { name: 'Ioni Bowcher', image: 'ionibowcher.png', email: 'ioni@email.com', role: 'Viewer' }
+]);
+
+const toggle = (event) => {
+    op.value.toggle(event);
+}
 </script>
