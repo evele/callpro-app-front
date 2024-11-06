@@ -8,23 +8,23 @@
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
-		"type-check": "vue-tsc --noEmit"
+		"type-check": "vue-tsc --noEmit",
+        "clean": "rm -rf .nuxt"
 	},
 	"dependencies": {
 		"@pinia/nuxt": "^0.5.1",
-		"@primevue/themes": "^4.0.7",
+		"@primevue/themes": "^4.x.x",
 		"@tanstack/vue-query": "^5.51.9",
-		"bulma": "^1.0.2",
 		"html2canvas": "^1.4.1",
 		"jspdf": "^2.5.1",
 		"nuxt": "^3.12.2",
 		"ohash": "^1.1.3",
-		"primevue": "^4.0.4",
+		"primevue": "^4.x.x",
 		"tailwindcss-primeui": "^0.3.4",
-		"vue": "latest"
+		"vue": "^3.x.x"
 	},
 	"devDependencies": {
-		"@primevue/nuxt-module": "^4.0.4",
+		"@primevue/nuxt-module": "^4.x.x",
 		"@vueuse/core": "^11.1.0",
 		"@vueuse/nuxt": "^11.1.0",
 		"autoprefixer": "^10.4.20",
