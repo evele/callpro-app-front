@@ -1,104 +1,116 @@
 <template>
-    <Dialog v-model:visible="visible" pt:root:class="modal">
-        <template #container>
-            <div class="modal-bg"></div>
-            <section class="modal-container">
-                <div class="modal-layout">
-                    <header class="modal-header">
-                        <h2 class="modal-header-title">Add new contact <ChevronDownSVG /></h2>
-                        <Button class="modal-header-close" @click="close"><CloseSVG/></Button>
-                    </header>
+    <Dialog v-model:visible="visible" modal :closable="false" class="w-full max-w-[850px] mx-4">
+        <template #header>
+            <header class="w-full flex justify-between pb-5">
+                <h2 class="flex items-center gap-4 font-bold text-lg text-black">Add new contact <ChevronDownSVG /></h2>
+                <Button @click="close" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
+            </header>
+            <Divider class="absolute left-0 top-[75px]" />
+        </template>
 
-                    <form @submit.prevent class="new-contact-form flex flex-col">
-                        <div class="form-block">
-                            <div class="input-group">
-                                <label for="name" class="block">Name</label>
-                                <InputText type="text" id="name" v-model="new_contact.first_name" placeholder="Enter Name" class="custom-input" />
-                            </div>
+        <div v-if="contact_numbers.length" class="flex flex-wrap gap-2 mt-4 mb-2">
+            <div v-for="(number, i) in contact_numbers" :key="i" class="px-3 pb-1 pt-[5px] text-sm rounded-full bg-[#1D192B] w-fit text-white">
+                <p><span class="rounded-full py-[2px] px-[5px] bg-white text-black text-xs mr-1">{{ i + 1 }}</span> {{ number.number }}</p>            
+            </div>
+        </div>
 
-                            <div class="input-group">
-                                <label for="surname" class="block">Surname</label>
-                                <InputText type="text" id="surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="custom-input" />
-                            </div>
-                        </div>
+        <form @submit.prevent class="new-contact-form flex flex-col gap-5 sm:gap-6" :class="[{ 'mt-5': !contact_numbers.length}]">
+            <p v-if="isSuccess" class="text-green-500">Success!</p>
+            <p class="text-red-500" v-if="isError">Something went wrong.</p>
 
-                        <div class="form-block">
-                            <div class="input-group">
-                                <label for="phone-1" class="block">Phone 1*</label>
-                                <PhoneInput :model-value="phone_number" @update:modelValue="show_value" />
-                                <p class="text-red absolute">{{ number_error }}</p>
-                            </div>
-
-                            <div class="input-group">
-                                <label class="block">Type*</label>
-                                <Select v-model="new_contact.numbers[0].type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="custom-select" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
-                                <p class="text-red absolute">{{ type_error }}</p>
-                            </div>
-                        </div>
-
-                        <div class="form-block">
-                            <div class="input-group">
-                                <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
-                                <div v-if="CGIsSuccess">
-                                    <label class="block">Groups</label>
-                                    <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
-                                    <MultiSelect v-else v-model="new_contact.numbers[0].number_groups" :options="custom_groups_options" optionLabel="name" 
-                                        display="chip" class="custom-select" placeholder="-" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-block">
-                            <div class="input-group">
-                                <label for="notes-1" class="block">Notes</label>
-                                <Textarea v-model="new_contact.numbers[0].notes" id="notes-1" cols="50" rows="5" placeholder="Enter text" class="custom-textarea" />
-                                <p class="text-info">*This information is mandatory to create a new contact</p>
-                                <p v-if="isSuccess" class="text-green">All good :D</p>
-                                <p class="text-red" v-if="isError">Something went wrong.</p>
-                            </div>
-                        </div>
-                    </form>
-
-                    <footer class="modal-footer">
-                        <Button @click="add_new" class="modal-footer-btn btn-add-new">
-                            Add new phone
-                        </Button>
-                        <Button @click="save_contact" :disabled="isPending" class="modal-footer-btn btn-save">
-                            {{ isPending ? 'Saving...' : 'Save' }}
-                        </Button>
-                    </footer>
+            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
+                <div class="w-full">
+                    <label for="contact-name" class="text-lg text-black">Name</label>
+                    <InputText type="text" id="contact-name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" :disabled="current_position > 0" />
                 </div>
-            </section>
+
+                <div class="w-full">
+                    <label for="contact-surname" class="text-lg text-black">Surname</label>
+                    <InputText type="text" id="contact-surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" :disabled="current_position > 0" />
+                </div>
+            </div>
+
+            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
+                <div class="w-full">
+                    <label for="contact-phone" class="text-lg text-black">Phone 1*</label>
+                    <PhoneInput class="mt-[2px]" :model-value="new_contact.numbers.number" @update:modelValue="(v: string) => new_contact.numbers.number = v" 
+                        :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
+                </div>
+
+                <div class="relative w-full flex">
+                    <div class="w-full">
+                        <label class="text-lg text-black">Type*</label>
+                        <Select v-model="new_contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
+                    </div>
+                    <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
+                </div>
+            </div>
+
+            <div class="w-full">
+                <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
+                <div v-if="CGIsSuccess" class="w-full">
+                    <label class="text-lg text-black">Groups</label>
+                    <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
+                    <MultiSelect v-else v-model="new_contact.numbers.number_groups" :options="custom_groups_options" optionLabel="name" 
+                        display="chip" class="w-full mt-1" placeholder="-" />
+                </div>
+            </div>
+
+            <div class="w-full">
+                <div>
+                    <label for="contact-notes" class="text-lg text-black">Notes</label>
+                    <Textarea v-model="new_contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
+                    <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
+                </div>
+            </div>
+        </form>
+        
+        
+        <template #footer>
+            <footer class="flex flex-col w-full justify-center gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
+                <Button v-if="contact_numbers.length" :disabled="isPending" @click="go_back" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+                    Go back
+                </Button>
+                <Button @click="add_new" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+                    Add new phone
+                </Button>
+                <Button @click="save_contact" :disabled="isPending" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
+                    {{ isPending ? 'Saving...' : 'Save' }}
+                </Button>
+            </footer>
         </template>
     </Dialog>
 </template>
 
 <script setup lang="ts">
+    import { useQueryClient } from '@tanstack/vue-query'
+
+    const queryClient = useQueryClient()
+
     const visible = ref(false);
     const number_error = ref('');
     const type_error = ref('');
-
-    // Lo dejo para testear
-    const phone_number = ref('')
-    const show_value = (value: string) => {
-        console.log('show value', value)
-    }
+    const form_action = ref('')
+    const has_phone_number_error = ref(false)
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
-    const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact()
+    const { mutate: saveContact, isPending, isError, isSuccess, reset } = useSaveContact() 
 
-    const empty_contact: ContactToSave = {
+    const empty_contact: ContactBeforeToSave = {
         first_name: '',
         last_name: '',
-        numbers: [{
+        numbers: {
             id: 'new',
             number: '',
             notes: '',
             type: '',
             number_groups: []
-        }] 
+        }
     }
-    let new_contact = reactive<ContactToSave>({...empty_contact})
+    let new_contact = reactive<ContactBeforeToSave>({...empty_contact})
+
+    const contact_numbers = ref<ContactNumber[]>([])
+    const current_position = ref(0)
 
     const type_options = [
         { name: 'Home', code: '4' },
@@ -120,48 +132,104 @@
     })
 
     watchEffect(() => {
-        if (new_contact.numbers[0].type) {
+        if (new_contact.numbers.type) {
             type_error.value = ''
         }
-        if (new_contact.numbers[0].number) {
+        if (new_contact.numbers.number) {
             number_error.value = ''
         }
     })
 
     const open = () => {
         visible.value = true;
-        const body = document.body;
-        body.style.overflow = 'hidden';
     }
 
     const close = () => {
         visible.value = false;
-        const body = document.body;
-        body.style.overflow = 'auto';
+        reset_contact()
+        number_error.value = ''
+        type_error.value = ''
+        contact_numbers.value = []
+        current_position.value = 0
+        form_action.value = ''
+    }
+
+    const reset_contact = () => {
         Object.assign(new_contact, empty_contact)
-        new_contact.numbers[0] = {
+        new_contact.numbers = {
             id: 'new',
             number: '',
             notes: '',
             type: '',
-            number_groups: []
+            number_groups: []    
         }
-        number_error.value = ''
-        type_error.value = ''
     }
 
     defineExpose({ open });
 
-    const add_new = () => {
-        console.log('Adding new phone...');
+    const validate_number_and_type = () => {
+        let is_invalid = false
+
+        if(!new_contact.numbers.number || !new_contact.numbers.type || has_phone_number_error.value) {
+            if(!new_contact.numbers.number) {
+                number_error.value = 'The Number field is required.'
+            }
+            if(!new_contact.numbers.type) {
+                type_error.value = 'The Type field is required.'
+            }
+            is_invalid = true
+        }
+        return is_invalid
+    }
+
+    const add_new = async () => {
+        form_action.value = 'clear'
+        if(validate_number_and_type()) return
+        
+        contact_numbers.value.push({
+            id: 'new',
+            number: new_contact.numbers.number,
+            notes: new_contact.numbers.notes,
+            type: new_contact.numbers.type,
+            number_groups: new_contact.numbers.number_groups
+        })
+        new_contact.numbers = {
+            id: 'new',
+            number: '',
+            notes: '',
+            type: '',
+            number_groups: []    
+        }
+        current_position.value++
+        await nextTick();
+        form_action.value = ''
+    }
+
+    const go_back = async () => {
+        form_action.value = 'fill'
+        new_contact.numbers = {
+            id: 'new',
+            number: contact_numbers.value[current_position.value - 1].number,
+            notes: contact_numbers.value[current_position.value - 1].notes,
+            type: contact_numbers.value[current_position.value - 1].type,
+            number_groups: contact_numbers.value[current_position.value - 1].number_groups
+        }
+        contact_numbers.value.pop()
+        current_position.value--
+        await nextTick();
+        form_action.value = ''
     }
 
     type number_groups_option = { code: string, name: string }
 
     const save_contact = () => {
+        if(validate_number_and_type()) return
+
+        const numbers_to_send = [...contact_numbers.value, new_contact.numbers]
+
         const formatted_contact: ContactToSave = {
             ...new_contact,
-            numbers: new_contact.numbers.map((number: any) => {
+            numbers: numbers_to_send.map((number: any) => {
                 return {
                     ...number,
                     number: number.number.replace(/\D/g, ''),
@@ -184,6 +252,9 @@
         saveContact(data_to_send, {
             onSuccess: (data: res_success | APIResponseError) => {
                 if(data.result) {
+                    reset_contact()
+                    form_action.value = 'clear'
+                    queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
                     setTimeout(() => {
                         reset()
                         close()
@@ -208,194 +279,8 @@
     }
 </script>
 
-<style scoped lang="scss">
-    .modal-bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        background-color: #FFF;
-        padding-bottom: 38px;
-        border-radius: 30px;
-        width: 100%;
-    }
-
-    .modal-layout {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        gap: 38px;
-        width: 100%;
-    }
-
-    .modal-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 90px;
-        padding: 0 20px;
-        border-bottom: 1px solid #CAC4D0;
-        @media (min-width: 400px) {
-            padding: 0 34px;
-        }
-
-        .modal-header-title {
-            color: #000;
-            font-size: 18px;
-            font-weight: 600;
-            line-height: 140%;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: auto 0;
-            @media (min-width: 400px) {
-                font-size: 23.8px;
-            }
-        }
-
-        .modal-header-close {
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            border-radius: 100%;
-            padding: 6px;
-
-            &:hover {
-                background-color: #F5F5F5;
-            }
-        }
-    }
-
-    .new-contact-form {
-        width: 100%;
-        padding: 0 32px;
-        gap: 20px;
-
-        .form-block {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            gap: 25px;
-
-            @media (min-width: 600px) {
-                flex-direction: row;
-                gap: 40px;
-            }
-
-            .input-group {
-                width: 100%;
-                
-                label {
-                    color: #1E1E1E;
-                    font-size: 19px;
-                    margin-bottom: 6px;
-                }
-
-                .custom-input, .custom-select, .custom-textarea {
-                    width: 100%;
-                    border: 1px solid #D9D9D9;
-                    padding: 8px 16px;
-                    transition: border-color 0.5s;
-                }
-
-                .custom-input, .custom-select {
-                    border-radius: 30px;
-                }
-
-                .custom-textarea {
-                    border-radius: 10px;
-                    min-height: 98px;
-                }
-
-                [aria-invalid="true"], .invalid {
-                    border-color: red;
-                }
-            }
-        }
-
-        .text-info {
-            color: #757575;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-    }
-
-    .modal-footer {
-        width: 100%;
-        text-align: center;
-        padding: 0 26px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 10px;
-        @media (min-width: 370px) {
-            flex-direction: row;
-            gap: 20px;
-        }
-        @media (min-width: 500px) {
-            gap: 50px;
-        }
-
-        .modal-footer-btn {
-            border-radius: 30px;
-            max-width: 300px;
-            width: 100%;
-            height: 40px;
-            font-size: 16px;
-            font-weight: 700;
-            transition: background-color 0.3s;
-
-            &:hover {
-                cursor: pointer;
-            }
-        }
-
-        .btn-add-new {
-            background-color: #F5F5F5;
-            color: #000;
-            border: 1px solid #000;
-            &:hover {
-                background-color: #E5E5E5;
-            }
-        }
-
-        .btn-save {
-            background-color: #653494;
-            color: #FFF;
-            border: 1px solid #FFF;
-            &:hover {
-                background-color: #4A1D6E;
-            }
-            &:disabled {
-                opacity: 0.6;
-                background-color: rgba(101, 52, 148, 0.60);
-                color: #B3B3B3;
-                border: 1px solid #B3B3B3;
-            }
-        }
-    }
-
-    .text-red {
-        color: red;
-    }
-    .text-green {
-        color: green;
-    }
-
-    .absolute {
-        position: absolute;
+<style scoped>
+    .no-resize {
+        resize: none;
     }
 </style>

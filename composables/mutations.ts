@@ -35,10 +35,7 @@ export const useDeleteCallInCode = () => {
 export const useSaveContact = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: ContactToSaveData) => saveContact(data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
-    }
+    mutationFn: (data: ContactToSaveData) => saveContact(data)
   })
 }
 

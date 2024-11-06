@@ -54,16 +54,24 @@ export type ContactGroup = {
   phone_launch_id: NumberOrNull;
 };
 
+export type ContactNumber = {
+  id: 'new' | number,
+  number: string,
+  notes: string,
+  type: '' | OneToFour,
+  number_groups: string[]
+}
+
 export type ContactToSave = {
   first_name: string,
   last_name: string,
-  numbers: {
-      id: 'new' | number,
-      number: string,
-      notes: string,
-      type: '' | OneToFour,
-      number_groups: string[]
-  }[]
+  numbers: ContactNumber[]
+}
+
+export type ContactBeforeToSave = {
+  first_name: string,
+  last_name: string,
+  numbers: ContactNumber
 }
 
 export type ContactToSaveData = {
