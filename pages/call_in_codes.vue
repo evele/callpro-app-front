@@ -1,5 +1,5 @@
-import { UserCallInCode } from '../utils/api-calls/call_in_code';
-<template>
+<!-- import { UserCallInCode } from '../utils/api-calls/call_in_code'; -->
+<template>    
     <div>
         <p class="text-title">Call in codes page</p>
         <div class="buttons-container">
@@ -17,9 +17,15 @@ import { UserCallInCode } from '../utils/api-calls/call_in_code';
             </li>
         </ul>
     </div>
+    <ModalCallInCodes ref="modalCallInCodes"/>
+    <Button label="Modal Call in Codes" @click="open_modal" />    
+   
 </template>
 
 <script setup lang="ts">
+
+
+
     
     const { data: userCallInCodes,isError, error, isLoading, isSuccess, refetch } = useFetchCallInCodes()
 
@@ -38,6 +44,12 @@ import { UserCallInCode } from '../utils/api-calls/call_in_code';
     const delete_code = (id: number) => {
         const code_id = { call_in_code_id: id }
         deleteCallInCode(code_id)
+    }
+
+    const modalCallInCodes = ref()
+
+    const open_modal = () => {
+        modalCallInCodes.value.open();
     }
 </script>
 
