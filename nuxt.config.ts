@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   devServer: {
     port: 3001,
   },
-  devtools: { enabled: true },
+  devtools: { enabled: false },
   modules: ['@pinia/nuxt', '@vueuse/nuxt', '@primevue/nuxt-module'],
   primevue: {
     /* Configuration */

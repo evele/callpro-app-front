@@ -4,39 +4,52 @@
             <h2 v-if="has_uploaded" >Upload Summary</h2>
             <h2 v-else >Upload new file <ChevronDownSVG /></h2>
         </template>      
-        <section>
-            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
-                <template #content="{files}">
-                    <div class="flex items-center gap-16">
+        <section >
+            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" :auto="false" @select="onSelectedFiles" @progress="upl">
+                <template ref="fileUploadHeader" #header="{chooseCallback, clearCallback}"> 
+                    <button ref="openFileSelector" @click="chooseCallback()" class="hidden"></button>    
+                    <button ref="clearFileSelection" @click="clearCallback()" class="hidden"></button>    
+                </template>
+                <template #empty>
+                        <div >
+                            <CircleSVG style="color: #E8DEF8;" @click="open_file_selection" />
+                            <p>Drop files here or select <span >here</span> to upload</p>
+                        </div>
+                </template>
+                <template  #content="{files}">
+                    <div v-if="uploading" class="flex items-center gap-14 pt-20 pb-11 m-auto max-w-xl">
                         <div>
-                            <Avatar v-if="!upload_error" class="bg-white border border-black" size="xlarge" shape="circle">
+                            <Avatar v-if="!upload_error" class="bg-white border border-2 border-black w-24 h-24"  shape="circle">
                                 <template #icon>
-                                    <FileSVG  class="text-black w-7"/>
+                                    <FileSVG  class="text-black w-10 h-10"/>
                                 </template>
                             </Avatar>
-                            <Avatar v-else class="bg-white border border-danger" size="xlarge" shape="circle">
+                            <Avatar v-else class="bg-white border border-2 border-danger w-24 h-24" shape="circle">
                                 <template #icon>
-                                    <CloseSVG class="text-danger w-7"/>
+                                    <CloseSVG class="text-danger w-10 h-10"/>
                                 </template>
                             </Avatar>
                         </div>
                         <div class="w-full flex flex-col gap-4">
                             <div class="text-xl font-light"><span class="font-medium mr-4">{{ files[0]?.name??"" }}</span>{{ formatFileSize(files[0]?.size)}} </div>
                             <div>
-                                <ProgressBar :show-value="false" :value="total_size_percent" :pt="{value: ()=>[{'bg-danger':upload_error}]}">
+                                <ProgressBar :show-value="false" :value="progress_size_percent" :pt="{value: ()=>[{'bg-danger':upload_error}]}">
                                 </ProgressBar>
                             </div>
                                 
                             <div class="text-lg">{{total_size_percent}}% Uploaded</div>
                         </div>
-                    </div>
-                </template>
-                <template #empty>
-                        <div >
-                            <CircleSVG style="color: #E8DEF8;" />
-                            <p>Drop files here or select <span >here</span> to upload</p>
+                        <div>
+                            <Avatar v-if="upload_error" class="bg-white border w-9 h-9"  shape="circle" @click="clear_file_seletion">
+                                <template #icon>
+                                    <TrashSVG></TrashSVG>
+                                </template>
+                            </Avatar>
                         </div>
+                    </div>
+                    <div v-else></div>
                 </template>
+               
             </FileUpload>
         </section>
         <section v-if="has_uploaded">
@@ -102,8 +115,10 @@
                     </header>
 
                     <section v-if="!has_uploaded" class="modal__dropfile special-input">
-                        <FileUpload name="file" :multiple="false" class="special-input" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
-                            
+                        <FileUpload name="file" :multiple="false" class="special-input" accept=".csv, .xlsx, .xls"  :maxFileSize="200000" @select="onSelectedFiles">
+                            <template #header="{ files }">
+                                <Button @click="uploadEvent(files)" class="is-hidden" />
+                            </template>
 
                             <template #content>
                                 <span style="display: none;"></span>
@@ -183,6 +198,7 @@
 
     import CheckSVG from '../svgs/CheckSVG.vue';
     import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
+import TrashSVG from '../svgs/TrashSVG.vue';
 
     const props = defineProps({
         selectedGroup: { type: String, required: true }
@@ -197,8 +213,14 @@
    
     const group_id = ref('');
     const has_uploaded = ref(false);
+    const upload_error = ref(false)
+    const uploading = ref(false)
     const showError = ref(false);
     const showSuccess = ref(false);
+
+    const upl = () => {
+        console.log("uploading")
+    }
 
     const selected_contacts_ids:Ref<number[]> = ref([]) 
    
@@ -207,11 +229,15 @@
     }
 
     const total_size_percent:Ref<number> = ref(0)
+    const progress_size_percent:Ref<number> = ref(0)
 
     const close = () => {
         visible.value = false   
         has_uploaded.value = false
+        upload_error.value = false
+        uploading.value = false
         total_size_percent.value = 0
+        progress_size_percent.value = 0
         reset()
         contacts.value = []
         selected_contacts_ids.value = []
@@ -243,11 +269,24 @@
         return formData;
     };
 
+    const fileUploadHeader= ref(null)
+    const chooseCallbackRef=  ref<(() => void) | null>(null); 
+
+    const openFileSelector=ref<HTMLButtonElement | null>(null);
+    const clearFileSelection=ref<HTMLButtonElement | null>(null);
+        
+    const open_file_selection = () => {
+        openFileSelector?.value?.click()
+    } 
+
+    const clear_file_seletion = () => {
+        clearFileSelection?.value?.click()
+        close()
+    }
+    
     const onSelectedFiles = (files: FileUploadEvent) => {
         uploadEvent(files.files);
     };
-
-    const upload_error:Ref<boolean> = ref(false)
 
     const uploadEvent = (file: File[]) => {
         contacts.value = [];
@@ -260,20 +299,38 @@
         };
         showError.value = true;
         const data_to_send = createFormData(data);
-        total_size_percent.value = 50
+        
+           // Iniciar la barra de progreso en 0 y aumentar gradualmente
+        total_size_percent.value = 0;
+        uploading.value = true
+        const progressInterval = setInterval(() => {
+            if (total_size_percent.value == 50) {
+                progress_size_percent.value = 50
+            }
+            if (total_size_percent.value < 90) { // Limitar hasta un 90% antes de recibir respuesta
+                total_size_percent.value += 2; // Incremento pequeño para simular carga continua
+            } else {
+                clearInterval(progressInterval); // Detener si llega al 90% o si se recibe una respuesta
+            }
+        }, 30); // Cada 50ms para un aumento suave
         uploadContact(data_to_send, {
             onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
                     /* TODO: check if belongs to group or not (not here probbly before upload */
                     group_id.value = data.group_id || 'all';
                     contacts.value = data.contacts
-                    total_size_percent.value = 100
                     setTimeout(() => {
+                        total_size_percent.value = 100
+                        progress_size_percent.value = 100
                         has_uploaded.value = true
+                        uploading.value = false
                     }, 1000);
                 } else {
-                    total_size_percent.value = 99 
-                    upload_error.value = true
+                    setTimeout(() => {
+                        total_size_percent.value = 99 
+                        progress_size_percent.value = 99
+                        upload_error.value = true
+                    }, 1000);
                 }
             }
         });
@@ -339,6 +396,10 @@
         left: unset;
         height: 1rem;
     }
+    
+    :deep()
+
+    /* -- eric -- */ 
 
     .modal__bg {
         position: absolute;

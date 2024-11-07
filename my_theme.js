@@ -502,6 +502,10 @@ export const MyPreset = definePreset(Aura, {
                     color: '{purple.500}'
                 }
             } 
+        },
+        fileupload: {
+            headerPadding: 0,
+            contentPadding: 0,
         }
     }
     
