@@ -53,15 +53,23 @@
                     :value="dnc_contacts_data.dnc_contacts" 
                     scrollable
                     scrollHeight="calc(70vh - 280px)"
-                    dataKey="number" 
+                    dataKey="id" 
                     class="dnc-table"
                     stripedRows
                     :rowClass="rowClass"
                     selectionMode="multiple"
                 >
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
-                    <Column field="name" header="Name"></Column>
-                    <Column field="number" header="Phone" class="text-center min-w-[150px]"></Column>
+                    <Column field="name" header="Name">
+                        <template #body="slotProps">
+                            <span class="text-sm">{{ slotProps.data.name }}</span>
+                        </template>
+                    </Column>
+                    <Column field="number" header="Phone" class="text-center min-w-[150px]">
+                        <template #body="slotProps">
+                            <span class="text-sm text-[#797676]">{{ slotProps.data.number }}</span>
+                        </template>
+                    </Column>
 
                     <Column field="number_id" header="" class="text-center">
                         <template #header>
@@ -79,10 +87,10 @@
                         </template>
                         <template #body="slotProps">
                             <Chip v-if="slotProps.data.number_id !== null" 
-                                label="Yes" class="bg-[#EADDFF] text-[#49454F] font-bold"
+                                label="Yes" class="bg-[#EADDFF] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                             <Chip v-else
-                                label="No" class="bg-[#E6E6E6] text-[#49454F] font-bold"
+                                label="No" class="bg-[#E6E6E6] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                         </template>
                     </Column>
@@ -90,10 +98,10 @@
                     <Column field="blocked_by" header="Blocked by" class="text-center" headerStyle="min-width: 150px">
                         <template #body="slotProps">
                             <Chip v-if="slotProps.data.dnc == '1'" 
-                                label="You" class="bg-[#FFFBEB] text-[#49454F] font-bold"
+                                label="You" class="bg-[#FFFBEB] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                             <Chip v-else
-                                label="Admin" class="bg-[#FEE9E7] text-[#49454F] font-bold"
+                                label="Admin" class="bg-[#FEE9E7] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                         </template>
                     </Column>
@@ -172,6 +180,7 @@
     const { refetch: download, isFetching: is_downloading } = useFetchDownloadDNCContacts()
 
     type FormatedContact = {
+        id: number,
         name: StringOrNull,
         number: string,
         number_id: StringOrNull,
@@ -183,9 +192,10 @@
         selected_contacts.value = []
         if(!dnc_contacts?.value?.result) return { dnc_contacts: [], dnc_total_contacts: 0 }
 
-        const formatted_contacts: FormatedContact[] = dnc_contacts?.value?.dnc_contacts.map((contact: ContactDNC) => {
+        const formatted_contacts: FormatedContact[] = dnc_contacts?.value?.dnc_contacts.map((contact: ContactDNC, index: number) => {
             const { first_name, last_name, number, ...rest } = contact;
             return {
+                id: index + 1,
                 name: show_full_name(first_name, last_name),
                 number: format_number_to_show(number),
                 ...rest
@@ -349,7 +359,7 @@
     defineExpose({ open });
 
     const rowClass = (data: any) => {
-        return [{ '!bg-[#E9DDFF]': selected_contacts.value.some((contact: FormatedContact) => contact.number === data.number) }];
+        return [{ '!bg-[#E9DDFF]': selected_contacts.value.some((contact: FormatedContact) => contact.id === data.id) }];
     };
 </script>
 
