@@ -8,7 +8,7 @@
                 <InputText v-model="search" placeholder="Search by Name or Type" />
             </IconField>
 
-            <Button class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none">
+            <Button class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg">
                 <SortBySVG class="text-[#757575]" />
                 <span class="font-semibold">Sort by</span>
             </Button>
@@ -94,13 +94,17 @@
 </template>
 
 <script setup lang="ts">
+    import type { QueryObserverResult } from '@tanstack/vue-query'
+
     const confirm = useConfirm();
     const toast = useToast();
     const show_older = ref(false)
+    const selected_audio_file_name = ref('')
 
     const { data: allAudiosData, isFetching } = useFetchGetAllAudios(show_older)
     const { mutate: saveAudio, isPending: isPendingSave } = useSaveAudio()
     const { mutate: deleteAudio, isPending: isPendingDelete } = useDeleteAudio()
+    const { refetch: download_audio_bro } = useDownloadAudio(selected_audio_file_name)
 
     const audio_playing = ref<Audio | null>(null)
     const selected_audio = ref<Audio | null>(null)
@@ -166,23 +170,22 @@
 
     const download_audio = (audio_id: number) => {
         selected_audio.value = user_audios.value.find((audio: Audio) => audio.id === audio_id) ?? null
-    
+        
         if(!selected_audio.value) {
             console.error('Audio file not found or invalid URL');
             return
         }
-
-        const link = document.createElement('a');
-        link.href = selected_audio.value.full_file_url;
-        link.target = '_blank'
-        link.setAttribute('download', selected_audio.value.file_name); 
         
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        //TODO: WORK ON THIS FUNCTIONALITY, CURRENTLY IS NOT DOWNLOADING THE AUDIO FILE
+        selected_audio_file_name.value = selected_audio.value.file_name
+        download_audio_bro()
+                .then((result: QueryObserverResult) => {
+                    if(!result.data) {
+                        show_error_toast('Sorry!', 'This audio is not available for download');
+                    }
+                })
+                .catch(() => {
+                    show_error_toast('Sorry!', 'This audio is not available for download');
+                });
     }
 
     const edit_audio = (audio_id: number) => {
@@ -257,7 +260,7 @@
 
 <style scoped lang="scss">
 ::v-deep(.audios-table) {
-    min-width: 30rem;
+    min-width: 40rem;
 
     .p-datatable-thead, .p-datatable-header-cell {
         background-color: rgb(233, 231, 235);
