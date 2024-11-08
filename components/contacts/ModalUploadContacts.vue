@@ -4,16 +4,16 @@
             <h2 v-if="has_uploaded" >Upload Summary</h2>
             <h2 v-else >Upload new file <ChevronDownSVG /></h2>
         </template>      
-        <section >
-            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" :auto="false" @select="onSelectedFiles" @progress="upl">
+        <div class="mt-6">
+            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" :auto="false" @select="onSelectedFiles">
                 <template ref="fileUploadHeader" #header="{chooseCallback, clearCallback}"> 
                     <button ref="openFileSelector" @click="chooseCallback()" class="hidden"></button>    
                     <button ref="clearFileSelection" @click="clearCallback()" class="hidden"></button>    
                 </template>
                 <template #empty>
-                        <div >
-                            <CircleSVG style="color: #E8DEF8;" @click="open_file_selection" />
-                            <p>Drop files here or select <span >here</span> to upload</p>
+                        <div class="flex flex-col items-center pt-11 pb-9">
+                            <CircleSVG class="text-[#E8DEF8]"/>
+                            <p class="font-medium text-center">Drop files here<br>or select <a href="#" class="text-[#674fa4] underline" @click.prevent="open_file_selection">here</a> to upload</p>
                         </div>
                 </template>
                 <template  #content="{files}">
@@ -47,95 +47,7 @@
                             </Avatar>
                         </div>
                     </div>
-                    <div v-else></div>
-                </template>
-               
-            </FileUpload>
-        </section>
-        <section v-if="has_uploaded">
-            <div v-if="uploadedSuccess && uploadedData?.result">
-                <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
-                    <thead class="bg-gray-100 border-b border-gray-300">
-                        <tr>
-                        <th class="px-4 py-2"> 
-                            <Checkbox :modelValue="all_selected" :indeterminate="some_selected" @change="toggle_select_all" binary/>
-                        </th>
-                        <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
-                        <th class="px-4 py-2 text-left text-gray-700">Phone</th>
-                        <th class="px-4 py-2 text-left text-gray-700 text-center">Status</th>
-                        <th class="px-4 py-2 text-left text-gray-700 text-center">Result</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <template v-for="contact in contacts" :key="contact.contact_id">
-                        <tr v-for="(number,index) in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
-                            <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">
-                                <Checkbox v-if="contact.valid"  v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
-                            </td>
-                            <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
-                            <td class="px-4 py-2">{{ number.number }}</td>
-                            <td class="px-4 py-2">
-                                <CheckSVG v-if="number.valid" class="m-auto text-success"/>
-                                <ErrorIconSVG v-else class="m-auto text-danger"/>
-                            </td>
-                            <td class="px-4 py-2 text-center">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
-                        </tr>
-                        </template>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-        <p v-if="isError || (uploadedSuccess && !uploadedData?.result)">Something went wrong!</p>
-        <div v-if="!has_uploaded">
-            <p>Accepted format files: .csv, .xlsx</p>
-            <p>Your data should be in this order:</p>
-            <ul>
-                <li>Column A: First Name (optional)</li>
-                <li>Column B: Last Name (optional)</li>
-                <li>Column C: Number (required)</li>
-                <li>Column D, E, F...: Number (optional)</li>
-            </ul>
-        </div>
-        <template #footer>
-            <ProgressBar :value="total_size_percent" class="w-full"></ProgressBar>
-            <Button @click="save_contact" :disabled="savedIsPending || selected_contacts_ids.length == 0">
-                            {{ !savedIsPending ? 'Save' : 'Saving...' }}
-                        </Button>
-        </template>
-    </Dialog>
-    <Dialog :visible="false" pt:root:class="modal">
-        <template #container>
-            <div class="modal__bg"></div>
-            <section class="modal__container">
-                <div class="modal__layout">
-                    <header class="modal__header">
-                        <h2 v-if="has_uploaded" class="modal__header--title">Upload Summary</h2>
-                        <h2 v-else class="modal__header--title">Upload new file <ChevronDownSVG /></h2>
-                        <Button class="modal__header--close" @click="close"><CloseSVG/></Button>
-                    </header>
-
-                    <section v-if="!has_uploaded" class="modal__dropfile special-input">
-                        <FileUpload name="file" :multiple="false" class="special-input" accept=".csv, .xlsx, .xls"  :maxFileSize="200000" @select="onSelectedFiles">
-                            <template #header="{ files }">
-                                <Button @click="uploadEvent(files)" class="is-hidden" />
-                            </template>
-
-                            <template #content>
-                                <span style="display: none;"></span>
-                            </template>
-
-                            <template #empty>
-                                    <div class="modal__dropfile--container">
-                                        <CircleSVG style="color: #E8DEF8;" />
-                                        <p class="modal__dropfile--content">Drop files here or select <span >here</span> to upload</p>
-                                    </div>
-                            </template>
-                        </FileUpload>
-                    </section>
-
-                    <p v-if="isPending">Uploading File...</p>
-
-                    <section v-if="has_uploaded">
+                    <div v-if="has_uploaded">
                         <div v-if="uploadedSuccess && uploadedData?.result">
                             <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
                                 <thead class="bg-gray-100 border-b border-gray-300">
@@ -167,38 +79,36 @@
                                 </tbody>
                             </table>
                         </div>
-                    </section>
-
-                    <p v-if=" uploadedSuccess && !uploadedData?.result " class="text-no-contacts">Something went wrong!</p>
-
-                    <div v-if="!has_uploaded" class="modal__info">
-                        <p>Accepted format files: .csv, .xlsx</p>
-                        <p>Your data should be in this order:</p>
-                        <ul>
-                            <li>Column A: First Name (optional)</li>
-                            <li>Column B: Last Name (optional)</li>
-                            <li>Column C: Number (required)</li>
-                            <li>Column D, E, F...: Number (optional)</li>
-                        </ul>
                     </div>
 
-                    <p v-if="savedSuccess && showSuccess" class="text-success">Contacts Saved!</p>
-                    <footer class="modal__footer">
-                        <Button @click="save_contact" class="modal__footer--btn" :disabled="savedIsPending || selected_contacts_ids.length == 0">
+                </template>
+               
+            </FileUpload>
+        </div>
+        <InfoPanel v-if="!has_uploaded" class="mt-7">
+            <p class="font-bold">Accepted format files: <span class="font-normal">.csv, .xlsx</span></p>
+            <p class="font-bold">Your data should be in this order:</p>
+            <ul class="list-disc pl-14">
+                <li>Column A: First Name (optional)</li>
+                <li>Column B: Last Name (optional)</li>
+                <li>Column C: Number (required)</li>
+                <li>Column D, E, F...: Number (optional)</li>
+            </ul>
+        </InfoPanel>
+        <template #footer>
+            <Button class="mt-6 m-auto w-[300px]" @click="save_contact" :disabled="savedIsPending || selected_contacts_ids.length == 0">
                             {{ !savedIsPending ? 'Save' : 'Saving...' }}
                         </Button>
-                    </footer>
-                </div>
-            </section>
         </template>
     </Dialog>
 </template>
 
 <script setup lang="ts">
 
+    import InfoPanel from '../reusables/InfoPanel.vue';
     import CheckSVG from '../svgs/CheckSVG.vue';
     import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
-import TrashSVG from '../svgs/TrashSVG.vue';
+    import TrashSVG from '../svgs/TrashSVG.vue';
 
     const props = defineProps({
         selectedGroup: { type: String, required: true }
@@ -217,10 +127,6 @@ import TrashSVG from '../svgs/TrashSVG.vue';
     const uploading = ref(false)
     const showError = ref(false);
     const showSuccess = ref(false);
-
-    const upl = () => {
-        console.log("uploading")
-    }
 
     const selected_contacts_ids:Ref<number[]> = ref([]) 
    
@@ -270,7 +176,6 @@ import TrashSVG from '../svgs/TrashSVG.vue';
     };
 
     const fileUploadHeader= ref(null)
-    const chooseCallbackRef=  ref<(() => void) | null>(null); 
 
     const openFileSelector=ref<HTMLButtonElement | null>(null);
     const clearFileSelection=ref<HTMLButtonElement | null>(null);
@@ -397,170 +302,4 @@ import TrashSVG from '../svgs/TrashSVG.vue';
         height: 1rem;
     }
     
-    :deep()
-
-    /* -- eric -- */ 
-
-    .modal__bg {
-        position: absolute;
-        left: 0;
-        top: 0;
-        height: 100%;
-        width: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-    }
-
-    .modal__container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-        background-color: #FFF;
-        padding-bottom: 38px;
-        border-radius: 30px;
-        width: 100%;
-    }
-
-    .modal__layout {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        width: 100%;
-        height: 100%;
-        gap: 38px;
-        width: 100%;
-    }
-
-    .modal__header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        width: 100%;
-        height: 90px;
-        padding: 0 20px;
-        border-bottom: 1px solid #CAC4D0;
-        @media (min-width: 400px) {
-            padding: 0 34px;
-        }
-    }
-
-    .modal__header--title {
-        color: #000;
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 140%;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: auto 0;
-        @media (min-width: 400px) {
-            font-size: 23.8px;
-        }
-    }
-
-    .modal__header--close {
-        background-color: transparent;
-        border: none;
-        cursor: pointer;
-        border-radius: 100%;
-        padding: 6px;
-    }
-    .modal__header--close:hover {
-        background-color: #F5F5F5;
-    }
-
-    .modal__dropfile {
-        padding: 0 26px;
-        width: 100%;
-        @media (min-width: 400px) {
-            padding: 0 38px;
-        }
-    }
-
-    .modal__dropfile--container {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 261px;
-        padding: 30px 10px;
-        justify-content: center;
-        align-items: center;
-        gap: 30px;
-        border: 1.4px solid #CAC4D0;
-        border-radius: 7.2px;
-    }
-    
-    .modal__dropfile--content {
-        color: #000;
-        text-align: center;
-        font-size: 16px;
-        font-weight: 500;
-        line-height: 140%;
-    }
-
-    .modal__info {
-        padding: 0 26px;
-        width: 100%;
-        color: #757575;
-        font-size: 14px;
-        line-height: 140%;
-        @media (min-width: 400px) {
-            padding: 0 38px;
-        }
-    }
-    .modal__info ul {
-        padding-left: 20px;
-        @media (min-width: 400px) {
-            padding-left: 60px;
-        }
-    }
-
-    .modal__footer {
-        width: 100%;
-        text-align: center;
-        padding: 0 26px;
-
-        .modal__footer--btn {
-            border-radius: 30px;
-            max-width: 300px;
-            width: 100%;
-            height: 40px;
-            background-color: #653494;
-            color: #FFF;
-            border: 1px solid #FFF;
-            font-size: 15.854px;
-            font-weight: 700;
-            line-height: 100%;
-            transition: background-color 0.3s;
-        }
-        
-        .modal__footer--btn:hover {
-            background-color: #4A1D6E;
-            cursor: pointer;
-        }
-
-        .modal__footer--btn[disabled] {
-            opacity: 0.6;
-            background-color: rgba(101, 52, 148, 0.60);
-            color: #B3B3B3;
-            border: 1px solid #B3B3B3;
-        }
-    }
-
-    .is-hidden {
-        display: none;
-    }
-
-    .text-no-contacts {
-        text-align: center;
-        color: #cf2626;
-        font-size: 20px;
-    }
-
-    .text-success {
-        text-align: center;
-        color: #1abd28;
-        font-size: 20px;
-    }
 </style>
