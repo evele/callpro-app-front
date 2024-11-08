@@ -17,36 +17,16 @@
                         </div>
                 </template>
                 <template  #content="{files}">
-                    <div v-if="uploading" class="flex items-center gap-14 pt-20 pb-11 m-auto max-w-xl">
-                        <div>
-                            <Avatar v-if="!upload_error" class="bg-white border border-2 border-black w-24 h-24"  shape="circle">
-                                <template #icon>
-                                    <FileSVG  class="text-black w-10 h-10"/>
-                                </template>
-                            </Avatar>
-                            <Avatar v-else class="bg-white border border-2 border-danger w-24 h-24" shape="circle">
-                                <template #icon>
-                                    <CloseSVG class="text-danger w-10 h-10"/>
-                                </template>
-                            </Avatar>
-                        </div>
-                        <div class="w-full flex flex-col gap-4">
-                            <div class="text-xl font-light"><span class="font-medium mr-4">{{ files[0]?.name??"" }}</span>{{ formatFileSize(files[0]?.size)}} </div>
-                            <div>
-                                <ProgressBar :show-value="false" :value="progress_size_percent" :pt="{value: ()=>[{'bg-danger':upload_error}]}">
-                                </ProgressBar>
-                            </div>
-                                
-                            <div class="text-lg">{{total_size_percent}}% Uploaded</div>
-                        </div>
-                        <div>
-                            <Avatar v-if="upload_error" class="bg-white border w-9 h-9"  shape="circle" @click="clear_file_seletion">
-                                <template #icon>
-                                    <TrashSVG></TrashSVG>
-                                </template>
-                            </Avatar>
-                        </div>
-                    </div>
+                    
+                    <UploadFileStatus
+                        :uploading="uploading"
+                        :upload-error="upload_error"
+                        :file-name="files[0]?.name??''"
+                        :file-size="files[0]?.size"
+                        :progress-size-percent="progress_size_percent"
+                        :total-size-percent="total_size_percent"
+                        @clear="clear_file_seletion"
+                    ></UploadFileStatus>
                     <div v-if="has_uploaded">
                         <div v-if="uploadedSuccess && uploadedData?.result">
                             <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
@@ -108,7 +88,6 @@
     import InfoPanel from '../reusables/InfoPanel.vue';
     import CheckSVG from '../svgs/CheckSVG.vue';
     import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
-    import TrashSVG from '../svgs/TrashSVG.vue';
 
     const props = defineProps({
         selectedGroup: { type: String, required: true }
@@ -138,17 +117,8 @@
     const progress_size_percent:Ref<number> = ref(0)
 
     const close = () => {
+        clear_file_seletion()
         visible.value = false   
-        has_uploaded.value = false
-        upload_error.value = false
-        uploading.value = false
-        total_size_percent.value = 0
-        progress_size_percent.value = 0
-        reset()
-        contacts.value = []
-        selected_contacts_ids.value = []
-        showError.value = false
-        showSuccess.value = false        
     }
 
     defineExpose({ open });
@@ -186,7 +156,16 @@
 
     const clear_file_seletion = () => {
         clearFileSelection?.value?.click()
-        close()
+        reset()
+        has_uploaded.value = false
+        upload_error.value = false
+        uploading.value = false
+        total_size_percent.value = 0
+        progress_size_percent.value = 0
+        contacts.value = []
+        selected_contacts_ids.value = []
+        showError.value = false
+        showSuccess.value = false        
     }
     
     const onSelectedFiles = (files: FileUploadEvent) => {
