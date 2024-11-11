@@ -1,6 +1,6 @@
 <template>
     <div class="option" @mouseover="is_hovering = true" @mouseleave="is_hovering = false">
-        <Button class="button" :class="[ { visible: is_hovering }, bgGradient ]">
+        <Button class="button" @click="handle_btn_action(text)" :class="[ { visible: is_hovering }, bgGradient ]">
             <component :is="iconOnHover !== null ? iconOnHover : icon" :style="{ color: iconOnHoverColor}"/>
         </Button>
 
@@ -9,7 +9,8 @@
                 <component :is="icon"/>
             </div>
             <span :class="[ count ? 'option-title' : 'option-only-title' ]">{{ text }}</span>
-            <span class="option-amount" v-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
+            <Skeleton v-if="count === null" shape="circle" size="1.5rem"></Skeleton>
+            <span class="option-amount" v-else-if="count" :style="{ color: props.iconColor }">{{ count }}</span>
         </div>
     </div>
 </template>
@@ -17,7 +18,7 @@
 <script setup lang="ts">
     const props = defineProps({
         text: { type: String, required: true },
-        count: { type: Number, required: false, default: null },
+        count: { type: [Number, null], required: false, default: undefined },
         icon: { type: Object, required: true },
         iconColor: { type: String, required: true },
         iconBg: { type: String, required: true },
@@ -27,6 +28,19 @@
     });
 
     const is_hovering = ref(false);
+
+    const emit = defineEmits(['click']);
+
+    const handle_btn_action = (text: string) => {
+        // Dejo creado el switch para agregar luego el resto de las acciones
+        switch (text) {
+            case 'DNC':
+                emit('click', 'dnc');
+                break;
+            default:
+                break;
+        }
+    }
 </script>
 
 <style scoped>
