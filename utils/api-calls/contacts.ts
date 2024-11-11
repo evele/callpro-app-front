@@ -61,6 +61,11 @@ export async function uploadContactCSV(data: FormData): Promise<UploadContactAPI
     return await fetchWrapper.post(UPLOAD_CONTACT_CSV_URL, data)  as UploadContactAPIResponse | APIResponseError
 }
 
+/* ----- Upload DNC Contact ----- */
+export async function uploadDNCContactCSV(data: FormData): Promise<APIResponseSuccess | APIResponseError> {    
+    return await fetchWrapper.post(UPLOAD_DNC_CONTACT_CSV_URL, data)  as APIResponseSuccess | APIResponseError
+}
+
 /* ----- Save Uploaded Contact ----- */
 export type SaveUploadedContactAPIResponse = {
     result: true;    
@@ -101,4 +106,78 @@ export async function downloadContactsFile(data: data_string): Promise<null> {
         console.error('Error processing the file download:', error);
     }
     return null;// TODO me tiraba error, busque y encontre esta solucion    
+}
+
+/* ----- Send numbers to trash ----- */
+export async function sendNumberToTrash(data: SendNumberToTrash): Promise<{ result: true } | APIResponseError>{    
+    return await fetchWrapper.post(SEND_NUMBER_TO_TRASH_URL, data) as { result: true } | APIResponseError
+}
+
+/* ----- Download DNC Contacts ----- */
+export async function downloadDNCContactsFile(): Promise<boolean> {
+    try {
+        const response = await fetchWrapper.get(DOWNLOAD_DNC_CONTACTS_FILE);
+        
+        if (response instanceof Blob) {
+            const filename = `user-x-_dnc_-${date_time_to_string()}.csv`;
+            const url = window.URL.createObjectURL(response);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } else {
+            return false
+        }
+    } catch (error) {
+        return false
+    }
+    return true
+}
+
+/* ----- Get DNC Contacts ----- */
+type DNCContactFilter = {
+    page: number,
+    limit: number,
+    filter: string,
+}
+
+export type GetDNCContactsAPIResponse = {
+    result: true;
+    dnc_contacts: ContactDNC[];
+    dnc_total_contacts: number; 
+}
+
+export async function getDNCContacts(data: DNCContactFilter): Promise<GetDNCContactsAPIResponse | APIResponseError> {
+    return await fetchWrapper.post(GET_DNC_CONTACTS_FILTERED_URL, data) as GetDNCContactsAPIResponse | APIResponseError
+}
+
+/* ----- Add DNC Contact ----- */
+type AddDNCContactData = {
+    number: string;
+}
+
+export async function addDNCContact(data: AddDNCContactData): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(ADD_DNC_CONTACT_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Send conctact to trash ----- */
+type SendContactToTrashData = {
+    numbers_ids: string[];
+}
+
+export async function sendContactToTrash(data: SendContactToTrashData): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(SEND_CONTACT_TO_TRASH_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Remove number from DNC ----- */
+type RemoveNumberFromDNCData = {
+    numbers: string[];
+}
+
+export async function removeNumberFromDNC(data: RemoveNumberFromDNCData): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(REMOVE_NUMBER_FROM_DNC_URL, data) as APIResponseSuccess | APIResponseError
 }
