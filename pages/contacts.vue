@@ -13,12 +13,15 @@
     <Button label="Add new contact" @click="open_new_contact_modal" />
 
     <ModalAddNewContact ref="modalAddNewContact" />
+    
     <ModalUploadContacts ref="modalUploadContacts" :selected-group="selected_tab" />
+    
     <ModalDNCContacts ref="modalDNCContacts" />
 </template>
 
 <script setup lang="ts">
     const modalAddNewContact = ref()
+    const modalUploadContacts = ref()
     const modalDNCContacts = ref()
     const selected_tab = ref(CONTACTS_ALL)
 

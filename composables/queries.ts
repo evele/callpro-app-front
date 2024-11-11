@@ -175,9 +175,9 @@ export const useFetchGetCustomGroups = () => {
   })
 }
 
-export function useFetchDownloadContacts(group_id:Ref<string>,enabled: boolean = true) {  
+export function useFetchDownloadContacts(group_id: string, enabled: boolean = true) {  
   const dataToSend = computed(() => ({
-    group_id: group_id.value
+    group_id: group_id
   }));
 
   return useQuery({
@@ -185,7 +185,7 @@ export function useFetchDownloadContacts(group_id:Ref<string>,enabled: boolean =
     queryFn: () => downloadContactsFile(dataToSend.value),
     enabled,
   });
-}
+} 
 
 export function useFetchDownloadDNCContacts() {  
   return useQuery({
@@ -243,15 +243,3 @@ export const useFetchSms = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerP
   })
 }
 
-
-export function useFetchDownloadContacts(group_id: string, enabled: boolean = true) {  
-  const dataToSend = computed(() => ({
-    group_id: group_id
-  }));
-
-  return useQuery({
-    queryKey: ['download_contacts_file', dataToSend.value],
-    queryFn: () => downloadContactsFile(dataToSend.value),
-    enabled,
-  });
-}

@@ -111,6 +111,8 @@ export async function downloadContactsFile(data: data_string): Promise<null> {
 /* ----- Send numbers to trash ----- */
 export async function sendNumberToTrash(data: SendNumberToTrash): Promise<{ result: true } | APIResponseError>{    
     return await fetchWrapper.post(SEND_NUMBER_TO_TRASH_URL, data) as { result: true } | APIResponseError
+}
+
 /* ----- Download DNC Contacts ----- */
 export async function downloadDNCContactsFile(): Promise<boolean> {
     try {

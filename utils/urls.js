@@ -37,6 +37,7 @@ export const DOWNLOAD_DNC_CONTACTS_FILE = "/contacts/download_dnc_as_csv"
 export const GET_DNC_CONTACTS_FILTERED_URL = "/contacts/get_dnc_contacts_filtered"
 export const ADD_DNC_CONTACT_URL = "/contacts/insert_dnc"
 export const SEND_CONTACT_TO_TRASH_URL = "/contacts/delete_numbers_contacts"
+export const SEND_NUMBER_TO_TRASH_URL = "/contacts/delete_numbers_contacts"  // TODO: check if should be the same
 export const REMOVE_NUMBER_FROM_DNC_URL = "/contacts/remove_number_from_dnc"
 
 /* ----- Dashboard Store ----- */
