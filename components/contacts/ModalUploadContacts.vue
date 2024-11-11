@@ -200,7 +200,7 @@
         uploadContact(data_to_send, {
             onSuccess: (data) => {
                 if(data.result && data.contacts?.length) {
-                    /* TODO: check if belongs to group or not (not here probbly before upload */
+                    /* TODO: check if belongs to group or not (not here probbly before upload) */
                     group_id.value = data.group_id || 'all';
                     contacts.value = data.contacts
                     setTimeout(() => {
@@ -220,6 +220,7 @@
         });
     };    
 
+    // TODO: set the right colors if selected
     const all_selected = computed(() => selected_contacts_ids.value.length === contacts.value.length);
     const some_selected = computed(()=> selected_contacts_ids.value.length >0 && selected_contacts_ids.value.length < contacts.value.length)
 
