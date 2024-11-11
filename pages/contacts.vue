@@ -5,7 +5,7 @@
     <div class="py-5 main-container gap-4 px-10">
         <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" />
         <div>
-            <ContactsActions />
+            <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_total_contacts" />
             <ContactsGroupsPanel />
         </div>
     </div>    
@@ -14,17 +14,47 @@
 
     <ModalAddNewContact ref="modalAddNewContact" />
     <ModalUploadContacts ref="modalUploadContacts" :selected-group="selected_tab" />
+    <ModalDNCContacts ref="modalDNCContacts" />
 </template>
 
 <script setup lang="ts">
     const modalAddNewContact = ref()
-    const modalUploadContacts = ref()
+    const modalDNCContacts = ref()
     const selected_tab = ref(CONTACTS_ALL)
 
+    /* ----- DNC Contacts ----- */
+    const page = ref(1)
+    const show = ref(0)
+    const search = ref('')
+    const dnc_total_contacts = ref<number | null>(null)
+
+    const { data: dnc_contacts, isLoading: dnc_is_loading, isSuccess: dnc_is_success, refetch: dnc_refetch } = useFetchDNCContacts(page,show,search)
+
+    const dnc_contacts_value = computed(() => dnc_contacts.value);
+
+    watch(dnc_contacts_value, (updated_data: GetDNCContactsAPIResponse | APIResponseError | undefined) => {
+        if (updated_data && updated_data?.result) {
+            dnc_total_contacts.value = updated_data.dnc_total_contacts;
+        } else {
+            dnc_total_contacts.value = -1;
+        }
+    });
+    /* ----- DNC Contacts ----- */
 
     const open_new_contact_modal = () => {
         modalAddNewContact.value.open();
     }
+
+    const handle_select_contact_action = (action: string) => {
+        switch (action) {
+            case 'dnc':
+                modalDNCContacts.value.open()
+                break;
+            default:
+                break;
+        }
+    }
+
 </script>
 
 <style scoped>

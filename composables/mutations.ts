@@ -45,6 +45,16 @@ export const useUploadContact = () => {
   })
 }
 
+export const useUploadDNCContact = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: FormData) => uploadDNCContactCSV(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+    }
+  })
+}
+
 export const useSaveUploadedContact = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -87,6 +97,37 @@ export const useSendNumberToTrash = () => {
       queryClient.invalidateQueries({ queryKey: ['system_groups'] })
       queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
       queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
+export const useAddDNCContact = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { number: string }) => addDNCContact(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+    }
+  })
+}
+
+export const useSendContactToTrash = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { numbers_ids: string[] }) => sendContactToTrash(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
+export const useRemoveNumberFromDNC = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { numbers: string[] }) => removeNumberFromDNC(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
     }
   })
 }
