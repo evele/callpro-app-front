@@ -87,10 +87,10 @@
                         </template>
                         <template #body="slotProps">
                             <Chip v-if="slotProps.data.number_id !== null" 
-                                label="Yes" class="bg-[#EADDFF] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
+                                label="Yes" class="bg-[#EADDFF] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                             <Chip v-else
-                                label="No" class="bg-[#E6E6E6] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
+                                label="No" class="bg-[#E6E6E6] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                         </template>
                     </Column>
@@ -98,10 +98,10 @@
                     <Column field="blocked_by" header="Blocked by" class="text-center" headerStyle="min-width: 150px">
                         <template #body="slotProps">
                             <Chip v-if="slotProps.data.dnc == '1'" 
-                                label="You" class="bg-[#FFFBEB] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
+                                label="You" class="bg-[#FFFBEB] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                             <Chip v-else
-                                label="Admin" class="bg-[#FEE9E7] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
+                                label="Admin" class="bg-[#FEE9E7] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                             />
                         </template>
                     </Column>
@@ -364,7 +364,7 @@
 </script>
 
 <style scoped lang="scss">
-::v-deep(.dnc-table) {
+:deep(.dnc-table) {
     min-width: 30rem;
 
     .p-datatable-thead, .p-datatable-header-cell {
@@ -384,15 +384,19 @@
         height: 60px;
     }
 }
-::v-deep(.light-spinner) {
+:deep(.light-spinner) {
     .p-progressspinner-circle {
         stroke: white!important;
     }
 }
 
-::v-deep(.dark-spinner) {
+:deep(.dark-spinner) {
     .p-progressspinner-circle {
         stroke: #757575!important;
     }
 }
+
+:deep(.p-chip-label){
+    width: 100%;
+} 
 </style>
