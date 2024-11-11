@@ -52,6 +52,8 @@ export const format_number_to_show = function (number: string) {
   return number
 }
 
+export const format_number_to_send = (number: string) => number.replace(/\D/g, '');
+
 export const show_full_name = (first_name: StringOrNull, last_name: StringOrNull) => {
   if(!first_name && !last_name) return '';
   if(!first_name) return last_name;

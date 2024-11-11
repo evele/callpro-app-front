@@ -21,6 +21,10 @@ export type APIResponseError = {
   validation_error?: Record<string, string>
 }
 
+export type APIResponseSuccess = {
+  result: true
+}
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number
@@ -45,6 +49,14 @@ export type ContactPhoneNumber = PhoneNumber & {
   first_name: string;
   last_name: string;
   is_deleted: ZeroOrOne;
+}
+
+export type ContactDNC = {
+  dnc: '1' | '2';
+  first_name: StringOrNull;
+  last_name: StringOrNull;
+  number: string;
+  number_id: StringOrNull;
 }
 
 // Type for Group Contacts
