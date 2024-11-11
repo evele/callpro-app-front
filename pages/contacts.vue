@@ -5,20 +5,17 @@
     <div class="py-5 main-container">
         <ContactsTable :selected-tab="selected_tab" />
         <div>
-            <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_total_contacts" />
+            <ContactsActions @click="open_contacts_modal" :dnc-total-numbers="dnc_total_contacts" />
             <ContactsGroupsPanel />
         </div>
     </div>    
 
-    <Button label="Add new contact" @click="open_new_contact_modal" />
-
-    <ModalAddNewContact ref="modalAddNewContact" />
-    <ModalDNCContacts ref="modalDNCContacts" />
+    <Button label="Add new contact" @click="open_contacts_modal('new_contact')" />
+    <ModalContacts ref="modalContacts" :section-to-show="section_to_show" />
 </template>
 
 <script setup lang="ts">
-    const modalAddNewContact = ref()
-    const modalDNCContacts = ref()
+    const modalContacts = ref()
     const selected_tab = ref(CONTACTS_ALL)
 
     /* ----- DNC Contacts ----- */
@@ -40,20 +37,10 @@
     });
     /* ----- DNC Contacts ----- */
 
-    const open_new_contact_modal = () => {
-        modalAddNewContact.value.open();
+    const open_contacts_modal = (section: string) => {
+        if(!section) return
+        modalContacts.value.open(section);
     }
-
-    const handle_select_contact_action = (action: string) => {
-        switch (action) {
-            case 'dnc':
-                modalDNCContacts.value.open()
-                break;
-            default:
-                break;
-        }
-    }
-
 </script>
 
 <style scoped>

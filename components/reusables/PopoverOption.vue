@@ -1,6 +1,6 @@
 <template>
     <div class="flex flex-row justify-start  text-black text-2xl font-semibold">
-        {{ options[selectedOption - 1].texto }}
+        {{ options.find(option => option.id === selectedOption)?.text }}
         <button @click="togglePopover" class=" rounded-full px-2 h-8 hover:bg-gray-100"><ChevronDownSVG class="h-4 w-4" /></button>                        
     </div>  
     <Popover ref="popover" class="border-none before:hidden after:hidden rounded-xl m-0">
@@ -10,7 +10,7 @@
                     class="cursor-pointer px-4 first:rounded-t-xl last:rounded-b-xl hover:bg-black hover:text-white transition-all duration-200"
                     @click="handleOptionClick(item.id)">
                     <div class="text-center leading-[30px]"> 
-                        {{ item.texto }}
+                        {{ item.text }}
                     </div>
                 </li>
             </template>
@@ -19,15 +19,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import Popover from 'primevue/popover';
 import ChevronDownSVG from '~/components/svgs/ChevronDownSVG.vue';
-
-
 
 const props = defineProps({
     selectedOption: {
-        type: Number,
+        type: String,
     },
     options: {
         type: Array,

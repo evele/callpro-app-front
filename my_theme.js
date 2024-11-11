@@ -443,8 +443,8 @@ export const MyPreset = definePreset(Aura, {
     components: {
         dialog: {
             borderRadius: "1.875rem",
-            headerPadding: "2rem 2rem 0 2rem",
-            contentPadding: "0 2rem",
+            headerPadding: "2rem 0 0 0",
+            contentPadding: "1.5rem 2rem 0 2rem",
             footerPadding: "0 2rem 2rem 2rem"
         },
         button: {

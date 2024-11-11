@@ -46,9 +46,7 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
-        <SaveCustomGroups ref="saveCustomGroupsRef" @update:saveGroup="handlerSaveGroup" :selected-group="selectedGroup" @update:selectedGroup="handlerSelectedGroup"
-            :is-pending="saveGroupContactsIsPending" :is-error="saveGroupContactsIsError"
-            :error-message="saveGroupContactsError?.message" :is-success="saveGroupContactsIsSuccess" />
+        <ModalContacts ref="saveCustomGroupsRef"  />
     </section>
 </template>
 
@@ -75,7 +73,7 @@ const setActiveButton = (name: string) => {
 };
 
 const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG, refetch: refetchGroupData } = useFetchGetCustomGroups()
-const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
+const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending } = useSaveGroupContacts()
 
 const saveCustomGroupsRef = ref();
 
@@ -118,13 +116,6 @@ const handlerSaveGroup = (dataToSend: ContactGroup) => {
     });
 
 }
-const handlerSelectedGroup =(e: CustomGroup| null) =>{
-
-}
-
-const fetch_groups_data = () => {
-        refetchGroupData()
-    }
 </script>
 
 <style scoped lang="scss">

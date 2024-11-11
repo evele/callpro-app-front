@@ -1,96 +1,81 @@
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" class="w-full max-w-[850px] mx-4">
-        <template #header>
-            <header class="w-full flex justify-between pb-5">
-                <h2 class="flex items-center gap-4 font-bold text-lg text-black">Add new contact <ChevronDownSVG /></h2>
-                <Button @click="close" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
-            </header>
-            <Divider class="absolute left-0 top-[75px]" />
-        </template>
+    <div v-if="contact_numbers.length" class="flex flex-wrap gap-2 mb-2">
+        <Chip v-for="(number, i) in contact_numbers" :key="i" class="bg-[#1D192B] text-white text-sm">
+            <template #default>
+                <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1">{{ i + 1 }}</span>
+                {{ number.number }}
+            </template>
+        </Chip>
+    </div>
 
-        <div v-if="contact_numbers.length" class="flex flex-wrap gap-2 mt-4 mb-2">
-            <Chip v-for="(number, i) in contact_numbers" :key="i" class="bg-[#1D192B] text-white text-sm">
-                <template #default>
-                    <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1">{{ i + 1 }}</span>
-                    {{ number.number }}
-                </template>
-            </Chip>
+    <form @submit.prevent class="new-contact-form flex flex-col gap-5 sm:gap-6">
+        <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
+            <div class="w-full">
+                <label for="contact-name" class="text-lg text-black">Name</label>
+                <InputText type="text" id="contact-name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
+            </div>
+
+            <div class="w-full">
+                <label for="contact-surname" class="text-lg text-black">Surname</label>
+                <InputText type="text" id="contact-surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
+            </div>
         </div>
 
-        <form @submit.prevent class="new-contact-form flex flex-col gap-5 sm:gap-6" :class="[{ 'mt-5': !contact_numbers.length}]">
-            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
-                <div class="w-full">
-                    <label for="contact-name" class="text-lg text-black">Name</label>
-                    <InputText type="text" id="contact-name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
-                </div>
-
-                <div class="w-full">
-                    <label for="contact-surname" class="text-lg text-black">Surname</label>
-                    <InputText type="text" id="contact-surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
-                </div>
-            </div>
-
-            <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
-                <div class="w-full">
-                    <label for="contact-phone" class="text-lg text-black">Phone {{current_position + 1}}*</label>
-                    <PhoneInput class="mt-[2px]" :model-value="new_contact.numbers.number" @update:modelValue="(v: string) => new_contact.numbers.number = v" 
-                        :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
-                </div>
-
-                <div class="relative w-full flex">
-                    <div class="w-full">
-                        <label class="text-lg text-black">Type*</label>
-                        <Select v-model="new_contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
-                    </div>
-                    <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
-                </div>
-            </div>
-
+        <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
             <div class="w-full">
-                <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
-                <div v-if="CGIsSuccess" class="w-full">
-                    <label class="text-lg text-black">Groups</label>
-                    <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
-                    <MultiSelect v-else v-model="new_contact.numbers.number_groups" :options="custom_groups_options" optionLabel="name" 
-                        display="chip" class="w-full mt-1" placeholder="-" />
-                </div>
+                <label for="contact-phone" class="text-lg text-black">Phone {{current_position + 1}}*</label>
+                <PhoneInput class="mt-[2px]" :model-value="new_contact.numbers.number" @update:modelValue="(v: string) => new_contact.numbers.number = v" 
+                    :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
             </div>
 
-            <div class="w-full">
-                <div>
-                    <label for="contact-notes" class="text-lg text-black">Notes</label>
-                    <Textarea v-model="new_contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
-                    <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
+            <div class="relative w-full flex">
+                <div class="w-full">
+                    <label class="text-lg text-black">Type*</label>
+                    <Select v-model="new_contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
                 </div>
+                <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
             </div>
-        </form>
-        
-        
-        <template #footer>
-            <footer class="flex flex-col w-full justify-center gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
-                <Button v-if="contact_numbers.length" :disabled="isPending" @click="go_back" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
-                    Go back
-                </Button>
-                <Button @click="add_new" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
-                    Add new phone
-                </Button>
-                <Button @click="save_contact" :disabled="isPending" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
-                    {{ isPending ? 'Saving...' : 'Save' }}
-                </Button>
-            </footer>
-        </template>
-        <Toast />
-    </Dialog>
+        </div>
+
+        <div class="w-full">
+            <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
+            <div v-if="CGIsSuccess" class="w-full">
+                <label class="text-lg text-black">Groups</label>
+                <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
+                <MultiSelect v-else v-model="new_contact.numbers.number_groups" :options="custom_groups_options" optionLabel="name" 
+                    display="chip" class="w-full mt-1" placeholder="-" />
+            </div>
+        </div>
+
+        <div class="w-full">
+            <div>
+                <label for="contact-notes" class="text-lg text-black">Notes</label>
+                <Textarea v-model="new_contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
+                <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
+            </div>
+        </div>
+    </form>
+    
+    <footer class="flex flex-col w-full justify-center gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
+        <Button v-if="contact_numbers.length" :disabled="isPending" @click="go_back" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+            Go back
+        </Button>
+        <Button @click="add_new" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+            Add new phone
+        </Button>
+        <Button @click="save_contact" :disabled="isPending" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
+            {{ isPending ? 'Saving...' : 'Save' }}
+        </Button>
+    </footer>
+    <Toast />
 </template>
 
 <script setup lang="ts">
     import { useQueryClient } from '@tanstack/vue-query'
-    import { useToast } from 'primevue/usetoast';
 
     const queryClient = useQueryClient()
     const toast = useToast()
 
-    const visible = ref(false);
     const number_error = ref('');
     const type_error = ref('');
     const form_action = ref('')
@@ -143,20 +128,6 @@
         }
     })
 
-    const open = () => {
-        visible.value = true;
-    }
-
-    const close = () => {
-        visible.value = false;
-        reset_contact()
-        number_error.value = ''
-        type_error.value = ''
-        contact_numbers.value = []
-        current_position.value = 0
-        form_action.value = ''
-    }
-
     const reset_contact = () => {
         Object.assign(new_contact, empty_contact)
         new_contact.numbers = {
@@ -167,8 +138,6 @@
             number_groups: []    
         }
     }
-
-    defineExpose({ open });
 
     const validate_number_and_type = () => {
         let is_invalid = false
