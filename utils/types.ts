@@ -208,7 +208,7 @@ export type SystemGroup = {
 }
 
 export type CustomGroup = {
-  id: number;
+  id: string;
   group_code: StringOrNumberOrNull;
   group_name: StringOrNumber;
   count: number;
@@ -221,6 +221,10 @@ export type AddNumberToGroup = {
 
 export type MoveNumberToGroup = AddNumberToGroup & {
   current_group_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+}
+
+export type SendNumberToTrash = {
+  number_ids: string[]; 
 }
 
 /* ----- Packages ----- */

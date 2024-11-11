@@ -72,6 +72,7 @@ export const useMoveNumberToGroup = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['system_groups'] })
       queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
     }
   })
 }
@@ -83,6 +84,19 @@ export const useAddNumberToGroup = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['system_groups'] })
       queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
+export const useSendNumberToTrash = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SendNumberToTrash) => sendNumberToTrash(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
     }
   })
 }

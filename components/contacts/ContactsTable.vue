@@ -1,10 +1,10 @@
 <template>
-    <div class="w-full table-container rounded-7 py-5 px-4">
+    <div class="w-full table-container max-w-[44rem] rounded-2xl py-5 px-4 text-sm bg-white">
         <DataTable 
             :value="formatted_contacts"
             scrollable 
             tableStyle="min-width: 50rem"
-            class="table w-full flex flex-col gap-18" 
+            class="table" 
             :paginator="show_pagination" 
             :rows="10" 
             dataKey="id"
@@ -14,85 +14,126 @@
             :totalRecords="total_records"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
+            :rowClass="rowClass"
+            selectionMode="single"
+            @rowSelect="onRowSelect"
         >
 
             <template #header>
-                <header class="flex flex-col w-full gap-18">
+                <header class="flex flex-col w-full gap-5 mb-4">
                     <div class="flex justify-between items-center w-full">
-                        <div class="search-input-container">
-                            <SearchSVG class="search-icon" />
-                            <InputText type="text" placeholder="Search by Name, Phone or Group" class="search-input rounded-8" />
-                        </div>
+
+                        <IconField class="w-full max-w-[300px]">
+                            <InputIcon>
+                                <SearchSVG class="text-[#757575]" />
+                            </InputIcon>
+                            <InputText class="py-2 w-full" placeholder="Search by Name, Phone or Group" />
+                        </IconField>
 
                         <div class="flex gap-4">
-                            <Button class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6" label="Filter">
-                                <template #icon>
-                                    <FilterSVG class="table-action-icon" />
-                                </template>
+                            <Button :class="action_button_style">
+                                <FilterSVG class="text-[#757575]" />
+                                <span class="font-semibold">Filter</span>
                             </Button>
-                            <Button class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6" label="Sort by">
-                                <template #icon>
-                                    <SortBySVG class="table-action-icon" />
-                                </template>
+                            <Button :class="action_button_style">
+                                <SortBySVG class="text-[#757575]" />
+                                <span class="font-semibold">Sort by</span>
                             </Button>
                         </div>
                     </div>
                     
-                    <div class="flex items-center">
-                        <div class="flex items-center gap-6 selected-group-info rounded-4">
-                            <CheckSVG class="check-icon rounded-full" />
-                            <span>All</span>
-                        </div>
-                        <div class="ml-4">
-                            <Button @click="handle_group_action('move')" style="margin-right: 1rem;">Move to Group</Button>
-                            <Button @click="handle_group_action('add')">Add to Group</Button>
-                        </div>
-                </div>
+                    <div class="flex items-center gap-2">
+                        <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                            <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
+                            <PlusRoundedSVG v-else class="w-5 h-5" />
+                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
+                        </Button>
+
+                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                            <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                            <MoveSVG v-else class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
+                        </Button>
+
+                        <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                            <ProgressSpinner v-if="STTIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                            <TrashSVG v-else class="w-5 h-5" />
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
+                        </Button>
+                    </div>
                 </header>
             </template>
 
-            <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
+            <Column headerStyle="width: 3rem">
+                <template #header>
+                    <Checkbox v-model="all_selected" :binary="true" @change="handle_select_all" :indeterminate="indeterminate_all" />                                   
+                </template>
 
-            <Column field="name" header="Name" class="left-aligned-column">
                 <template #body="slotProps">
-                    <span class="name-item">{{ slotProps.data.name }}</span>
+                    <Checkbox v-model="selected_contacts" :inputId="slotProps.data.id" :value="slotProps.data.id" 
+                        :indeterminate="indeterminate_contacts[slotProps.data.id]" @click.stop @change="handle_select_checkbox(slotProps.data.id, true)" />                                  
                 </template>
             </Column>
 
-            <Column field="number" header="Phone" class="center-aligned-column">
+            <Column field="name" header="Name" class="text-left">
                 <template #body="slotProps">
-                    <div class="phone-data-container h-row">
-                        <span class="phone-item">{{ slotProps.data.number }}</span>
-                        <span v-if="slotProps.data.total_numbers > 1" class="extra-number-chip"> +{{ slotProps.data.total_numbers -1 }}</span>
+                    <div class="text-[#1D1B20] relative w-fit">
+                        {{ slotProps.data.name }}
+                        <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
+                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                                <EditIconSVG class="w-3 h-4" />
+                            </Button>
+                            <Button class="bg-gray-200 py-1 px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                                <TrashSVG class="w-4 h-4" />
+                            </Button>
+                        </div>
                     </div>
                 </template>
             </Column>
 
-            <Column field="groups" header="Groups" class="center-aligned-column">
+            <Column field="number" header="Phone" class="text-center">
                 <template #body="slotProps">
-                    <span class="font-bold">{{ slotProps.data.total_groups }}</span>
+                    <div class="relative flex items-center" :class="[ Object.keys(expandedRows) == slotProps.data.id ? '' : 'h-11']">
+                        <span class="text-[#797676] w-full">{{ hide_contact_data(slotProps.data.id) ? '' : slotProps.data.numbers[0] }}</span>
+                        <span v-if="slotProps.data.total_numbers > 1 && !hide_contact_data(slotProps.data.id)"
+                            v-tooltip.top="{
+                                value: slotProps.data.numbers.slice(1).join(', '),
+                                pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
+                            }"
+                            class="absolute -right-3 top-5 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> 
+                            + {{ slotProps.data.total_numbers -1 }}
+                        </span>
+                    </div>
                 </template>
             </Column>
 
-            <Column field="dnc" header="" class="center-aligned-column">
+            <Column field="groups" header="Groups" class="text-center">
+                <template #body="slotProps">
+                    <span class="font-semibold">{{ hide_contact_data(slotProps.data.id) ? '' : slotProps.data.total_groups }}</span>
+                </template>
+            </Column>
+
+            <Column field="dnc" header="" class="text-center">
                 <template #header>
-                    <div class="dnc-header-container">
+                    <div class="flex justify-center pl-[14px] text-white font-semibold">
                         <span>DNC</span>
                         <ErrorIconSVG />
                     </div>
                 </template>
                 <template #body="slotProps">
-                    <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon w-full" />
+                    <span v-if="hide_contact_data(slotProps.data.id)"></span>
+                    <span v-else-if="slotProps.data.dnc > 0 && slotProps.data.dnc != slotProps.data.total_numbers">-</span>
+                    <DncSVG v-else-if="slotProps.data.dnc > 0" class="text-[#751617] w-full" />
                     <PhoneSVG v-else class="w-full" />
                 </template>
             </Column>
 
             <Column expander>
                 <template #body="slotProps">
-                    <Button class="expand-btn" @click="toggleRow(slotProps.data.id)">
+                    <Button class="flex justify-center items-center bg-transparent border-none w-9 h-9" @click.stop @click="toggleRow(slotProps.data.id)">
                         <template #icon>
-                            <ChevronUpSVG v-if="isRowExpanded(slotProps.data.id)" class="chevron-icon" />
-                            <ChevronDownSVG v-else class="chevron-icon" />
+                            <ChevronUpSVG v-if="isRowExpanded(slotProps.data.id)" class="text-[#302f31]" />
+                            <ChevronDownSVG v-else class="text-[#302f31]" />
                         </template>
                     </Button>
                 </template>
@@ -103,43 +144,56 @@
                 <DataTable 
                     :value="formatted_contact"
                     tableStyle="min-width: 35rem"
-                    class="contacts-expanded-row w-full"
                 >
-                    <Column selectionMode="multiple" headerStyle="text-align: left"></Column>
-                    <Column field="name" header="" class="left-aligned-column" style="width: 35%;">
+                    <Column headerStyle="width: 3rem">
                         <template #body="slotProps">
-                            <span class="name-item">
+                            <div class="w-14 flex items-center justify-end">
+                                <Checkbox v-model="selected_numbers" :value="slotProps.data.number_id" @change="handle_select_checkbox(slotProps.data.id, false)" />
+                            </div>
+                        </template>
+                    </Column>
+                    <Column field="name" header="" class="text-left" style="width: 30%;">
+                        <template #body="slotProps">
+                            <span class="text-[#1D1B20] pl-4">
                                 {{ format_contact_type(slotProps.data.type) }}
                             </span>
                         </template>
                     </Column>
 
-                    <Column field="number" header="" class="center-aligned-column" style="width: 20%;">
+                    <Column field="number" header="" class="text-center" style="width: 20%;">
                         <template #body="slotProps">
-                            <span class="phone-item">
+                            <span class="text-[#797676] pl-6">
                                 {{ slotProps.data.number }}
                             </span>
                         </template>
                     </Column>
 
-                    <Column field="groups" header="" class="center-aligned-column" style="width: 25%; padding-left: 0;">
+                    <Column field="groups" header="" class="text-center" style="width: 25%; padding-left: 0;">
                         <template #body="slotProps">
-                            <div class="group-container">
-                                <span class="rounded-4 group-chip" v-for="(group, g_i) in slotProps.data.group" :key="g_i">Group {{ g_i + 1 }}</span>
+                            <div class="relative flex justify-center gap-1 items-center">
+                                <span v-if="slotProps.data.group.length > 0" class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px]">{{ slotProps.data?.group[0] }}</span>
+                                <span v-if="slotProps.data.group.length > 1"
+                                    v-tooltip.top="{
+                                        value: get_number_group_name(slotProps.data.group.slice(1)).join(', '),
+                                        pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
+                                    }"
+                                    class="absolute right-10 bg-[#49454F] text-white px-2 rounded-xl font-medium leading-none h-4"> 
+                                    ...
+                                </span>
                             </div>
                         </template>
                     </Column>
 
-                    <Column field="dnc" header="" class="center-aligned-column" style="width: 9%; padding-left: 12px;">
+                    <Column field="dnc" header="" class="text-center" style="width: 9%; padding-left: 12px;">
                         <template #body="slotProps">
                             <span>
-                                <DncSVG v-if="slotProps.data.dnc === '1'" class="dnc-icon" />
+                                <DncSVG v-if="slotProps.data.dnc === '1'" class="text-[#751617]" />
                                 <PhoneSVG v-else />
                             </span>
                         </template>
                     </Column>
 
-                    <Column field="empty" header="" class="center-aligned-column" style="width: 12%;">
+                    <Column field="empty" header="" class="text-center" style="width: 20%;">
                         <template body>
                             <span>
                             </span>
@@ -163,30 +217,35 @@
 
             <template #paginatorstart>
                 <div class="flex gap-4">
-                    <Button type="button" label="Upload file" class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6">
-                        <template #icon>
-                            <UploadSVG class="upload-icon" />
-                        </template>
+                    <Button type="button" :class="action_button_style" @click="emit('uploadFile', true)">
+                        <UploadSVG class="w-5 h-5 text-[#757575]" />
+                        <span class="font-semibold">Upload file</span>
                     </Button>
 
-                    <Button type="button" label="Download list" class="table-action-btn flex items-center py-2 px-3 rounded-9 gap-6">
-                        <template #icon>
-                            <DownloadSVG />
-                        </template>
+                    <Button type="button" :class="action_button_style" @click="download_contacts">
+                        <DownloadSVG class="text-[#757575]" />
+                        <span class="font-semibold">Download list</span>
                     </Button>
                 </div>
             </template>
         </DataTable>
+
+        <ConfirmDialog>
+            <template #message>
+                <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
+            </template>
+        </ConfirmDialog>
+        <Toast />
     </div>
-    
 </template>
 
 <script setup lang="ts">
-    import { format_contact_type } from '@/utils/functions';
-
     const props = defineProps({
         selectedTab: { type: String, required: true }
     })
+
+    const confirm = useConfirm()
+    const toast = useToast()
 
     const page = ref(1)    
     const show = ref(10)
@@ -197,58 +256,115 @@
 
     const expandedRows = ref<{ [key: string]: boolean }>({});
     const formatted_contact: Ref<FormattedContact[]> = ref([]);
+    const associative_array = ref<{ [key: string]: string[] }>({})
+    const indeterminate_all = ref(false);
+    const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
+    const numbers_ids = ref<string[]>([])
 
-    type FormattedContact = {
+    const emit = defineEmits(['uploadFile'])
+
+    /* ----- Types ----- */
+    type FormattedContact = { // This is the data that is shown in the expanded row
         dnc: ZeroOrOne,
         group: string[],
         number: string,
-        type: OneToFour
+        type: OneToFour,
+        number_id: string,
+        id: number,
+    }
+
+    type ContactRow = { // This is the data that is shown in the main table
+        id: string,
+        name: string | null,
+        numbers: string[],
+        total_numbers: number,
+        total_groups: number,
+        dnc: number,
+    }
+
+    type GroupedContacts = {
+        [key: string]: ContactRow;
     }
 
     const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
     const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups() 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
-    const { mutate: moveNumberToGroup, isPending: MTGIsPending, isError: MTGIsError, isSuccess: MTGIsSuccess } = useMoveNumberToGroup()
-    const { mutate: addNumberToGroup, isPending: ATGIsPending, isError: ATGIIsError, isSuccess: ATGIIsSuccess } = useAddNumberToGroup()
+    const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
+    const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
+    const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
+    const { refetch: download } = useFetchDownloadContacts(props.selectedTab, false)
 
     const contacts_data = computed(() => {
         if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }
         return all_contacts_data?.value
     })
 
+    const custom_groups = computed(() => {
+        if(!CGData?.value?.result) return []
+        return CGData?.value.custom_groups
+    })
+
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
 
+    // Contacts that are shown in the main table
     const formatted_contacts = computed(() => {
         total_records.value = contacts_data.value.total_numbers;
         if(!contacts_data.value.contacts) return []
 
-        const groupedContacts = contacts_data.value?.contacts?.reduce((acc: any, contact: ContactPhoneNumber) => {
+        const groupedContacts: GroupedContacts = contacts_data.value?.contacts?.reduce((acc: GroupedContacts, contact: ContactPhoneNumber) => {
             if (acc[contact.id]) {
                 acc[contact.id].total_numbers += 1;
+                acc[contact.id].dnc += +contact.dnc
+                acc[contact.id].numbers.push(format_number_to_show(contact.number));
                 if(typeof contact.number_groups === 'string') {
                     acc[contact.id].total_groups += get_number_groups(contact.number_groups).length;
                 }
             } else {
                 acc[contact.id] = {
-                    id: contact.id,
+                    id: String(contact.id),
                     name: show_full_name(contact.first_name, contact.last_name),
-                    number: format_number_to_show(contact.number),
+                    numbers: [format_number_to_show(contact.number)],
                     total_numbers: 1,
-                    total_groups: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups).length : '0',
-                    dnc: contact.dnc
+                    total_groups: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups).length : 0,
+                    dnc: +contact.dnc,
                 };
+
+            }
+
+            // Create an associative array to store the numbers of each contact
+            if (!associative_array.value[contact.id]) {
+                associative_array.value[contact.id] = [];
+                indeterminate_contacts.value[contact.id] = false;
+            }
+    
+            if (!associative_array.value[contact.id].includes(contact.number_id)) {
+                associative_array.value[contact.id].push(contact.number_id);
             }
 
             return acc;
         }, {});
 
+        numbers_ids.value = Object.values(associative_array.value).flat();
         return Object.values(groupedContacts);
     });
 
-    const onPageChange = (event: any) => {
-        page.value = event.page + 1
+    // Reset checkboxes and expanded row
+    const reset_selected_contacts = () => {
+        all_selected.value = false;
+        selected_contacts.value = [];
+        selected_numbers.value = [];
+        expandedRows.value = {};
+        Object.keys(indeterminate_contacts.value).forEach((key) => indeterminate_contacts.value[key] = false);
+        indeterminate_all.value = false;
     }
 
+    // Handle pagination
+    const onPageChange = (event: any) => {
+        page.value = event.page + 1
+        reset_selected_contacts()
+    }
+
+    // When the expand button is clicked, it expands the row and shows the contact numbers and its data
     const toggleRow = (id: string) => {
         let is_same_row = false;
         if(Object.keys(expandedRows.value).length) {
@@ -260,6 +376,9 @@
         format_expanded_contact(id);
     }
 
+    const hide_contact_data = (id: number) => (id === formatted_contact.value[0]?.id) && expandedRows.value[id];
+
+    // Contact data that is shown in the expanded row
     const format_expanded_contact = (id: string | number) => {
         if(!contacts_data.value?.contacts) return [];
 
@@ -270,7 +389,9 @@
                                     type: contact.type,
                                     number: format_number_to_show(contact.number),
                                     group: typeof contact.number_groups === 'string' ? get_number_groups(contact.number_groups) : [],
-                                    dnc: contact.dnc
+                                    dnc: contact.dnc,
+                                    number_id: contact.number_id,
+                                    id: contact.id,
                                 }
                             })
     }
@@ -279,51 +400,292 @@
 
     const get_number_groups = (groups: string) => groups === null ? [] : groups.trim().split(/\s*,\s*/);
 
+    // These next 2 functions will be deleted in the future
     const target_groups = computed(() => {
-        if(CGData?.value?.result && CGData?.value?.custom_groups?.length) {
-            return CGData.value.custom_groups.map((group: CustomGroup) => group.id).slice(0, 2)
+        if(custom_groups.value.length) {
+            return custom_groups.value.map((group: CustomGroup) => group.id).slice(0, 2)
         }
     })
 
     const hardcoded_contact_data = computed(() => {
-        if(all_contacts_data?.value?.result && all_contacts_data?.value?.contacts?.length) {
-            const contact = all_contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups?.length < 5)
-            console.log('contact', contact)
-            if(contact) return { number_id: contact.number_id, group_id: contact.number_groups }; 
-        }
-        return null
+        const contact = contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups !== null && c.number_groups?.length < 5)
+        if(contact) return { number_id: contact.number_id, group_id: contact.number_groups };
+        else return null;
     })
 
-    const handle_group_action = (action: string) => {
+    // Show confirmation modal
+    const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 });
+    const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 });
+
+    const message_text = ref('');
+    const confirm_modal = (data_to_send: SendNumberToTrash) => {
+        const many_numbers = data_to_send.number_ids.length > 1;
+        message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
+                                          : 'Are you sure you want to send this number to Trash?';
+
+        confirm.require({
+            header: 'Confirmation',
+            rejectProps: {
+                label: 'No',
+                severity: 'secondary'
+            },
+            acceptProps: {
+                label: 'Yes'
+            },
+            accept: () => {
+                sendNumberToTrash(data_to_send, {
+                    onSuccess: (response: { result: true } | APIResponseError) => {
+                        if(response.result) {
+                            reset_selected_contacts();
+                            show_success_toast('Success!', many_numbers ? 'Numbers removed!' : 'Number removed!')
+                        } else {
+                            show_error_toast('Oops...', 'Something went wrong...')
+                        }
+                    },
+                    onError: () => show_error_toast('Oops...', 'Something went wrong...')
+                })
+            }
+        });
+    };
+
+    /* ----- Group actions ----- */
+    const disabled_groups_action_btn = computed(() => selected_contacts.value.length === 0 && selected_numbers.value.length === 0);
+
+    const handle_group_action = (action: 'add' | 'move' | 'trash') => {
+        const numbers_id: { number_id: string }[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
+
         if(action === 'move') {
+            //TODO: Add functionality to move numbers to a group, need to work with the contact number groups
+            console.log('currently not working D:')
+            return
             const data_to_send: MoveNumberToGroup = {
                 number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
                 groups: target_groups?.value,
                 current_group_id: hardcoded_contact_data?.value?.group_id
             }
-            console.log('move', data_to_send)
 
             moveNumberToGroup(data_to_send)
         } else if(action === 'add') {
             const data_to_send: AddNumberToGroup = {
-                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
+                number_id: numbers_id,
                 groups: target_groups?.value
             }
-            console.log('add', data_to_send)
 
             addNumberToGroup(data_to_send)
         } else {
-            return 'Error';
+            const data_to_send: SendNumberToTrash = {
+                number_ids: numbers_id.map((number) => number.number_id)
+            }
+
+            confirm_modal(data_to_send)
         }
     }
+
+    // It's used in the tooltip
+    const get_number_group_name = (groups: string[]) => {
+        let groups_names: StringOrNumber[] = [];
+
+        if(custom_groups.value.length) {
+            groups_names = groups.map((group_id: string) => {
+                const group = custom_groups.value.find((g: CustomGroup) => g.id === group_id);
+                return group?.group_name ? group.group_name : group_id;
+            });
+        }
+
+        return groups_names.length > 0 ? groups_names : groups;
+    }
+
+
+    const download_contacts = () => {
+        download();
+    };
+
+    /* ----- Here we handle the all the checkboxes in the table ----- */
+    const all_selected = ref(false);
+    const selected_contacts = ref<string[]>([]);
+    const selected_numbers = ref<string[]>([]);
+
+    // To select all contacts
+    const handle_select_all = () => {
+        selected_contacts.value = all_selected.value ? formatted_contacts.value.map((contact: ContactRow) =>  {
+            indeterminate_contacts.value[contact.id] = false;
+            return contact.id
+        }) : [];
+        selected_numbers.value = all_selected.value ? formatted_contacts.value.reduce((acc: string[], contact: ContactRow) => {
+            return acc.concat(associative_array.value[contact.id]);
+        }, []) : [];
+    }
+
+    // Here we handle the checkboxes of every contact and its numbers
+    const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
+        if(from_parent) { // Contact checkbox
+            const is_selected = selected_contacts.value.includes(contact_id);
+            const is_expanded = Object.keys(expandedRows.value)[0] === contact_id;
+            indeterminate_contacts.value[contact_id] = false;
+
+            associative_array.value[contact_id].forEach((number_id: string) => {
+                if(selected_contacts.value.includes(contact_id)) {
+                    if(!selected_numbers.value.includes(number_id)) {
+                        selected_numbers.value.push(number_id);
+                    }
+                } else {
+                    selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
+                }
+            });
+            
+            if (!(is_selected && is_expanded)) { // Handle the row expansion
+                if (is_selected || is_expanded) {
+                    toggleRow(contact_id);
+                }
+            }
+        } else { // Number checkbox
+            const is_some_selected = associative_array.value[contact_id].some((n_id: string) => selected_numbers.value.includes(n_id))
+            const is_all_selected = associative_array.value[contact_id].every((n_id: string) => selected_numbers.value.includes(n_id))
+            indeterminate_contacts.value[contact_id] = is_some_selected && !is_all_selected;
+
+            if(is_all_selected || is_some_selected) {
+                if(!selected_contacts.value.includes(contact_id)) {
+                    selected_contacts.value.push(contact_id);
+                }
+            } else {
+                selected_contacts.value = selected_contacts.value.filter((c_id: string) => c_id !== contact_id);
+            }
+        }
+        
+        all_selected.value = selected_contacts.value.length + selected_numbers.value.length == formatted_contacts.value.length + numbers_ids.value.length;
+        if(all_selected.value) {
+            indeterminate_all.value = false;
+        } else {
+            //TODO: indeterminate is not always being displayed, but this is workin good
+            indeterminate_all.value = selected_contacts.value.length > 0 || selected_numbers.value.length > 0;
+        }
+    }
+
+    // When a row is clicked, it expands
+    const onRowSelect = (event: any) => {
+        toggleRow(event.data.id)
+    };
+
+    const rowClass = (data: ContactRow) => {
+        return [{ '!bg-[#E9DDFF]': selected_contacts.value.includes(data.id) }];
+    };
+
+    const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none';
 </script>
 
 <style scoped lang="scss">
+::v-deep(.table) {
+    .p-datatable-table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    .p-datatable-thead, .p-datatable-header-cell {
+        background-color: #9A83DB;
+        line-height: 28px;
+    
+        &:first-child {
+            border-top-left-radius: 6px;
+        }
+        &:last-child {
+            border-top-right-radius: 6px;
+        }
+
+        tr {
+            th:nth-child(n+3) {
+                .p-datatable-column-header-content {
+                    display: flex;
+                    justify-content: center;
+                }
+            }
+        }
+
+        .p-datatable-column-title {
+            color: white;
+            font-weight: 600;
+        }
+    }
+
+    .p-datatable-column-title {
+        text-align: center;
+    }
+
+    .p-checkbox-input, .p-checkbox-box {
+        border-radius: 2px
+    }
+
+    tr {
+        &:nth-child(even) {
+            background-color: rgba(121, 116, 126, 0.08);
+        }
+
+        &:hover {
+            cursor: pointer;
+            background-color: #ebe5f7;
+        }
+    }
+
+    .p-datatable-paginator-bottom {
+        border: none;
+        margin-top: 15px;
+
+        .p-paginator-prev, .p-paginator-page, .p-paginator-next {
+            background-color: transparent;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            height: 35px;
+
+            &:hover {
+                background-color: #e6e2e2;
+            }
+        }
+
+        .p-paginator-page-selected {
+            background-color: #2C2C2C;
+            color: white;
+            
+            &:hover {
+                background-color: #2C2C2C;
+            }
+        }
+    }
+
+    /* ----- Sub table ----- */
+    .p-datatable-row-expansion {
+        .p-datatable-thead, .p-datatable-header-cell {
+            display: none;
+        }
+
+        tr {
+            background-color: #F3EDF7;
+
+            &:hover {
+                background-color: #ebe5f7;
+            }
+        }
+
+        td {
+            padding: 0;
+            height: 40px;
+            vertical-align: middle;
+        }
+
+        .p-checkbox {
+            width: 14px;
+            height: 14px;
+            .p-checkbox-input, .p-checkbox-box {
+                width: 14px;
+                height: 14px;
+                border-radius: 2px
+            }
+        } 
+    }
+}
+
     .table-container {
-        max-width: 700px;
-        background-color: white;
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-        font-size: 14px;
 
         @media (min-width: 980px) {
             max-width: 800px;
@@ -331,140 +693,5 @@
         @media (min-width: 1100px) {
             max-width: 850px;
         }
-    }
-    
-    .table-action-btn {
-        background-color: transparent;
-        border: none;
-        transition: background-color 0.3s;
-        font-weight: 600;
-
-        &:hover {
-            cursor: pointer;
-            background-color: #e6e2e2;
-        }
-    }
-
-    .table-action-icon {
-        color: #757575;
-    }
-
-    .search-input-container {
-        position: relative;
-        display: inline-block;
-    }
-
-    .search-icon {
-        position: absolute;
-        left: 10px; 
-        top: 50%;
-        transform: translateY(-50%);
-        pointer-events: none;
-    }
-
-    .search-input {
-        border: 1px solid #DED8E1;
-        padding: 2px 10px 2px 35px;
-        width: 280px;
-        height: 38px;
-    }
-
-    .selected-group-info {
-        background-color: #e1daf0;
-        padding: 4px 8px;
-        border-bottom: 1px solid #ccc;
-        width: fit-content;
-        color: black;
-    }
-
-    .check-icon {
-        background-color: #65558F;
-        color: white;
-        width: 16px;
-        height: 16px;
-        padding: 1px;
-    }
-
-    .upload-icon {
-        width: 20px; 
-        height: 20px;
-    }
-
-    .dnc-icon {
-        color: #751617;
-    }
-
-    .font-bold {
-        font-weight: 600;
-    }
-
-    .phone-item {
-        color: #797676;
-        letter-spacing: 0.117px;
-    }
-
-    .name-item {
-        color: #1D1B20;
-        letter-spacing: 0.117px;
-    }
-
-    .expand-btn {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        background-color: transparent;
-        border: none;
-        height: 35px;
-        width: 35px;
-
-        &:hover {
-            cursor: pointer;
-        }
-    }
-
-    .chevron-icon {
-        color: #302f31;
-    }
-
-    .phone-data-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        .extra-number-chip {
-            position: absolute;
-            right: 2px;
-            top: 25px;
-            background-color: #49454F;
-            color: #FFF;
-            font-size: 10px;
-            padding: 1.5px 7px;
-            border-radius: 10px;
-        }
-    }
-    
-    .dnc-header-container {
-        display: flex;
-        justify-content: center;
-        padding-left: 14px;
-    }
-
-    .group-container {
-        display: flex;
-        justify-content: center;
-        gap: 5px;
-
-        .group-chip {
-            background-color: #EBFFEE;
-            font-size: 12px;
-            font-weight: 600;
-            color: #49454F;
-            padding: 2px 8px 3px 8px;
-        }
-    }
-
-    .h-row {
-        height: 68px;
     }
 </style>
