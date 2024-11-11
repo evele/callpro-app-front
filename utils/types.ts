@@ -105,7 +105,7 @@ export type ContactUploadedData = {
     type: OneToFour;
     valid: boolean;
     validation_desc: string;
-    number_id: -1;
+    number_id: number;
     in_trash: 0;
     dnc: 0;
   }[];
@@ -115,7 +115,8 @@ export type uploadedContactToSave = {
   first_name: string;
   last_name: string;
   number: number;
-  contact_id: string;
+  contact_id: number;
+  number_id: number;
 };
 
 export type uploadedContactToSaveData = {
