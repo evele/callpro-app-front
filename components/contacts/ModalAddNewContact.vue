@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" class="w-full max-w-[850px] mx-4">
+    <Dialog v-model:visible="visible" modal :draggable="false" :closable="false" class="w-full max-w-[850px] mx-4">
         <template #header>
             <header class="w-full flex justify-between pb-5">
                 <h2 class="flex items-center gap-4 font-bold text-lg text-black">Add new contact <ChevronDownSVG /></h2>
