@@ -12,6 +12,10 @@ module.exports = {
         fontFamily: {
           sans: ['Roboto', 'sans-serif'], 
         },
+        colors: {
+          danger: '#C00F0C', // Define aquí tu color danger
+          'danger-light': '#fbd5d5', // Color más claro si lo necesitas
+        }
       },
     },
     plugins: [require('tailwindcss-primeui')]

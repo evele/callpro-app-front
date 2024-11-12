@@ -52,6 +52,8 @@ export const format_number_to_show = function (number: string) {
   return number
 }
 
+export const format_number_to_send = (number: string) => number.replace(/\D/g, '');
+
 export const show_full_name = (first_name: StringOrNull, last_name: StringOrNull) => {
   if(!first_name && !last_name) return '';
   if(!first_name) return last_name;
@@ -81,3 +83,19 @@ export const format_seconds = (time: number | undefined): string => {
   const seconds = Math.floor(time % 60);
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 };
+
+export const formatFileSize = (bytes:number) => {
+  const k = 1024;
+  const dm = 3;
+  const sizes = FILE_SIZES_TYPES;
+  
+  if (!bytes || bytes === 0) {
+      return `0 ${sizes[0]}`;
+  }
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+
+  return `${formattedSize}${sizes[i]}`;
+}; 
+
