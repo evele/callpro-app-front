@@ -153,6 +153,18 @@ export const useFetchContact = (contact_id:Ref<string>) => {
   })
 }
 
+export const useFetchDNCContacts = (page:Ref<number>, limit:Ref<number>, filter:Ref<string>) => {
+  const dataToSend = computed(() => ({
+    page: page.value,
+    limit: limit.value,
+    filter: filter.value,
+  }))
+  return useQuery({
+    queryKey: ['dnc_contacts_filtered', dataToSend],
+    queryFn: () => getDNCContacts(dataToSend.value)
+  })
+}
+
 export const useFetchUserCustomGrups = () => {
   return useQuery({
     queryKey: ['user_custom_groups'],
@@ -172,6 +184,26 @@ export const useFetchGetCustomGroups = () => {
     queryKey: ['custom_groups'],
     queryFn: () => getCustomGroups(),
   })
+}
+
+export function useFetchDownloadContacts(group_id: string, enabled: boolean = true) {  
+  const dataToSend = computed(() => ({
+    group_id: group_id
+  }));
+
+  return useQuery({
+    queryKey: ['download_contacts_file', dataToSend.value],
+    queryFn: () => downloadContactsFile(dataToSend.value),
+    enabled,
+  });
+} 
+
+export function useFetchDownloadDNCContacts() {  
+  return useQuery({
+    queryKey: ['download_dnc_contacts_file'],
+    queryFn: () => downloadDNCContactsFile(),
+    enabled: false,
+  });
 }
 
 /* ----- Did numbers ----- */
@@ -222,15 +254,3 @@ export const useFetchSms = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerP
   })
 }
 
-
-export function useFetchDownloadContacts(group_id:Ref<string>,enabled: boolean = true) {  
-  const dataToSend = computed(() => ({
-    group_id: group_id.value
-  }));
-
-  return useQuery({
-    queryKey: ['download_contacts_file', dataToSend.value],
-    queryFn: () => downloadContactsFile(dataToSend.value),
-    enabled,
-  });
-}
