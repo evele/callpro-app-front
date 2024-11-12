@@ -2,8 +2,8 @@
     <div>
         <p class="text-title">Contact page</p>
     </div>
-    <div class="py-5 main-container">
-        <ContactsTable :selected-tab="selected_tab" />
+    <div class="py-5 main-container gap-4 px-10">
+        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" />
         <div>
             <ContactsActions @click="open_contacts_modal" :dnc-total-numbers="dnc_total_contacts" />
             <ContactsGroupsPanel />
@@ -11,7 +11,7 @@
     </div>    
 
     <Button label="Add new contact" @click="open_contacts_modal('new_contact')" />
-    <ModalContacts ref="modalContacts" :section-to-show="section_to_show" />
+    <ModalContacts ref="modalContacts" :section-to-show="section_to_show" :selected-tab="selected_tab" />
 </template>
 
 <script setup lang="ts">

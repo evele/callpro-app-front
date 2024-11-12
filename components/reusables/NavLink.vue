@@ -26,7 +26,7 @@
     }
 </script>
 
-<style>
+<style scoped>
     li {
         list-style-type: none;
     }

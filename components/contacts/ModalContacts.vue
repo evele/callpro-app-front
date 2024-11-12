@@ -18,6 +18,10 @@
 </template>
 
 <script setup lang="ts">
+    const props = defineProps({
+        selectedGroup: { type: String, required: true }
+    })
+    
     const visible = ref(false);
 
     type SectionToShow = '' | 'new_contact' | 'new_group' | 'dnc';

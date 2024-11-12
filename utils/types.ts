@@ -105,7 +105,7 @@ export type ContactUploadedData = {
     type: OneToFour;
     valid: boolean;
     validation_desc: string;
-    number_id: -1;
+    number_id: number;
     in_trash: 0;
     dnc: 0;
   }[];
@@ -115,7 +115,8 @@ export type uploadedContactToSave = {
   first_name: string;
   last_name: string;
   number: number;
-  contact_id: string;
+  contact_id: number;
+  number_id: number;
 };
 
 export type uploadedContactToSaveData = {
@@ -208,7 +209,7 @@ export type SystemGroup = {
 }
 
 export type CustomGroup = {
-  id: number;
+  id: string;
   group_code: StringOrNumberOrNull;
   group_name: StringOrNumber;
   count: number;
@@ -221,6 +222,10 @@ export type AddNumberToGroup = {
 
 export type MoveNumberToGroup = AddNumberToGroup & {
   current_group_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+}
+
+export type SendNumberToTrash = {
+  number_ids: string[]; 
 }
 
 /* ----- Packages ----- */

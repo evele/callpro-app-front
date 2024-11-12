@@ -1,3 +1,5 @@
+export const FILE_SIZES_TYPES = ["B","KB","MB","GB","TB","PB","EB","ZB","YB"]
+
 /* ---- PAGE AUDIOS ---- */
 export const PREVIEW_TTS = 'preview_tts'
 export const CALLPRO_APP_FRONT = 'callpro-app-front'
@@ -29,8 +31,6 @@ export const PACKAGES_STEPS = 'packages_steps'
 /* ---- PAGE Settings ---- */
 export const ON = 'On'
 export const OFF = 'Off'
-
-
 
 
 
