@@ -81,6 +81,8 @@
     const form_action = ref('')
     const has_phone_number_error = ref(false)
 
+    const emit = defineEmits(['success', 'error']);
+
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, reset } = useSaveContact() 
 
@@ -234,17 +236,14 @@
                     reset_contact()
                     form_action.value = 'clear'
                     queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
-                    toast.add({ severity: 'success', summary: 'Success', detail: 'Contact saved successfully.', life: 3000 })
-                    setTimeout(() => {
-                        close()
-                    }, 2000);
+                    emit('success', 'Contact saved successfully.')
                 } else if(data.validation_error) {
-                    toast.add({ severity: 'error', summary: 'Error', detail: data.validation_error ?? 'Something failed, please try again.', life: 3000 })
+                    emit('error', data.validation_error ?? 'Something failed, please try again.')
                 } else {
-                    toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed, please try again.', life: 3000 })
+                    emit('error', 'Something failed, please try again.')
                 }
             },
-            onError: () => toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed, please try again.', life: 3000 })
+            onError: () => emit('error', 'Something failed, please try again.')
         })
     }
 </script>

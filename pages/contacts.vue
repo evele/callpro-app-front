@@ -1,18 +1,13 @@
 <template>
-    <div>
-        <p class="text-center text-2xl text-bold">Contact page</p>
-    </div>
-
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" />
+        <ContactsTable :selected-tab="selected_tab" @uploadFile="open_contacts_modal" />
         <div class="flex flex-col gap-4">
             <ContactsActions @click="open_contacts_modal" :dnc-total-numbers="dnc_total_contacts" />
-            <ContactsGroupsPanel />
+            <ContactsGroupsPanel :selected-tab="selected_tab" />
         </div>
-    </div>    
+    </div>
 
-    <Button label="Add new contact" @click="open_contacts_modal('new_contact')" />
-    <ModalContacts ref="modalContacts" :section-to-show="section_to_show" :selected-tab="selected_tab" />
+    <ModalContacts ref="modalContacts" :selected-tab="selected_tab" />
 </template>
 
 <script setup lang="ts">
@@ -38,7 +33,7 @@
     });
     /* ----- DNC Contacts ----- */
 
-    const open_contacts_modal = (section: string) => {
+    const open_contacts_modal = (section: SectionToShow) => {
         if(!section) return
         modalContacts.value.open(section);
     }

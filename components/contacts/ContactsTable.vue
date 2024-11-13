@@ -217,7 +217,7 @@
 
             <template #paginatorstart>
                 <div class="flex gap-4">
-                    <Button type="button" :class="action_button_style" @click="emit('uploadFile', true)">
+                    <Button type="button" :class="action_button_style" @click="emit('uploadFile', 'upload')">
                         <UploadSVG class="w-5 h-5 text-[#757575]" />
                         <span class="font-semibold">Upload file</span>
                     </Button>
@@ -413,9 +413,7 @@
         else return null;
     })
 
-    // Show confirmation modal
-    const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 });
-    const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 });
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const message_text = ref('');
     const confirm_modal = (data_to_send: SendNumberToTrash) => {

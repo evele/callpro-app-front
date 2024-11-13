@@ -156,6 +156,7 @@
     const has_phone_number_error = ref(false)
 
     const emit = defineEmits(['close'])
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const { data: dnc_contacts, isLoading: dnc_is_loading, isFetching: is_fetching_dnc } = useFetchDNCContacts(page,show,search)
     const { mutate: add_dnc_contact, isPending: add_is_pending } = useAddDNCContact()
@@ -202,9 +203,6 @@
     const disabled_remove_from_dnc_btn = computed(() => selected_contacts.value.length && selected_contacts.value.some((contact: FormatedContact) => contact.dnc !== '2'))
     const disabled_send_to_trash_btn = computed(() => selected_contacts.value.length && selected_contacts.value.some((contact: FormatedContact) => contact.number_id !== null))
     const disabled_add_new_btn = computed(() => !new_number.value || has_phone_number_error.value)
-
-    const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 });
-    const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 });
 
     // Filter and format the numbers to send to API
     const handle_comfirm = (action: 'trash' | 'dnc') => {

@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model:visible="visible" modal :closable="false" class="w-full max-w-[850px] mx-4">
+    <Dialog v-model:visible="visible" modal :draggable="false" :closable="false" class="w-full max-w-[850px] mx-4 contacts-modal">
         <template #header>
             <header class="w-full flex items-center justify-between px-8 border-b pb-6">
                 <PopoverOption :options="menuOptions" :selected-option="selected_option" @optionSelected="handleOptionSelected" />
@@ -7,11 +7,10 @@
             </header>
         </template>
 
-        <AddNewContact v-if="section_to_show === 'new_contact'" />
+        <AddNewContact v-if="section_to_show === 'new_contact'" @success="handleSuccess" @error="handleError" />
         <DNCContacts v-if="section_to_show === 'dnc'" @close="close" />
-        <SaveCustomGroups v-if="section_to_show === 'new_group'" @update:saveGroup="handlerSaveGroup"
-            :selected-group="selectedGroup" :is-pending="saveGroupContactsIsPending" 
-        />
+        <SaveCustomGroups v-if="section_to_show === 'new_group'" :selected-group="selected_group" />
+        <UploadContacts v-if="section_to_show === 'upload'" :selected-tab="selectedTab" @success="handleSuccess" @error="handleError" @changeTitle="handleChangeTitle" />
 
         <template #footer />
     </Dialog>
@@ -19,29 +18,41 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedGroup: { type: String, required: true }
+        selectedTab: { type: String, required: true },
+        selectedGroup: { type: Object, required: false, default: null }
     })
-    
-    const visible = ref(false);
 
-    type SectionToShow = '' | 'new_contact' | 'new_group' | 'dnc';
-    const section_to_show = ref<SectionToShow>('');
+    const selected_group = ref()
+    const visible = ref(false)
+
+    const section_to_show = ref<SectionToShow>('')
     const selected_option = ref('')
+    const upload_title = ref('Upload new file')
 
-    const menuOptions = ref([
+    const menuOptions = computed(() => [
         { id: 'new_contact', text: "Add new contact" },
         { id: 'new_group', text: "Add new Group" },
         { id: 'dnc', text: "Add new DNC" },
+        { id: 'upload', text: upload_title.value },
     ]);
 
-    const handleOptionSelected = (selectedOption: string) => {
+    const handleOptionSelected = (selectedOption: SectionToShow) => {
         selected_option.value = selectedOption
-        section_to_show.value = selectedOption;
+        section_to_show.value = selectedOption
+
+        if(upload_title.value !== 'Upload new file') {
+            upload_title.value = 'Upload new file';
+        }
+
+        if(selectedOption === 'new_group') {
+            selected_group.value = null;
+        }
     };
 
-     const open = (section: string) => {
-        section_to_show.value = section;
+     const open = (section: SectionToShow) => {
+        section_to_show.value = section
         selected_option.value = section
+        selected_group.value = props.selectedGroup
         visible.value = true;
     }
 
@@ -52,4 +63,15 @@
     }
 
     defineExpose({ open });
+
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
+
+    const handleSuccess = (message: string) => {
+        show_success_toast('Success', message);
+        close();
+    }
+
+    const handleError = (error: string) => show_error_toast('Error', error)
+
+    const handleChangeTitle = (title: string) => upload_title.value = title
 </script>
