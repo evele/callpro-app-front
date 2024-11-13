@@ -166,7 +166,7 @@ export async function addDNCContact(data: AddDNCContactData): Promise<APIRespons
 
 /* ----- Send conctact to trash ----- */
 type SendContactToTrashData = {
-    numbers_ids: string[];
+    number_ids: string[];
 }
 
 export async function sendContactToTrash(data: SendContactToTrashData): Promise<APIResponseSuccess | APIResponseError> {

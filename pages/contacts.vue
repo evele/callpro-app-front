@@ -1,18 +1,26 @@
 <template>
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable :selected-tab="selected_tab" @uploadFile="open_contacts_modal" />
+        <ContactsTable :selected-tab="selected_tab" @uploadFile="open_contacts_modal" @updateMessage="handle_update_message" />
         <div class="flex flex-col gap-4">
             <ContactsActions @click="open_contacts_modal" :dnc-total-numbers="dnc_total_contacts" />
             <ContactsGroupsPanel :selected-tab="selected_tab" />
         </div>
     </div>
 
-    <ModalContacts ref="modalContacts" :selected-tab="selected_tab" />
+    <ModalContacts ref="modalContacts" :selected-tab="selected_tab" @updateMessage="handle_update_message" />
+
+    <ConfirmDialog class="confirm-dialog">
+        <template #message>
+            <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
+        </template>
+    </ConfirmDialog>
+    <Toast />
 </template>
 
 <script setup lang="ts">
     const modalContacts = ref()
     const selected_tab = ref(CONTACTS_ALL)
+    const message_text = ref('')
 
     /* ----- DNC Contacts ----- */
     const page = ref(1)
@@ -36,6 +44,10 @@
     const open_contacts_modal = (section: SectionToShow) => {
         if(!section) return
         modalContacts.value.open(section);
+    }
+
+    const handle_update_message = (message: string) => {
+        message_text.value = message
     }
 </script>
 

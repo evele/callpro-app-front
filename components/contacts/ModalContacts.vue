@@ -8,7 +8,7 @@
         </template>
 
         <AddNewContact v-if="section_to_show === 'new_contact'" @success="handleSuccess" @error="handleError" />
-        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" />
+        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @updateMessage="handle_update_message" />
         <SaveCustomGroups v-if="section_to_show === 'new_group'" :selected-group="selected_group" />
         <UploadContacts v-if="section_to_show === 'upload'" :selected-tab="selectedTab" @success="handleSuccess" @error="handleError" @changeTitle="handleChangeTitle" />
 
@@ -24,6 +24,8 @@
 
     const selected_group = ref()
     const visible = ref(false)
+
+    const emit = defineEmits(['updateMessage'])
 
     const section_to_show = ref<SectionToShow>('')
     const selected_option = ref('')
@@ -74,4 +76,8 @@
     const handleError = (error: string) => show_error_toast('Error', error)
 
     const handleChangeTitle = (title: string) => upload_title.value = title
+
+    const handle_update_message = (message: string) => {
+        emit('updateMessage', message)
+    }
 </script>
