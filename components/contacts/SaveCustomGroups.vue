@@ -31,6 +31,8 @@ const props = defineProps({
 
 const { mutate: saveGroupContacts, isPending } = useSaveGroupContacts()
 
+const emit = defineEmits(['close', 'success', 'error'])
+
 const groupName = ref('')
 const launchID = ref<number | null>(null);
 const groupID = ref<number | null>(null);
@@ -52,7 +54,7 @@ onMounted(() => {
 
 const save_new_group = () => {
     if (!groupName.value || !launchID.value) {
-        alert('Group Name and Phone Launch ID are required.');
+        emit('error', 'Group Name and Phone Launch ID are required.')
         return;
     }
     const dataToSend: ContactGroup = {
@@ -61,6 +63,14 @@ const save_new_group = () => {
         phone_launch_id: launchID.value ? parseInt(launchID.value.toString(), 10) : null
     }
 
-    saveGroupContacts(dataToSend)
+    saveGroupContacts(dataToSend, {
+        onSuccess: () => {
+            emit('success', 'Group saved successfully')
+            emit('close')
+        },
+        onError: () => {
+            emit('error', 'Error saving group')
+        }
+    })
 }
 </script>

@@ -7,10 +7,19 @@
             </header>
         </template>
 
-        <AddNewContact v-if="section_to_show === 'new_contact'" @success="handleSuccess" @error="handleError" />
-        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @updateMessage="handle_update_message" />
-        <SaveCustomGroups v-if="section_to_show === 'new_group'" :selected-group="selected_group" />
-        <UploadContacts v-if="section_to_show === 'upload'" :selected-tab="selectedTab" @success="handleSuccess" @error="handleError" @changeTitle="handleChangeTitle" />
+        <AddNewContact v-if="section_to_show === 'new_contact'" @close="handleClose" @success="handleSuccess" @error="handleError" />
+
+        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess"
+            @error="handleError" @updateMessage="handle_update_message" 
+        />
+
+        <SaveCustomGroups v-if="section_to_show === 'new_group'" :selected-group="selected_group" 
+            @close="handleClose" @success="handleSuccess" @error="handleError" 
+        />
+
+        <UploadContacts v-if="section_to_show === 'upload'" :selected-tab="selectedTab" 
+            @close="handleClose" @success="handleSuccess" @error="handleError" @changeTitle="handleChangeTitle" 
+        />
 
         <template #footer />
     </Dialog>
@@ -68,16 +77,13 @@
 
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
-    const handleSuccess = (message: string) => {
-        show_success_toast('Success', message);
-        close();
-    }
+    const handleClose = () => close()
+
+    const handleSuccess = (message: string) => show_success_toast('Success', message)
 
     const handleError = (error: string) => show_error_toast('Error', error)
 
     const handleChangeTitle = (title: string) => upload_title.value = title
 
-    const handle_update_message = (message: string) => {
-        emit('updateMessage', message)
-    }
+    const handle_update_message = (message: string) => emit('updateMessage', message)
 </script>

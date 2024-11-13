@@ -147,7 +147,7 @@
     const form_action = ref('')
     const has_phone_number_error = ref(false)
 
-    const emit = defineEmits(['close', 'updateMessage'])
+    const emit = defineEmits(['close', 'updateMessage', 'success', 'error'])
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const { data: dnc_contacts, isLoading: dnc_is_loading, isFetching: is_fetching_dnc } = useFetchDNCContacts(page,show,search)
@@ -210,13 +210,12 @@
                 onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                     if(response.result) {
                         selected_contacts.value = []
-                        show_success_toast('Success!', 'Number successfully sent to trash!')
-                        
+                        emit('success', 'Number successfully sent to trash!')
                     } else {
-                        show_error_toast('Oops...', 'Error sending number to trash...')
+                        emit('error', 'Error sending number to trash...')
                     }
                 },
-                onError: () =>  show_error_toast('Oops...', 'Error sending number to trash...')
+                onError: () =>  emit('error', 'Error sending number to trash...')
             })
         }
 
@@ -232,13 +231,13 @@
                 onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                     if(response.result) {
                         selected_contacts.value = []
-                        show_success_toast('Success!', 'Number successfully removed from DNC!')
+                        emit('success', 'Number successfully removed from DNC!')
                         
                     } else {
-                        show_error_toast('Oops...', 'Error removing number from DNC...')
+                        emit('error', 'Error removing number from DNC...')
                     }
                 },
-                onError: () =>  show_error_toast('Oops...', 'Error removing number from DNC...')
+                onError: () =>  emit('error', 'Error removing number from DNC...')
             })
         }
     }
@@ -277,12 +276,12 @@
                 if(response.result) {
                     new_number.value = ''
                     form_action.value = 'clear'
-                    show_success_toast('Success!', 'Number successfully added!')
+                    emit('success', 'Number successfully added!')
                 } else {
-                    show_error_toast('Oops...', 'Error adding number...')
+                    emit('error', 'Error adding number...')
                 }
             },
-            onError: () => show_error_toast('Oops...', 'Error adding number...')
+            onError: () => emit('error', 'Error adding number...')
         })
     }
 
@@ -290,13 +289,13 @@
         download()
             .then((result: QueryObserverResult) => {
                 if (result.data) {
-                    show_success_toast('Success!', 'List successfully downloaded!');
+                    emit('success', 'List successfully downloaded!')
                 } else {
-                    show_error_toast('Oops...', 'Error downloading list...');
+                    emit('error', 'Error downloading list...')
                 }
             })
             .catch(() => {
-                show_error_toast('Oops...', 'Error downloading list...');
+                emit('error', 'Error downloading list...')
             });
     }
 
@@ -305,9 +304,9 @@
 
     const handle_show_upload_toast = (type: 'success' | 'error') => {
         if(type === 'success') {
-            show_success_toast('Success!', 'File successfully uploaded!');
+            emit('success', 'File successfully uploaded!')
         } else {
-            show_error_toast('Oops...', 'Error uploading file...');
+            emit('error', 'Error uploading file...')
         }
     }
 

@@ -89,7 +89,7 @@
     
     const contacts: Ref<ContactUploadedData[]> = ref([]);
 
-    const emit = defineEmits(['success', 'error', 'changeTitle']);
+    const emit = defineEmits(['close', 'success', 'error', 'changeTitle']);
    
     const group_id = ref('');
     const has_uploaded = ref(false);
@@ -240,6 +240,7 @@
             onSuccess: (response: SaveUploadedContactAPIResponse | APIResponseError) => {
                 if(response.result)  {
                     emit('success', 'Contacts saved successfully!')
+                    emit('close')
                     clear_file_seletion()
                 } else {
                     emit('error', 'Something went wrong, please try again')

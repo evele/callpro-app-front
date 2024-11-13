@@ -74,14 +74,13 @@
     import { useQueryClient } from '@tanstack/vue-query'
 
     const queryClient = useQueryClient()
-    const toast = useToast()
 
     const number_error = ref('');
     const type_error = ref('');
     const form_action = ref('')
     const has_phone_number_error = ref(false)
 
-    const emit = defineEmits(['success', 'error']);
+    const emit = defineEmits(['close', 'success', 'error'])
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, reset } = useSaveContact() 
@@ -237,6 +236,7 @@
                     form_action.value = 'clear'
                     queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
                     emit('success', 'Contact saved successfully.')
+                    emit('close')
                 } else if(data.validation_error) {
                     emit('error', data.validation_error ?? 'Something failed, please try again.')
                 } else {
