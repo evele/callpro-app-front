@@ -4,8 +4,9 @@
     </div>
 
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" />
+        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" @updateMessage="handle_update_message" />
         <div class="flex flex-col gap-4">
+
             <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_total_contacts" />
             <ContactsGroupsPanel />
         </div>
@@ -17,7 +18,14 @@
     
     <ModalUploadContacts ref="modalUploadContacts" :selected-group="selected_tab" />
     
-    <ModalDNCContacts ref="modalDNCContacts" />
+    <ModalDNCContacts ref="modalDNCContacts" @updateMessage="handle_update_message" />
+
+    <ConfirmDialog class="confirm-dialog">
+        <template #message>
+            <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
+        </template>
+    </ConfirmDialog>
+    <Toast />
 </template>
 
 <script setup lang="ts">
@@ -25,6 +33,7 @@
     const modalUploadContacts = ref()
     const modalDNCContacts = ref()
     const selected_tab = ref(CONTACTS_ALL)
+    const message_text = ref('')
 
     /* ----- DNC Contacts ----- */
     const page = ref(1)
@@ -51,6 +60,10 @@
 
     const handle_select_contact_action = (action: string) => {
         console.log(action)
+    }
+
+    const handle_update_message = (message: string) => {
+        message_text.value = message
     }
 
 </script>

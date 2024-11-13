@@ -1,5 +1,5 @@
 <template>
-    <Dialog v-model:visible="visible" :draggable="false" @hide="close" class="max-w-[850px] w-[90vw]">
+    <Dialog v-model:visible="visible" modal :draggable="false" @hide="close" class="max-w-[850px] w-[90vw]">
         <template #header>
             <h2 v-if="has_uploaded" >Upload Summary</h2>
             <h2 v-else >Upload new file <ChevronDownSVG /></h2>

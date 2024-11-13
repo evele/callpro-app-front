@@ -143,20 +143,11 @@
             </div>
         </template>
 
-        <ConfirmDialog class="confirm-dialog">
-            <template #message>
-                <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
-            </template>
-        </ConfirmDialog>
-        <Toast />
-
         <ModalUploadDNCContacts ref="uploadDNCContactModal" @show_toast="handle_show_upload_toast" />
     </Dialog>
 </template>
 
 <script setup lang="ts">
-    import { useConfirm } from "primevue/useconfirm";
-    import { useToast } from 'primevue/usetoast';
     import type { QueryObserverResult } from '@tanstack/vue-query'
 
     const confirm = useConfirm();
@@ -172,6 +163,8 @@
     const new_number = ref('')
     const form_action = ref('')
     const has_phone_number_error = ref(false)
+
+    const emit = defineEmits(['updateMessage'])
 
     const { data: dnc_contacts, isLoading: dnc_is_loading, isFetching: is_fetching_dnc } = useFetchDNCContacts(page,show,search)
     const { mutate: add_dnc_contact, isPending: add_is_pending } = useAddDNCContact()
@@ -229,7 +222,7 @@
                                                     .map((contact: FormatedContact) => format_number_to_send(contact.number_id!))
                                                     
             const data_to_send = {
-                numbers_ids: number_ids
+                number_ids: number_ids
             }
 
             send_to_trash(data_to_send, {
@@ -269,16 +262,13 @@
         }
     }
 
-    // Close the confirmation modal
-    const handle_cancel = () => {
-        console.log('cancel')
-    }
-
     // Show confirmation modal
     const confirm_modal = (action: 'trash' | 'dnc') => {
         message_text.value = action === 'trash' ? 
                             'Are you sure you want to send the selected contact numbers to trash?' : 
                             'Are you sure you want to remove all selected numbers from DNC list?'
+
+        emit('updateMessage', message_text.value)
         confirm.require({
             header: 'Confirmation',
             rejectProps: {
@@ -290,9 +280,6 @@
             },
             accept: () => {
                 handle_comfirm(action)
-            },
-            reject: () => {
-                handle_cancel()
             }
         });
     };
