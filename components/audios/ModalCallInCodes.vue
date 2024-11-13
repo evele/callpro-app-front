@@ -39,7 +39,7 @@
                         :key="code.id"
                         :class="[
                             index % 2 === 0 ? 'bg-gray-100' : 'bg-white',
-                            'hover:bg-[#9884cf]-500'
+                            'hover:bg-[#9884cf]'
                         ]"
                         class="pt-4 pb-[15px]">
                         <td class="w-[220px] text-center py-2">{{ code.call_in_code }}</td>
@@ -59,7 +59,7 @@
         <p v-else-if="isError" class="text-center my-4 text-red-500">Error: {{ error?.message }}</p>
 
         <!-- Panel de información adicional -->
-        <InfoPanel v-if="!has_uploaded" class="mt-7">
+        <InfoPanel class="mt-7">
             <p class="font-bold">You have to call to the number <span class="font-normal">(888) 604 2611</span></p>
             <p class="font-bold">and follow the instructions using the code to add your Call in Audio.</p>
         </InfoPanel>
