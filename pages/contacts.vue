@@ -4,7 +4,7 @@
     </div>
 
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" @updateMessage="handle_update_message" />
+        <ContactsTable :selected-tab="selected_tab" @uploadFile="modalUploadContacts.open()" @updateMessage="handle_update_message" :dnc-total-numbers="dnc_total_contacts" />
         <div class="flex flex-col gap-4">
 
             <ContactsActions @click="handle_select_contact_action" :dnc-total-numbers="dnc_total_contacts" />
