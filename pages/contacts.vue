@@ -11,7 +11,7 @@
 
     <ConfirmDialog class="confirm-dialog">
         <template #message>
-            <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
+            <p class="mb-6 text-lg font-semibold">{{ message_text }}</p>
         </template>
     </ConfirmDialog>
     <Toast />
@@ -28,7 +28,7 @@
     const search = ref('')
     const dnc_total_contacts = ref<number | null>(null)
 
-    const { data: dnc_contacts, isLoading: dnc_is_loading, isSuccess: dnc_is_success, refetch: dnc_refetch } = useFetchDNCContacts(page,show,search)
+    const { data: dnc_contacts } = useFetchDNCContacts(page,show,search)
 
     const dnc_contacts_value = computed(() => dnc_contacts.value);
 
@@ -39,13 +39,14 @@
             dnc_total_contacts.value = -1;
         }
     });
-    /* ----- DNC Contacts ----- */
 
+    /* ----- Open contacts modal ----- */
     const open_contacts_modal = (section: SectionToShow) => {
         if(!section) return
         modalContacts.value.open(section);
     }
 
+    /* ----- Confirm Dialog ----- */
     const handle_update_message = (message: string) => {
         message_text.value = message
     }

@@ -10,7 +10,7 @@
         <AddNewContact v-if="section_to_show === 'new_contact'" @close="handleClose" @success="handleSuccess" @error="handleError" />
 
         <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess"
-            @error="handleError" @updateMessage="handle_update_message" 
+            @error="handleError" @updateMessage="handleUpdateMessage" 
         />
 
         <SaveCustomGroups v-if="section_to_show === 'new_group'" :selected-group="selected_group" 
@@ -85,5 +85,5 @@
 
     const handleChangeTitle = (title: string) => upload_title.value = title
 
-    const handle_update_message = (message: string) => emit('updateMessage', message)
+    const handleUpdateMessage = (message: string) => emit('updateMessage', message)
 </script>
