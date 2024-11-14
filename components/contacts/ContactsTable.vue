@@ -229,13 +229,6 @@
                 </div>
             </template>
         </DataTable>
-
-        <ConfirmDialog>
-            <template #message>
-                <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
-            </template>
-        </ConfirmDialog>
-        <Toast />
     </div>
 </template>
 
@@ -261,7 +254,7 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile'])
+    const emit = defineEmits(['uploadFile', 'updateMessage'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -423,6 +416,7 @@
         message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
                                           : 'Are you sure you want to send this number to Trash?';
 
+        emit('updateMessage', message_text.value)
         confirm.require({
             header: 'Confirmation',
             rejectProps: {
