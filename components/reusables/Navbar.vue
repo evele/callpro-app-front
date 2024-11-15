@@ -19,7 +19,6 @@
             <li><NuxtLink to="did_numbers">Did Numbers</NuxtLink></li>
             <li><NuxtLink to="get_contact">Get Contact</NuxtLink></li>
             <li><NuxtLink to="packages">Packages</NuxtLink></li>
-            <li><NuxtLink to="settings">Settings</NuxtLink></li>
             <li><NuxtLink to="sms">Sms</NuxtLink></li>     
           </ul>
         </li>
@@ -27,7 +26,7 @@
       <div class="menu-footer p-4">
         <hr>
         <ul class="menu-list">
-          <NavLink name="Settings" :icon="SettingsSVG" />
+          <NavLink route="settings" name="Settings" :icon="SettingsSVG" />
           <NavLink name="Logout" :icon="LogoutSVG" />
         </ul>
       </div>
