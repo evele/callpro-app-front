@@ -1,7 +1,13 @@
 <template>
-    <div>
+    <div class="p-6">
         <p class="text-title">Audios Page</p>        
         <span v-if="loadingAllAudios">Loading audios...</span>
+        <Card class="bg-white">
+            <template #content>
+                <ButtonsLibraryContainer />
+            </template>  
+        </Card>
+    
         <div v-if="isSuccess && user_audios.length">
             <AudioPlayer :audios="user_audios" />
         </div>
@@ -43,6 +49,10 @@
 </template>
 
 <script setup lang="ts">
+    import { useQueryClient, useQuery } from '@tanstack/vue-query'
+
+    const queryClient = useQueryClient()
+
     const text_to_convert = ref('')
     const isLoading = ref(false)
     
