@@ -13,8 +13,7 @@ export type NumberOrNull = number | null;
 export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
-export type FilterOption = { id: string, name: string, count: string | number }
-
+export type FilterOption = { id: string, name: string, count: number }
 
 export type APIResponseError = {
   result: false,
@@ -212,7 +211,7 @@ export type SystemGroup = {
 export type CustomGroup = {
   id: string;
   group_code: StringOrNumberOrNull;
-  group_name: StringOrNumber;
+  group_name: string;
   count: number;
 }
 

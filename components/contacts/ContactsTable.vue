@@ -295,8 +295,8 @@
         return CGData?.value.custom_groups
     })
 
-    const system_groups = computed(() => {
-        if(!SGData?.value?.result) return []
+    const system_groups = computed<SystemGroup | null>(() => {
+        if(!SGData?.value?.result) return null
         return SGData?.value.system_groups
     })
 
@@ -571,17 +571,19 @@
 
     /* ----- Filters ----- */
     const ALL = computed(() => ({ name: 'All', count: contacts_data.value?.total_numbers }));
-    const FILTERS_SYSTEM_GROUPS = computed(() => [
-        { id: '1', name: 'Unassigned', count: system_groups.value?.unassigned },
-        { id: '2', name: 'Trash', count: system_groups.value?.trash },
-        { id: '3', name: 'DNC', count: props.dncTotalNumbers }
-    ])
+    const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
+        if(!system_groups.value) return []
+        return [
+            { id: '1', name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
+            { id: '2', name: 'Trash', count: system_groups.value?.trash ?? 0 },
+            { id: '3', name: 'DNC', count: props.dncTotalNumbers ?? 0 }
+        ]
+    })
     const FILTERS_CUSTOM_GROUPS = computed(() => custom_groups.value.map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count })))
 
-    type SelectedFilters = {[key: string]: string};
-    const filters = ref<SelectedFilters>({});
+    const filters = ref<string[]>([]);
 
-    const handleUpdateFilters = (filters: SelectedFilters) => {
+    const handleUpdateFilters = (filters: string[]) => {
         console.log(filters);
     }
 </script>

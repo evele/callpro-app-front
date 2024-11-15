@@ -35,21 +35,21 @@
 <script setup lang="ts">
     const props = defineProps({
         allContacts: { type: Object, required: true }, //TODO: Fix ts errors
-        filtersSystem: { type: Array, required: true, default: [] },
-        filtersCustom: { type: Array, required: false, default: [] }
+        filtersSystem: { type: Array as PropType<FilterOption[]>, required: true, default: [] },
+        filtersCustom: { type: Array as PropType<FilterOption[]>, required: false, default: [] }
     })
 
-    const popover = ref(null)
+    const popover = ref()
     const emit = defineEmits(['update:filters'])
 
     const togglePopover = (event: MouseEvent) => {
-        popover.value.toggle(event)
+        popover.value?.toggle(event)
     }
 
     const all = ref(false)
-    const selected_filters = ref([])
+    const selected_filters = ref<string[]>([])
 
-    const all_filters = computed(() => {
+    const all_filters = computed<FilterOption[]>(() => {
         return props.filtersSystem.concat(props.filtersCustom)
     })
 
@@ -70,6 +70,7 @@
         } else {
             selected_filters.value.splice(index, 1)
         }
+        console.log(selected_filters.value)
         all.value = selected_filters.value.length === all_filters.value.length
         emit('update:filters', selected_filters.value)
     }
