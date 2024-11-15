@@ -34,7 +34,7 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        allContacts: { type: Object, required: true }, //TODO: Fix ts errors
+        allContacts: { type: Object, required: true },
         filtersSystem: { type: Array as PropType<FilterOption[]>, required: true, default: [] },
         filtersCustom: { type: Array as PropType<FilterOption[]>, required: false, default: [] }
     })
@@ -70,7 +70,6 @@
         } else {
             selected_filters.value.splice(index, 1)
         }
-        console.log(selected_filters.value)
         all.value = selected_filters.value.length === all_filters.value.length
         emit('update:filters', selected_filters.value)
     }
