@@ -1,56 +1,61 @@
 <template>
-    <Card class="my-4 mx-6 relative">
-        <template #content>
-            <Tabs value="0" class="pt-3 px-6">
-                <TabList class="pb-8">
+    <div class="bg-white rounded-2xl my-4 mx-6">
+        <Tabs value="0">
+            <div class="flex justify-between py-7 px-12 border-b">
+                <TabList class="flex items-center">
                     <Tab value="0" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10" @click="console.log(voice_settings)">Voice settings</Tab>
                     <Tab value="1" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Text settings</Tab>
                     <Tab value="2" class="text-lg rounded border-none py-0 px-[10px] h-8">General settings</Tab>
                 </TabList>
+                <Button label="Save" class="w-32 h-9 ml-auto" />
+            </div>
 
-                <Divider class="absolute left-0 top-[75px]" />
-
-                <TabPanels>
-                    <TabPanel value="0">
-                        <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
-                            <div class="flex justify-between gap-2 items-center mb-7">
-                                <label class="text-lg font-medium min-w-fit">Caller ID</label>
-                                <Select v-model="option_selected" :options="caller_id_options" optionLabel="name" class="w-[294px] mt-1" placeholder="Select" />
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <label class="text-lg font-medium min-w-fit">Enter Caller ID</label>
-                                <PhoneInput class="mt-[2px] w-[294px]" :model-value="caller_id_number" @update:modelValue="(v: string) => caller_id_number = v" />
-                            </div>
-                        </SettingSection>
-                        <Divider class="mb-[22px] "/>
-
-                        <SettingSection title="Static Intro" description="Include a professional or personalizad message as an intro to your voice broadcast.">
-                            <div class="flex justify-between items-center mb-7">
-                                <label class="text-lg font-medium">Static audio introduction</label>
-                                <ToggleSwitch v-model="checked" class="h-7" />
-                            </div>
-                            
-                        </SettingSection>
+            <TabPanels class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl">
+                <TabPanel value="0">
+                    <div v-if="isLoading">
+                        <div class="flex flex-col w-[75%]">
+                            <Skeleton class="mb-2"></Skeleton>
+                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
+                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
+                        </div>
                         <Divider />
-                    </TabPanel>
-                    <TabPanel value="1">
-                        <p class="m-0">
-                            Text settings
-                        </p>
-                    </TabPanel>
-                    <TabPanel value="2">
-                        <p class="m-0">
-                            General settings
-                        </p>
-                    </TabPanel>
-                </TabPanels>
-            </Tabs>
-        </template>
-    </Card>
+                        <div class="flex flex-col w-[75%]">
+                            <Skeleton class="mb-2"></Skeleton>
+                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
+                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
+                        </div>
+                        <Divider />
+                        <div class="flex flex-col w-[75%]">
+                            <Skeleton class="mb-2"></Skeleton>
+                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
+                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
+                        </div>
+                        <Divider />
+                        <div class="flex flex-col w-[75%]">
+                            <Skeleton class="mb-2"></Skeleton>
+                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
+                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
+                        </div>
+                    </div>
+                    <VoiceSettings v-else :voice-settings="voice_settings" @updateVoiceSettings="handle_update_voice_settings" />
+                </TabPanel>
+                <TabPanel value="1">
+                    <p class="m-0">
+                        Text settings
+                    </p>
+                </TabPanel>
+                <TabPanel value="2">
+                    <p class="m-0">
+                        General settings
+                    </p>
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
+    </div>
 </template>
 
 <script setup lang="ts">
-    const { data: settings } = useFetchSettings()
+    const { data: settings, isLoading } = useFetchSettings()
     const { mutate: updateVoiceSettings } = useUpdateVoiceSettings()
     const { mutate: updateTextSettings } = useUpdateTextSettings()
     
@@ -61,15 +66,9 @@
         return settings.value.settings
     })
 
-    const caller_id_number = ref('')
-    const option_selected = ref('3')
-    const caller_id_options = [
-        { name: 'Your CallPro Number', code: '1' },
-        { name: 'Toll Free Number', code: '2' },
-        { name: 'Choose Caller ID', code: '3' },
-    ]
-
-    const checked = ref(false);
+    const handle_update_voice_settings = (voice_settings) => {
+        console.log(voice_settings)
+    }
 
     const format_value = (value: ZeroOrOne) => {
         return value == '1' ? ON : OFF;
@@ -85,9 +84,14 @@
 <style scoped lang="scss">
     :deep(.p-tabs) {
         .p-tablist {
-            width: fit-content;
+            .p-tablist-content {
+                align-items: center;
+            }
+
             .p-tablist-tab-list {
                 border: none;
+                align-items: center;
+
                 .p-tab-active {
                     background-color: rgba(208, 188, 255, 0.16);
                     color: #6750A4;
