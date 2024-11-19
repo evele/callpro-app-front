@@ -7,37 +7,14 @@
                     <Tab value="1" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Text settings</Tab>
                     <Tab value="2" class="text-lg rounded border-none py-0 px-[10px] h-8">General settings</Tab>
                 </TabList>
-                <Button label="Save" class="w-32 h-9 ml-auto" />
+                <Button label="Save" class="w-32 h-9 ml-auto transition-opacity" :class="[show_save_button ? 'opacity-1' : 'opacity-0']" 
+                    @click="handle_save_settings" :disabled="disabled_save_button" />
             </div>
 
             <TabPanels class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl">
                 <TabPanel value="0">
-                    <div v-if="isLoading">
-                        <div class="flex flex-col w-[75%]">
-                            <Skeleton class="mb-2"></Skeleton>
-                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
-                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
-                        </div>
-                        <Divider />
-                        <div class="flex flex-col w-[75%]">
-                            <Skeleton class="mb-2"></Skeleton>
-                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
-                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
-                        </div>
-                        <Divider />
-                        <div class="flex flex-col w-[75%]">
-                            <Skeleton class="mb-2"></Skeleton>
-                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
-                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
-                        </div>
-                        <Divider />
-                        <div class="flex flex-col w-[75%]">
-                            <Skeleton class="mb-2"></Skeleton>
-                            <Skeleton class="mb-2 !w-[75%]"></Skeleton>
-                            <Skeleton class="mb-2 !w-[50%]"></Skeleton>
-                        </div>
-                    </div>
-                    <VoiceSettings v-else :voice-settings="voice_settings" @updateVoiceSettings="handle_update_voice_settings" />
+                    <SettingsSkeleton v-if="isLoading" />
+                    <VoiceSettings v-else :voice-settings="voice_settings" @updateVoiceSettings="handle_update_voice_settings" @hasError="handle_voice_settings_error" />
                 </TabPanel>
                 <TabPanel value="1">
                     <p class="m-0">
@@ -58,26 +35,49 @@
     const { data: settings, isLoading } = useFetchSettings()
     const { mutate: updateVoiceSettings } = useUpdateVoiceSettings()
     const { mutate: updateTextSettings } = useUpdateTextSettings()
-    
-    const generalStore = useGeneralStore()
 
     const voice_settings = computed(() => {
         if(!settings?.value?.result) return null;
         return settings.value.settings
     })
 
-    const handle_update_voice_settings = (voice_settings) => {
-        console.log(voice_settings)
+    const user_admin_settings = computed(() => {
+        if(!settings?.value?.result) return null;
+        return settings.value.user_admin_settings
+    })
+
+    const voice_settings_ui = ref<VoiceSettingsUI | null>(null)
+
+    const show_save_button = ref(false)
+    const disabled_save_button = ref(false)
+
+    const voice_settings_mounted = ref(false)
+    const handle_update_voice_settings = (voice_settings: VoiceSettingsUI) => {
+        if(!voice_settings_mounted.value) { // Prevents the first update (when settings are loaded) from being sent
+            voice_settings_mounted.value = true
+            return;
+        }
+        show_save_button.value = true
+        voice_settings_ui.value = voice_settings
     }
 
-    const format_value = (value: ZeroOrOne) => {
-        return value == '1' ? ON : OFF;
+    const handle_save_settings = () => {
+        const voice_settings_to_save =  {
+        
+        }
+        console.log('aca?', voice_settings_to_save)
+        return
+
+
+        const dataToSend: VoiceSettingsDataToSave = {
+                'settings': voice_settings,
+                'cid_confirm': user_admin_settings.value.cid_confirm,
+            }
+        updateVoiceSettings(dataToSend)
     }
 
-    const format_tz = (value: OneToNine) => {
-        if(!generalStore.timezones?.length) return '';
-        const tz = generalStore.timezones?.find((tz: Timezone) => tz.zones_id == value)?.display;
-        return tz;
+    const handle_voice_settings_error = (hasError: boolean) => {
+        disabled_save_button.value = hasError
     }
 </script>
 

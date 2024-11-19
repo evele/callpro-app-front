@@ -5,7 +5,7 @@ export type ZeroOrOne = '0' | '1';
 export type OneOrTwo = '1' | '2';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
-export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
+export type CallSpeed = '5' | '20' | '50' | '100' | '200' | '999';
 export type SelectOption = { name: string; code: string | number };
 export type StringOrNumber = string | number;
 export type StringOrNull = string | null;
@@ -323,6 +323,21 @@ export type UserAdminSettings = {
   special_monthly_groups_id: NumberOrNull;
   special_paug_id: number;
   voice_price: number;
+}
+
+export type VoiceSettingsUI = {
+  show_caller_id: boolean,
+  caller_id_selected: { name: string, code: string },
+  caller_id: string,
+  static_intro: boolean,
+  repeat: boolean,
+  offer_dnc: boolean,
+  retries: { name: string, code: string },
+  call_speed: { name: string, code: string },
+  amd_detection: boolean,
+  email_on_finish: boolean,
+  number_when_completed_status: boolean,
+  number_when_completed: string,
 }
 
 export type VoiceSettingsToSave = {

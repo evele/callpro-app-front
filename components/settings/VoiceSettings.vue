@@ -2,14 +2,16 @@
     <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
         <div class="flex justify-between gap-2 items-center mb-7">
             <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="caller_id_selected" :options="caller_id_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
         </div>
-        <div class="flex justify-between items-center">
+        <div v-if="voice_settings.show_caller_id" class="flex justify-between items-center">
             <label class="text-lg font-medium w-48">Enter Caller ID</label>
-            <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" />
+            <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
+                :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
+            />
         </div>
     </SettingSection>
-    <Divider class="mb-[22px] "/>
+    <Divider/>
 
     <SettingSection title="Static Intro" description="Include a professional or personalized message as an intro to your voice broadcast.">
         <div class="flex justify-between items-center mb-7">
@@ -38,7 +40,7 @@
     <SettingSection title="Retries" description="The number of times the system have to call the recipient.">
         <div class="flex justify-between items-center mb-7 gap-2">
             <label class="text-lg font-medium">Number of Retries</label>
-            <Select v-model="voice_settings.retries_selected" :options="retries_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.retries" :options="retries_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
@@ -46,7 +48,7 @@
     <SettingSection title="Call Speed" description="The number of calls the system have to call at once.">
         <div class="flex justify-between items-center mb-7 gap-2">
             <label class="text-lg font-medium max-w-48">Number of calls at once</label>
-            <Select v-model="voice_settings.call_speed_selected" :options="call_speed_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
@@ -62,7 +64,7 @@
     <SettingSection title="Broadcast Confirmation Email" description="Receive an email when the broadcast is completed.">
         <div class="flex justify-between items-center mb-7">
             <label class="text-lg font-medium">Receive an email</label>
-            <ToggleSwitch v-model="voice_settings.confirmation_email" />
+            <ToggleSwitch v-model="voice_settings.email_on_finish" />
         </div>
     </SettingSection>
     <Divider />
@@ -74,7 +76,9 @@
         </div>
         <div v-if="voice_settings.number_when_completed_status" class="flex justify-between items-center">
             <label class="text-lg font-medium w-48">Number To Send When Completed</label>
-            <PhoneInput class="!w-[294px]" :model-value="voice_settings.number_when_completed" @update:modelValue="(v: string) => voice_settings.number_when_completed = v" />
+            <PhoneInput class="!w-[294px]" :model-value="voice_settings.number_when_completed" @update:modelValue="(v: string) => voice_settings.number_when_completed = v" 
+                :number-error="number_when_completed_error_message" @hasError="(val: boolean) => number_when_completed_error = val"    
+            />
         </div>
     </SettingSection>
 </template>
@@ -84,24 +88,34 @@
         voiceSettings: { type: [Object, null] as PropType<Settings | null>, required: true, default: null }
     })
 
-    const emit = defineEmits(['updateVoiceSettings'])
+    const emit = defineEmits(['updateVoiceSettings', 'hasError'])
+
+    const caller_id_empty = ref(false)
+    const caller_id_error = ref(false)
+    const caller_id_error_message = ref('')
+    const number_when_completed_empty = ref(false)
+    const number_when_completed_error = ref(false)
+    const number_when_completed_error_message = ref('')
 
     const voice_settings = reactive({
-        caller_id: undefined,
-        static_intro: undefined,
-        repeat: undefined,
-        offer_dnc: undefined,
-        retries: undefined,
-        call_speed: undefined,
-        amd_detection: undefined,
-        email_on_finish: undefined,
-        number_when_completed_status: undefined,
-        number_when_completed: undefined,
-    })
+        show_caller_id: false,
+        caller_id_selected: { name: '', code: '' },
+        caller_id: '',
+        static_intro: false,
+        repeat: false,
+        offer_dnc: false,
+        retries: { name: '', code: '' },
+        call_speed: { name: '', code: '' },
+        amd_detection: false,
+        email_on_finish: false,
+        number_when_completed_status: false,
+        number_when_completed: '',
+    });
 
     onMounted(() => {
-        console.log(props.voiceSettings)
         if(props.voiceSettings) {
+            voice_settings.show_caller_id = true
+            voice_settings.caller_id_selected = { name: 'Choose Caller ID', code: '3' }
             voice_settings.caller_id = props.voiceSettings.caller_id
             voice_settings.static_intro = props.voiceSettings.static_intro === '1'
             voice_settings.repeat = props.voiceSettings.repeat === '1'
@@ -113,7 +127,6 @@
             voice_settings.number_when_completed_status = props.voiceSettings.number_when_completed_status === '1'
             voice_settings.number_when_completed = props.voiceSettings.number_when_completed
         }
-        console.log(voice_settings)
     })
     
     const caller_id_options = [
@@ -121,7 +134,6 @@
         { name: 'Toll Free Number', code: '2' },
         { name: 'Choose Caller ID', code: '3' },
     ]
-    const caller_id_selected = ref({ name: 'Choose Caller ID', code: '3' })
 
     const retries_options = [
         { name: '1', code: '1' },
@@ -139,11 +151,31 @@
         { name: 'MAX', code: '999' },
     ]
 
-    const format_retries = (retries: string) => retries_options.find(option => option.code === retries)
+    const format_retries = (retries: string) => retries_options.find(option => option.code === retries) ?? retries_options[0]
+    const format_call_speed = (call_speed: string) => call_speed_options.find(option => option.code === call_speed) ?? call_speed_options[0]
 
-    const format_call_speed = (call_speed: string) => call_speed_options.find(option => option.code === call_speed)
+    watch(voice_settings, (updatedSettings: VoiceSettingsUI) => {
+        if(updatedSettings.caller_id === '') {
+            caller_id_empty.value = true
+            caller_id_error_message.value = 'Caller ID is required'
+        } else {
+            caller_id_empty.value = false
+            caller_id_error_message.value = ''
+        }
 
-    // watch(voice_settings, (newVal, oldVal) => {
-    //     emit('updateVoiceSettings', newVal)
-    // })
+        if(updatedSettings.number_when_completed === '' && updatedSettings.number_when_completed_status) {
+            number_when_completed_empty.value = true
+            number_when_completed_error_message.value = 'Number when completed is required'
+        } else {
+            number_when_completed_empty.value = false
+            number_when_completed_error_message.value = ''
+        }
+
+        emit('updateVoiceSettings', updatedSettings)
+    })
+
+    const hasError = computed(() => (caller_id_empty.value || number_when_completed_empty.value) || (caller_id_error.value || number_when_completed_error.value))
+    watch(hasError, (newVal: boolean) => {
+        emit('hasError', newVal)
+    })
 </script>
