@@ -16,7 +16,7 @@
     <SettingSection title="Static Intro" description="Include a professional or personalized message as an intro to your voice broadcast.">
         <div class="flex justify-between items-center mb-7">
             <label class="text-lg font-medium">Static audio introduction</label>
-            <ToggleSwitch v-model="voice_settings.static_intro" @change="console.log(voiceSettings)" />
+            <ToggleSwitch v-model="voice_settings.static_intro" class="scale-125" />
         </div>
     </SettingSection>
     <Divider />
@@ -24,7 +24,7 @@
     <SettingSection title="Repeat" description="Give recipients of your message, the option to replay it.">
         <div class="flex justify-between items-center mb-7">
             <label class="text-lg font-medium">Repeat</label>
-            <ToggleSwitch v-model="voice_settings.repeat" />
+            <ToggleSwitch v-model="voice_settings.repeat" class="scale-125" />
         </div>
     </SettingSection>
     <Divider />
@@ -32,7 +32,7 @@
     <SettingSection title="Offer Do not Call response" description="Offer your recipients the chance to not receive future calls.">
         <div class="flex justify-between items-center mb-7">
             <label class="text-lg font-medium">DNC response</label>
-            <ToggleSwitch v-model="voice_settings.offer_dnc" />
+            <ToggleSwitch v-model="voice_settings.offer_dnc" class="scale-125" />
         </div>
     </SettingSection>
     <Divider />
@@ -56,7 +56,7 @@
     <SettingSection title="AMD Detection" description="The system must detect if a machine answered the call. If it does, wait for the machine to stop playing the greeting.">
         <div class="flex justify-between items-center mb-7">
             <label class="text-lg font-medium">Stop playing if detects machine</label>
-            <ToggleSwitch v-model="voice_settings.amd_detection" />
+            <ToggleSwitch v-model="voice_settings.amd_detection" class="scale-125" />
         </div>
     </SettingSection>
     <Divider />
@@ -64,7 +64,7 @@
     <SettingSection title="Broadcast Confirmation Email" description="Receive an email when the broadcast is completed.">
         <div class="flex justify-between items-center mb-7">
             <label class="text-lg font-medium">Receive an email</label>
-            <ToggleSwitch v-model="voice_settings.email_on_finish" />
+            <ToggleSwitch v-model="voice_settings.email_on_finish" class="scale-125" />
         </div>
     </SettingSection>
     <Divider />
@@ -72,7 +72,7 @@
     <SettingSection title="Number when completed" description="Set a phone number to receive a call when the broadcast is completed.">
         <div class="flex justify-between items-center mb-5">
             <label class="text-lg font-medium">Number when completed</label>
-            <ToggleSwitch v-model="voice_settings.number_when_completed_status" />
+            <ToggleSwitch v-model="voice_settings.number_when_completed_status" class="scale-125" />
         </div>
         <div v-if="voice_settings.number_when_completed_status" class="flex justify-between items-center">
             <label class="text-lg font-medium w-48">Number To Send When Completed</label>
@@ -97,15 +97,15 @@
     const number_when_completed_error = ref(false)
     const number_when_completed_error_message = ref('')
 
-    const voice_settings = reactive({
+    const voice_settings = reactive<VoiceSettingsUI>({
         show_caller_id: false,
         caller_id_selected: { name: '', code: '' },
         caller_id: '',
         static_intro: false,
         repeat: false,
         offer_dnc: false,
-        retries: { name: '', code: '' },
-        call_speed: { name: '', code: '' },
+        retries: { name: '', code: '1' },
+        call_speed: { name: '', code: '5' },
         amd_detection: false,
         email_on_finish: false,
         number_when_completed_status: false,
@@ -135,14 +135,14 @@
         { name: 'Choose Caller ID', code: '3' },
     ]
 
-    const retries_options = [
+    const retries_options: { name: string; code: OneToFour }[] = [
         { name: '1', code: '1' },
         { name: '2', code: '2' },
         { name: '3', code: '3' },
         { name: '4', code: '3' },
     ]
 
-    const call_speed_options = [
+    const call_speed_options: { name: string; code: CallSpeed }[] = [
         { name: '5', code: '5' },
         { name: '20', code: '20' },
         { name: '50', code: '50' },
@@ -151,8 +151,8 @@
         { name: 'MAX', code: '999' },
     ]
 
-    const format_retries = (retries: string) => retries_options.find(option => option.code === retries) ?? retries_options[0]
-    const format_call_speed = (call_speed: string) => call_speed_options.find(option => option.code === call_speed) ?? call_speed_options[0]
+    const format_retries = (retries: OneToFour) => retries_options.find(option => option.code === retries) ?? retries_options[0]
+    const format_call_speed = (call_speed: CallSpeed) => call_speed_options.find(option => option.code === call_speed) ?? call_speed_options[0]
 
     watch(voice_settings, (updatedSettings: VoiceSettingsUI) => {
         if(updatedSettings.caller_id === '') {

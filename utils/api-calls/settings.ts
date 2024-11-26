@@ -14,19 +14,11 @@ export async function getSettings(): Promise<SettingsAPIResponse | APIResponseEr
 }
 
 /* ----- Update voice settings ----- */
-type UpdateVoiceSettingsAPIResponse = {
-    result: true;
-}
-
-export async function updateVoiceSettings(data: VoiceSettingsDataToSave): Promise<UpdateVoiceSettingsAPIResponse | APIResponseError>{    
-    return await fetchWrapper.post(UPDATE_VOICE_SETTINGS_URL, data) as UpdateVoiceSettingsAPIResponse | APIResponseError
+export async function updateVoiceSettings(data: VoiceSettingsDataToSave): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(UPDATE_VOICE_SETTINGS_URL, data) as APIResponseSuccess | APIResponseError
 }
 
 /* ----- Update text settings ----- */
-type UpdateTextSettingsAPIResponse = {
-    result: true;       
-}
-
-export async function updateTextSettings(data: TextSettingsDataToSave): Promise<UpdateTextSettingsAPIResponse | APIResponseError>{    
-    return await fetchWrapper.post(UPDATE_TEXT_SETTINGS_URL, data) as UpdateTextSettingsAPIResponse | APIResponseError
+export async function updateTextSettings(data: TextSettingsDataToSave): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(UPDATE_TEXT_SETTINGS_URL, data) as APIResponseSuccess | APIResponseError
 }
