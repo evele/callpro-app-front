@@ -31,10 +31,7 @@
                         </IconField>
 
                         <div class="flex gap-4">
-                            <Button :class="action_button_style">
-                                <FilterSVG class="text-[#757575]" />
-                                <span class="font-semibold">Filter</span>
-                            </Button>
+                            <FilterDropdown :all-contacts="ALL" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
                             <Button :class="action_button_style">
                                 <SortBySVG class="text-[#757575]" />
                                 <span class="font-semibold">Sort by</span>
@@ -234,7 +231,8 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedTab: { type: String, required: true }
+        selectedTab: { type: String, required: true },
+        dncTotalNumbers: { type: [Number, null], required: true }
     })
 
     const confirm = useConfirm()
@@ -295,6 +293,11 @@
     const custom_groups = computed(() => {
         if(!CGData?.value?.result) return []
         return CGData?.value.custom_groups
+    })
+
+    const system_groups = computed<SystemGroup | null>(() => {
+        if(!SGData?.value?.result) return null
+        return SGData?.value.system_groups
     })
 
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
@@ -562,7 +565,25 @@
         return [{ '!bg-[#E9DDFF]': selected_contacts.value.includes(data.id) }];
     };
 
-    const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none';
+    const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
+
+    /* ----- Filters ----- */
+    const ALL = computed(() => ({ name: 'All', count: contacts_data.value?.total_numbers }));
+    const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
+        if(!system_groups.value) return []
+        return [
+            { id: '1', name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
+            { id: '2', name: 'Trash', count: system_groups.value?.trash ?? 0 },
+            { id: '3', name: 'DNC', count: props.dncTotalNumbers ?? 0 }
+        ]
+    })
+    const FILTERS_CUSTOM_GROUPS = computed(() => custom_groups.value.map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count })))
+
+    const filters = ref<string[]>([]);
+
+    const handleUpdateFilters = (filters: string[]) => {
+        console.log(filters);
+    }
 </script>
 
 <style scoped lang="scss">

@@ -14,7 +14,7 @@ export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 export type SectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
-
+export type FilterOption = { id: string, name: string, count: number }
 
 export type APIResponseError = {
   result: false,
@@ -212,7 +212,7 @@ export type SystemGroup = {
 export type CustomGroup = {
   id: string;
   group_code: StringOrNumberOrNull;
-  group_name: StringOrNumber;
+  group_name: string;
   count: number;
 }
 
@@ -365,7 +365,7 @@ export type Tts_Convert = {
 }
 // TODO: Ver Audio y AudioAUX para extender o algo similar
 export type Audio = {
-  id: number;
+  id: string;
   user_id: number;
   name: string;
   created_at: string;

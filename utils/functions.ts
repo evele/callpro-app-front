@@ -76,9 +76,15 @@ export const format_contact_type = (type: OneToFour) => {
   }
 }
 
+// Returned format: 00:00
+export const format_seconds = (time: number | undefined): string => {
+  if (!time || isNaN(time)) return "00:00";
+  const minutes = Math.floor(time / 60);
+  const seconds = Math.floor(time % 60);
+  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};
 
 export const formatFileSize = (bytes:number) => {
-
   const k = 1024;
   const dm = 3;
   const sizes = FILE_SIZES_TYPES;
@@ -92,3 +98,4 @@ export const formatFileSize = (bytes:number) => {
 
   return `${formattedSize}${sizes[i]}`;
 }; 
+
