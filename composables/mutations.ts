@@ -159,6 +159,7 @@ export const useSaveGroupContacts = () =>{
     mutationFn: (data:ContactGroup) => fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['group_contacts']})
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
     },
   })
 }

@@ -23,7 +23,6 @@
 
     const emit = defineEmits(['click']);
     const handle_btn_action = (text: string) => {
-        console.log(text)
-        // emit('click', text);
+        emit('click', text);
     }
 </script>
