@@ -42,7 +42,7 @@
 
     const menuOptions = computed(() => [
         { id: 'new_contact', text: "Add new contact" },
-        { id: 'new_group', text: "Add new Group" },
+        { id: 'new_group', text: "Add new Group" }, // TODO: check about edit group
         { id: 'dnc', text: "Add new DNC" },
         { id: 'upload', text: upload_title.value },
     ]);

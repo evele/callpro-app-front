@@ -21,6 +21,7 @@
     const modalContacts = ref()
     const selected_tab = ref(CONTACTS_ALL)
     const message_text = ref('')
+    // TODO: review logic between selected_group, selected_tab, editing group
 
     /* ----- DNC Contacts ----- */
     const page = ref(1)
