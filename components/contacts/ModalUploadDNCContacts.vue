@@ -1,21 +1,20 @@
 <template>
-    <Dialog v-model:visible="show_upload_dnc_modal" modal :draggable="false" :closable="false" class="w-full max-w-[850px] mx-4 flex flex-col gap-4 md:gap-7">
+    <Dialog v-model:visible="show_upload_dnc_modal" modal :draggable="false" :closable="false" class="w-full max-w-[800px] mx-4 flex flex-col gap-4 md:gap-7 pb-8">
         <template #header>
-            <header class="w-full flex justify-between pb-5">
+            <header class="w-full flex justify-between pb-5 px-8">
                 <h2 class="flex items-center gap-4 font-bold text-lg text-black">Upload new file <ChevronDownSVG /></h2>
                 <Button @click="close_upload_dnc_modal" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
             </header>
             <Divider class="absolute left-0 top-[75px]" />
         </template>
 
-        <section class="">
+        <section>
             <div class="modal__dropfile">
                 <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" @select="onSelectedFiles">
                     <template #header="{ files }">
                         <Button @click="uploadEvent(files)" class="hidden" />
                     </template>
 
-                    
                     <template #content>
                         <ProgressBar v-if="isPending" mode="indeterminate" style="height: 6px"></ProgressBar>
                     </template>
@@ -28,15 +27,15 @@
                     </template>
                 </FileUpload>
             </div>
-
-            <div class="mt-4 mb-6 px-10 w-full text-[#757575]">
-                <p>Accepted format files: .csv, .xlsx</p>
-                <p>More info: your data should be in this format:</p>
-                <ul class="pl-16">
-                    <li>Column A: Number (required)</li>
-                </ul>
-            </div>
         </section>
+
+        <InfoPanel class="mt-7">
+            <p class="font-bold">Accepted format files: <span class="font-normal">.csv, .xlsx</span></p>
+            <p class="font-bold">More info: your data should be in this format:</p>
+            <ul class="list-disc pl-14">
+                <li>Column A: Number (required)</li>
+            </ul>
+        </InfoPanel>
     </Dialog>
 </template>
 
@@ -102,11 +101,8 @@
 }
    
     .modal__dropfile {
-        padding: 0 26px;
+        padding: 0;
         width: 100%;
-        @media (min-width: 400px) {
-            padding: 0 38px;
-        }
     }
 
     .modal__dropfile--container {

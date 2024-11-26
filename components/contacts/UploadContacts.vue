@@ -1,127 +1,105 @@
 <template>
-    <Dialog v-model:visible="visible" modal :draggable="false" @hide="close" class="max-w-[850px] w-[90vw]">
-        <template #header>
-            <h2 v-if="has_uploaded" >Upload Summary</h2>
-            <h2 v-else >Upload new file <ChevronDownSVG /></h2>
-        </template>      
-        <div class="mt-6">
-            <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" :auto="false" @select="onSelectedFiles">
-                <template ref="fileUploadHeader" #header="{chooseCallback, clearCallback}"> 
-                    <button ref="openFileSelector" @click="chooseCallback()" class="hidden"></button>    
-                    <button ref="clearFileSelection" @click="clearCallback()" class="hidden"></button>    
-                </template>
-                <template #empty>
-                        <div class="flex flex-col items-center pt-11 pb-9">
-                            <CircleSVG class="text-[#E8DEF8]"/>
-                            <p class="font-medium text-center">Drop files here<br>or select <a href="#" class="text-[#674fa4] underline" @click.prevent="open_file_selection">here</a> to upload</p>
-                        </div>
-                </template>
-                <template  #content="{files}">
-                    
-                    <UploadFileStatus
-                        :uploading="uploading"
-                        :upload-error="upload_error"
-                        :file-name="files[0]?.name??''"
-                        :file-size="files[0]?.size"
-                        :progress-size-percent="progress_size_percent"
-                        :total-size-percent="total_size_percent"
-                        @clear="clear_file_seletion"
-                    ></UploadFileStatus>
-                    <div v-if="has_uploaded">
-                        <div v-if="uploadedSuccess && uploadedData?.result">
-                            <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
-                                <thead class="bg-gray-100 border-b border-gray-300">
-                                    <tr>
-                                    <th class="px-4 py-2"> 
-                                        <Checkbox :modelValue="all_selected" :indeterminate="some_selected" @change="toggle_select_all" binary/>
-                                    </th>
-                                    <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
-                                    <th class="px-4 py-2 text-left text-gray-700">Phone</th>
-                                    <th class="px-4 py-2 text-left text-gray-700 text-center">Status</th>
-                                    <th class="px-4 py-2 text-left text-gray-700 text-center">Result</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <template v-for="contact in contacts" :key="contact.contact_id">
-                                    <tr v-for="(number,index) in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
-                                        <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">
-                                            <Checkbox v-if="contact.valid"  v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
-                                        </td>
-                                        <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
-                                        <td class="px-4 py-2">{{ number.number }}</td>
-                                        <td class="px-4 py-2">
-                                            <CheckSVG v-if="number.valid" class="m-auto text-success"/>
-                                            <ErrorIconSVG v-else class="m-auto text-danger"/>
-                                        </td>
-                                        <td class="px-4 py-2 text-center">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
-                                    </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </template>
-               
-            </FileUpload>
-        </div>
-        <InfoPanel v-if="!has_uploaded" class="mt-7">
-            <p class="font-bold">Accepted format files: <span class="font-normal">.csv, .xlsx</span></p>
-            <p class="font-bold">Your data should be in this order:</p>
-            <ul class="list-disc pl-14">
-                <li>Column A: First Name (optional)</li>
-                <li>Column B: Last Name (optional)</li>
-                <li>Column C: Number (required)</li>
-                <li>Column D, E, F...: Number (optional)</li>
-            </ul>
-        </InfoPanel>
-        <template #footer>
-            <Button class="mt-6 m-auto w-[300px]" @click="save_contact" :disabled="savedIsPending || selected_contacts_ids.length == 0">
-                            {{ !savedIsPending ? 'Save' : 'Saving...' }}
-                        </Button>
+    <FileUpload name="file" :multiple="false" accept=".csv, .xlsx, .xls" :maxFileSize="200000" :auto="false" @select="onSelectedFiles">
+        <template ref="fileUploadHeader" #header="{chooseCallback, clearCallback}"> 
+            <button ref="openFileSelector" @click="chooseCallback()" class="hidden"></button>    
+            <button ref="clearFileSelection" @click="clearCallback()" class="hidden"></button>    
         </template>
-    </Dialog>
+        <template #empty>
+            <div class="flex flex-col items-center pt-11 pb-9">
+                <CircleSVG class="text-[#E8DEF8]"/>
+                <p class="font-medium text-center">Drop files here<br>or select <a href="#" class="text-[#674fa4] underline" @click.prevent="open_file_selection">here</a> to upload</p>
+            </div>
+        </template>
+        <template  #content="{files}">
+            
+            <UploadFileStatus
+                :uploading="uploading"
+                :upload-error="upload_error"
+                :file-name="files[0]?.name??''"
+                :file-size="files[0]?.size"
+                :progress-size-percent="progress_size_percent"
+                :total-size-percent="total_size_percent"
+                @clear="clear_file_seletion"
+            ></UploadFileStatus>
+            <div v-if="has_uploaded">
+                <div v-if="uploadedSuccess && uploadedData?.result">
+                    <table class="table-auto w-full border-collapse shadow-lg rounded-lg">
+                        <thead class="bg-gray-100 border-b border-gray-300">
+                            <tr>
+                            <th class="px-4 py-2"> 
+                                <Checkbox :modelValue="all_selected" :indeterminate="some_selected" @change="toggle_select_all" binary/>
+                            </th>
+                            <th class="px-4 py-2 text-left text-gray-700">Last, First</th>
+                            <th class="px-4 py-2 text-left text-gray-700">Phone</th>
+                            <th class="px-4 py-2 text-left text-gray-700 text-center">Status</th>
+                            <th class="px-4 py-2 text-left text-gray-700 text-center">Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template v-for="contact in contacts" :key="contact.contact_id">
+                            <tr v-for="(number,index) in contact.numbers" :key="number.number" class="bg-white even:bg-gray-50 hover:bg-gray-100">
+                                <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">
+                                    <Checkbox v-if="contact.valid"  v-model="selected_contacts_ids" :inputId="contact.contact_id.toString()" name="selected_contacts" :value="contact.contact_id" />
+                                </td>
+                                <td v-if="index === 0" :rowspan="contact.numbers.length" class="px-4 py-2">{{ contact.last_name }}, {{ contact.first_name }}</td>
+                                <td class="px-4 py-2">{{ number.number }}</td>
+                                <td class="px-4 py-2">
+                                    <CheckSVG v-if="number.valid" class="m-auto text-success"/>
+                                    <ErrorIconSVG v-else class="m-auto text-danger"/>
+                                </td>
+                                <td class="px-4 py-2 text-center">{{ number?.validation_desc === "Valid and inserted" ? 'Ok' : number?.validation_desc}}</td>
+                            </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </template>
+    </FileUpload>
+
+    <InfoPanel v-if="!has_uploaded" class="mt-7">
+        <p class="font-bold">Accepted format files: <span class="font-normal">.csv, .xlsx</span></p>
+        <p class="font-bold">Your data should be in this order:</p>
+        <ul class="list-disc pl-14">
+            <li>Column A: First Name (optional)</li>
+            <li>Column B: Last Name (optional)</li>
+            <li>Column C: Number (required)</li>
+            <li>Column D, E, F...: Number (optional)</li>
+        </ul>
+    </InfoPanel>
+
+    <div class="w-full flex mt-6">
+        <Button class="mx-auto w-[300px]" @click="save_contact" :disabled="savedIsPending || selected_contacts_ids.length == 0">
+            {{ !savedIsPending ? 'Save' : 'Saving...' }}
+        </Button>
+    </div>
 </template>
 
 <script setup lang="ts">
-
     import InfoPanel from '../reusables/InfoPanel.vue';
     import CheckSVG from '../svgs/CheckSVG.vue';
     import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
 
     const props = defineProps({
-        selectedGroup: { type: String, required: true }
+        selectedTab: { type: String, required: true }
     })
     
     const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending, isError,reset } = useUploadContact();
     const { mutate: saveUploadedContact, isSuccess: savedSuccess, data: savedData, isPending: savedIsPending } = useSaveUploadedContact();
-
-    const visible = ref(false);
     
     const contacts: Ref<ContactUploadedData[]> = ref([]);
+
+    const emit = defineEmits(['close', 'success', 'error', 'changeTitle']);
    
     const group_id = ref('');
     const has_uploaded = ref(false);
     const upload_error = ref(false)
     const uploading = ref(false)
-    const showError = ref(false);
-    const showSuccess = ref(false);
 
     const selected_contacts_ids:Ref<number[]> = ref([]) 
-   
-    const open = () => {
-        visible.value = true;        
-    }
 
     const total_size_percent:Ref<number> = ref(0)
     const progress_size_percent:Ref<number> = ref(0)
-
-    const close = () => {
-        clear_file_seletion()
-        visible.value = false   
-    }
-
-    defineExpose({ open });
 
     type UploadContactData = {
         file: File;
@@ -164,8 +142,6 @@
         progress_size_percent.value = 0
         contacts.value = []
         selected_contacts_ids.value = []
-        showError.value = false
-        showSuccess.value = false        
     }
     
     const onSelectedFiles = (files: FileUploadEvent) => {
@@ -179,9 +155,8 @@
             file: file[0],
             from_broadcast: 'false',
             save_contact: 'true',
-            group_id: props.selectedGroup
+            group_id: props.selectedTab
         };
-        showError.value = true;
         const data_to_send = createFormData(data);
         
            // Iniciar la barra de progreso en 0 y aumentar gradualmente
@@ -208,6 +183,7 @@
                         progress_size_percent.value = 100
                         has_uploaded.value = true
                         uploading.value = false
+                        emit('changeTitle', 'Upload Summary')
                     }, 1000);
                 } else {
                     setTimeout(() => {
@@ -261,12 +237,17 @@
         }
         
         saveUploadedContact(data_to_send, {
-            onSuccess: () => {
-                // Should be a toast
-                showSuccess.value = true;
-                setTimeout(() => {
-                    close()
-                }, 2000);
+            onSuccess: (response: SaveUploadedContactAPIResponse | APIResponseError) => {
+                if(response.result)  {
+                    emit('success', 'Contacts saved successfully!')
+                    emit('close')
+                    clear_file_seletion()
+                } else {
+                    emit('error', 'Something went wrong, please try again')
+                }
+            },
+            onError: () => {
+                emit('error', 'Something went wrong, please try again')
             }
         })
     }
