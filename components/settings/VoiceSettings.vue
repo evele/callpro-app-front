@@ -1,10 +1,10 @@
 <template>
     <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
-        <div class="flex justify-between gap-2 items-center mb-7">
+        <div class="flex justify-between gap-2 items-center">
             <label class="text-lg font-medium w-48">Caller ID</label>
             <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
         </div>
-        <div v-if="voice_settings.show_caller_id" class="flex justify-between items-center">
+        <div v-if="voice_settings.show_caller_id" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium w-48">Enter Caller ID</label>
             <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
                 :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
@@ -14,7 +14,7 @@
     <Divider/>
 
     <SettingSection title="Static Intro" description="Include a professional or personalized message as an intro to your voice broadcast.">
-        <div class="flex justify-between items-center mb-7">
+        <div class="flex justify-between items-center">
             <label class="text-lg font-medium">Static audio introduction</label>
             <ToggleSwitch v-model="voice_settings.static_intro" class="scale-125" />
         </div>
@@ -22,7 +22,7 @@
     <Divider />
 
     <SettingSection title="Repeat" description="Give recipients of your message, the option to replay it.">
-        <div class="flex justify-between items-center mb-7">
+        <div class="flex justify-between items-center">
             <label class="text-lg font-medium">Repeat</label>
             <ToggleSwitch v-model="voice_settings.repeat" class="scale-125" />
         </div>
@@ -30,7 +30,7 @@
     <Divider />
 
     <SettingSection title="Offer Do not Call response" description="Offer your recipients the chance to not receive future calls.">
-        <div class="flex justify-between items-center mb-7">
+        <div class="flex justify-between items-center">
             <label class="text-lg font-medium">DNC response</label>
             <ToggleSwitch v-model="voice_settings.offer_dnc" class="scale-125" />
         </div>
@@ -38,7 +38,7 @@
     <Divider />
 
     <SettingSection title="Retries" description="The number of times the system have to call the recipient.">
-        <div class="flex justify-between items-center mb-7 gap-2">
+        <div class="flex justify-between items-center gap-2">
             <label class="text-lg font-medium">Number of Retries</label>
             <Select v-model="voice_settings.retries" :options="retries_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
         </div>
@@ -46,7 +46,7 @@
     <Divider />
 
     <SettingSection title="Call Speed" description="The number of calls the system have to call at once.">
-        <div class="flex justify-between items-center mb-7 gap-2">
+        <div class="flex justify-between items-center gap-2">
             <label class="text-lg font-medium max-w-48">Number of calls at once</label>
             <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
         </div>
@@ -54,7 +54,7 @@
     <Divider />
 
     <SettingSection title="AMD Detection" description="The system must detect if a machine answered the call. If it does, wait for the machine to stop playing the greeting.">
-        <div class="flex justify-between items-center mb-7">
+        <div class="flex justify-between items-center">
             <label class="text-lg font-medium">Stop playing if detects machine</label>
             <ToggleSwitch v-model="voice_settings.amd_detection" class="scale-125" />
         </div>
@@ -62,7 +62,7 @@
     <Divider />
 
     <SettingSection title="Broadcast Confirmation Email" description="Receive an email when the broadcast is completed.">
-        <div class="flex justify-between items-center mb-7">
+        <div class="flex justify-between items-center">
             <label class="text-lg font-medium">Receive an email</label>
             <ToggleSwitch v-model="voice_settings.email_on_finish" class="scale-125" />
         </div>
@@ -70,11 +70,11 @@
     <Divider />
 
     <SettingSection title="Number when completed" description="Set a phone number to receive a call when the broadcast is completed.">
-        <div class="flex justify-between items-center mb-5">
+        <div class="flex justify-between items-center">
             <label class="text-lg font-medium">Number when completed</label>
             <ToggleSwitch v-model="voice_settings.number_when_completed_status" class="scale-125" />
         </div>
-        <div v-if="voice_settings.number_when_completed_status" class="flex justify-between items-center">
+        <div v-if="voice_settings.number_when_completed_status" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium w-48">Number To Send When Completed</label>
             <PhoneInput class="!w-[294px]" :model-value="voice_settings.number_when_completed" @update:modelValue="(v: string) => voice_settings.number_when_completed = v" 
                 :number-error="number_when_completed_error_message" @hasError="(val: boolean) => number_when_completed_error = val"    
