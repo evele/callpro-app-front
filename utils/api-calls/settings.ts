@@ -22,3 +22,8 @@ export async function updateVoiceSettings(data: VoiceSettingsDataToSave): Promis
 export async function updateTextSettings(data: TextSettingsDataToSave): Promise<APIResponseSuccess | APIResponseError>{    
     return await fetchWrapper.post(UPDATE_TEXT_SETTINGS_URL, data) as APIResponseSuccess | APIResponseError
 }
+
+/* ----- Update general settings ----- */
+export async function updateGeneralSettings(data: GeneralSettingsDataToSave): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(UPDATE_GENERAL_SETTINGS_URL, data) as APIResponseSuccess | APIResponseError
+}

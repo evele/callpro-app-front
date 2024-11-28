@@ -304,7 +304,7 @@ export type Settings = GeneralSettings & VoiceSettings;
 
 export type TextSettings = {
   chat: ZeroOrOne;
-  root_user_id: number;
+  root_user_id?: number;
   sms_dnc: ZeroOrOne;
   text_caller_id: string;
 }
@@ -342,8 +342,23 @@ export type VoiceSettingsUI = {
   number_when_completed: string,
 }
 
+export type TextSettingsUI = {
+  show_text_caller_id: boolean,
+  text_caller_id_selected: { name: string, code: string },
+  text_caller_id: string,
+  chat: boolean,
+  sms_dnc: boolean
+}
+
+export type GeneralSettingsUI = {
+  call_window_start: string,
+  call_window_end: string,
+  time_guard: boolean,
+  time_zone: { name: string, code: OneToNine }
+}
+
 export type VoiceSettingsDataToSave = {
-  settings: Settings;
+  settings: VoiceSettings;
   cid_confirm: ZeroOrOne;
 }
 
@@ -355,6 +370,11 @@ export type TextSettingsDataToSave = {
   }
 }
 
+export type GeneralSettingsDataToSave = {
+  settings: GeneralSettings;
+}
+
+/* ----- Audio ----- */
 export type Tts_Convert = {
   full_file_url:string,
   file_name: string

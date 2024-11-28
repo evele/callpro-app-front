@@ -85,7 +85,7 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        voiceSettings: { type: [Object, null] as PropType<Settings | null>, required: true, default: null }
+        voiceSettings: { type: [Object, null] as PropType<VoiceSettings | null>, required: true, default: null }
     })
 
     const emit = defineEmits(['updateVoiceSettings', 'hasError'])

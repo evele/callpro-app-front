@@ -153,6 +153,16 @@ export const useUpdateTextSettings = () => {
   }) 
 }
 
+export const useUpdateGeneralSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: GeneralSettingsDataToSave) => updateGeneralSettings(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+  }) 
+}
+
 export const useSaveGroupContacts = () =>{  
   const queryClient = useQueryClient()
   return useMutation({
