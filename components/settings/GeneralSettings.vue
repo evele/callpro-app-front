@@ -12,6 +12,24 @@
             <label class="text-lg font-medium">Set a time guard</label>
             <ToggleSwitch v-model="general_settings.time_guard" class="scale-125" />
         </div>
+        
+        <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-7">
+            <label class="text-lg font-medium">Choose A Starting Time</label>
+            <DatePicker v-model="general_settings.call_window_start" hourFormat="12" showIcon timeOnly fluid iconDisplay="input" class="w-[294px] flex items-center">
+                <template #inputicon="slotProps">
+                    <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
+                </template>
+            </DatePicker>
+        </div>
+
+        <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-5">
+            <label class="text-lg font-medium">Choose An Ending Time</label>
+            <DatePicker v-model="general_settings.call_window_end" hourFormat="12" showIcon timeOnly fluid iconDisplay="input" class="w-[294px] flex items-center">
+                <template #inputicon="slotProps">
+                    <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
+                </template>
+            </DatePicker>
+        </div>
     </SettingSection>
     <Divider />
 </template>
@@ -21,14 +39,16 @@
         generalSettings: { type: [Object, null] as PropType<GeneralSettings | null>, required: true, default: null }
     })
 
+    type TimeZoneOpt = { name: string, code: OneToNine }
+
     const generalStore = useGeneralStore()
     const emit = defineEmits(['updateGeneralSettings', 'hasError'])
-    const time_zones_options: { name: string, code: OneToNine }[] = []
+    const time_zones_options = ref<TimeZoneOpt[]>([])
 
     onMounted(() => {
         if(generalStore.timezones.length) {
             generalStore.timezones.forEach((timezone: Timezone) => {
-                time_zones_options.push({ name: timezone.display, code: timezone.zones_id })
+                time_zones_options.value.push({ name: timezone.display, code: timezone.zones_id })
             })
         } 
     })
@@ -42,18 +62,46 @@
 
     watch(() => props.generalSettings, (newVal: GeneralSettings | null) => {
         if(newVal) {
-            console.log(newVal)
-            general_settings.call_window_start = newVal.call_window_start
-            general_settings.call_window_end = newVal.call_window_end
+            general_settings.call_window_start = parse_time(newVal.call_window_start)
+            general_settings.call_window_end = parse_time(newVal.call_window_end)
             general_settings.time_guard = newVal.time_guard === '1'
             general_settings.time_zone = format_time_zone(newVal.time_zone)
-            console.log(general_settings.time_zone)
+            console.log(general_settings)
         }
     })
 
-    const format_time_zone = (zone_id: OneToNine) => time_zones_options.find(option => option.code === zone_id) ?? time_zones_options[0]
+    const parse_time = (time: string) => {
+        const [hours, minutes] = time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0);
+        return date;
+    }
+
+    const format_time = (date) => {
+        console.log(date)
+        return 'hola'
+        const hours = String(date.getHours()).padStart(2, "0");
+        const minutes = String(date.getMinutes()).padStart(2, "0");
+        return `${hours}:${minutes}:00`;
+    }
+
+    const format_time_zone = (zone_id: OneToNine) => time_zones_options.value.find((option: TimeZoneOpt) => option.code === zone_id) ?? time_zones_options.value[0]
     
     watch(general_settings, (updatedSettings: GeneralSettingsUI) => {
-        emit('updateTextSettings', updatedSettings)
+        const settings_to_save: GeneralSettings = {
+            call_window_start: format_time(updatedSettings.call_window_start),
+            call_window_end: format_time(updatedSettings.call_window_end),
+            time_guard: updatedSettings.time_guard ? '1' : '0',
+            time_zone: updatedSettings.time_zone.code,
+        }
+        emit('updateTextSettings', settings_to_save)
     })
 </script>
+
+<style scoped lang="scss">
+:deep(.p-datepicker) {
+    .p-datepicker-input-icon-container {
+        top: 40%;
+    }
+}
+</style>
