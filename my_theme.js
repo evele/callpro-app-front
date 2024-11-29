@@ -418,7 +418,21 @@ export const MyPreset = definePreset(Aura, {
             800: '#42206b',  // Un púrpura oscuro y más intenso
             900: '#2c1459',  // El tono más oscuro, casi añil
             950: '#170b2f'   // Un tono profundo y oscuro, ideal para sombras
-        }   
+        },
+        red: {
+            50: '#fdecec',  // Un tono más claro que el nivel 100
+            100: '#fbd5d5', // Más claro que el 200
+            200: '#f9adad', // Más claro que el 300
+            300: '#f78787', // Más claro que el 400
+            400: '#f45f5f', // Más claro que el 500
+            500: '#e93632', // Color de transición más claro al nuevo 700
+            600: '#d31414', // Un tono más oscuro que el 500
+            700: '#C00F0C', // El color nuevo que has solicitado
+            800: '#9f0b09', // Más oscuro
+            900: '#7f0a08', // Aún más oscuro
+            950: '#520505'  // El más oscuro de la escala
+        }
+             
     },
     semantic: {
         primary: {
@@ -434,6 +448,23 @@ export const MyPreset = definePreset(Aura, {
             900: '{violet.900}',
             950: '{violet.950}'
         },
+        /*
+        danger: {
+            50: '{red.50}',
+            100: '{red.100}',
+            200: '{red.200}',
+            300: '{red.300}',
+            400: '{red.400}',
+            500: '{red.500}',
+            600: '{red.600}',
+            700: '{red.700}',  // Puedes usar el nuevo valor que configuraste (#C00F0C)
+            800: '{red.800}',
+            900: '{red.900}',
+            950: '{red.950}'
+        }, */
+        danger: {
+            color: '#C00F0C', // El color principal para "danger"
+        },
         formField: {
             paddingX: '1rem',
             paddingY: '0.45rem',
@@ -443,8 +474,8 @@ export const MyPreset = definePreset(Aura, {
     components: {
         dialog: {
             borderRadius: "1.875rem",
-            headerPadding: "2rem 2rem 0 2rem",
-            contentPadding: "0 2rem",
+            headerPadding: "2rem 0 0 0",
+            contentPadding: "1.5rem 2rem 0 2rem",
             footerPadding: "0 2rem 2rem 2rem"
         },
         button: {
@@ -471,6 +502,10 @@ export const MyPreset = definePreset(Aura, {
                     color: '{purple.500}'
                 }
             } 
+        },
+        fileupload: {
+            headerPadding: 0,
+            contentPadding: 0,
         }
     }
     
