@@ -3,25 +3,19 @@
         class="text-2xl w-full max-w-[850px] gap-[38px]">
         <!--  -->
         <div class="flex flex-col  gap-[38px]">
-            <div
-                class="pl-2.5 py-2 bg-[#4f378b]/20 rounded-tl-[10px] rounded-tr-[10px] border-b border-[#9747ff] justify-start items-center inline-flex">
-                <div class="text-[#1e1e1e] text-sm font-normal font-['Inter']">Type
-                    the message here to have it converted to audio.</div>
-            </div>
+            <InfoPanel>Type
+                the message here to have it converted to audio.
+            </InfoPanel>  
             <textarea v-model="text_to_convert" placeholder="Enter text"
                 class="h-24 px-4 py-3 bg-white rounded-[10px] border border-[#d9d9d9] text-[#1e1e1e] text-base font-normal">
-                </textarea>
+            </textarea>          
             <!-- area preview aduio conver -->
-            <div class="justify-start items-center inline-flex">
-                <div
-                    class="w-[170px] self-stretch px-10 py-[9px] bg-[#322f35] rounded-xl shadow justify-center items-center gap-2 inline-flex">
+            <div class="justify-start items-center inline-flex">                
                     <button type="button" @click="convert_Text"
-                        class="text-center text-white text-sm font-medium"
+                        class="w-[170px] self-stretch px-10 py-[9px] bg-[#322f35] rounded-xl shadow text-center text-white text-sm font-medium"
                         :disabled="isConverting">
                         {{ isConverting ? 'Converting...' : 'Convert' }}
-                    </button>
-                    
-                </div>
+                    </button>                
             </div>
             <ul v-if="isSuccess && convertedAudios.length" class="ml-2 is-flex is-flex-direction-column is-gap-1">
 
@@ -85,7 +79,7 @@
         </div>
         <!--  -->
         <template #footer>
-            <Button type="button" class="justify-center items-center w-[300px] mx-auto" :disabled="isPending">
+            <Button type="button" class="justify-center items-center w-[300px] mx-auto" :disabled="isPending || !isSaveEnabled">
                 {{ isPending ? 'Saving...' : 'Save' }}
             </Button>
         </template>
@@ -94,6 +88,7 @@
 
 <script setup lang="ts">
 
+import InfoPanel from '../reusables/InfoPanel.vue';
 import CloseSVG from '../svgs/CloseSVG.vue';
 import DownloadSVG from '../svgs/DownloadSVG.vue';
 import EditIconSVG from '../svgs/EditIconSVG.vue';
@@ -109,7 +104,7 @@ const isPending = ref(false);
 const show_older = ref(false)
 // TODO: audios convertidos pensnado en que sean mas de uno...
 const convertedAudios = ref<Tts_Convert[]>([]);
-
+    const isSaveEnabled = computed(() => convertedAudios.value.length > 0);
 // Variables audio Name edit
 interface AudioFile {
     file_name: string;
@@ -167,11 +162,16 @@ const convert_Text = async () => {
 // Función para iniciar edición
 const startEditing = (index: number, currentName: string) => {
     editingIndex.value = index;
-    audioNameTemp.value = currentName;
 
-    // almacenamos la extensión del nombre original
+    // Dividir el nombre y la extensión
     const splitName = currentName.split(".");
-    originalExtension = splitName.length > 1 ? splitName.pop()! : ""; 
+    if (splitName.length > 1) {
+        originalExtension = splitName.pop()!; // Almacena la extensión
+    } else {
+        originalExtension = ""; // Sin extensión
+    }
+
+    audioNameTemp.value = splitName.join("."); // Almacena solo el nombre sin la extensión
 }
 
 // Función para guardar el nombre editado
@@ -180,20 +180,13 @@ const saveAudioName = (index: number) => {
         alert("The name cannot be empty.");
         return;
     }
-
-    const splitEditedName = audioNameTemp.value.split(".");
-    const editedExtension = splitEditedName.length > 1 ? splitEditedName.pop()! : "";
-
-    if (editedExtension !== originalExtension) {
-        alert(`The file extension must be .${originalExtension}`);
-        return;
+    
+    if (convertedAudios.value[index]) {     
+        convertedAudios.value[index].file_name = `${audioNameTemp.value.trim()}.${originalExtension}`;
     }
-
-
-    if (convertedAudios.value[index]) {
-        convertedAudios.value[index].file_name = audioNameTemp.value;
-    }
+    
     editingIndex.value = null;
+    audioNameTemp.value = "";
 }
 
 const cancelEditing = () => {
