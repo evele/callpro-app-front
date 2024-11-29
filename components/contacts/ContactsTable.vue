@@ -31,10 +31,7 @@
                         </IconField>
 
                         <div class="flex gap-4">
-                            <Button :class="action_button_style">
-                                <FilterSVG class="text-[#757575]" />
-                                <span class="font-semibold">Filter</span>
-                            </Button>
+                            <FilterDropdown :all-contacts="ALL" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
                             <Button :class="action_button_style">
                                 <SortBySVG class="text-[#757575]" />
                                 <span class="font-semibold">Sort by</span>
@@ -217,7 +214,7 @@
 
             <template #paginatorstart>
                 <div class="flex gap-4">
-                    <Button type="button" :class="action_button_style" @click="emit('uploadFile', true)">
+                    <Button type="button" :class="action_button_style" @click="emit('uploadFile', 'upload')">
                         <UploadSVG class="w-5 h-5 text-[#757575]" />
                         <span class="font-semibold">Upload file</span>
                     </Button>
@@ -229,19 +226,13 @@
                 </div>
             </template>
         </DataTable>
-
-        <ConfirmDialog>
-            <template #message>
-                <p class="mt-4 mb-6 text-lg font-semibold">{{ message_text }}</p>
-            </template>
-        </ConfirmDialog>
-        <Toast />
     </div>
 </template>
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedTab: { type: String, required: true }
+        selectedTab: { type: String, required: true },
+        dncTotalNumbers: { type: [Number, null], required: true }
     })
 
     const confirm = useConfirm()
@@ -261,7 +252,7 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile'])
+    const emit = defineEmits(['uploadFile', 'updateMessage'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -302,6 +293,11 @@
     const custom_groups = computed(() => {
         if(!CGData?.value?.result) return []
         return CGData?.value.custom_groups
+    })
+
+    const system_groups = computed<SystemGroup | null>(() => {
+        if(!SGData?.value?.result) return null
+        return SGData?.value.system_groups
     })
 
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
@@ -413,9 +409,7 @@
         else return null;
     })
 
-    // Show confirmation modal
-    const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 });
-    const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 });
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const message_text = ref('');
     const confirm_modal = (data_to_send: SendNumberToTrash) => {
@@ -423,6 +417,7 @@
         message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
                                           : 'Are you sure you want to send this number to Trash?';
 
+        emit('updateMessage', message_text.value)
         confirm.require({
             header: 'Confirmation',
             rejectProps: {
@@ -570,7 +565,25 @@
         return [{ '!bg-[#E9DDFF]': selected_contacts.value.includes(data.id) }];
     };
 
-    const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none';
+    const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
+
+    /* ----- Filters ----- */
+    const ALL = computed(() => ({ name: 'All', count: contacts_data.value?.total_numbers }));
+    const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
+        if(!system_groups.value) return []
+        return [
+            { id: '1', name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
+            { id: '2', name: 'Trash', count: system_groups.value?.trash ?? 0 },
+            { id: '3', name: 'DNC', count: props.dncTotalNumbers ?? 0 }
+        ]
+    })
+    const FILTERS_CUSTOM_GROUPS = computed(() => custom_groups.value.map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count })))
+
+    const filters = ref<string[]>([]);
+
+    const handleUpdateFilters = (filters: string[]) => {
+        console.log(filters);
+    }
 </script>
 
 <style scoped lang="scss">

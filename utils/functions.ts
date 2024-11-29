@@ -98,3 +98,4 @@ export const formatFileSize = (bytes:number) => {
 
   return `${formattedSize}${sizes[i]}`;
 };
+

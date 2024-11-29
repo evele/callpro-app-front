@@ -1,14 +1,13 @@
 <template>
-    <div class="p-6">
-        <p class="text-center text-2xl font-bold">Audios Page</p>     
+    <div class="p-6">       
         <Card class="bg-white">
             <template #content>
-                <main>
-                    <AudiosTable />
-                </main>
+                <ButtonsLibraryContainer />
+                <AudiosTable />
             </template>  
         </Card>
-        <div class="mt-20">
+
+        <div>
             <h3>Write some text and convert it to speech.</h3>
             <textarea cols="50" rows="10" v-model="text_to_convert" />
             <button type="button" @click="convert_Text" class="btn-convert" :disabled="isConverting">

@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col gap-10">
+    <div class="flex flex-col gap-10 mt-8">
         <div class="flex justify-between w-full">
             <IconField>
                 <InputIcon>
@@ -62,7 +62,7 @@
 
                 <template #empty>
                     <p v-if="search.length">No matching records found</p>
-                    <p v-if="!user_audios.length">You have no audios yet</p>
+                    <p v-if="!user_audios.length">{{ isFetching ? 'Loading Audios' : 'You have no audios yet' }}</p>
                 </template>
             </DataTable>
         </section>
@@ -91,6 +91,7 @@
 
         <Toast />
     </div>
+    <AudioPlayer :current-audio="audio_playing" @action="handle_player_action" />
 </template>
 
 <script setup lang="ts">
@@ -101,7 +102,7 @@
     const show_older = ref(false)
     const selected_audio_file_name = ref('')
 
-    const { data: allAudiosData, isFetching } = useFetchGetAllAudios(show_older)
+    const { data: allAudiosData, isFetching, isSuccess } = useFetchGetAllAudios(show_older)
     const { mutate: saveAudio, isPending: isPendingSave } = useSaveAudio()
     const { mutate: deleteAudio, isPending: isPendingDelete } = useDeleteAudio()
     const { refetch: download_audio_bro } = useDownloadAudio(selected_audio_file_name)
@@ -199,7 +200,6 @@
     const update_audio_data = () => {
         if(!selected_audio.value) return
         if(!audio_name.value) {
-            console.log('what')
             show_error_toast('Validation error', 'Please enter a name for the audio')
             return
         }
@@ -256,6 +256,70 @@
     const rowClass = (data: any) => {
         return [{ '!bg-[#D0BCFF]': audio_playing.value && audio_playing.value?.id === data.id }];
     };
+
+    /* ----- Audio Player ----- */
+    const is_audio_playing = ref(false)
+    const is_audio_loading = ref(false)
+    const is_audio_paused = ref(false)
+    const is_audio_error = ref(false)
+    const show_controls = ref(false)
+
+    const reset_states = () => {
+        is_audio_playing.value = false
+        is_audio_loading.value = false
+        is_audio_paused.value = false
+        is_audio_error.value = false
+    }
+
+    watch(() => audio_playing.value, (newVal: Audio | null) => {
+        if(!newVal) {
+            audio_playing.value = null
+            return
+        }
+        reset_states()
+    })
+
+    const select_previous_audio = () => {
+        if(!audio_playing.value) return
+        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
+        const new_position = (current_position === 0) ? user_audios.value.length - 1 : current_position - 1
+        audio_playing.value = user_audios.value[new_position]
+    }
+
+    const select_next_audio = () => {
+        if(!audio_playing.value) return
+        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
+        const new_position = (current_position === user_audios.value.length - 1) ? 0 : current_position + 1
+        audio_playing.value = user_audios.value[new_position]
+    }
+
+    const handle_player_action = (action: string) => {
+        reset_states()
+        switch(action) {
+            case 'loading':
+                is_audio_loading.value = true
+                break
+            case 'play':
+                is_audio_playing.value = true
+                break
+            case 'pause':
+                is_audio_paused.value = true
+                break
+            case 'error':
+                is_audio_error.value = true
+                show_error_toast('Sorry!', "This audio can't be played");
+                break
+            case 'prev':
+                select_previous_audio()
+                break
+            case 'next':
+                select_next_audio()
+                break
+            default:
+                break
+        }
+    }
+    /* ----- Audio Player ----- */
 </script>
 
 <style scoped lang="scss">

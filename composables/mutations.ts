@@ -134,7 +134,7 @@ export const useAddDNCContact = () => {
 export const useSendContactToTrash = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { numbers_ids: string[] }) => sendContactToTrash(data),
+    mutationFn: (data: { number_ids: string[] }) => sendContactToTrash(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
       queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
@@ -179,6 +179,7 @@ export const useSaveGroupContacts = () =>{
     mutationFn: (data:ContactGroup) => fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data),
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['group_contacts']})
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
     },
   })
 }
