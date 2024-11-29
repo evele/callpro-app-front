@@ -20,7 +20,7 @@
 
                 <Button v-if="selected_tab === 'general'" class="w-32 h-9 ml-auto transition-opacity" :class="[show_save_general_settings_button ? 'opacity-1' : 'opacity-0']" 
                     @click="handle_save_general_settings" :disabled="disabled_save_general_settings_button">
-                    {{ is_saving_general_settings ? 'Saving...' : 'Save general' }}
+                    {{ is_saving_general_settings ? 'Saving...' : 'Save' }}
                 </Button>
             </div>
 
@@ -201,26 +201,42 @@
         return { time_guard, time_zone, call_window_end, call_window_start }
     })
 
-    const general_settings_ui = ref<GeneralSettingsUI | null>(null)
+    const general_settings_formatted = ref<GeneralSettings | null>(null)
     const show_save_general_settings_button = ref(false)
     const disabled_save_general_settings_button = computed(() => is_saving_general_settings.value || !show_save_general_settings_button.value)
 
     const general_settings_mounted = ref(false)
-    const handle_update_general_settings = (general_settings: GeneralSettingsUI) => {
+    const handle_update_general_settings = (general_settings: GeneralSettings) => {
         if(!general_settings_mounted.value) { // Prevents the first update (when settings are loaded) from being sent
             general_settings_mounted.value = true
             return;
         }
         show_save_general_settings_button.value = true
-        general_settings_ui.value = general_settings
-    }
-
-    const format_general_settings_to_save = (general_settings_ui: GeneralSettingsUI) => {
-        console.log('he')
+        general_settings_formatted.value = general_settings
     }
 
     const handle_save_general_settings = () => {
-       console.log('aca')
+        if(!general_settings_formatted.value) return;
+
+        const general_settings_to_save: GeneralSettings = { ...general_settings_formatted.value }
+
+        const dataToSend: GeneralSettingsDataToSave = {
+            'settings': general_settings_to_save
+        }
+
+        updateGeneralSettings(dataToSend, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_save_general_settings_button.value = false
+                    general_settings_mounted.value = false
+                    visible.value = true
+                    setTimeout(() => visible.value = false, 2000)
+                } else {
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving general settings', life: 3000 })
+                }
+            },
+            onError: () =>  toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while general text settings', life: 3000 })
+        })
     }
     /* ----- End General Settings ----- */
 </script>

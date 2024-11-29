@@ -351,8 +351,8 @@ export type TextSettingsUI = {
 }
 
 export type GeneralSettingsUI = {
-  call_window_start: string,
-  call_window_end: string,
+  call_window_start: Date | null,
+  call_window_end: Date | null,
   time_guard: boolean,
   time_zone: { name: string, code: OneToNine }
 }

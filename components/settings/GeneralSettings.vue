@@ -15,7 +15,7 @@
         
         <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium">Choose A Starting Time</label>
-            <DatePicker v-model="general_settings.call_window_start" hourFormat="12" showIcon timeOnly fluid iconDisplay="input" class="w-[294px] flex items-center">
+            <DatePicker v-model="general_settings.call_window_start" hourFormat="12" :manualInput="false" showIcon timeOnly iconDisplay="input" class="w-[294px] flex items-center">
                 <template #inputicon="slotProps">
                     <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
                 </template>
@@ -24,7 +24,7 @@
 
         <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-5">
             <label class="text-lg font-medium">Choose An Ending Time</label>
-            <DatePicker v-model="general_settings.call_window_end" hourFormat="12" showIcon timeOnly fluid iconDisplay="input" class="w-[294px] flex items-center">
+            <DatePicker v-model="general_settings.call_window_end" hourFormat="12" :manualInput="false" showIcon timeOnly iconDisplay="input" class="w-[294px] flex items-center">
                 <template #inputicon="slotProps">
                     <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
                 </template>
@@ -54,8 +54,8 @@
     })
 
     const general_settings = reactive<GeneralSettingsUI>({
-        call_window_start: '',
-        call_window_end: '',
+        call_window_start: null,
+        call_window_end: null,
         time_guard: false,
         time_zone: { name: '', code: '1' },
     });
@@ -66,7 +66,6 @@
             general_settings.call_window_end = parse_time(newVal.call_window_end)
             general_settings.time_guard = newVal.time_guard === '1'
             general_settings.time_zone = format_time_zone(newVal.time_zone)
-            console.log(general_settings)
         }
     })
 
@@ -77,13 +76,17 @@
         return date;
     }
 
-    const format_time = (date) => {
-        console.log(date)
-        return 'hola'
-        const hours = String(date.getHours()).padStart(2, "0");
-        const minutes = String(date.getMinutes()).padStart(2, "0");
-        return `${hours}:${minutes}:00`;
-    }
+    const format_time = (date: Date | null): string => {
+    if (!date || !(date instanceof Date)) return '0000-00-00 00:00';
+
+    const year = String(date.getFullYear());
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
 
     const format_time_zone = (zone_id: OneToNine) => time_zones_options.value.find((option: TimeZoneOpt) => option.code === zone_id) ?? time_zones_options.value[0]
     
@@ -94,7 +97,7 @@
             time_guard: updatedSettings.time_guard ? '1' : '0',
             time_zone: updatedSettings.time_zone.code,
         }
-        emit('updateTextSettings', settings_to_save)
+        emit('updateGeneralSettings', settings_to_save)
     })
 </script>
 
