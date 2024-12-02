@@ -1,8 +1,20 @@
 <template>
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable :selected-tab="selected_tab" @uploadFile="open_contacts_modal" @updateMessage="handle_update_message" :dnc-total-numbers="dnc_total_contacts" />
+        <ContactsTable 
+            :selected-tab="selected_tab" 
+            @uploadFile="open_contacts_modal" 
+            @updateMessage="handle_update_message" 
+            :dnc-total-numbers="total_dnc_count" 
+            :system-groups="system_groups" 
+            :custom-groups="custom_groups" 
+        />
         <div class="flex flex-col gap-4">
-            <ContactsActions @click="open_contacts_modal" :dnc-total-numbers="dnc_total_contacts" />
+            <ContactsActions 
+                @click="open_contacts_modal" 
+                :total-contacts-number="total_contacts_count" 
+                :total-groups-number="total_custom_groups_count" 
+                :total-dnc-number="total_dnc_count" 
+            />
             <ContactsGroupsPanel :selected-tab="selected_tab" />
         </div>
     </div>
@@ -23,22 +35,42 @@
     const message_text = ref('')
     // TODO: review logic between selected_group, selected_tab, editing group
 
+    /* ----- System Groups ----- */
+    const { data: SGData } = useFetchGetSystemGroups()
+    const system_groups = computed<SystemGroup | null>(() => {
+        if(!SGData?.value?.result) return null
+        return SGData?.value.system_groups
+    })
+
+    const total_contacts_count = computed(() => {
+        if(!SGData?.value?.result) return null
+        const data = SGData?.value.system_groups
+        return Number(data.not_trash)
+    })
+
+    /* ----- Custom Groups ----- */
+    const { data: CGData} = useFetchGetCustomGroups() 
+    const custom_groups = computed(() => {
+        if(!CGData?.value?.result) return []
+        return CGData?.value.custom_groups
+    })
+
+    const total_custom_groups_count = computed(() => {
+        if(!CGData?.value?.result) return null
+        const data = CGData?.value.custom_groups
+        return data.length
+    })
+
     /* ----- DNC Contacts ----- */
     const page = ref(1)
     const show = ref(0)
     const search = ref('')
-    const dnc_total_contacts = ref<number | null>(null)
 
     const { data: dnc_contacts } = useFetchDNCContacts(page,show,search)
 
-    const dnc_contacts_value = computed(() => dnc_contacts.value);
-
-    watch(dnc_contacts_value, (updated_data: GetDNCContactsAPIResponse | APIResponseError | undefined) => {
-        if (updated_data && updated_data?.result) {
-            dnc_total_contacts.value = updated_data.dnc_total_contacts;
-        } else {
-            dnc_total_contacts.value = -1;
-        }
+    const total_dnc_count = computed(() => {
+        const data = dnc_contacts?.value;
+        return data && data?.result ? data?.dnc_total_contacts : null;
     });
 
     /* ----- Open contacts modal ----- */

@@ -1,5 +1,5 @@
 <template>
-    <Button @mouseenter="is_hovering = true" @mouseleave="is_hovering = false" @click="handle_btn_action(text)"
+    <Button @mouseenter="is_hovering = true" @mouseleave="is_hovering = false"
         class="rounded-xl min-h-16 h-16 bg-white border-[#CAC4D0] hover:bg-[#6750A4] w-full h-full flex flex-col items-start justify-center pt-3 px-3 relative -space-y-2 hover:items-center hover:pt-2"
     >
         <div v-if="is_hovering" class="bg-white rounded-full p-2 absolute shadow-lg hover:scale-125 transition-transform">
@@ -24,22 +24,4 @@
     });
 
     const is_hovering = ref(false);
-
-    const emit = defineEmits(['btnAction']);
-
-    const handle_btn_action = (text: string) => {
-        switch (text) {
-            case 'Total Contacts':
-                emit('btnAction', 'new_contact');
-                break;
-            case 'Total Groups':
-                emit('btnAction', 'new_group');
-                break;
-            case 'Total DNC':
-                emit('btnAction', 'dnc');
-                break;
-            default:
-                break;
-        }
-    }
 </script>

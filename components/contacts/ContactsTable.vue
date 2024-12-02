@@ -232,7 +232,9 @@
 <script setup lang="ts">
     const props = defineProps({
         selectedTab: { type: String, required: true },
-        dncTotalNumbers: { type: [Number, null], required: true }
+        dncTotalNumbers: { type: [Number, null], required: true },
+        systemGroups: { type: Object as PropType<SystemGroup | null>, required: true },
+        customGroups: { type: Array as PropType<CustomGroup[]>, required: true }
     })
 
     const confirm = useConfirm()
@@ -277,8 +279,6 @@
         [key: string]: ContactRow;
     }
 
-    const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
-    const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups() 
     const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
@@ -290,15 +290,9 @@
         return all_contacts_data?.value
     })
 
-    const custom_groups = computed(() => {
-        if(!CGData?.value?.result) return []
-        return CGData?.value.custom_groups
-    })
+    const custom_groups = computed(() => props.customGroups)
 
-    const system_groups = computed<SystemGroup | null>(() => {
-        if(!SGData?.value?.result) return null
-        return SGData?.value.system_groups
-    })
+    const system_groups = computed<SystemGroup | null>(() => props.systemGroups)
 
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
 
