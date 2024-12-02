@@ -97,5 +97,5 @@ export const formatFileSize = (bytes:number) => {
   const formattedSize = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
 
   return `${formattedSize}${sizes[i]}`;
-}; 
+};
 
