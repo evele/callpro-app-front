@@ -45,9 +45,9 @@
                             <td class="text-center">{{ code.call_in_code }}</td>
                             <td class="text-center">{{ code.date }}</td>
                             <td class="text-center w-24">
-                                <Button
+                                <Button rounded
                                     @click="delete_code(code?.id)"
-                                    class="bg-gray-200 py-1 px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                                    class="p-2 bg-gray-200  border-none text-black">
                                     <TrashSVG class="w-6 h-6" />
                                 </Button>
                             </td>
