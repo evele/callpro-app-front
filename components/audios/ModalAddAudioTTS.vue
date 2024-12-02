@@ -28,7 +28,7 @@
                 <li v-for="(audio, index) in convertedAudios" :key="index" class="is-flex is-gap-2">
                     <!-- area preview aduio conver -->
                     <div
-                        class="px-2.5 py-[5px] rounded-tl-[10px] rounded-tr-[10px] justify-start items-center gap-[30px] inline-flex">
+                        class="px-2.5 py-[5px] justify-start items-center gap-[30px] inline-flex">
                         <!-- Condicional para mostrar el nombre o el input -->
                         <div v-if="editingIndex === index"
                             class="w-[371px] flex flex-col  justify-start items-start gap-2">
