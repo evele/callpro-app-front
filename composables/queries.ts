@@ -135,7 +135,7 @@ export function useFetchAllContacts(page:Ref<number>, limit:Ref<number>, with_gr
     limit: limit.value,
     with_groups: with_groups.value, // TODO: review this
     is_custom_group:is_custom_group.value, 
-    group_id:'trash',
+    group_id:group_id,
     filter:filter.value,
   }))
   return useQuery({
