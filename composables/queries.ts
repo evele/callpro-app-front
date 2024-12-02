@@ -66,6 +66,17 @@ export const useFetchGetAudio = (audio_id: Ref<StringOrNull>, audio_full_url:Ref
   })
 }
 
+export function useDownloadAudio(file_name: Ref<string>) {
+  const dataToSend = computed(() => ({
+    file_name: file_name.value
+  }));
+  return useQuery({
+    queryKey: ['audio_to_download', dataToSend],
+    queryFn: () => downloadAudio(dataToSend.value),
+    enabled: false,
+  });
+}
+
 /* ----- Billing ----- */
 export const useFetchInvoices = () => {
   return useQuery({

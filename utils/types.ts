@@ -365,7 +365,7 @@ export type Tts_Convert = {
 }
 // TODO: Ver Audio y AudioAUX para extender o algo similar
 export type Audio = {
-  id: string;
+  id: number;
   user_id: number;
   name: string;
   created_at: string;
@@ -392,4 +392,18 @@ export type AudioAux = {
 export type TextToConvert = {
   text: string, 
   temp: boolean    
+}
+
+export type AudioToSave = {
+  action: 'create' | 'update',
+  audio_info: {
+    audio_id: number;
+    file_name: string;
+    length: number;
+    name: string;
+  },
+}
+
+export type AudioToDelete = {
+  audio_id: number;
 }
