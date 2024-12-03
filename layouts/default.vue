@@ -1,6 +1,6 @@
 <template>
     <div class="grid-container">
-        <div class="item1">
+        <div class="item1 sticky top-0 left-0 z-[1000]">
             Header
             <span v-if="show_current_env() !== ''" class="env-title">{{ show_current_env() }}</span>
         </div>
@@ -59,10 +59,12 @@
         height:6.5rem;
         padding: 10px 0;
         border-bottom: 2px solid #DED8E1;
+        margin-left: 250px
     }
 
     .item3 {
         background-color: var(--p-purple-100);
+        margin-left: 250px
     }
 
 </style>
