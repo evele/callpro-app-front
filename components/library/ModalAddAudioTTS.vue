@@ -51,9 +51,9 @@
                             </div>
                         </div>
                         <!-- Mostrar el nombre si no está en modo de edición -->
-                        <div v-else @click="startEditing(index, audio.file_name)"
+                        <div v-else @click="startEditing(index, audio.name)"
                             class="text-[#65558f] text-base font-normal font-['Inter'] underline cursor-pointer">
-                            {{ audio.file_name }}
+                            {{ audio.name }}
                         </div>
 
                         <!-- Bloque de botones (Play, Download, Edit, Trash) si no está en modo de edición -->
@@ -68,7 +68,7 @@
                                 <DownloadSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
                             </div>
                             <!-- edit -->
-                            <Button @click="startEditing(index, audio.file_name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[10px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
+                            <Button @click="startEditing(index, audio.name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[10px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
                                 <template #icon>
                                     <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
                                 </template>
@@ -107,15 +107,10 @@ const audio_id: Ref<string | null> = ref(null);
 const audio_url: Ref<string | null> = ref(null);
 const visible = ref(false);
 const text_to_convert = ref('');
-const isLoading = ref(false)
-const isPending = ref(false);
-const show_older = ref(false)
 // TODO: audios convertidos pensnado en que sean mas de uno...
-const convertedAudios = ref<Tts_Convert[]>([]);
+type Tts_Convert_with_name = Tts_Convert & { name: string }
+const convertedAudios = ref<Tts_Convert_with_name[]>([]);
 // Variables audio Name edit
-interface AudioFile {
-    file_name: string;
-}
 const editingIndex = ref<number | null>(null); // indice del audio en edición
 const audioNameTemp = ref("");  // temporal para el nombre del audio
 let originalExtension = ""; // para almacenar la extension original del archivo
@@ -123,6 +118,8 @@ let originalExtension = ""; // para almacenar la extension original del archivo
 const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
 const { data: audioData, refetch: refetchAudioData } = useFetchGetAudio(audio_id, audio_url, CALLPRO_APP_FRONT)
 const { mutate: saveAudio, isPending: isPendingSave } = useSaveAudio()
+
+const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
 const close = () => {
     visible.value = false;
@@ -141,7 +138,7 @@ const convert_Text = async () => {
     audio_url.value = null
 
     if (!(text_to_convert.value.trim())) {
-        alert('No se puede convertir texto vacío');
+        show_error_toast('Error', "The text cannot be empty.")
         return;
     }
     const dataToSend = {
@@ -159,6 +156,7 @@ const convert_Text = async () => {
             convertedAudios.value.push({
                 full_file_url: data.full_file_url,
                 file_name: data.file_name,
+                name: data.file_name
             });
         }
     });
@@ -184,12 +182,12 @@ const handle_delete = (fileName: string) => convertedAudios.value = convertedAud
 // Función para guardar el nombre editado
 const saveAudioName = (index: number) => {
     if (!audioNameTemp.value.trim()) {
-        alert("The name cannot be empty.");
+        show_error_toast('Error', "The name cannot be empty.")
         return;
     }
-    
+
     if (convertedAudios.value[index]) {     
-        convertedAudios.value[index].file_name = `${audioNameTemp.value.trim()}.${originalExtension}`;
+        convertedAudios.value[index].name = `${audioNameTemp.value.trim()}.${originalExtension}`;
     }
     
     editingIndex.value = null;
@@ -201,17 +199,13 @@ const cancelEditing = () => {
     audioNameTemp.value = ''; // Limpia el nombre temporal si es necesario
 }
 
-const { show_success_toast, show_error_toast } = usePrimeVueToast();
-
 const save_audios = () => {
     if(!convertedAudios.value.length) return
     
-    const audios_to_save: AudioInfoToSave[] = convertedAudios.value.map((audio: Tts_Convert) => {
+    const audios_to_save: AudioInfoToSave[] = convertedAudios.value.map((audio: Tts_Convert_with_name) => {
         return {
-            audio_id: audio_id.value,
             file_name: audio.file_name,
-            length: 0,
-            name: audio.file_name
+            name: audio.name.split('.')[0],
         }
     })
 
@@ -219,18 +213,18 @@ const save_audios = () => {
         action: 'create',
         audio_info: audios_to_save
     }
-    console.log(data_to_send)
-    return
+
     saveAudio(data_to_send, {
         onSuccess: (response: APIResponseSuccess | APIResponseError) => {
             if(response.result) {
-                show_success_toast('Success', 'Data saved successfully!')
+                const message = audios_to_save.length > 1 ? 'Audios saved successfully!' : 'Audio saved successfully!'
+                show_success_toast('Success', message)
                 close()
             } else {
-                show_error_toast('Oops...', response.error ?? 'Something failed!')
+                show_error_toast('Oops...', response.error ?? 'Something failed... please try again later.')
             }
         },
-        onError: () => show_error_toast('Oops...', 'Something failed!')
+        onError: () => show_error_toast('Oops...', 'Something failed... please try again later.')
     })
 }
 

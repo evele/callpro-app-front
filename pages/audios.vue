@@ -1,5 +1,5 @@
 <template>
-    <div class="p-6">       
+    <div class="p-6 mb-10">       
         <Card class="bg-white">
             <template #content>
                 <ButtonsLibraryContainer @action="handle_btn_action" />
@@ -11,11 +11,11 @@
 </template>
 
 <script setup lang="ts">
-    const addAudioTTSRef = ref(null)  
+    const addAudioTTSRef = ref()  
 
     const handle_btn_action = (action: string) => {
         if (action === 'tts') {
-            addAudioTTSRef.value.open()
+            addAudioTTSRef?.value?.open()
         }
     }
 </script>

@@ -395,9 +395,9 @@ export type TextToConvert = {
 }
 
 export type AudioInfoToSave = {
-  audio_id: number;
+  audio_id?: number;
   file_name: string;
-  length: number;
+  length?: number;
   name: string;
 }
 
