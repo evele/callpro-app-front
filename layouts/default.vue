@@ -1,9 +1,6 @@
 <template>
     <div class="grid-container">
-        <div class="item1">
-            Header
-            <span v-if="show_current_env() !== ''" class="env-title">{{ show_current_env() }}</span>
-        </div>
+        <MainHeader class="item1" />
         <Navbar class="item2"></Navbar>
         <main class="item3">
             <slot></slot>
@@ -12,20 +9,7 @@
 </template>
 
 <script setup lang="ts">
-    const show_current_env = () => {
-        const runtimeConfig = useRuntimeConfig()
-        let env = '';
-
-        switch (runtimeConfig.public.ENVIRONMENT) {
-            case 'development':
-                env = 'Development'
-                break
-            case 'test':
-                env = 'Test'
-                break
-        }
-        return env
-    }
+   
 </script>
 
 <style scoped>
@@ -47,17 +31,8 @@
     background-color: rgba(255, 255, 255, 0.99);
     }
 
-    .env-title {
-        color: white;
-        background-color: #f00;
-        font-weight: bold;
-        padding: 2px 10px;
-        letter-spacing: .8px;
-    }
-
     .item1 {
         height:6.5rem;
-        padding: 10px 0;
         border-bottom: 2px solid #DED8E1;
     }
 
