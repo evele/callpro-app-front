@@ -52,7 +52,7 @@
     { name: "Dashboard", route: "dashboard", icon: DashboardSVG },
     { name: "Chat", route: "chat", icon: ChatSVG },
     { name: "Contacts", route: "contacts", icon: ContactsSVG },
-    { name: "Library", icon: AudioSVG },
+    { name: "Library", route: "audios", icon: AudioSVG },
     { name: "Billing", route: "billing", icon: BillingSVG },
   ]
 </script>

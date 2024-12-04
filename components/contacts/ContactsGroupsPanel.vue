@@ -46,21 +46,20 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
-        <SaveCustomGroups ref="saveCustomGroupsRef" @update:saveGroup="handlerSaveGroup" :selected-group="selectedGroup" @update:selectedGroup="handlerSelectedGroup"
-            :is-pending="saveGroupContactsIsPending" :is-error="saveGroupContactsIsError"
-            :error-message="saveGroupContactsError?.message" :is-success="saveGroupContactsIsSuccess" />
+        <ModalContacts ref="modalContacts" :selected-tab="selectedTab" :selected-group="selectedGroup" />
     </section>
 </template>
 
 <script setup lang="ts">
-import { useQueryClient } from '@tanstack/vue-query';
 import EditIconSVG from "@/components/svgs/EditIconSVG.vue"
 import AllSVG from "@/components/svgs/AllSVG.vue";
 import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
 import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
 
-const queryClient = useQueryClient();
+const props = defineProps({
+    selectedTab: { type: String, required: false, default: 'all' }
+})
 
 const DefaultGroupsButtons = [
     { text: 'ALL', value: Math.floor(Math.random() * 100), icon: AllSVG },
@@ -75,18 +74,8 @@ const setActiveButton = (name: string) => {
 };
 
 const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG, refetch: refetchGroupData } = useFetchGetCustomGroups()
-const { mutate: saveGroupContacts, isPending: saveGroupContactsIsPending, isError: saveGroupContactsIsError, error: saveGroupContactsError, isSuccess: saveGroupContactsIsSuccess } = useSaveGroupContacts()
 
-const saveCustomGroupsRef = ref();
-
-const open_modal = () => {
-    Object.assign(selectedGroup, {
-        groupID: "",
-        groupName:null,
-        launchID: null
-    });    
-    saveCustomGroupsRef?.value?.open();
-}
+const modalContacts = ref();
 
 const selectedGroup = reactive({
     groupID: '',
@@ -94,37 +83,23 @@ const selectedGroup = reactive({
     launchID: ''
 })
 
+const open_modal = () => {
+    Object.assign(selectedGroup, {
+        groupID: "",
+        groupName:null,
+        launchID: null
+    });    
+    modalContacts.value.open('new_group');
+}
+
 const openEditDialog = (group: CustomGroup) => {
     Object.assign(selectedGroup, {
         groupID: group.id,
         groupName: group.group_name,
         launchID: group.group_code
     });
-    console.log ("-->",selectedGroup.launchID)
-    saveCustomGroupsRef?.value?.open()
+    modalContacts.value.open('new_group')
 };
-
-const handlerSaveGroup = (dataToSend: ContactGroup) => {
-    saveGroupContacts(dataToSend, {
-        onSuccess: () => {
-            Object.assign(selectedGroup, {
-                groupID: dataToSend.id,
-                name: dataToSend.name,
-                launchID: dataToSend.phone_launch_id
-            });
-            queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
-
-        }
-    });
-
-}
-const handlerSelectedGroup =(e: CustomGroup| null) =>{
-
-}
-
-const fetch_groups_data = () => {
-        refetchGroupData()
-    }
 </script>
 
 <style scoped lang="scss">
