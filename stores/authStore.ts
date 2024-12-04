@@ -1,26 +1,15 @@
 import { defineStore } from "pinia"
 
-type User = {
-  id: string;
-  token: string;
-};
-export type LoginResponse = {
-  result: true;
-  user: User; 
-  message: string;
-};
-
-export type AuthState = {
+type AuthState = {
   user: User | null;
 };
 
-export type PasswordRecoveryResponse = {
+type PasswordRecoveryResponse = {
   result: true;
   message?: string;
-  
 };
 
-export type UserRegister = {
+type UserRegister = {
   firstName: string;
   lastName: string;
   address: string;
@@ -32,10 +21,7 @@ export type UserRegister = {
   agreeToTerms: boolean;
 }
 
-export type APIResponseSuccess = {
-  result: true;
-  message: string;
-};
+type RegisterResponseSuccess = APIResponseSuccess & { message: string }
 
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
@@ -50,10 +36,10 @@ export const useAuthStore = defineStore("AuthStore", {
     },
   },
   actions: {
-    async login(credentials: { email: string; password: string }): Promise<LoginResponse | APIResponseError>  {
+    async login(credentials: { email: string; password: string }): Promise<LoginResponseSuccess | APIResponseError>  {
       const { email, password } = credentials
       // const response = await fetchWrapper.post(LOGIN_URL, { email, password })
-      var response = await fetchWrapper.post(LOGIN_URL, { email, password }) as LoginResponse | APIResponseError
+      var response = await fetchWrapper.post(LOGIN_URL, { email, password }) as LoginResponseSuccess | APIResponseError
 
       if (response.result == true) {
         // update pinia state
@@ -77,8 +63,8 @@ export const useAuthStore = defineStore("AuthStore", {
     async resetPassword(new_password: string, new_password_confirm: string, token: string) {
       return await fetchWrapper.post(RESET_PASSWORD_URL, { new_password, new_password_confirm, token })
     },
-    async registerUser(dataToSend:UserRegister): Promise<APIResponseSuccess | APIResponseError> {
-        return await fetchWrapper.post(CREATE_USER_URL, dataToSend) as APIResponseSuccess | APIResponseError;        
+    async registerUser(dataToSend:UserRegister): Promise<RegisterResponseSuccess | APIResponseError> {
+        return await fetchWrapper.post(CREATE_USER_URL, dataToSend) as RegisterResponseSuccess | APIResponseError;        
     },
   },
 })

@@ -26,6 +26,17 @@ export type APIResponseSuccess = {
   result: true
 }
 
+export type User = {
+  id: string;
+  token: string;
+};
+
+export type LoginResponseSuccess = {
+  result: true;
+  user: User; 
+  message: string;
+};
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number
