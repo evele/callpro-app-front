@@ -81,7 +81,7 @@
     import ErrorIconSVG from '../svgs/ErrorIconSVG.vue';
 
     const props = defineProps({
-        selectedTab: { type: String, required: true }
+        selectedGroup: { type: String, required: true }
     })
     
     const { mutate: uploadContact, isSuccess: uploadedSuccess, data: uploadedData, isPending, isError,reset } = useUploadContact();
@@ -155,7 +155,7 @@
             file: file[0],
             from_broadcast: 'false',
             save_contact: 'true',
-            group_id: props.selectedTab
+            group_id: props.selectedGroup
         };
         const data_to_send = createFormData(data);
         
