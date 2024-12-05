@@ -140,7 +140,7 @@ const phone = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const timezone = ref(null);
+const timezone = ref('');
 const agreeToTerms = ref(false);
 const notRobot = ref(false);
 const canRegister = computed(() => {

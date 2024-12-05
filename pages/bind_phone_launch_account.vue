@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-[#E6E0E9] flex items-center justify-center min-h-screen rounded-3xl">
+    <div class="bg-[#E6E0E9] flex items-center justify-center min-h-screen">
         <Card class="w-full max-w-[850px] flex flex-col items-center justify-center font-normal gap-10">
             <!-- Bloque de logo y texto -->
             <template #header>
@@ -11,7 +11,7 @@
             </template>
             <template #content>
                 <!-- Formulario de Login -->
-                <form @keydown.enter.prevent="login"
+                <form @keydown.enter.prevent="next"
                     class="flex flex-col gap-10 w-full max-w-[520px] sm:w-[90vw] mx-auto">
                     <!-- Bloque de Phone Launch Account -->
                     <div class="flex flex-col items-start gap-2 w-full">
@@ -38,7 +38,7 @@
                 <div class="flex flex-col gap-4 mt-10">
                     <Button type="button" 
                         class="flex justify-center items-center py-2 w-[300px] mx-auto"
-                        :disabled="isPending" @click.prevent="login">
+                        :disabled="isPending" @click="next">
                         {{ isPending ? 'Logging in...' : 'Next' }}
                     </Button>
                     <div
@@ -65,26 +65,13 @@ definePageMeta({
 const email = ref('');
 const password = ref('');
 const rememberMe = ref(false);
-// const rememberMe = ref(true);
 const isPending = ref(false);
 
 const authStore = useAuthStore();
 
 
-function login() {
-    console.log('data', email.value, password.value);
-    isPending.value = true;
-    authStore.login({ email: email.value, password: password.value })
-        .then((response) => {
-            isPending.value = false;
-            if (!response.result) {
-                console.log('Error en el login:', response.error);
-            }
-        })
-        .catch(() => {
-            isPending.value = false;
-            console.log('Error al intentar iniciar sesión');
-        });
+function next() {
+    console.log('next')
 }
 
 
