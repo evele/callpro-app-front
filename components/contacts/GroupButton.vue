@@ -38,6 +38,7 @@
     height: 50px;
     padding: 12px;
     align-items: center;
+    justify-content: left;
     gap: 10px;  
     border-radius: 10px;
     border: none;

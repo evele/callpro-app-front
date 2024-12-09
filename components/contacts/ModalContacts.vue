@@ -13,11 +13,11 @@
             @error="handleError" @updateMessage="handleUpdateMessage" 
         />
 
-        <SaveCustomGroups v-if="section_to_show === 'new_group'" :selected-group="selected_group" 
+        <SaveCustomGroups v-if="section_to_show === 'new_group'" :group-to-edit="group_to_edit" 
             @close="handleClose" @success="handleSuccess" @error="handleError" 
         />
 
-        <UploadContacts v-if="section_to_show === 'upload'" :selected-tab="selectedTab" 
+        <UploadContacts v-if="section_to_show === 'upload'" :selected-group="selectedGroup" 
             @close="handleClose" @success="handleSuccess" @error="handleError" @changeTitle="handleChangeTitle" 
         />
 
@@ -27,11 +27,11 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedTab: { type: String, required: true },
-        selectedGroup: { type: Object, required: false, default: null }
+        selectedGroup: { type: String, required: true },
+        groupToEdit: { type: Object, required: false, default: null }
     })
 
-    const selected_group = ref()
+    const group_to_edit = ref()
     const visible = ref(false)
 
     const emit = defineEmits(['updateMessage'])
@@ -56,14 +56,14 @@
         }
 
         if(selectedOption === 'new_group') {
-            selected_group.value = null;
+            group_to_edit.value = null;
         }
     };
 
-     const open = (section: SectionToShow) => {
+    const open = (section: SectionToShow) => {
         section_to_show.value = section
         selected_option.value = section
-        selected_group.value = props.selectedGroup
+        group_to_edit.value = props.groupToEdit
         visible.value = true;
     }
 

@@ -28,13 +28,13 @@ export async function getUserConvertedAudios(data:FilterAudio):Promise<APIRespon
 }
 
 /* ----- Save Audio ----- */
-export async function saveAudio(data:AudioToSave):Promise<{ result: true } | APIResponseError> {
-    return await fetchWrapper.post(SAVE_AUDIO_URL, data) as { result: true } | APIResponseError;
+export async function saveAudio(data:AudioToSave):Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(SAVE_AUDIO_URL, data) as APIResponseSuccess | APIResponseError;
 }
 
 /* ----- Save Audio ----- */
-export async function deleteAudio(data:AudioToDelete):Promise<{ result: true } | APIResponseError> {
-    return await fetchWrapper.post(DELETE_AUDIO_URL, data) as { result: true } | APIResponseError;
+export async function deleteAudio(data:AudioToDelete):Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(DELETE_AUDIO_URL, data) as APIResponseSuccess | APIResponseError;
 }
 
 /* ----- Download Audio ----- */
