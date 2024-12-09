@@ -231,17 +231,19 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedTab: { type: String, required: true },
+        selectedGroup: { type: String, required: true },
+        isCustomGroup: { type: Boolean, required: true },
         dncTotalNumbers: { type: [Number, null], required: true }
     })
 
     const confirm = useConfirm()
     const toast = useToast()
 
+    const updatedSelectedGroup = computed(() => props.selectedGroup);
     const page = ref(1)    
     const show = ref(10)
     const with_groups = ref(true)
-    const is_custom_group = ref(false)
+    const is_custom_group = computed(() => props.isCustomGroup)
     const search = ref("")
     const total_records = ref()
 
@@ -279,11 +281,11 @@
 
     const { data: SGData, isLoading: isLoadingSG, isSuccess: isSuccessSG, isError: isErrorSG } = useFetchGetSystemGroups()
     const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups() 
-    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,props.selectedTab,search) 
+    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroup,search) 
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
-    const { refetch: download } = useFetchDownloadContacts(props.selectedTab, false)
+    const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroup, false)
 
     const contacts_data = computed(() => {
         if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }

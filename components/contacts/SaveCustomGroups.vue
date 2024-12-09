@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 const props = defineProps({
-    selectedGroup: {
+    groupToEdit: {
         type: Object,
         required: false,
         default: null
@@ -45,10 +45,10 @@ const launchIDString = computed({ //TODO: CHECK THIS, IT SHOULD BE A NUMBER
 });
 
 onMounted(() => {
-    if (props.selectedGroup) {
-        groupName.value = props.selectedGroup.groupName,
-        launchID.value = props.selectedGroup.launchID,
-        groupID.value = props.selectedGroup.groupID
+    if (props.groupToEdit) {
+        groupName.value = props.groupToEdit.groupName,
+        launchID.value = props.groupToEdit.launchID,
+        groupID.value = props.groupToEdit.groupID
     }
 })
 

@@ -10,7 +10,7 @@
                 <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                     <MusicSVG class="w-5 h-5" />
                 </div>
-                <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ currentAudio?.name }}</span>
+                <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ current_audio?.name }}</span>
             </div>
 
             <div class="flex flex-col items-center justify-center gap-2 sm:w-[70%] order-3 sm:order-2">
@@ -38,7 +38,7 @@
                 <div class="flex items-center w-full gap-6">
                     <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(current_time) }}</span>
                     <Slider v-model="track_progress" @change="handle_track_progress" class="w-full h-2" />
-                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(currentAudio?.length) }}</span>
+                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(current_audio?.length) }}</span>
                 </div>
             </div>
 
@@ -47,7 +47,7 @@
                     <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                         <MusicSVG class="w-5 h-5" />
                     </div>
-                    <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ currentAudio?.name }}</span>
+                    <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ current_audio?.name }}</span>
                 </div>
 
                 <Button class="bg-transparent border-none hover:bg-gray-200" @click="toggle_mute_unmute">
@@ -84,6 +84,7 @@
     const emit = defineEmits(['action']);
 
     const audio = ref<HTMLAudioElement | null>(null);
+    const current_audio = computed(() => props.currentAudio);
     const show_controls = ref(false);
 
     const volume = ref(50);
@@ -92,7 +93,7 @@
     const current_time = ref(0);
     const is_playing = ref(false);
 
-    watch(() => props.currentAudio, async (newAudio: Audio | null) => {
+    watch(() => current_audio.value, async (newAudio: Audio | null) => {
 
         if (newAudio && audio.value) {
             emit('action', 'loading')
@@ -109,6 +110,10 @@
                 show_controls.value = false;
                 emit('action', 'error');
             }
+        } else {
+            is_playing.value = false;
+            show_controls.value = false;
+            audio?.value?.pause()
         }
     });
 

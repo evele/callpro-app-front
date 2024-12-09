@@ -4,9 +4,9 @@
             <h4 class="groups-title">Groups</h4>
 
             <ul class="flex flex-col default-groups-ul">
-                <li v-for="(button, index) in DefaultGroupsButtons" :key="index">
+                <li v-for="button in defaultGroupsButtons" :key="button.group_id">
                     <GroupButton :group-name="button.text" :contacts-count="button.value"
-                        :active="activeButton === button.text" @click="setActiveButton(button.text)">
+                        :active="activeButton === button.group_id" @click="setActiveButton(button.text, button.group_id)">
                         <template #icon>
                             <component :is="button.icon" :alt="button.text" />
                         </template>
@@ -19,8 +19,8 @@
 
         <div class="second-section flex flex-col">
             <GroupButton group-name="My Groups"
-                :contacts-count="isSuccessCG && CGData?.result ? CGData?.custom_groups.length : 0" :active="false"
-                @click.prevent>
+                :contacts-count="isSuccessCG && CGData?.result ? CGData?.custom_groups.length : 0" :active="activeButton === 'custom'"
+            >
                 <template #icon>
                     <MyGroupsSVG alt="My Groups" />
                 </template>
@@ -31,12 +31,12 @@
                 <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
                     :key="group.id">
 
-                    <Button class="user-group-btn flex justify-between items-center">
+                    <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id)">
                         <div class="flex items-center user-group-data">
                             {{ group.group_name }}
                             <span class="contacts-count">{{ group.count }}</span>
                         </div>
-                        <EditIconSVG @click="openEditDialog(group)" />
+                        <EditIconSVG @click.stop="openEditDialog(group)" />
                     </Button>
                 </li>
             </ul>
@@ -46,7 +46,7 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
-        <ModalContacts ref="modalContacts" :selected-tab="selectedTab" :selected-group="selectedGroup" />
+        <ModalContacts ref="modalContacts" :selected-group="selectedGroup" :group-to-edit="selected_group_to_edit" />
     </section>
 </template>
 
@@ -58,33 +58,38 @@ import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
 
 const props = defineProps({
-    selectedTab: { type: String, required: false, default: 'all' }
+    selectedGroup: { type: String, required: false, default: 'all' }
 })
 
-const DefaultGroupsButtons = [
-    { text: 'ALL', value: Math.floor(Math.random() * 100), icon: AllSVG },
-    { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: UnassginedSVG },
-    { text: 'Trash', value: Math.floor(Math.random() * 100), icon: TrashSVG }
+const emit = defineEmits(['selectedGroup'])
+
+const defaultGroupsButtons = [
+    { text: 'ALL', value: Math.floor(Math.random() * 100), icon: AllSVG, group_id: CONTACTS_ALL },
+    { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: UnassginedSVG, group_id: UNASSIGNED },
+    { text: 'Trash', value: Math.floor(Math.random() * 100), icon: TrashSVG, group_id: TRASH }
 ];
 
-const activeButton = ref<string>('');
+const activeButton = ref<string>(props.selectedGroup);
 
-const setActiveButton = (name: string) => {
-    activeButton.value = name;
+const setActiveButton = (button_name: string, button_group_id: string) => {
+    const is_custom = !defaultGroupsButtons.some(button => button.group_id === button_group_id)
+    activeButton.value = is_custom ? 'custom' : button_group_id;
+
+    emit('selectedGroup', button_name, button_group_id, is_custom);
 };
 
 const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG, refetch: refetchGroupData } = useFetchGetCustomGroups()
 
 const modalContacts = ref();
 
-const selectedGroup = reactive({
+const selected_group_to_edit = reactive({
     groupID: '',
     groupName: '',
     launchID: ''
 })
 
 const open_modal = () => {
-    Object.assign(selectedGroup, {
+    Object.assign(selected_group_to_edit, {
         groupID: "",
         groupName:null,
         launchID: null
@@ -93,7 +98,7 @@ const open_modal = () => {
 }
 
 const openEditDialog = (group: CustomGroup) => {
-    Object.assign(selectedGroup, {
+    Object.assign(selected_group_to_edit, {
         groupID: group.id,
         groupName: group.group_name,
         launchID: group.group_code
