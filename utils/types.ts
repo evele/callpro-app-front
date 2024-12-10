@@ -13,7 +13,8 @@ export type NumberOrNull = number | null;
 export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
-export type SectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
+export type ContactsModalSectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
+export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type FilterOption = { id: string, name: string, count: number }
 
 export type APIResponseError = {
@@ -408,4 +409,8 @@ export type AudioToSave = {
 
 export type AudioToDelete = {
   audio_id: number;
+}
+
+export type CreateCallInCodeResponse = APIResponseSuccess & {
+  call_in_code: number;
 }
