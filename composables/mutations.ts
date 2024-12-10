@@ -55,7 +55,10 @@ export const useDeleteCallInCode = () => {
 export const useSaveContact = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: ContactToSaveData) => saveContact(data)
+    mutationFn: (data: ContactToSaveData) => saveContact(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
+    }
   })
 }
 
@@ -138,6 +141,7 @@ export const useSendContactToTrash = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
       queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
     }
   })
 }
@@ -180,6 +184,7 @@ export const useSaveGroupContacts = () =>{
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['group_contacts']})
       queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
     },
   })
 }
