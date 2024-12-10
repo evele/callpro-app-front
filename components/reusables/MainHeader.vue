@@ -1,5 +1,5 @@
 <template>
-    <nav class="flex items-center pl-[50px] pr-[25px] justify-between">
+    <div class="flex items-center pl-[50px] pr-[25px] justify-between">
         <div class="flex items-center gap-6">
             <p class="text-[#79747E] text-sm">{{ current_route_name }} {{ currentSection ? '/' : '' }}
                 <span v-if="currentSection" class="text-black font-medium"> {{ currentSection }}</span>
@@ -39,7 +39,7 @@
                 </ul>
             </Popover>
         </div>
-    </nav>
+    </div>
 </template>
 
 <script setup lang="ts">
