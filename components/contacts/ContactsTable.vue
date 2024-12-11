@@ -97,7 +97,7 @@
                                 value: slotProps.data.numbers.slice(1).join(', '),
                                 pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
                             }"
-                            class="absolute -right-3 top-5 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> 
+                            class="absolute -right-3 top-3 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> 
                             + {{ slotProps.data.total_numbers -1 }}
                         </span>
                     </div>
@@ -239,7 +239,6 @@
     })
 
     const confirm = useConfirm()
-    const toast = useToast()
 
     const updatedSelectedGroup = computed(() => props.selectedGroup);
     const page = ref(1)    
@@ -256,7 +255,7 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile', 'updateMessage'])
+    const emit = defineEmits(['uploadFile', 'updateMessage', 'updateGroup'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -281,9 +280,7 @@
         [key: string]: ContactRow;
     }
 
-    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroup,search) 
-    const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
-    const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
+    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroup,search) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroup, false)
 
@@ -392,19 +389,6 @@
 
     const get_number_groups = (groups: string) => groups === null ? [] : groups.trim().split(/\s*,\s*/);
 
-    // These next 2 functions will be deleted in the future
-    const target_groups = computed(() => {
-        if(custom_groups.value.length) {
-            return custom_groups.value.map((group: CustomGroup) => group.id).slice(0, 2)
-        }
-    })
-
-    const hardcoded_contact_data = computed(() => {
-        const contact = contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups !== null && c.number_groups?.length < 5)
-        if(contact) return { number_id: contact.number_id, group_id: contact.number_groups };
-        else return null;
-    })
-
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const message_text = ref('');
@@ -425,7 +409,7 @@
             },
             accept: () => {
                 sendNumberToTrash(data_to_send, {
-                    onSuccess: (response: { result: true } | APIResponseError) => {
+                    onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                         if(response.result) {
                             reset_selected_contacts();
                             show_success_toast('Success!', many_numbers ? 'Numbers removed!' : 'Number removed!')
@@ -446,23 +430,9 @@
         const numbers_id: { number_id: string }[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
 
         if(action === 'move') {
-            //TODO: Add functionality to move numbers to a group, need to work with the contact number groups
-            console.log('currently not working D:')
-            return
-            const data_to_send: MoveNumberToGroup = {
-                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
-                groups: target_groups?.value,
-                current_group_id: hardcoded_contact_data?.value?.group_id
-            }
-
-            moveNumberToGroup(data_to_send)
+            emit('updateGroup', 'move', numbers_id)
         } else if(action === 'add') {
-            const data_to_send: AddNumberToGroup = {
-                number_id: numbers_id,
-                groups: target_groups?.value
-            }
-
-            addNumberToGroup(data_to_send)
+            emit('updateGroup', 'add', numbers_id)
         } else {
             const data_to_send: SendNumberToTrash = {
                 number_ids: numbers_id.map((number) => number.number_id)
@@ -518,7 +488,6 @@
 
     // Here we handle the checkboxes of every contact and its numbers
     const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
-        console.log(contact_id, from_parent)
         if(from_parent) { // Contact checkbox
             const is_selected = selected_contacts.value.includes(contact_id);
             const is_expanded = Object.keys(expandedRows.value)[0] === contact_id;
@@ -533,7 +502,7 @@
                     selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
                 }
             });
-            console.log(selected_contacts.value)
+
             if (!(is_selected && is_expanded)) { // Handle the row expansion
                 if (is_selected || is_expanded) {
                     toggleRow(contact_id);
@@ -570,6 +539,8 @@
     const rowClass = (data: ContactRow) => {
         return [{ '!bg-[#E9DDFF]': selected_contacts.value.includes(data.id) }];
     };
+
+    defineExpose({ reset_selected_contacts })
 
     const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
 

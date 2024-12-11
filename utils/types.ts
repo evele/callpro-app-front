@@ -6,7 +6,7 @@ export type OneOrTwo = '1' | '2';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
 export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
-export type SelectOption = { name: string; code: string | number };
+export type SelectOption = { name: string; code: string };
 export type StringOrNumber = string | number;
 export type StringOrNull = string | null;
 export type NumberOrNull = number | null;
@@ -228,12 +228,12 @@ export type CustomGroup = {
 }
 
 export type AddNumberToGroup = {
-  number_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
-  groups: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+  number_id: string[];
+  groups: string[];
 }
 
 export type MoveNumberToGroup = AddNumberToGroup & {
-  current_group_id: any; //TODO: Any va a volar una vez que se implemente bien, lo puse para que no llore ts ahora
+  current_group_id: string;
 }
 
 export type SendNumberToTrash = {

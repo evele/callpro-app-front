@@ -11,10 +11,11 @@
     </section>
 
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable 
+        <ContactsTable ref="contactsTableRef"
             :selected-group="selected_group.group_id" 
             @uploadFile="open_contacts_modal" 
-            @updateMessage="handle_update_message" 
+            @updateMessage="handle_update_message"
+            @updateGroup="handle_move_or_add_to_group"
             :dnc-total-numbers="total_dnc_count" 
             :is-custom-group="is_custom_group" 
             :system-groups="system_groups" 
@@ -35,7 +36,12 @@
 
     <ConfirmDialog class="confirm-dialog">
         <template #message>
-            <p class="mb-6 text-lg font-semibold">{{ message_text }}</p>
+            <p v-if="!is_adding_or_moving" class="mb-6 text-lg font-semibold">{{ message_text }}</p>
+            <div v-if="is_adding_or_moving" class="flex flex-col gap-4 mb-6">
+                <p class="text-lg font-semibold">{{ message_text }}</p>
+                <MultiSelect v-model="target_groups_ui" :options="custom_groups_options" optionLabel="name" 
+                    display="chip" class="w-full max-w-[490px]" placeholder="Choose many..." :maxSelectedLabels="4" />
+            </div>
         </template>
     </ConfirmDialog>
     <Toast />
@@ -104,6 +110,95 @@
         selected_group.value = { group_name: button_name, group_id: button_group_id }
         is_custom_group.value = is_custom
     }
+
+    /* ----- Contacts Table ----- */
+    const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
+    const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
+    
+    const confirm = useConfirm()
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
+    const is_adding_or_moving = ref(false)
+    const contactsTableRef = ref()
+
+    const confirm_modal_handle_group = (action: 'move' | 'add', numbers_id: { number_id: string }[]) => {
+        message_text.value = action === 'add' ? 'Are you sure you want to add the numbers to this group(s)?'
+                                                         : 'Are you sure you want to move the numbers to this group(s)?';
+
+        confirm.require({
+            header: 'Confirmation',
+            rejectProps: {
+                label: 'No',
+                severity: 'secondary'
+            },
+            acceptProps: {
+                label: 'Yes'
+            },
+            onHide: () => {
+                is_adding_or_moving.value = false
+                target_groups_ui.value = []
+            },
+            accept: () => {
+               if(action === 'add') {
+                    const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
+                    const data_to_send: AddNumberToGroup = {
+                        number_id: numbers_id.map((number: { number_id: string }) => number.number_id),
+                        groups: formatted_target_groups,
+                    }
+                    addNumberToGroup(data_to_send, {
+                        onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                            if(response.result) {
+                                contactsTableRef.value?.reset_selected_contacts()
+                                show_success_toast('Success!', 'Numbers added!')
+                            } else {
+                                show_error_toast('Error', 'Something failed while adding numbers...')
+                            }
+                        },
+                        onError: () => show_error_toast('Error', 'Something failed while adding numbers...')
+                    })
+               } else {
+                    const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
+                    const data_to_send: MoveNumberToGroup = {
+                        number_id: numbers_id.map((number: { number_id: string }) => number.number_id),
+                        groups: formatted_target_groups,
+                        current_group_id: selected_group?.value?.group_id
+                    }
+                    moveNumberToGroup(data_to_send, {
+                        onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                            if(response.result) {
+                                contactsTableRef.value?.reset_selected_contacts()
+                                show_success_toast('Success!', 'Numbers moved!')
+                            } else {
+                                show_error_toast('Oops...', 'Something failed while moving numbers...')
+                            }
+                        },
+                        onError: () => show_error_toast('Oops...', 'Something failed while moving numbers...')
+                    })
+               }
+            },
+            reject: () => {
+                is_adding_or_moving.value = false
+                target_groups_ui.value = []
+            }
+        });
+    };
+
+    const handle_move_or_add_to_group = (action: 'move' | 'add', numbers_id: { number_id: string }[]) => {
+        is_adding_or_moving.value = true
+        confirm_modal_handle_group(action, numbers_id)
+    }
+
+    const target_groups_ui = ref<SelectOption[]>([])
+    const custom_groups_options = computed(() => {
+        if (custom_groups.value?.length) {
+            return custom_groups.value.filter((group: CustomGroup) => group.id != selected_group.value.group_id).map((group: CustomGroup) => {
+                return {
+                    name: group.group_name,
+                    code: group.id
+                }
+            })
+        }
+        return []
+    })
 </script>
 
 <style scoped>
