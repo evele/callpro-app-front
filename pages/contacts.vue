@@ -89,7 +89,7 @@
     });
 
     /* ----- Open contacts modal ----- */
-    const open_contacts_modal = (section: SectionToShow) => {
+    const open_contacts_modal = (section: ContactsModalSectionToShow) => {
         if(!section) return
         modalContacts.value.open(section);
     }
