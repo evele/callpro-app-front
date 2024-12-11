@@ -10,7 +10,6 @@
             dataKey="id"
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
-            :loading="isLoading"
             :totalRecords="total_records"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
@@ -39,17 +38,17 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-2 relative">
                         <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
+                            <ProgressSpinner v-if="isAdding" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
                             <PlusRoundedSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
+                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ isAdding ? 'Adding...' : 'Add to Group'}}</span>
                         </Button>
 
                         <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                            <ProgressSpinner v-if="isMoving" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
                             <MoveSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ isMoving ? 'Moving...' : 'Move to Group' }}</span>
                         </Button>
 
                         <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
@@ -57,6 +56,7 @@
                             <TrashSVG v-else class="w-5 h-5" />
                             <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
                         </Button>
+                        <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
                     </div>
                 </header>
             </template>
@@ -235,7 +235,9 @@
         isCustomGroup: { type: Boolean, required: true },
         dncTotalNumbers: { type: [Number, null], required: true },
         systemGroups: { type: Object as PropType<SystemGroup | null>, required: true },
-        customGroups: { type: Array as PropType<CustomGroup[]>, required: true }
+        customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
+        isAdding: { type: Boolean, required: true },
+        isMoving: { type: Boolean, required: true }
     })
 
     const confirm = useConfirm()

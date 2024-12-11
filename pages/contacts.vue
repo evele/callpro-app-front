@@ -20,6 +20,8 @@
             :is-custom-group="is_custom_group" 
             :system-groups="system_groups" 
             :custom-groups="custom_groups"
+            :is-adding="ATGIsPending"
+            :is-moving="MTGIsPending"
         />
         <div class="flex flex-col gap-4">
             <ContactsActions 
@@ -40,7 +42,7 @@
             <div v-if="is_adding_or_moving" class="flex flex-col gap-4 mb-6">
                 <p class="text-lg font-semibold">{{ message_text }}</p>
                 <MultiSelect v-model="target_groups_ui" :options="custom_groups_options" optionLabel="name" 
-                    display="chip" class="w-full max-w-[490px]" placeholder="Choose many..." :maxSelectedLabels="4" />
+                    display="chip" class="w-full max-w-[300px] sm:max-w-[490px] mx-auto" placeholder="Choose many..." :maxSelectedLabels="4" />
             </div>
         </template>
     </ConfirmDialog>
@@ -118,11 +120,17 @@
     const confirm = useConfirm()
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
     const is_adding_or_moving = ref(false)
+    const target_groups_ui = ref<SelectOption[]>([])
     const contactsTableRef = ref()
+
+    const reset_dialog_state = () => {
+        is_adding_or_moving.value = false
+        target_groups_ui.value = []
+    }
 
     const confirm_modal_handle_group = (action: 'move' | 'add', numbers_id: { number_id: string }[]) => {
         message_text.value = action === 'add' ? 'Are you sure you want to add the numbers to this group(s)?'
-                                                         : 'Are you sure you want to move the numbers to this group(s)?';
+                                              : 'Are you sure you want to move the numbers to this group(s)?';
 
         confirm.require({
             header: 'Confirmation',
@@ -133,15 +141,12 @@
             acceptProps: {
                 label: 'Yes'
             },
-            onHide: () => {
-                is_adding_or_moving.value = false
-                target_groups_ui.value = []
-            },
+            onHide: () => reset_dialog_state(),
             accept: () => {
                if(action === 'add') {
                     const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
                     const data_to_send: AddNumberToGroup = {
-                        number_id: numbers_id.map((number: { number_id: string }) => number.number_id),
+                        number_id: numbers_id,
                         groups: formatted_target_groups,
                     }
                     addNumberToGroup(data_to_send, {
@@ -158,7 +163,7 @@
                } else {
                     const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
                     const data_to_send: MoveNumberToGroup = {
-                        number_id: numbers_id.map((number: { number_id: string }) => number.number_id),
+                        number_id: numbers_id,
                         groups: formatted_target_groups,
                         current_group_id: selected_group?.value?.group_id
                     }
@@ -174,11 +179,9 @@
                         onError: () => show_error_toast('Oops...', 'Something failed while moving numbers...')
                     })
                }
+               reset_dialog_state()
             },
-            reject: () => {
-                is_adding_or_moving.value = false
-                target_groups_ui.value = []
-            }
+            reject: () => reset_dialog_state()
         });
     };
 
@@ -187,7 +190,6 @@
         confirm_modal_handle_group(action, numbers_id)
     }
 
-    const target_groups_ui = ref<SelectOption[]>([])
     const custom_groups_options = computed(() => {
         if (custom_groups.value?.length) {
             return custom_groups.value.filter((group: CustomGroup) => group.id != selected_group.value.group_id).map((group: CustomGroup) => {

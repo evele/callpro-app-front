@@ -228,7 +228,7 @@ export type CustomGroup = {
 }
 
 export type AddNumberToGroup = {
-  number_id: string[];
+  number_id: { number_id: string }[];
   groups: string[];
 }
 
