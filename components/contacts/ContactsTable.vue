@@ -75,7 +75,7 @@
             <Column field="name" header="Name" class="text-left">
                 <template #body="slotProps">
                     <div class="text-[#1D1B20] relative w-fit">
-                        {{ slotProps.data.name }}
+                        <span @click.stop="handle_select_by_name(slotProps.data.id, true)">{{ slotProps.data.name }}</span>
                         <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
                             <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
                                 <EditIconSVG class="w-3 h-4" />
@@ -507,8 +507,18 @@
         }, []) : [];
     }
 
+    const handle_select_by_name = (contact_id: string, from_parent: boolean) => {
+        if(selected_contacts.value.includes(contact_id)) {
+            selected_contacts.value = selected_contacts.value.filter((c_id: string) => c_id !== contact_id);
+        } else {
+            selected_contacts.value.push(contact_id);
+        }
+        handle_select_checkbox(contact_id, from_parent);
+    }
+
     // Here we handle the checkboxes of every contact and its numbers
     const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
+        console.log(contact_id, from_parent)
         if(from_parent) { // Contact checkbox
             const is_selected = selected_contacts.value.includes(contact_id);
             const is_expanded = Object.keys(expandedRows.value)[0] === contact_id;
@@ -523,7 +533,7 @@
                     selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
                 }
             });
-            
+            console.log(selected_contacts.value)
             if (!(is_selected && is_expanded)) { // Handle the row expansion
                 if (is_selected || is_expanded) {
                     toggleRow(contact_id);
