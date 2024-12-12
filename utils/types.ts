@@ -13,7 +13,8 @@ export type NumberOrNull = number | null;
 export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
-export type SectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
+export type ContactsModalSectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
+export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type FilterOption = { id: string, name: string, count: number }
 
 export type APIResponseError = {
@@ -25,6 +26,17 @@ export type APIResponseError = {
 export type APIResponseSuccess = {
   result: true
 }
+
+export type User = {
+  id: string;
+  token: string;
+};
+
+export type LoginResponseSuccess = {
+  result: true;
+  user: User; 
+  message: string;
+};
 
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
@@ -394,16 +406,22 @@ export type TextToConvert = {
   temp: boolean    
 }
 
+export type AudioInfoToSave = {
+  audio_id?: number;
+  file_name: string;
+  length?: number;
+  name: string;
+}
+
 export type AudioToSave = {
   action: 'create' | 'update',
-  audio_info: {
-    audio_id: number;
-    file_name: string;
-    length: number;
-    name: string;
-  },
+  audio_info: AudioInfoToSave | AudioInfoToSave[]
 }
 
 export type AudioToDelete = {
   audio_id: number;
+}
+
+export type CreateCallInCodeResponse = APIResponseSuccess & {
+  call_in_code: number;
 }
