@@ -2,21 +2,20 @@
     <div class="p-6 mb-10">       
         <Card class="bg-white">
             <template #content>
-                <ButtonsLibraryContainer @action="handle_btn_action" />
+                <ButtonsLibraryContainer @action="open_audio_lbry_modal" />
                 <AudiosTable />
             </template>  
         </Card>
     </div>
-    <ModalAddAudioTTS ref="addAudioTTSRef"/>
+    <ModalAudioLibrary ref="modalAudioLibrary" />
 </template>
 
 <script setup lang="ts">
-    const addAudioTTSRef = ref()  
+    const modalAudioLibrary = ref()
 
-    const handle_btn_action = (action: string) => {
-        if (action === 'tts') {
-            addAudioTTSRef?.value?.open()
-        }
+    const open_audio_lbry_modal = (section: AudioLbryModalSectionToShow) => {
+        if(!section) return
+        modalAudioLibrary.value.open(section);
     }
 </script>
 

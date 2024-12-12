@@ -36,7 +36,7 @@
 
     const emit = defineEmits(['updateMessage'])
 
-    const section_to_show = ref<SectionToShow>('')
+    const section_to_show = ref<ContactsModalSectionToShow>('')
     const selected_option = ref('')
     const upload_title = ref('Upload new file')
 
@@ -47,7 +47,7 @@
         { id: 'upload', text: upload_title.value },
     ]);
 
-    const handleOptionSelected = (selectedOption: SectionToShow) => {
+    const handleOptionSelected = (selectedOption: ContactsModalSectionToShow) => {
         selected_option.value = selectedOption
         section_to_show.value = selectedOption
 
@@ -60,7 +60,7 @@
         }
     };
 
-    const open = (section: SectionToShow) => {
+    const open = (section: ContactsModalSectionToShow) => {
         section_to_show.value = section
         selected_option.value = section
         group_to_edit.value = props.groupToEdit
