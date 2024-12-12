@@ -1,6 +1,6 @@
 <template>
     <div class="grid-container">
-        <MainHeader class="item1" />
+        <MainHeader class="item1  sticky top-0 left-0 z-[1000]" />
         <Navbar class="item2"></Navbar>
         <main class="item3">
             <slot></slot>
