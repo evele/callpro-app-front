@@ -40,15 +40,15 @@
                     
                     <div class="flex items-center gap-2 relative">
                         <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="isAdding" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
+                            <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
                             <PlusRoundedSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ isAdding ? 'Adding...' : 'Add to Group'}}</span>
+                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
                         </Button>
 
                         <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="isMoving" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                            <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
                             <MoveSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ isMoving ? 'Moving...' : 'Move to Group' }}</span>
+                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
                         </Button>
 
                         <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
@@ -227,6 +227,16 @@
             </template>
         </DataTable>
     </div>
+    <ConfirmationModal ref="confirmationModal" :title="confirmation_title" :is-disabled="false" @confirm="handle_confirm_modal" @cancel="handle_cancel_modal">
+        <p v-if="current_action === 'trash'" class="text-lg font-semibold">{{ message_text }}</p>
+        <div v-if="current_action === 'add' || current_action === 'move'" class="flex flex-col gap-4">
+            <p class="text-lg font-semibold">{{ message_text }}</p>
+            <MultiSelect v-model="target_groups_ui" :options="custom_groups_options" optionLabel="name" 
+                display="chip" class="w-full mx-auto" placeholder="Choose many..." :maxSelectedLabels="4" 
+            />
+            <Message v-if="current_action === 'move'" severity="error" class="mb-1"><span class="font-bold">Warning:</span> This action will replace the current group of this numbers with the selected ones!</Message>
+        </div>
+    </ConfirmationModal>
 </template>
 
 <script setup lang="ts">
@@ -236,11 +246,7 @@
         dncTotalNumbers: { type: [Number, null], required: true },
         systemGroups: { type: Object as PropType<SystemGroup | null>, required: true },
         customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
-        isAdding: { type: Boolean, required: true },
-        isMoving: { type: Boolean, required: true }
     })
-
-    const confirm = useConfirm()
 
     const updatedSelectedGroup = computed(() => props.selectedGroup);
     const page = ref(1)    
@@ -257,7 +263,7 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile', 'updateMessage', 'updateGroup'])
+    const emit = defineEmits(['uploadFile'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -284,6 +290,8 @@
 
     const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroup,search) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
+    const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
+    const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
     const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroup, false)
 
     const contacts_data = computed(() => {
@@ -393,55 +401,147 @@
 
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
-    const message_text = ref('');
-    const confirm_modal = (data_to_send: SendNumberToTrash) => {
-        const many_numbers = data_to_send.number_ids.length > 1;
-        message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
-                                          : 'Are you sure you want to send this number to Trash?';
-
-        emit('updateMessage', message_text.value)
-        confirm.require({
-            header: 'Confirmation',
-            rejectProps: {
-                label: 'No',
-                severity: 'secondary'
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                sendNumberToTrash(data_to_send, {
-                    onSuccess: (response: APIResponseSuccess | APIResponseError) => {
-                        if(response.result) {
-                            reset_selected_contacts();
-                            show_success_toast('Success!', many_numbers ? 'Numbers removed!' : 'Number removed!')
-                        } else {
-                            show_error_toast('Oops...', 'Something went wrong...')
-                        }
-                    },
-                    onError: () => show_error_toast('Oops...', 'Something went wrong...')
-                })
-            }
-        });
-    };
-
-    /* ----- Group actions ----- */
+    /* ----- Trash and Groups actions ----- */
+    const target_groups_ui = ref<SelectOption[]>([])
+    const confirmationModal = ref()
     const disabled_groups_action_btn = computed(() => selected_contacts.value.length === 0 && selected_numbers.value.length === 0);
+    const confirmation_title = ref('')
+    const message_text = ref('');
 
-    const handle_group_action = (action: 'add' | 'move' | 'trash') => {
+    type CurrentAction = 'add' | 'move' | 'trash' | ''
+    const current_action = ref<CurrentAction>('')
+
+    type SelectedNumberIds = { number_id: string }[]
+
+    const custom_groups_options = computed(() => {
+        if (custom_groups.value?.length) {
+            return custom_groups.value.filter((group: CustomGroup) => group.id != updatedSelectedGroup.value).map((group: CustomGroup) => {
+                return {
+                    name: group.group_name,
+                    code: group.id
+                }
+            })
+        }
+        return []
+    })
+
+    const reset_confirmation_modal_state = () => {
+        current_action.value = ''
+        target_groups_ui.value = []
+    }
+
+    const handle_group_action = (action: CurrentAction) => {
+        if(action === 'add') {
+            current_action.value = 'add'
+            confirmation_title.value = 'Add to group'
+            message_text.value = 'Are you sure you want to add the numbers to this group(s)?'
+        } else if(action === 'move') {
+            current_action.value = 'move'
+            confirmation_title.value = 'Move to group'
+            message_text.value = 'Are you sure you want to move the numbers to this group(s)?'
+        } else {
+            current_action.value = 'trash'
+            confirmation_title.value = 'Confirmation'
+
+            const many_numbers = selected_numbers.value.length > 1;
+            message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
+                                              : 'Are you sure you want to send this number to Trash?';
+        }
+        confirmationModal.value?.open()
+    }
+
+    const handle_confirm_modal = () => {
         const numbers_id: { number_id: string }[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
 
-        if(action === 'move') {
-            emit('updateGroup', 'move', numbers_id)
-        } else if(action === 'add') {
-            emit('updateGroup', 'add', numbers_id)
-        } else {
-            const data_to_send: SendNumberToTrash = {
-                number_ids: numbers_id.map((number) => number.number_id)
-            }
+        switch(current_action.value) {
+            case 'add':
+                handle_add_to_group(numbers_id)
+                break;
+            case 'move':
+                handle_move_to_group(numbers_id)
+                break;
+            case 'trash':
+                handle_send_to_trash(numbers_id)
+                break;
+            default:
+                break;
+        }  
+    };
 
-            confirm_modal(data_to_send)
+    const handle_cancel_modal = () => {
+        reset_confirmation_modal_state()
+    }
+
+    const handle_add_to_group = (numbers_id: SelectedNumberIds) => {
+        const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
+        if(formatted_target_groups.length === 0) {
+            show_error_toast('Invalid', 'Please select at least one group...')
+            return;
         }
+
+        const data_to_send: AddNumberToGroup = {
+            number_id: numbers_id,
+            groups: formatted_target_groups,
+        }
+
+        addNumberToGroup(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts()
+                    show_success_toast('Success!', 'Numbers added!')
+                } else {
+                    show_error_toast('Error', 'Something failed while adding numbers...')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something failed while adding numbers...')
+        })
+        reset_confirmation_modal_state()
+    }
+
+    const handle_move_to_group = (numbers_id: SelectedNumberIds) => {
+        const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
+        if(formatted_target_groups.length === 0) {
+            show_error_toast('Invalid', 'Please select at least one group...')
+            return;
+        }
+        
+        const data_to_send: MoveNumberToGroup = {
+            number_id: numbers_id,
+            groups: formatted_target_groups,
+            current_group_id: updatedSelectedGroup.value
+        }
+
+        moveNumberToGroup(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts()
+                    show_success_toast('Success!', 'Numbers moved!')
+                } else {
+                    show_error_toast('Oops...', 'Something failed while moving numbers...')
+                }
+            },
+            onError: () => show_error_toast('Oops...', 'Something failed while moving numbers...')
+        })
+        reset_confirmation_modal_state()
+    }
+
+    const handle_send_to_trash = (numbers_id: SelectedNumberIds) => {
+        const data_to_send: SendNumberToTrash = {
+            number_ids: numbers_id.map((number) => number.number_id)
+        }
+
+        sendNumberToTrash(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts();
+                    show_success_toast('Success!', data_to_send.number_ids.length > 1 ? 'Numbers removed!' : 'Number removed!')
+                } else {
+                    show_error_toast('Oops...', 'Something went wrong...')
+                }
+            },
+            onError: () => show_error_toast('Oops...', 'Something went wrong...')
+        })
+        current_action.value = ''
     }
 
     // It's used in the tooltip
