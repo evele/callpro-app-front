@@ -252,15 +252,3 @@
         })
     }
 </script>
-
-<style scoped lang="scss">
-
-    :deep(.p-progressbar) {
-        width: unset;
-        position: relative;
-        top: unset;
-        left: unset;
-        height: 1rem;
-    }
-    
-</style>
