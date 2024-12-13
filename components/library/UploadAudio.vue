@@ -57,8 +57,6 @@
     const upload_success = ref(false)
     const uploading = ref(false)
 
-    const selected_contacts_ids:Ref<number[]> = ref([]) 
-
     const total_size_percent:Ref<number> = ref(0)
     const progress_size_percent:Ref<number> = ref(0)
 
@@ -91,7 +89,6 @@
         total_size_percent.value = 0
         progress_size_percent.value = 0
         uploadedAudio.value = { file_name: '', name: '' }
-        selected_contacts_ids.value = []
     }
     
     const onSelectedFiles = (files: FileUploadEvent) => {
