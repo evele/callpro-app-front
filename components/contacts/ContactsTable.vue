@@ -30,7 +30,7 @@
                         </IconField>
 
                         <div class="flex gap-4">
-                            <FilterDropdown :all-contacts="ALL" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
+                            <FilterDropdown ref="filterDropdownRef" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
                             <Button :class="action_button_style">
                                 <SortBySVG class="text-[#757575]" />
                                 <span class="font-semibold">Sort by</span>
@@ -38,7 +38,7 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-2 relative">
+                    <div v-if="!updatedSelectedGroupsID.includes(TRASH)" class="flex items-center gap-2 relative">
                         <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
                             <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
                             <PlusRoundedSVG v-else class="w-5 h-5" />
@@ -151,7 +151,7 @@
                     </Column>
                     <Column field="name" header="" class="text-left" style="width: 30%;">
                         <template #body="slotProps">
-                            <span class="text-[#1D1B20] pl-4">
+                            <span class="text-[#1D1B20] pl-4" @click.stop="handle_select_by_number(slotProps.data.number_id, slotProps.data.id, false)">
                                 {{ format_contact_type(slotProps.data.type) }}
                             </span>
                         </template>
@@ -241,14 +241,14 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedGroup: { type: String, required: true },
+        selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },
         isCustomGroup: { type: Boolean, required: true },
         dncTotalNumbers: { type: [Number, null], required: true },
         systemGroups: { type: Object as PropType<SystemGroup | null>, required: true },
         customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
     })
 
-    const updatedSelectedGroup = computed(() => props.selectedGroup);
+    const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
     const page = ref(1)    
     const show = ref(10)
     const with_groups = ref(true)
@@ -263,7 +263,9 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile'])
+    const filterDropdownRef = ref()
+
+    const emit = defineEmits(['uploadFile', 'update:filters'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -288,11 +290,11 @@
         [key: string]: ContactRow;
     }
 
-    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroup,search) 
+    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroupsID,search) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
-    const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroup, false)
+    const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroupsID, false)
 
     const contacts_data = computed(() => {
         if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }
@@ -355,6 +357,7 @@
         expandedRows.value = {};
         Object.keys(indeterminate_contacts.value).forEach((key) => indeterminate_contacts.value[key] = false);
         indeterminate_all.value = false;
+        filterDropdownRef.value.reset_selected_filters()
     }
 
     // Handle pagination
@@ -415,7 +418,7 @@
 
     const custom_groups_options = computed(() => {
         if (custom_groups.value?.length) {
-            return custom_groups.value.filter((group: CustomGroup) => group.id != updatedSelectedGroup.value).map((group: CustomGroup) => {
+            return custom_groups.value.filter((group: CustomGroup) => updatedSelectedGroupsID.value.includes(group.id) ? null : group).map((group: CustomGroup) => {
                 return {
                     name: group.group_name,
                     code: group.id
@@ -508,7 +511,7 @@
         const data_to_send: MoveNumberToGroup = {
             number_id: numbers_id,
             groups: formatted_target_groups,
-            current_group_id: updatedSelectedGroup.value
+            current_group_id: updatedSelectedGroupsID.value[0]
         }
 
         moveNumberToGroup(data_to_send, {
@@ -588,6 +591,15 @@
         handle_select_checkbox(contact_id, from_parent);
     }
 
+    const handle_select_by_number = (number_id: string, contact_id: string, from_parent: boolean) => {
+        if(selected_numbers.value.includes(number_id)) {
+            selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
+        } else {
+            selected_numbers.value.push(number_id);
+        }
+        handle_select_checkbox(contact_id, from_parent);
+    }
+
     // Here we handle the checkboxes of every contact and its numbers
     const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
         if(from_parent) { // Contact checkbox
@@ -647,21 +659,31 @@
     const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
 
     /* ----- Filters ----- */
-    const ALL = computed(() => ({ name: 'All', count: contacts_data.value?.total_numbers }));
     const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
         if(!system_groups.value) return []
         return [
-            { id: '1', name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
-            { id: '2', name: 'Trash', count: system_groups.value?.trash ?? 0 },
-            { id: '3', name: 'DNC', count: props.dncTotalNumbers ?? 0 }
+            { id: CONTACTS_ALL, name: 'All', count: system_groups.value?.not_trash ?? 0 },
+            { id: UNASSIGNED, name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
+            { id: TRASH, name: 'Trash', count: system_groups.value?.trash ?? 0 }
         ]
     })
     const FILTERS_CUSTOM_GROUPS = computed(() => custom_groups.value.map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count })))
 
-    const filters = ref<string[]>([]);
+    const handleUpdateFilters = (selected_filters: string[]) => {
+        const all_filters = [...FILTERS_SYSTEM_GROUPS.value, ...FILTERS_CUSTOM_GROUPS.value];
 
-    const handleUpdateFilters = (filters: string[]) => {
-        console.log(filters);
+        const selected_filters_formatted = selected_filters.map((filter_id: string) => {
+            const current_filter = all_filters.find((filter: FilterOption) => filter.id === filter_id);
+            if(current_filter) {
+                return {
+                    group_name: current_filter.name,
+                    group_id: current_filter.id,
+                    is_custom: !SYSTEM_GROUPS.includes(current_filter.id)
+                }
+            }
+        })
+
+        emit('update:filters', selected_filters_formatted);
     }
 </script>
 

@@ -38,6 +38,12 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+export type ContactSelectedGroup = { 
+  group_name: string, 
+  group_id: string, 
+  is_custom: boolean 
+}
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number
