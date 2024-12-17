@@ -45,7 +45,7 @@
                             <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
                         </Button>
 
-                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_move_to_group_btn">
                             <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
                             <MoveSVG v-else class="w-5 h-5" />
                             <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
@@ -248,6 +248,7 @@
         customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
     })
 
+    const updatedSelectedGroups = computed(() => props.selectedGroups)
     const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
     const page = ref(1)    
     const show = ref(10)
@@ -408,6 +409,7 @@
     const target_groups_ui = ref<SelectOption[]>([])
     const confirmationModal = ref()
     const disabled_groups_action_btn = computed(() => selected_contacts.value.length === 0 && selected_numbers.value.length === 0);
+    const disabled_move_to_group_btn = computed(() => (selected_contacts.value.length === 0 && selected_numbers.value.length === 0) || updatedSelectedGroupsID.value.length > 1);
     const confirmation_title = ref('')
     const message_text = ref('');
 
@@ -665,9 +667,12 @@
             { id: CONTACTS_ALL, name: 'All', count: system_groups.value?.not_trash ?? 0 },
             { id: UNASSIGNED, name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
             { id: TRASH, name: 'Trash', count: system_groups.value?.trash ?? 0 }
-        ]
+        ].filter((group: FilterOption) => group.id !== updatedSelectedGroupsID.value[0])
     })
-    const FILTERS_CUSTOM_GROUPS = computed(() => custom_groups.value.map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count })))
+
+    const FILTERS_CUSTOM_GROUPS = computed(() => {
+        return custom_groups.value.filter((group: CustomGroup) => group.id !== updatedSelectedGroupsID.value[0]).map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count }))
+    })
 
     const handleUpdateFilters = (selected_filters: string[]) => {
         const all_filters = [...FILTERS_SYSTEM_GROUPS.value, ...FILTERS_CUSTOM_GROUPS.value];
@@ -682,8 +687,8 @@
                 }
             }
         })
-
-        emit('update:filters', selected_filters_formatted);
+        // Emit the selected groups to the parent component, and in the first position we always have the selected group
+        emit('update:filters', [updatedSelectedGroups.value[0], ...selected_filters_formatted]);
     }
 </script>
 
