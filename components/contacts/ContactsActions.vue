@@ -18,7 +18,7 @@
     })
 
     const OPTIONS = computed(() => [
-        { id: 'new_contact', text: "Total Contacts", count: props.totalContactsNumber, icon: ContactsSVG, iconColor: "#4F378B" },
+        { id: 'contact', text: "Total Contacts", count: props.totalContactsNumber, icon: ContactsSVG, iconColor: "#4F378B" },
         { id: 'new_group', text: "Total Groups", count: props.totalGroupsNumber, icon: GroupsSVG, iconColor: "#009951" },
         { id: 'dnc', text: "Total DNC", count: props.totalDncNumber, icon: DncSVG, iconColor: "#E5A000" },
     ])

@@ -12,26 +12,26 @@
         <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
             <div class="w-full">
                 <label for="contact-name" class="text-lg text-black">Name</label>
-                <InputText type="text" id="contact-name" v-model="new_contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
+                <InputText type="text" id="contact-name" v-model="contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
             </div>
 
             <div class="w-full">
                 <label for="contact-surname" class="text-lg text-black">Surname</label>
-                <InputText type="text" id="contact-surname" v-model="new_contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
+                <InputText type="text" id="contact-surname" v-model="contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
             </div>
         </div>
 
         <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
             <div class="w-full">
                 <label for="contact-phone" class="text-lg text-black">Phone {{current_position + 1}}*</label>
-                <PhoneInput class="mt-[2px]" :model-value="new_contact.numbers.number" @update:modelValue="(v: string) => new_contact.numbers.number = v" 
+                <PhoneInput :key="contact.numbers.id" class="mt-[2px]" :model-value="contact.numbers.number" @update:modelValue="(v: string) => contact.numbers.number = v" 
                     :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
             </div>
 
             <div class="relative w-full flex">
                 <div class="w-full">
                     <label class="text-lg text-black">Type*</label>
-                    <Select v-model="new_contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
+                    <Select v-model="contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" optionValue="code" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
                 </div>
                 <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
             </div>
@@ -39,10 +39,14 @@
 
         <div class="w-full">
             <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
+            <div v-if="CGIsLoading" class="w-full">
+                <label class="text-lg text-black">Groups</label>
+                <Skeleton height="2rem" borderRadius="16px"></Skeleton>
+            </div>
             <div v-if="CGIsSuccess" class="w-full">
                 <label class="text-lg text-black">Groups</label>
                 <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
-                <MultiSelect v-else v-model="new_contact.numbers.number_groups" :options="custom_groups_options" optionLabel="name" 
+                <MultiSelect v-else v-model="contact.numbers.number_groups" :options="custom_groups_options" optionLabel="name" optionValue="code"
                     display="chip" class="w-full mt-1" placeholder="-" />
             </div>
         </div>
@@ -50,7 +54,7 @@
         <div class="w-full">
             <div>
                 <label for="contact-notes" class="text-lg text-black">Notes</label>
-                <Textarea v-model="new_contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
+                <Textarea v-model="contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
                 <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
             </div>
         </div>
@@ -73,19 +77,25 @@
 <script setup lang="ts">
     import { useQueryClient } from '@tanstack/vue-query'
 
+    const props = defineProps({
+        selectedContact: { type: Object as PropType<ContactToEdit | null>, required: false, default: null }
+    })
+
     const queryClient = useQueryClient()
 
     const number_error = ref('');
     const type_error = ref('');
     const form_action = ref('')
     const has_phone_number_error = ref(false)
+    const is_editing = ref(false)
 
-    const emit = defineEmits(['close', 'success', 'error'])
+    const emit = defineEmits(['close', 'success', 'error', 'update:table'])
 
-    const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
+    const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError, isLoading: CGIsLoading } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, reset } = useSaveContact() 
 
     const empty_contact: ContactBeforeToSave = {
+        contact_id: null,
         first_name: '',
         last_name: '',
         numbers: {
@@ -96,10 +106,64 @@
             number_groups: []
         }
     }
-    let new_contact = reactive<ContactBeforeToSave>({...empty_contact})
+    let contact = reactive<ContactBeforeToSave>({...empty_contact})
 
     const contact_numbers = ref<ContactNumber[]>([])
     const current_position = ref(0)
+
+    onMounted(() => {
+        // if selectedContact is passed, it means we are editing a contact
+        if(props.selectedContact) {
+            is_editing.value = true
+            const total_length = props.selectedContact?.numbers?.length ?? 0
+
+            if(total_length > 1) { // if there are more than one numbers, we will show the last number in the form
+                const last_number = props.selectedContact.numbers[total_length - 1]
+
+                contact_numbers.value = props.selectedContact.numbers.slice(0, total_length - 1).map((number: ContactNumberWithReceivedGroups) => {
+                    return {
+                        id: number.id,
+                        number: number.number,
+                        notes: number.notes,
+                        type: number.type,
+                        number_groups: convert_to_array_of_strings(number.number_groups)
+                    }
+                })
+                current_position.value = total_length - 1
+
+                contact.contact_id = props.selectedContact.id
+                contact.first_name = props.selectedContact.first_name
+                contact.last_name = props.selectedContact.last_name
+                Object.assign(contact.numbers, {
+                    id: last_number.id,
+                    number: last_number.number,
+                    notes: last_number.notes,
+                    type: last_number.type,
+                    number_groups: convert_to_array_of_strings(last_number.number_groups)
+                })
+            } else { // if there is only one number, we will show it in the form
+                const contact_number = props.selectedContact?.numbers[0]
+
+                contact.contact_id = props.selectedContact.id
+                contact.first_name = props.selectedContact.first_name
+                contact.last_name = props.selectedContact.last_name
+                Object.assign(contact.numbers, {
+                    id: contact_number.id,
+                    number: contact_number.number,
+                    notes: contact_number.notes,
+                    type: contact_number.type,
+                    number_groups: convert_to_array_of_strings(contact_number.number_groups)
+                })
+            }
+        } else {
+            is_editing.value = false
+        }
+    })
+
+    const convert_to_array_of_strings = (groups: StringOrNull) => {
+        if(!groups) return []
+        return groups.split(',').filter((item: string) => item != '0').map((item: string) => item.trim())
+    }
 
     const type_options = [
         { name: 'Home', code: '4' },
@@ -121,17 +185,17 @@
     })
 
     watchEffect(() => {
-        if (new_contact.numbers.type) {
+        if (contact.numbers.type) {
             type_error.value = ''
         }
-        if (new_contact.numbers.number) {
+        if (contact.numbers.number) {
             number_error.value = ''
         }
     })
 
     const reset_contact = () => {
-        Object.assign(new_contact, empty_contact)
-        new_contact.numbers = {
+        Object.assign(contact, empty_contact)
+        contact.numbers = {
             id: 'new',
             number: '',
             notes: '',
@@ -143,17 +207,17 @@
     const validate_number_and_type = () => {
         let is_invalid = false
 
-        if(contact_numbers.value.some((number: ContactNumber) => number.number === new_contact.numbers.number)) {
+        if(contact_numbers.value.some((number: ContactNumber) => number.number === contact.numbers.number)) {
             number_error.value = 'This number is already added.'
             is_invalid = true
             return is_invalid
         }
 
-        if(!new_contact.numbers.number || !new_contact.numbers.type || has_phone_number_error.value) {
-            if(!new_contact.numbers.number) {
+        if(!contact.numbers.number || !contact.numbers.type || has_phone_number_error.value) {
+            if(!contact.numbers.number) {
                 number_error.value = 'The Number field is required.'
             }
-            if(!new_contact.numbers.type) {
+            if(!contact.numbers.type) {
                 type_error.value = 'The Type field is required.'
             }
             is_invalid = true
@@ -167,13 +231,13 @@
         form_action.value = 'clear'
         
         contact_numbers.value.push({
-            id: 'new',
-            number: new_contact.numbers.number,
-            notes: new_contact.numbers.notes,
-            type: new_contact.numbers.type,
-            number_groups: new_contact.numbers.number_groups
+            id: contact.numbers.id === 'new' ? 'new' : contact.numbers.id,
+            number: contact.numbers.number,
+            notes: contact.numbers.notes,
+            type: contact.numbers.type,
+            number_groups: contact.numbers.number_groups
         })
-        new_contact.numbers = {
+        contact.numbers = {
             id: 'new',
             number: '',
             notes: '',
@@ -187,12 +251,13 @@
 
     const go_back = async () => {
         form_action.value = 'fill'
-        new_contact.numbers = {
-            id: 'new',
-            number: contact_numbers.value[current_position.value - 1].number,
-            notes: contact_numbers.value[current_position.value - 1].notes,
-            type: contact_numbers.value[current_position.value - 1].type,
-            number_groups: contact_numbers.value[current_position.value - 1].number_groups
+        const prev_number = contact_numbers.value[current_position.value - 1]
+        contact.numbers = {
+            id: prev_number.id === 'new' ? 'new' : prev_number.id,
+            number: prev_number.number,
+            notes: prev_number.notes,
+            type: prev_number.type,
+            number_groups: prev_number.number_groups
         }
         contact_numbers.value.pop()
         current_position.value--
@@ -205,22 +270,22 @@
     const save_contact = () => {
         if(validate_number_and_type()) return
 
-        const numbers_to_send = [...contact_numbers.value, new_contact.numbers]
+        const numbers_to_send = [...contact_numbers.value, contact.numbers]
 
         const formatted_contact: ContactToSave = {
-            ...new_contact,
+            ...contact,
             numbers: numbers_to_send.map((number: any) => {
                 return {
                     ...number,
                     number: number.number.replace(/\D/g, ''),
-                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group: number_groups_option) => group.code) : null,
-                    type: number.type.code
+                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group: number_groups_option) => group) : null,
+                    type: number.type
                 }
             })
         }
 
         const data_to_send: ContactToSaveData = {
-            action: 'create',
+            action: is_editing.value ? 'update' : 'create',
             contact_info: formatted_contact,
             save_contact: true
         }
@@ -228,7 +293,7 @@
         type res_success = {
             result: true  
         }
-        
+
         saveContact(data_to_send, {
             onSuccess: (data: res_success | APIResponseError) => {
                 if(data.result) {
@@ -236,6 +301,7 @@
                     form_action.value = 'clear'
                     queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
                     emit('success', 'Contact saved successfully.')
+                    emit('update:table')
                     emit('close')
                 } else if(data.validation_error) {
                     emit('error', data.validation_error ?? 'Something failed, please try again.')

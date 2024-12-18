@@ -11,10 +11,11 @@
     </section>
 
     <div class="py-5 main-container gap-4 px-10">
-        <ContactsTable 
+        <ContactsTable ref="contactsTableRef"
             :selected-group="selected_group.group_id" 
             @uploadFile="open_contacts_modal" 
-            @updateMessage="handle_update_message" 
+            @updateMessage="handle_update_message"
+            @update:contactToEdit="handle_edit_contact"
             :dnc-total-numbers="total_dnc_count" 
             :is-custom-group="is_custom_group" 
             :system-groups="system_groups" 
@@ -31,7 +32,14 @@
         </div>
     </div>
 
-    <ModalContacts ref="modalContacts" :selected-group="selected_group.group_id" @updateMessage="handle_update_message" />
+    <ModalContacts 
+        ref="modalContacts" 
+        :selected-group="selected_group.group_id" 
+        :selected-contact="selected_contact" 
+        @updateMessage="handle_update_message" 
+        @reset="handle_reset_values"
+        @update:table="handle_update_table"
+    />
 
     <ConfirmDialog class="confirm-dialog">
         <template #message>
@@ -46,6 +54,8 @@
     const selected_group = ref<SelectedGroup>({ group_name: 'All', group_id: CONTACTS_ALL })
     const is_custom_group = ref(false)
     const message_text = ref('')
+    const selected_contact = ref<ContactToEdit | null>(null)
+    const contactsTableRef = ref()
     // TODO: review logic between selected_group, selected_tab, editing group
 
     type SelectedGroup = { group_name: string, group_id: string }
@@ -94,6 +104,14 @@
         modalContacts.value.open(section);
     }
 
+    const handle_reset_values = () => {
+        selected_contact.value = null
+    }
+
+    const handle_update_table = () => {
+        contactsTableRef.value?.reset_selected_contacts()
+    }
+
     /* ----- Confirm Dialog ----- */
     const handle_update_message = (message: string) => {
         message_text.value = message
@@ -103,6 +121,12 @@
     const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean) => {
         selected_group.value = { group_name: button_name, group_id: button_group_id }
         is_custom_group.value = is_custom
+    }
+
+    /* ----- Contacts Table ----- */
+    const handle_edit_contact = (contact: ContactToEdit) => {
+        selected_contact.value = contact
+        open_contacts_modal('contact')
     }
 </script>
 
