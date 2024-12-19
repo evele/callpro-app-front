@@ -7,7 +7,7 @@
             </header>
         </template>
 
-        <AddNewContact v-if="section_to_show === 'contact'" 
+        <SaveContact v-if="section_to_show === 'contact'" 
             :selected-contact="selected_contact" 
             @close="handleClose" 
             @success="handleSuccess" 

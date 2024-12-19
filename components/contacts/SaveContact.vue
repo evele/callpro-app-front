@@ -1,9 +1,16 @@
 <template>
     <div v-if="contact_numbers.length" class="flex flex-wrap gap-2 mb-2">
-        <Chip v-for="(number, i) in contact_numbers" :key="i" class="bg-[#1D192B] text-white text-sm">
+        <Chip v-for="number in contact_numbers" :key="number.id" class="bg-[#1D192B] text-white text-sm">
             <template #default>
-                <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1">{{ i + 1 }}</span>
-                {{ number.number }}
+                <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1"
+                    :class="{ 'bg-amber-300': contact.numbers.id === number.id }"
+                >
+                    {{ contact_numbers.findIndex((item: ContactNumber) => item.id === number.id) + 1 }}
+                </span>
+                <span class="leading-none">{{ number.number }}</span>
+                <Button @click="handle_remove_number(number.id)" class="rounded-full p-0 bg-[#E8DEF8] w-[14px] h-[14px] border-none shadow-md hover:bg-[#D1C6F0]">
+                    <CloseSVG class="text-black w-3 h-3" />
+                </Button>
             </template>
         </Chip>
     </div>
@@ -61,11 +68,14 @@
     </form>
     
     <footer class="flex flex-col w-full justify-center gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
-        <Button v-if="contact_numbers.length" :disabled="isPending" @click="go_back" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
-            Go back
+        <Button v-if="current_position > 0" :disabled="isPending" @click="go_previous" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+            Previous
         </Button>
-        <Button @click="add_new" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+        <Button v-if="show_add_new_btn" @click="add_new" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
             Add new phone
+        </Button>
+        <Button v-else @click="go_next" :disabled="isPending" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
+            Next
         </Button>
         <Button @click="save_contact" :disabled="isPending" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
             {{ isPending ? 'Saving...' : 'Save' }}
@@ -94,12 +104,14 @@
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError, isLoading: CGIsLoading } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, reset } = useSaveContact() 
 
+    const temp_random_id = () => `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+
     const empty_contact: ContactBeforeToSave = {
         contact_id: null,
         first_name: '',
         last_name: '',
         numbers: {
-            id: 'new',
+            id: temp_random_id(),
             number: '',
             notes: '',
             type: '',
@@ -110,6 +122,8 @@
 
     const contact_numbers = ref<ContactNumber[]>([])
     const current_position = ref(0)
+
+    
 
     onMounted(() => {
         // if selectedContact is passed, it means we are editing a contact
@@ -196,7 +210,7 @@
     const reset_contact = () => {
         Object.assign(contact, empty_contact)
         contact.numbers = {
-            id: 'new',
+            id: temp_random_id(),
             number: '',
             notes: '',
             type: '',
@@ -207,7 +221,7 @@
     const validate_number_and_type = () => {
         let is_invalid = false
 
-        if(contact_numbers.value.some((number: ContactNumber) => number.number === contact.numbers.number)) {
+        if(contact_numbers.value.some((number: ContactNumber ) => number.number === contact.numbers.number && number.id !== contact.numbers.id)) {
             number_error.value = 'This number is already added.'
             is_invalid = true
             return is_invalid
@@ -229,16 +243,17 @@
         if(validate_number_and_type()) return
 
         form_action.value = 'clear'
-        
+
         contact_numbers.value.push({
-            id: contact.numbers.id === 'new' ? 'new' : contact.numbers.id,
+            id: contact.numbers.id,
             number: contact.numbers.number,
             notes: contact.numbers.notes,
             type: contact.numbers.type,
             number_groups: contact.numbers.number_groups
         })
+        
         contact.numbers = {
-            id: 'new',
+            id: temp_random_id(),
             number: '',
             notes: '',
             type: '',
@@ -249,36 +264,99 @@
         form_action.value = ''
     }
 
-    const go_back = async () => {
+    const go_next = async () => {
+        if(validate_number_and_type()) return
+        form_action.value = 'clear'
+        console.log(contact_numbers.value[current_position.value])
+        console.log(contact.numbers)
+
+        contact_numbers.value[current_position.value] = {
+            id: contact.numbers.id,
+            number: contact.numbers.number,
+            notes: contact.numbers.notes,
+            type: contact.numbers.type,
+            number_groups: contact.numbers.number_groups
+        }
+
+        const next_number = contact_numbers.value[current_position.value + 1]
+        if(next_number) {
+            contact.numbers = {
+                id: next_number.id,
+                number: next_number.number,
+                notes: next_number.notes,
+                type: next_number.type,
+                number_groups: next_number.number_groups
+            }
+        } else {
+            contact.numbers = {
+                id: temp_random_id(),
+                number: '',
+                notes: '',
+                type: '',
+                number_groups: []
+            }
+        }
+ 
+        current_position.value++
+        await nextTick();
+        form_action.value = ''
+    }
+
+    const go_previous = async () => {
         form_action.value = 'fill'
         const prev_number = contact_numbers.value[current_position.value - 1]
         contact.numbers = {
-            id: prev_number.id === 'new' ? 'new' : prev_number.id,
+            id: prev_number.id,
             number: prev_number.number,
             notes: prev_number.notes,
             type: prev_number.type,
             number_groups: prev_number.number_groups
         }
-        contact_numbers.value.pop()
+
         current_position.value--
         await nextTick();
         form_action.value = ''
     }
 
-    type number_groups_option = { code: string, name: string }
+    const handle_remove_number = (number: string) => {
+        console.log(number)
+        contact_numbers.value = contact_numbers.value.filter((item: ContactNumber) => item.number !== number)
+        current_position.value--
+        console.log(contact_numbers.value)
+    }
+
+    const is_in_previous_position = computed(() => current_position.value !== contact_numbers.value.length)
+    const show_add_new_btn = computed(() => !contact_numbers.value.length || !is_in_previous_position.value)
 
     const save_contact = () => {
         if(validate_number_and_type()) return
 
-        const numbers_to_send = [...contact_numbers.value, contact.numbers]
-
+        if(is_in_previous_position.value) {
+            contact_numbers.value[current_position.value] = {
+                id: contact.numbers.id,
+                number: contact.numbers.number,
+                notes: contact.numbers.notes,
+                type: contact.numbers.type,
+                number_groups: contact.numbers.number_groups
+            }
+        } else {
+            contact_numbers.value.push({
+                id: contact.numbers.id,
+                number: contact.numbers.number,
+                notes: contact.numbers.notes,
+                type: contact.numbers.type,
+                number_groups: contact.numbers.number_groups
+            })
+        }
+        console.log(contact_numbers.value)
         const formatted_contact: ContactToSave = {
             ...contact,
-            numbers: numbers_to_send.map((number: any) => {
+            numbers: contact_numbers.value.map((number: ContactNumber) => {
                 return {
                     ...number,
+                    id: typeof number.id === 'string' ? 'new' : number.id,
                     number: number.number.replace(/\D/g, ''),
-                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group: number_groups_option) => group) : null,
+                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group) => group) : null,
                     type: number.type
                 }
             })
@@ -293,7 +371,8 @@
         type res_success = {
             result: true  
         }
-
+        console.log(data_to_send)
+        return
         saveContact(data_to_send, {
             onSuccess: (data: res_success | APIResponseError) => {
                 if(data.result) {

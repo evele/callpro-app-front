@@ -89,7 +89,7 @@ export type ContactGroup = {
 export type ReceivedNumberGroups = { number_groups: StringOrNull }
 
 export type ContactNumberWithoutGroups = {
-  id: 'new' | number,
+  id: StringOrNumber,
   number: string,
   notes: string,
   type: '' | OneToFour,
