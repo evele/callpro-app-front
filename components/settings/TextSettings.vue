@@ -2,9 +2,9 @@
     <SettingSection title="Text message caller ID" description="">
         <div class="flex justify-between gap-2 items-center">
             <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="text_settings.text_caller_id_selected" :options="text_caller_id_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="text_settings.text_caller_id_selected" :options="text_caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
         </div>
-        <div v-if="text_settings.show_text_caller_id" class="flex justify-between items-center mt-7">
+        <div :key="text_settings.text_caller_id_selected" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium w-48">Your Call Pro number</label>
             <PhoneInput class="!w-[294px]" :model-value="text_settings.text_caller_id" @update:modelValue="(v: string) => text_settings.text_caller_id = v" 
                 :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
@@ -43,7 +43,7 @@
 
     const text_settings = reactive<TextSettingsUI>({
         show_text_caller_id: false,
-        text_caller_id_selected: { name: '', code: '' },
+        text_caller_id_selected: undefined,
         text_caller_id: '',
         chat: false,
         sms_dnc: false,
@@ -52,7 +52,7 @@
     watch(() => props.textSettings, (newVal: TextSettings | null) => {
         if(newVal) {
             text_settings.show_text_caller_id = true
-            text_settings.text_caller_id_selected = { name: 'Your CallPro Number', code: '1' }
+            text_settings.text_caller_id_selected = '1'
             text_settings.text_caller_id = newVal.text_caller_id
             text_settings.chat = newVal.chat === '1'
             text_settings.sms_dnc = newVal.sms_dnc === '1'

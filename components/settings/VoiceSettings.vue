@@ -2,9 +2,9 @@
     <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
         <div class="flex justify-between gap-2 items-center">
             <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
         </div>
-        <div v-if="voice_settings.show_caller_id" class="flex justify-between items-center mt-7">
+        <div :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium w-48">Enter Caller ID</label>
             <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
                 :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
@@ -40,7 +40,7 @@
     <SettingSection title="Retries" description="The number of times the system have to call the recipient.">
         <div class="flex justify-between items-center gap-2">
             <label class="text-lg font-medium">Number of Retries</label>
-            <Select v-model="voice_settings.retries" :options="retries_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.retries" :options="retries_options" class="w-[294px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
@@ -48,7 +48,7 @@
     <SettingSection title="Call Speed" description="The number of calls the system have to call at once.">
         <div class="flex justify-between items-center gap-2">
             <label class="text-lg font-medium max-w-48">Number of calls at once</label>
-            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
@@ -98,14 +98,13 @@
     const number_when_completed_error_message = ref('')
 
     const voice_settings = reactive<VoiceSettingsUI>({
-        show_caller_id: false,
-        caller_id_selected: { name: '', code: '' },
+        caller_id_selected: undefined,
         caller_id: '',
         static_intro: false,
         repeat: false,
         offer_dnc: false,
-        retries: { name: '', code: '1' },
-        call_speed: { name: '', code: '5' },
+        retries: undefined,
+        call_speed: undefined,
         amd_detection: false,
         email_on_finish: false,
         number_when_completed_status: false,
@@ -114,14 +113,13 @@
 
     onMounted(() => {
         if(props.voiceSettings) {
-            voice_settings.show_caller_id = true
-            voice_settings.caller_id_selected = { name: 'Choose Caller ID', code: '3' }
+            voice_settings.caller_id_selected = '3'
             voice_settings.caller_id = props.voiceSettings.caller_id
             voice_settings.static_intro = props.voiceSettings.static_intro === '1'
             voice_settings.repeat = props.voiceSettings.repeat === '1'
             voice_settings.offer_dnc = props.voiceSettings.offer_dnc === '1'
-            voice_settings.retries = format_retries(props.voiceSettings.retries)
-            voice_settings.call_speed = format_call_speed(props.voiceSettings.call_speed)
+            voice_settings.retries = props.voiceSettings.retries
+            voice_settings.call_speed = props.voiceSettings.call_speed
             voice_settings.amd_detection = props.voiceSettings.amd_detection === '1'
             voice_settings.email_on_finish = props.voiceSettings.email_on_finish === '1'
             voice_settings.number_when_completed_status = props.voiceSettings.number_when_completed_status === '1'
@@ -135,12 +133,7 @@
         { name: 'Choose Caller ID', code: '3' },
     ]
 
-    const retries_options: { name: string; code: OneToFour }[] = [
-        { name: '1', code: '1' },
-        { name: '2', code: '2' },
-        { name: '3', code: '3' },
-        { name: '4', code: '3' },
-    ]
+    const retries_options = ['1', '2', '3', '4'];
 
     const call_speed_options: { name: string; code: CallSpeed }[] = [
         { name: '5', code: '5' },
@@ -150,9 +143,6 @@
         { name: '200', code: '200' },
         { name: 'MAX', code: '999' },
     ]
-
-    const format_retries = (retries: OneToFour) => retries_options.find(option => option.code === retries) ?? retries_options[0]
-    const format_call_speed = (call_speed: CallSpeed) => call_speed_options.find(option => option.code === call_speed) ?? call_speed_options[0]
 
     watch(voice_settings, (updatedSettings: VoiceSettingsUI) => {
         if(updatedSettings.caller_id === '') {

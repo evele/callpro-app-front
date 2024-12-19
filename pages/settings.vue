@@ -93,7 +93,7 @@
     const format_voice_settings_to_save = (voice_settings_ui: VoiceSettingsUI) => {
         const formatted_settings: VoiceSettings = {
             amd_detection: voice_settings_ui.amd_detection ? '1' : '0',
-            call_speed: voice_settings_ui.call_speed.code,
+            call_speed: voice_settings_ui.call_speed ?? '5',
             caller_id: voice_settings_ui.caller_id.replace(/\D/g, ''),
             email_on_finish: voice_settings_ui.email_on_finish ? '1' : '0',
             number_when_completed: voice_settings_ui.number_when_completed.replace(/\D/g, ''),
@@ -102,7 +102,7 @@
             repeat: voice_settings_ui.repeat ? '1' : '0',
             repeat_audio: "system",
             repeat_library_id: null,
-            retries: voice_settings_ui.retries.code,
+            retries: voice_settings_ui.retries ?? '1',
             static_intro: voice_settings_ui.static_intro ? '1' : '0',
             static_intro_library_id: 0,
         }

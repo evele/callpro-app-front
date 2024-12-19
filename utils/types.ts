@@ -340,14 +340,13 @@ export type UserAdminSettings = {
 }
 
 export type VoiceSettingsUI = {
-  show_caller_id: boolean,
-  caller_id_selected: { name: string, code: string },
+  caller_id_selected: undefined | OneOrTwo | '3',
   caller_id: string,
   static_intro: boolean,
   repeat: boolean,
   offer_dnc: boolean,
-  retries: { name: string, code: OneToFour },
-  call_speed: { name: string, code: CallSpeed },
+  retries: undefined | OneToFour,
+  call_speed: undefined | CallSpeed,
   amd_detection: boolean,
   email_on_finish: boolean,
   number_when_completed_status: boolean,
@@ -356,7 +355,7 @@ export type VoiceSettingsUI = {
 
 export type TextSettingsUI = {
   show_text_caller_id: boolean,
-  text_caller_id_selected: { name: string, code: string },
+  text_caller_id_selected: undefined | OneOrTwo,
   text_caller_id: string,
   chat: boolean,
   sms_dnc: boolean
@@ -366,7 +365,7 @@ export type GeneralSettingsUI = {
   call_window_start: Date | null,
   call_window_end: Date | null,
   time_guard: boolean,
-  time_zone: { name: string, code: OneToNine }
+  time_zone: undefined | OneToNine 
 }
 
 export type VoiceSettingsDataToSave = {

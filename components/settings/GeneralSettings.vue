@@ -2,7 +2,7 @@
     <SettingSection title="Time zones" description="Set your time zone">
         <div class="flex justify-between items-center">
             <label class="text-lg font-medium">Time zone</label>
-            <Select v-model="general_settings.time_zone" :options="time_zones_options" optionLabel="name" class="w-[294px]" placeholder="Select" />
+            <Select v-model="general_settings.time_zone" :options="time_zones_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
@@ -57,7 +57,7 @@
         call_window_start: null,
         call_window_end: null,
         time_guard: false,
-        time_zone: { name: '', code: '1' },
+        time_zone: undefined,
     });
 
     watch(() => props.generalSettings, (newVal: GeneralSettings | null) => {
@@ -65,7 +65,7 @@
             general_settings.call_window_start = parse_time(newVal.call_window_start)
             general_settings.call_window_end = parse_time(newVal.call_window_end)
             general_settings.time_guard = newVal.time_guard === '1'
-            general_settings.time_zone = format_time_zone(newVal.time_zone)
+            general_settings.time_zone = newVal.time_zone
         }
     })
 
@@ -77,25 +77,23 @@
     }
 
     const format_time = (date: Date | null): string => {
-    if (!date || !(date instanceof Date)) return '0000-00-00 00:00';
+        if (!date || !(date instanceof Date)) return '0000-00-00 00:00';
 
-    const year = String(date.getFullYear());
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+        const year = String(date.getFullYear());
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
 
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-};
+        return `${year}-${month}-${day} ${hours}:${minutes}`;
+    };
 
-    const format_time_zone = (zone_id: OneToNine) => time_zones_options.value.find((option: TimeZoneOpt) => option.code === zone_id) ?? time_zones_options.value[0]
-    
     watch(general_settings, (updatedSettings: GeneralSettingsUI) => {
         const settings_to_save: GeneralSettings = {
             call_window_start: format_time(updatedSettings.call_window_start),
             call_window_end: format_time(updatedSettings.call_window_end),
             time_guard: updatedSettings.time_guard ? '1' : '0',
-            time_zone: updatedSettings.time_zone.code,
+            time_zone: updatedSettings.time_zone ?? '1',
         }
         emit('updateGeneralSettings', settings_to_save)
     })
