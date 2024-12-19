@@ -1,7 +1,7 @@
 <template>
     <section class="flex flex-col gap-2 w-[250px] rounded-2xl bg-white p-[14px] shadow-lg">
-        <ContactsActionBtn v-for="option in OPTIONS" :key="option.text" :text="option.text"
-            :count="option.count" :icon="option.icon" :icon-color="option.iconColor" @btnAction="handle_btn_action"
+        <ContactsActionBtn v-for="option in OPTIONS" :key="option.id" :text="option.text"
+            :count="option.count" :icon="option.icon" :icon-color="option.iconColor" @click="emit('click', option.id);"
         />
     </section>
 </template>
@@ -12,17 +12,16 @@
     import DncSVG from "@/components/svgs/DncSVG.vue"
 
     const props = defineProps({
-        dncTotalNumbers: { type: [Number, null], required: true },
+        totalContactsNumber: { type: [Number, null], required: true },
+        totalGroupsNumber: { type: [Number, null], required: true },
+        totalDncNumber: { type: [Number, null], required: true },
     })
 
     const OPTIONS = computed(() => [
-        { text: "Total Contacts", count: 123, icon: ContactsSVG, iconColor: "#4F378B" },
-        { text: "Total Groups", count: 23, icon: GroupsSVG, iconColor: "#009951" },
-        { text: "Total DNC", count: props.dncTotalNumbers, icon: DncSVG, iconColor: "#E5A000" },
+        { id: 'new_contact', text: "Total Contacts", count: props.totalContactsNumber, icon: ContactsSVG, iconColor: "#4F378B" },
+        { id: 'new_group', text: "Total Groups", count: props.totalGroupsNumber, icon: GroupsSVG, iconColor: "#009951" },
+        { id: 'dnc', text: "Total DNC", count: props.totalDncNumber, icon: DncSVG, iconColor: "#E5A000" },
     ])
 
     const emit = defineEmits(['click']);
-    const handle_btn_action = (text: string) => {
-        emit('click', text);
-    }
 </script>

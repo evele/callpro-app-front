@@ -10,6 +10,7 @@ export const DOWNLOAD_AUDIO_URL = "/audios/download_audio_file"
 export const LOGIN_URL = "/jwtauth/login"
 export const FORGOT_PASSWORD_URL ="/jwtauth/forgot_password"
 export const RESET_PASSWORD_URL = "/jwtauth/reset_password"
+export const CREATE_USER_URL = "/jwtauth/create_user"
 
 /* ----- Billing Store ----- */
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"

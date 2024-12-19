@@ -34,7 +34,7 @@ export const useDeleteAudio = () => {
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data:{ is_static: ZeroOrOne }) => fetchWrapper.post(CREATE_CALL_IN_CODE_URL,data),
+    mutationFn: (data:{ is_static: ZeroOrOne }) => createCallInCode(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
     },
@@ -44,7 +44,7 @@ export const useCreateCallInCode = () => {
 export const useDeleteCallInCode = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { call_in_code_id: number }) => fetchWrapper.post(DELETE_CALL_IN_CODE_URL,data),
+    mutationFn: (data: { call_in_code_id: number }) => deleteCallInCode(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['call_in_codes'] })
     },
@@ -55,7 +55,10 @@ export const useDeleteCallInCode = () => {
 export const useSaveContact = () => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: ContactToSaveData) => saveContact(data)
+    mutationFn: (data: ContactToSaveData) => saveContact(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
+    }
   })
 }
 
@@ -138,6 +141,7 @@ export const useSendContactToTrash = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['dnc_contacts_filtered'] })
       queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
     }
   })
 }
@@ -190,6 +194,7 @@ export const useSaveGroupContacts = () =>{
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['group_contacts']})
       queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
     },
   })
 }

@@ -11,7 +11,6 @@
             <li><NuxtLink to="audios">Audios</NuxtLink></li>
             <li><NuxtLink to="billing">Billing</NuxtLink></li>
             <li><NuxtLink to="broadcast">Broadcast</NuxtLink></li>
-            <li><NuxtLink to="call_in_codes">Call In Codes</NuxtLink></li>
             <li><NuxtLink to="caller_id">Caller Id</NuxtLink></li>
             <li><NuxtLink to="chat">Chat</NuxtLink></li>
             <li><NuxtLink to="contacts">Contacts</NuxtLink></li>

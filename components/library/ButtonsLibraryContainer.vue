@@ -15,7 +15,7 @@
             <p class="font-medium">Add Text to</p>
             <p class="font-medium">Speech (TTS)</p>
         </ButtonLibrary>
-        <ButtonLibrary @click="emit('action', 'call')">
+        <ButtonLibrary @click="emit('action', 'call_in')">
             <Avatar class="bg-[#fff1c2] mb-2" size="xlarge" shape="circle">
                 <CallInSVG class="w-7 h-7 text-[#E5A000]" />
             </Avatar>
