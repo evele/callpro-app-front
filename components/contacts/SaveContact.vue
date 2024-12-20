@@ -1,9 +1,9 @@
 <template>
     <div v-if="contact_numbers.length" class="flex flex-wrap gap-2 mb-2">
-        <Chip v-for="number in contact_numbers" :key="number.id" class="bg-[#1D192B] text-white text-sm">
+        <Chip v-for="number in contact_numbers" :key="number.id" class="bg-[#1D192B] text-white text-sm hover:cursor-pointer" @click="navitage_to_number(number.id)">
             <template #default>
                 <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1"
-                    :class="{ 'bg-amber-300': contact.numbers.id === number.id }"
+                    :class="{ 'bg-emerald-300': contact.numbers.id === number.id }"
                 >
                     {{ contact_numbers.findIndex((item: ContactNumber) => item.id === number.id) + 1 }}
                 </span>
@@ -105,6 +105,7 @@
     const { mutate: saveContact, isPending, reset } = useSaveContact() 
 
     const temp_random_id = () => `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+    const is_custom_ID = (id: string) => /^\d+-[a-z0-9]{9}$/.test(id);
 
     const empty_contact: ContactBeforeToSave = {
         contact_id: null,
@@ -121,9 +122,8 @@
     let contact = reactive<ContactBeforeToSave>({...empty_contact})
 
     const contact_numbers = ref<ContactNumber[]>([])
+    const numbers_to_delete = ref<ContactNumber[]>([])
     const current_position = ref(0)
-
-    
 
     onMounted(() => {
         // if selectedContact is passed, it means we are editing a contact
@@ -131,44 +131,30 @@
             is_editing.value = true
             const total_length = props.selectedContact?.numbers?.length ?? 0
 
-            if(total_length > 1) { // if there are more than one numbers, we will show the last number in the form
-                const last_number = props.selectedContact.numbers[total_length - 1]
+            // if there are more than one numbers, we will show the last number in the form
+            const last_number = props.selectedContact.numbers[total_length - 1]
 
-                contact_numbers.value = props.selectedContact.numbers.slice(0, total_length - 1).map((number: ContactNumberWithReceivedGroups) => {
-                    return {
-                        id: number.id,
-                        number: number.number,
-                        notes: number.notes,
-                        type: number.type,
-                        number_groups: convert_to_array_of_strings(number.number_groups)
-                    }
-                })
-                current_position.value = total_length - 1
+            contact_numbers.value = props.selectedContact.numbers.map((number: ContactNumberWithReceivedGroups) => {
+                return {
+                    id: number.id,
+                    number: format_number_to_show(number.number),
+                    notes: number.notes,
+                    type: number.type,
+                    number_groups: convert_to_array_of_strings(number.number_groups)
+                }
+            })
+            current_position.value = total_length - 1
 
-                contact.contact_id = props.selectedContact.id
-                contact.first_name = props.selectedContact.first_name
-                contact.last_name = props.selectedContact.last_name
-                Object.assign(contact.numbers, {
-                    id: last_number.id,
-                    number: last_number.number,
-                    notes: last_number.notes,
-                    type: last_number.type,
-                    number_groups: convert_to_array_of_strings(last_number.number_groups)
-                })
-            } else { // if there is only one number, we will show it in the form
-                const contact_number = props.selectedContact?.numbers[0]
-
-                contact.contact_id = props.selectedContact.id
-                contact.first_name = props.selectedContact.first_name
-                contact.last_name = props.selectedContact.last_name
-                Object.assign(contact.numbers, {
-                    id: contact_number.id,
-                    number: contact_number.number,
-                    notes: contact_number.notes,
-                    type: contact_number.type,
-                    number_groups: convert_to_array_of_strings(contact_number.number_groups)
-                })
-            }
+            contact.contact_id = props.selectedContact.id
+            contact.first_name = props.selectedContact.first_name
+            contact.last_name = props.selectedContact.last_name
+            Object.assign(contact.numbers, {
+                id: last_number.id,
+                number: last_number.number,
+                notes: last_number.notes,
+                type: last_number.type,
+                number_groups: convert_to_array_of_strings(last_number.number_groups)
+            })
         } else {
             is_editing.value = false
         }
@@ -267,8 +253,6 @@
     const go_next = async () => {
         if(validate_number_and_type()) return
         form_action.value = 'clear'
-        console.log(contact_numbers.value[current_position.value])
-        console.log(contact.numbers)
 
         contact_numbers.value[current_position.value] = {
             id: contact.numbers.id,
@@ -318,11 +302,53 @@
         form_action.value = ''
     }
 
-    const handle_remove_number = (number: string) => {
-        console.log(number)
-        contact_numbers.value = contact_numbers.value.filter((item: ContactNumber) => item.number !== number)
-        current_position.value--
-        console.log(contact_numbers.value)
+    const handle_remove_number = (id: string) => {
+        const is_current_number = contact.numbers.id === id
+        
+        const next_number = contact_numbers.value[current_position.value + 1]
+        const prev_number = contact_numbers.value[current_position.value - 1]
+
+        const selected_number = contact_numbers.value.find((item: ContactNumber) => item.id === id)
+        selected_number.number = 'deleted'
+
+        numbers_to_delete.value.push(selected_number)
+        contact_numbers.value = contact_numbers.value.filter((item: ContactNumber) => item.id !== id)
+
+        if(is_current_number) {
+            contact.numbers = {
+                id: next_number?.id ?? prev_number?.id ?? temp_random_id(),
+                number: next_number?.number ?? prev_number?.number ?? '',
+                notes: next_number?.notes ?? prev_number?.notes ?? '',
+                type: next_number?.type ?? prev_number?.type ?? '',
+                number_groups: next_number?.number_groups ?? prev_number?.number_groups ?? []
+            }
+
+            if(next_number) {
+                current_position.value = contact_numbers.value.findIndex((item: ContactNumber) => item.id === next_number.id)
+            } else if(prev_number) {
+                current_position.value = contact_numbers.value.findIndex((item: ContactNumber) => item.id === prev_number.id)
+            } else {
+                current_position.value = contact_numbers.value.length
+            }
+
+        } else {
+            current_position.value = contact_numbers.value.findIndex((item: ContactNumber) => item.id === contact.numbers.id)
+        }
+        
+    }
+
+    const navitage_to_number = (id: string) => {
+        const number = contact_numbers.value.find((item: ContactNumber) => item.id === id)
+        if(number) {
+            contact.numbers = {
+                id: number.id,
+                number: number.number,
+                notes: number.notes,
+                type: number.type,
+                number_groups: number.number_groups
+            }
+            current_position.value = contact_numbers.value.findIndex((item: ContactNumber) => item.id === id)
+        }
     }
 
     const is_in_previous_position = computed(() => current_position.value !== contact_numbers.value.length)
@@ -331,6 +357,7 @@
     const save_contact = () => {
         if(validate_number_and_type()) return
 
+        let numbers_to_send = []
         if(is_in_previous_position.value) {
             contact_numbers.value[current_position.value] = {
                 id: contact.numbers.id,
@@ -339,24 +366,23 @@
                 type: contact.numbers.type,
                 number_groups: contact.numbers.number_groups
             }
+            numbers_to_send = [...contact_numbers.value]
         } else {
-            contact_numbers.value.push({
-                id: contact.numbers.id,
-                number: contact.numbers.number,
-                notes: contact.numbers.notes,
-                type: contact.numbers.type,
-                number_groups: contact.numbers.number_groups
-            })
+            numbers_to_send = [...contact_numbers.value, contact.numbers]
         }
-        console.log(contact_numbers.value)
+
+        if(numbers_to_delete.value.length > 0) {
+            numbers_to_send = [...numbers_to_send, ...numbers_to_delete.value]
+        }
+
         const formatted_contact: ContactToSave = {
             ...contact,
-            numbers: contact_numbers.value.map((number: ContactNumber) => {
+            numbers: numbers_to_send.map((number: ContactNumber) => {
                 return {
                     ...number,
-                    id: typeof number.id === 'string' ? 'new' : number.id,
-                    number: number.number.replace(/\D/g, ''),
-                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group) => group) : null,
+                    id: is_custom_ID(number.id) ? 'new' : number.id,
+                    number: number.number === 'deleted' ? 'deleted' : number.number.replace(/\D/g, ''),
+                    number_groups: number.number_groups.length > 0 ? number.number_groups.map((group) => group) : [],
                     type: number.type
                 }
             })
@@ -372,7 +398,7 @@
             result: true  
         }
         console.log(data_to_send)
-        return
+
         saveContact(data_to_send, {
             onSuccess: (data: res_success | APIResponseError) => {
                 if(data.result) {
