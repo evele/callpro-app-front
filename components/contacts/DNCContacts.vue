@@ -23,16 +23,18 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <Button @click="confirm_modal('trash')" class="rounded-md bg-transparent text-black hover:bg-[#e9e6e6] disabled:bg-transparent" :disabled="!disabled_send_to_trash_btn">
+            <Button @click="confirm_modal('trash')" class="rounded-md bg-transparent text-black hover:bg-[#e9e6e6] disabled:bg-transparent" :disabled="!disabled_send_to_trash_btn || trash_is_pending">
                 <div class="flex items-center gap-2">
-                    <TrashSVG class="w-5 h-5" />
-                    <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Send to Trash</span>
+                    <ProgressSpinner v-if="trash_is_pending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Deleting number" />
+                    <TrashSVG v-else class="w-5 h-5" />
+                    <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ trash_is_pending ? 'Sending...' : 'Send to Trash' }}</span>
                 </div>
             </Button>
-            <Button @click="confirm_modal('dnc')" class="rounded-md bg-transparent text-black hover:bg-[#e9e6e6] disabled:bg-transparent" :disabled="!disabled_remove_from_dnc_btn">
+            <Button @click="confirm_modal('dnc')" class="rounded-md bg-transparent text-black hover:bg-[#e9e6e6] disabled:bg-transparent" :disabled="!disabled_remove_from_dnc_btn || remove_is_pending">
                 <div class="flex items-center gap-2">
-                    <ScissorsSVG class="w-5 h-5" />
-                    <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">Remove from DNC</span>
+                    <ProgressSpinner v-if="remove_is_pending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Removing number" />
+                    <ScissorsSVG v-else class="w-5 h-5" />
+                    <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ remove_is_pending ? 'Removing...' : 'Remove from DNC' }}</span>
                 </div>
             </Button>
         </div>
@@ -130,13 +132,15 @@
     </section>
 
     <ModalUploadDNCContacts ref="uploadDNCContactModal" @show_toast="handle_show_upload_toast" />
+    <ConfirmationModal ref="confirmationModal" title="Confirmation" @confirm="handle_confirmation_modal">
+        <p class="text-lg font-semibold">{{ message_text }}</p>
+    </ConfirmationModal>
 </template>
 
 <script setup lang="ts">
     import type { QueryObserverResult } from '@tanstack/vue-query'
 
     const message_text = ref('')
-    const confirm = useConfirm()
 
     const page = ref(1)
     const show = ref(0)
@@ -147,8 +151,8 @@
     const form_action = ref('')
     const has_phone_number_error = ref(false)
 
-    const emit = defineEmits(['close', 'updateMessage', 'success', 'error'])
-    const { show_success_toast, show_error_toast } = usePrimeVueToast();
+    const emit = defineEmits(['close', 'success', 'error'])
+    type CurrentAction = 'trash' | 'dnc' | ''
 
     const { data: dnc_contacts, isLoading: dnc_is_loading, isFetching: is_fetching_dnc } = useFetchDNCContacts(page,show,search)
     const { mutate: add_dnc_contact, isPending: add_is_pending } = useAddDNCContact()
@@ -197,7 +201,7 @@
     const disabled_add_new_btn = computed(() => !new_number.value || has_phone_number_error.value)
 
     // Filter and format the numbers to send to API
-    const handle_comfirm = (action: 'trash' | 'dnc') => {
+    const handle_comfirm = (action: CurrentAction) => {
         if(action === 'trash') {
             const number_ids = selected_contacts.value.filter((contact: FormatedContact) => contact.number_id !== null && contact.dnc !== '2')
                                                     .map((contact: FormatedContact) => format_number_to_send(contact.number_id!))
@@ -243,26 +247,22 @@
     }
 
     // Show confirmation modal
-    const confirm_modal = (action: 'trash' | 'dnc') => {
+    const confirmationModal = ref();
+    const current_action = ref<CurrentAction>('')
+
+    const confirm_modal = (action: CurrentAction) => {
+        current_action.value = action
         message_text.value = action === 'trash' ? 
                             'Are you sure you want to send the selected contact numbers to trash?' : 
                             'Are you sure you want to remove all selected numbers from DNC list?'
 
-        emit('updateMessage', message_text.value)
-        confirm.require({
-            header: 'Confirmation',
-            rejectProps: {
-                label: 'No',
-                severity: 'secondary'
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                handle_comfirm(action)
-            }
-        });
+        confirmationModal.value?.open()
     };
+
+    const handle_confirmation_modal = () => {
+        handle_comfirm(current_action.value)
+        current_action.value = ''
+    }
 
     // Add new number to DNC list
     const add_new_number = () => {
