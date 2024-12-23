@@ -95,6 +95,7 @@
     /* ----- Contacts Groups Panel ----- */
     const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean) => {
         selected_groups.value = [{ group_name: button_name, group_id: button_group_id, is_custom: is_custom }]
+        is_custom_group.value = is_custom
         contactsTableRef.value?.reset_selected_contacts()
     }
 
