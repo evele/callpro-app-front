@@ -3,11 +3,11 @@
         <Chip v-for="number in contact_numbers" :key="number.id" class="bg-[#1D192B] text-white text-sm hover:cursor-pointer" @click="navitage_to_number(number.id)">
             <template #default>
                 <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1"
-                    :class="{ 'bg-emerald-300': contact.numbers.id === number.id }"
+                    :class="{ 'bg-emerald-200': contact.numbers.id === number.id }"
                 >
                     {{ contact_numbers.findIndex((item: ContactNumber) => item.id === number.id) + 1 }}
                 </span>
-                <span class="leading-none">{{ number.number }}</span>
+                <span class="leading-none">{{ format_number_to_show(number.number) }}</span>
                 <Button @click="handle_remove_number(number.id)" class="rounded-full p-0 bg-[#E8DEF8] w-[14px] h-[14px] border-none shadow-md hover:bg-[#D1C6F0]">
                     <CloseSVG class="text-black w-3 h-3" />
                 </Button>
@@ -137,7 +137,7 @@
             contact_numbers.value = props.selectedContact.numbers.map((number: ContactNumberWithReceivedGroups) => {
                 return {
                     id: number.id,
-                    number: format_number_to_show(number.number),
+                    number: number.number,
                     notes: number.notes,
                     type: number.type,
                     number_groups: convert_to_array_of_strings(number.number_groups)
@@ -207,7 +207,7 @@
     const validate_number_and_type = () => {
         let is_invalid = false
 
-        if(contact_numbers.value.some((number: ContactNumber ) => number.number === contact.numbers.number && number.id !== contact.numbers.id)) {
+        if(contact_numbers.value.some((number: ContactNumber ) => number.number === format_number_to_send(contact.numbers.number) && number.id !== contact.numbers.id)) {
             number_error.value = 'This number is already added.'
             is_invalid = true
             return is_invalid
@@ -232,7 +232,7 @@
 
         contact_numbers.value.push({
             id: contact.numbers.id,
-            number: contact.numbers.number,
+            number: format_number_to_send(contact.numbers.number),
             notes: contact.numbers.notes,
             type: contact.numbers.type,
             number_groups: contact.numbers.number_groups
@@ -256,7 +256,7 @@
 
         contact_numbers.value[current_position.value] = {
             id: contact.numbers.id,
-            number: contact.numbers.number,
+            number: format_number_to_send(contact.numbers.number),
             notes: contact.numbers.notes,
             type: contact.numbers.type,
             number_groups: contact.numbers.number_groups
@@ -308,7 +308,7 @@
         const next_number = contact_numbers.value[current_position.value + 1]
         const prev_number = contact_numbers.value[current_position.value - 1]
 
-        const selected_number = contact_numbers.value.find((item: ContactNumber) => item.id === id)
+        const selected_number = contact_numbers.value.find((item: ContactNumber) => item.id === id)!
         selected_number.number = 'deleted'
 
         numbers_to_delete.value.push(selected_number)
@@ -332,7 +332,8 @@
             }
 
         } else {
-            current_position.value = contact_numbers.value.findIndex((item: ContactNumber) => item.id === contact.numbers.id)
+            const to_assign = contact_numbers.value.findIndex((item: ContactNumber) => item.id === contact.numbers.id)
+            current_position.value = to_assign !== -1 ? to_assign : contact_numbers.value.length
         }
         
     }
@@ -361,7 +362,7 @@
         if(is_in_previous_position.value) {
             contact_numbers.value[current_position.value] = {
                 id: contact.numbers.id,
-                number: contact.numbers.number,
+                number: format_number_to_send(contact.numbers.number),
                 notes: contact.numbers.notes,
                 type: contact.numbers.type,
                 number_groups: contact.numbers.number_groups
@@ -381,7 +382,7 @@
                 return {
                     ...number,
                     id: is_custom_ID(number.id) ? 'new' : number.id,
-                    number: number.number === 'deleted' ? 'deleted' : number.number.replace(/\D/g, ''),
+                    number: number.number === 'deleted' ? 'deleted' : format_number_to_send(number.number),
                     number_groups: number.number_groups.length > 0 ? number.number_groups.map((group) => group) : [],
                     type: number.type
                 }
@@ -397,7 +398,6 @@
         type res_success = {
             result: true  
         }
-        console.log(data_to_send)
 
         saveContact(data_to_send, {
             onSuccess: (data: res_success | APIResponseError) => {
