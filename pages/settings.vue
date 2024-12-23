@@ -19,7 +19,7 @@
                 </Button>
 
                 <Button v-if="selected_tab === 'general'" class="w-32 h-9 ml-auto transition-opacity" :class="[show_save_general_settings_button ? 'opacity-1' : 'opacity-0']" 
-                    @click="handle_save_general_settings" :disabled="disabled_save_general_settings_button">
+                    @click="handle_check_tz_change_before_save" :disabled="disabled_save_general_settings_button">
                     {{ is_saving_general_settings ? 'Saving...' : 'Save' }}
                 </Button>
             </div>
@@ -50,6 +50,11 @@
             </div>
         </template>
     </Dialog>
+
+    <ConfirmationModal ref="confirmationModal" title="Change Timezone" @confirm="handle_confirmation_modal">
+        <p class="text-lg font-semibold">Scheduled broadcasts will be send with new time zone. Are you sure you want to change it?</p>
+    </ConfirmationModal>
+
     <Toast />
 </template>
 
@@ -62,6 +67,7 @@
     const toast = useToast()
     const visible = ref(false)
     const selected_tab = ref('voice')
+    const confirmationModal = ref();
 
     /* ----- Begin Voice Settings ----- */
     const voice_settings = computed(() => {
@@ -197,7 +203,7 @@
     /* ----- Begin General Settings ----- */
     const general_settings = computed(() => {
         if(!settings?.value?.result) return null;
-        const { time_guard, time_zone, call_window_end, call_window_start, ...filteredSettings } = settings.value.settings
+        const { time_guard, time_zone, call_window_end, call_window_start } = settings.value.settings
         return { time_guard, time_zone, call_window_end, call_window_start }
     })
 
@@ -214,6 +220,21 @@
         show_save_general_settings_button.value = true
         general_settings_formatted.value = general_settings
     }
+
+    const handle_check_tz_change_before_save = () => {
+        if(!general_settings_formatted.value) return;
+
+        const current_tz = general_settings.value?.time_zone
+        const selected_tz = general_settings_formatted.value?.time_zone
+
+        if(current_tz !== selected_tz) {
+            confirmationModal.value?.open()
+        } else {
+            handle_save_general_settings()
+        }
+    }
+
+    const handle_confirmation_modal = () => handle_save_general_settings()
 
     const handle_save_general_settings = () => {
         if(!general_settings_formatted.value) return;
