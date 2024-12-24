@@ -27,7 +27,13 @@
             <TabPanels class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl">
                 <TabPanel value="voice">
                     <SettingsSkeleton v-if="isLoading" />
-                    <VoiceSettings v-else :voice-settings="voice_settings" @updateVoiceSettings="handle_update_voice_settings" @hasError="handle_voice_settings_error" />
+                    <VoiceSettings v-else 
+                        :voice-settings="voice_settings"
+                        :call-pro-numbers="call_pro_numbers"
+                        :toll-free-numbers="toll_free_numbers"
+                        @updateVoiceSettings="handle_update_voice_settings" 
+                        @hasError="handle_voice_settings_error" 
+                    />
                 </TabPanel>
                 <TabPanel value="text">
                     <TextSettings :text-settings="text_settings" @updateTextSettings="handle_update_text_settings" @hasError="handle_text_settings_error" />
@@ -51,7 +57,7 @@
         </template>
     </Dialog>
 
-    <ConfirmationModal ref="confirmationModal" title="Change Timezone" @confirm="handle_confirmation_modal">
+    <ConfirmationModal ref="confirmationModal" title="Change Timezone" max-width="680px" @confirm="handle_confirmation_modal">
         <p class="text-lg font-semibold">Scheduled broadcasts will be send with new time zone. Are you sure you want to change it?</p>
     </ConfirmationModal>
 
@@ -59,6 +65,7 @@
 </template>
 
 <script setup lang="ts">
+    const { data } = useFetchDidAndTollFreeNumbers()
     const { data: settings, isLoading } = useFetchSettings()
     const { mutate: updateVoiceSettings, isPending: is_saving_voice_settings } = useUpdateVoiceSettings()
     const { mutate: updateTextSettings, isPending: is_saving_text_settings } = useUpdateTextSettings()
@@ -97,10 +104,19 @@
     }
 
     const format_voice_settings_to_save = (voice_settings_ui: VoiceSettingsUI) => {
+        let caller_id
+        if(voice_settings_ui.caller_id_selected === '1') {
+            caller_id = voice_settings_ui.call_pro_number
+        } else if(voice_settings_ui.caller_id_selected === '2') {
+            caller_id = voice_settings_ui.toll_free_number
+        } else {
+            caller_id = voice_settings_ui.caller_id
+        }
+
         const formatted_settings: VoiceSettings = {
             amd_detection: voice_settings_ui.amd_detection ? '1' : '0',
             call_speed: voice_settings_ui.call_speed ?? '5',
-            caller_id: voice_settings_ui.caller_id.replace(/\D/g, ''),
+            caller_id: format_number_to_send(caller_id),
             email_on_finish: voice_settings_ui.email_on_finish ? '1' : '0',
             number_when_completed: voice_settings_ui.number_when_completed.replace(/\D/g, ''),
             number_when_completed_status: voice_settings_ui.number_when_completed_status ? '1' : '0',
@@ -260,6 +276,21 @@
         })
     }
     /* ----- End General Settings ----- */
+
+    /* ----- Begin Did Numbers ----- */
+    const call_pro_numbers = computed(() => {
+        if(!data?.value?.result) return ['8888899050'];
+        if(!data.value.did_numbers.length) return ['8888899050'];
+        return data.value.did_numbers.map((did: DidNumber) => did.number)
+    })
+
+    const toll_free_numbers = computed(() => {
+        if(!data?.value?.result) return [];
+        if(!data.value.toll_free_numbers.length) return [];
+        return data.value.toll_free_numbers.map((toll_free: DidNumber) => toll_free.number)
+    })
+
+    /* ----- End Did Numbers ----- */
 </script>
 
 <style scoped lang="scss">

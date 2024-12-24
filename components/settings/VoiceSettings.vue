@@ -4,7 +4,14 @@
             <label class="text-lg font-medium w-48">Caller ID</label>
             <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
         </div>
-        <div :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
+
+        <div v-if="voice_settings.caller_id_selected !== '3'" class="flex justify-between items-center mt-7">
+            <label class="text-lg font-medium w-48">Your CallPro Number</label>
+            <Select v-if="voice_settings.caller_id_selected === '1'" v-model="selected_call_pro" :options="formatted_callpro_numbers" class="w-[294px]" placeholder="Select" :disabled="props.callProNumbers.length < 2" />
+            <Select v-else v-model="selected_toll_free" :options="formatted_tollfree_numbers" class="w-[294px]" placeholder="Select" :disabled="props.tollFreeNumbers.length < 2" />
+        </div>
+
+        <div v-else :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium w-48">Enter Caller ID</label>
             <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
                 :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
@@ -85,7 +92,9 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        voiceSettings: { type: [Object, null] as PropType<VoiceSettings | null>, required: true, default: null }
+        voiceSettings: { type: [Object, null] as PropType<VoiceSettings | null>, required: true, default: null },
+        callProNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
+        tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] }
     })
 
     const emit = defineEmits(['updateVoiceSettings', 'hasError'])
@@ -100,6 +109,8 @@
     const voice_settings = reactive<VoiceSettingsUI>({
         caller_id_selected: undefined,
         caller_id: '',
+        call_pro_number: '',
+        toll_free_number: '',
         static_intro: false,
         repeat: false,
         offer_dnc: false,
@@ -113,7 +124,26 @@
 
     onMounted(() => {
         if(props.voiceSettings) {
-            voice_settings.caller_id_selected = '3'
+            if(props.callProNumbers.includes(props.voiceSettings.caller_id)) {
+                voice_settings.caller_id_selected = '1'
+                const db_number = props.callProNumbers.find((number: string) => number === props.voiceSettings?.caller_id)
+                voice_settings.call_pro_number = db_number ? format_number_to_show(db_number) : ''
+            } else if(props.tollFreeNumbers.length && props.tollFreeNumbers.includes(props.voiceSettings?.caller_id)) {
+                voice_settings.caller_id_selected = '2'
+                const db_number = props.tollFreeNumbers.find((number: string) => number === props.voiceSettings?.caller_id)
+                voice_settings.toll_free_number = db_number ? format_number_to_show(db_number) : ''
+            } else {
+                voice_settings.caller_id_selected = '3'
+            }
+
+            
+            if(voice_settings.call_pro_number === '') {
+                voice_settings.call_pro_number = format_number_to_show(props.callProNumbers[0])
+            }
+            if(voice_settings.toll_free_number === '') {
+                voice_settings.toll_free_number = props.tollFreeNumbers.length ? format_number_to_show(props.tollFreeNumbers[0]) : ''
+            }
+
             voice_settings.caller_id = props.voiceSettings.caller_id
             voice_settings.static_intro = props.voiceSettings.static_intro === '1'
             voice_settings.repeat = props.voiceSettings.repeat === '1'
@@ -126,12 +156,35 @@
             voice_settings.number_when_completed = props.voiceSettings.number_when_completed
         }
     })
+
+    const selected_call_pro = computed({
+        get: () => voice_settings.call_pro_number,
+        set: (val: string) => (voice_settings.call_pro_number = val),
+    });
+
+    const selected_toll_free = computed({
+        get: () => voice_settings.toll_free_number,
+        set: (val: string) => (voice_settings.toll_free_number = val),
+    });
     
-    const caller_id_options = [
-        { name: 'Your CallPro Number', code: '1' },
-        { name: 'Toll Free Number', code: '2' },
-        { name: 'Choose Caller ID', code: '3' },
-    ]
+    const caller_id_options = computed(() => {
+        const options = []
+        options.push({ name: 'Your CallPro Number', code: '1' })
+        if(props.tollFreeNumbers.length) {
+            options.push({ name: 'Toll Free Number', code: '2' })
+        }
+        options.push({ name: 'Choose Caller ID', code: '3' })
+
+        return options
+    })
+
+    const formatted_callpro_numbers = computed(() => {
+        return props.callProNumbers?.map((number: string) => format_number_to_show(number))
+    })
+
+    const formatted_tollfree_numbers = computed(() => {
+        return props.tollFreeNumbers?.map((number: string) => format_number_to_show(number))
+    })
 
     const retries_options = ['1', '2', '3', '4'];
 
@@ -145,7 +198,7 @@
     ]
 
     watch(voice_settings, (updatedSettings: VoiceSettingsUI) => {
-        if(updatedSettings.caller_id === '') {
+        if(updatedSettings.caller_id_selected === '3' && updatedSettings.caller_id === '') {
             caller_id_empty.value = true
             caller_id_error_message.value = 'Caller ID is required'
         } else {

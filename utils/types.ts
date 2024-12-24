@@ -348,6 +348,8 @@ export type UserAdminSettings = {
 export type VoiceSettingsUI = {
   caller_id_selected: undefined | OneOrTwo | '3',
   caller_id: string,
+  call_pro_number: string,
+  toll_free_number: string,
   static_intro: boolean,
   repeat: boolean,
   offer_dnc: boolean,
