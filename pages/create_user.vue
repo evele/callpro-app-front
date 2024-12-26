@@ -13,7 +13,7 @@
             <template #content>
                 <!-- <div class=" w-full grid sm:grid-cols-1 "> -->
                 <form @keydown.enter.prevent="register" @submit.prevent
-                    class="new-contact-form flex flex-col gap-10 md:px-8">
+                    class="new-contact-form flex flex-col gap-10 md:px-6">
                     <!-- Primer bloque: Nombre -->
                     <div class="form-block">
                         <div class="input-group">
@@ -48,6 +48,7 @@
                             <label for="email">Email</label>
                             <InputText id="email" class="flex w-full px-4 py-3 border" autocomplete="off"
                                 placeholder="Enter your email" v-model="email" />
+                            <span v-if="duplicate_email" class="text-red-500">There's already an account with this email. <NuxtLink class="font-bold text-primary" to="login">Sign in</NuxtLink></span>
                         </div>
                         <div class="flex flex-col items-start gap-1 w-full">
                             <label for="password">Password</label>
@@ -104,8 +105,8 @@
                                 </Button>
                             </router-link>
 
-                            <Button type="button" class="w-full max-w-80 py-2 px-4" :disabled="!canRegister" @click.prevent="register">
-                                Register
+                            <Button type="button" class="w-full max-w-80 py-2 px-4" :disabled="!canRegister || isPending" @click.prevent="register">
+                                {{ isPending ? 'Saving...' : 'Register' }}
                             </Button>
                         </div>
                     </div>                   
@@ -147,11 +148,13 @@ const canRegister = computed(() => {
     return agreeToTerms.value && notRobot.value && firstName.value && lastName.value && password.value && confirmPassword.value && password.value === confirmPassword.value;
 });
 const isPending = ref(false);
+const duplicate_email = ref(false)
 
 const authStore = useAuthStore();
 
 async function register() {
     console.log('Registering user', { firstName, lastName, address, phone, email, password });
+    duplicate_email.value = false
     isPending.value = true;
     const dataToSend = {
         firstName: firstName.value,
@@ -170,11 +173,15 @@ async function register() {
         if (response.result) {
             show_success_toast('Success', 'User registered successfully');
         } else {
+            if(response.validation_error?.email) {
+                duplicate_email.value = true
+            }
             show_error_toast('Error', response.error || 'Something failed while trying to register');
         }
     } catch (error) {
         show_error_toast('Error', 'Something failed while trying to register');
     }
+    isPending.value = false;
 }
 </script>
 <style scoped lang="scss">
