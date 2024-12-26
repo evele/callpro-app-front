@@ -45,14 +45,6 @@
     const emit = defineEmits(['updateGeneralSettings', 'hasError'])
     const time_zones_options = ref<TimeZoneOpt[]>([])
 
-    onMounted(() => {
-        if(generalStore.timezones.length) {
-            generalStore.timezones.forEach((timezone: Timezone) => {
-                time_zones_options.value.push({ name: timezone.display, code: timezone.zones_id })
-            })
-        } 
-    })
-
     const general_settings = reactive<GeneralSettingsUI>({
         call_window_start: null,
         call_window_end: null,
@@ -60,14 +52,30 @@
         time_zone: undefined,
     });
 
+    onMounted(() => {
+        if(generalStore.timezones.length) {
+            generalStore.timezones.forEach((timezone: Timezone) => {
+                time_zones_options.value.push({ name: timezone.display, code: timezone.zones_id })
+            })
+        } 
+
+        if (props.generalSettings) {
+            format_general_settings(props.generalSettings);
+        }
+    });
+
     watch(() => props.generalSettings, (newVal: GeneralSettings | null) => {
-        if(newVal) {
-            general_settings.call_window_start = parse_time(newVal.call_window_start)
-            general_settings.call_window_end = parse_time(newVal.call_window_end)
-            general_settings.time_guard = newVal.time_guard === '1'
-            general_settings.time_zone = newVal.time_zone
+        if (newVal) {
+            format_general_settings(newVal);
         }
     })
+
+    const format_general_settings = (settings: GeneralSettings) => {
+        general_settings.call_window_start = parse_time(settings.call_window_start)
+        general_settings.call_window_end = parse_time(settings.call_window_end)
+        general_settings.time_guard = settings.time_guard === '1'
+        general_settings.time_zone = settings.time_zone
+    }
 
     const parse_time = (time: string) => {
         const [hours, minutes] = time.split(":").map(Number);

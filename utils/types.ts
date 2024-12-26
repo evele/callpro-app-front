@@ -362,9 +362,10 @@ export type VoiceSettingsUI = {
 }
 
 export type TextSettingsUI = {
-  show_text_caller_id: boolean,
   text_caller_id_selected: undefined | OneOrTwo,
   text_caller_id: string,
+  call_pro_number: string,
+  toll_free_number: string,
   chat: boolean,
   sms_dnc: boolean
 }

@@ -26,7 +26,7 @@
 
             <TabPanels class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl">
                 <TabPanel value="voice">
-                    <SettingsSkeleton v-if="isLoading" />
+                    <SettingsSkeleton v-if="isLoading || is_loading_did" />
                     <VoiceSettings v-else 
                         :voice-settings="voice_settings"
                         :call-pro-numbers="call_pro_numbers"
@@ -36,10 +36,18 @@
                     />
                 </TabPanel>
                 <TabPanel value="text">
-                    <TextSettings :text-settings="text_settings" @updateTextSettings="handle_update_text_settings" @hasError="handle_text_settings_error" />
+                    <TextSettings v-if="!is_loading_did"
+                        :text-settings="text_settings" 
+                        :call-pro-numbers="call_pro_numbers"
+                        :toll-free-numbers="toll_free_numbers"
+                        @updateTextSettings="handle_update_text_settings"
+                    />
                 </TabPanel>
                 <TabPanel value="general">
-                    <GeneralSettings :general-settings="general_settings" @updateGeneralSettings="handle_update_general_settings" />
+                    <GeneralSettings 
+                        :general-settings="general_settings" 
+                        @updateGeneralSettings="handle_update_general_settings" 
+                    />
                 </TabPanel>
             </TabPanels>
         </Tabs>
@@ -65,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-    const { data } = useFetchDidAndTollFreeNumbers()
+    const { data: did_numbers, isLoading: is_loading_did } = useFetchDidAndTollFreeNumbers()
     const { data: settings, isLoading } = useFetchSettings()
     const { mutate: updateVoiceSettings, isPending: is_saving_voice_settings } = useUpdateVoiceSettings()
     const { mutate: updateTextSettings, isPending: is_saving_text_settings } = useUpdateTextSettings()
@@ -118,7 +126,7 @@
             call_speed: voice_settings_ui.call_speed ?? '5',
             caller_id: format_number_to_send(caller_id),
             email_on_finish: voice_settings_ui.email_on_finish ? '1' : '0',
-            number_when_completed: voice_settings_ui.number_when_completed.replace(/\D/g, ''),
+            number_when_completed: format_number_to_send(voice_settings_ui.number_when_completed),
             number_when_completed_status: voice_settings_ui.number_when_completed_status ? '1' : '0',
             offer_dnc: voice_settings_ui.offer_dnc ? '1' : '0',
             repeat: voice_settings_ui.repeat ? '1' : '0',
@@ -167,8 +175,7 @@
 
     const text_settings_ui = ref<TextSettingsUI | null>(null)
     const show_save_text_settings_button = ref(false)
-    const has_error_text = ref(false)
-    const disabled_save_text_settings_button = computed(() => has_error_text.value || is_saving_text_settings.value || !show_save_text_settings_button.value)
+    const disabled_save_text_settings_button = computed(() => is_saving_text_settings.value || !show_save_text_settings_button.value)
 
     const text_settings_mounted = ref(false)
     const handle_update_text_settings = (text_settings: TextSettingsUI) => {
@@ -181,8 +188,15 @@
     }
 
     const format_text_settings_to_save = (text_settings_ui: TextSettingsUI) => {
+        let caller_id
+        if(text_settings_ui.text_caller_id_selected === '2') {
+            caller_id = text_settings_ui.toll_free_number
+        } else {
+            caller_id = text_settings_ui.call_pro_number
+        }
+
         const formatted_settings: TextSettings = {
-            text_caller_id: text_settings_ui.text_caller_id.replace(/\D/g, ''),
+            text_caller_id: format_number_to_send(caller_id),
             chat: text_settings_ui.chat ? '1' : '0',
             sms_dnc: text_settings_ui.sms_dnc ? '1' : '0'
         }
@@ -212,8 +226,6 @@
             onError: () =>  toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving text settings', life: 3000 })
         })
     }
-
-    const handle_text_settings_error = (hasError: boolean) => has_error_text.value = hasError
     /* ----- End Text Settings ----- */
 
     /* ----- Begin General Settings ----- */
@@ -279,15 +291,15 @@
 
     /* ----- Begin Did Numbers ----- */
     const call_pro_numbers = computed(() => {
-        if(!data?.value?.result) return ['8888899050'];
-        if(!data.value.did_numbers.length) return ['8888899050'];
-        return data.value.did_numbers.map((did: DidNumber) => did.number)
+        if(!did_numbers?.value?.result) return ['8888899050'];
+        if(!did_numbers.value.did_numbers.length) return ['8888899050'];
+        return did_numbers.value.did_numbers.map((did: DidNumber) => did.number)
     })
 
     const toll_free_numbers = computed(() => {
-        if(!data?.value?.result) return [];
-        if(!data.value.toll_free_numbers.length) return [];
-        return data.value.toll_free_numbers.map((toll_free: DidNumber) => toll_free.number)
+        if(!did_numbers?.value?.result) return [];
+        if(!did_numbers.value.toll_free_numbers.length) return [];
+        return did_numbers.value.toll_free_numbers.map((toll_free: DidNumber) => toll_free.number)
     })
 
     /* ----- End Did Numbers ----- */
