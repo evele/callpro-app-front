@@ -10,7 +10,6 @@
             dataKey="id"
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
-            :loading="isLoading"
             :totalRecords="total_records"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
@@ -31,7 +30,7 @@
                         </IconField>
 
                         <div class="flex gap-4">
-                            <FilterDropdown :all-contacts="ALL" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
+                            <FilterDropdown ref="filterDropdownRef" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
                             <Button :class="action_button_style">
                                 <SortBySVG class="text-[#757575]" />
                                 <span class="font-semibold">Sort by</span>
@@ -39,14 +38,14 @@
                         </div>
                     </div>
                     
-                    <div class="flex items-center gap-2">
+                    <div v-if="!updatedSelectedGroupsID.includes(TRASH)" class="flex items-center gap-2 relative">
                         <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
                             <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
                             <PlusRoundedSVG v-else class="w-5 h-5" />
                             <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
                         </Button>
 
-                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_move_to_group_btn">
                             <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
                             <MoveSVG v-else class="w-5 h-5" />
                             <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
@@ -57,6 +56,7 @@
                             <TrashSVG v-else class="w-5 h-5" />
                             <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
                         </Button>
+                        <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
                     </div>
                 </header>
             </template>
@@ -75,7 +75,7 @@
             <Column field="name" header="Name" class="text-left">
                 <template #body="slotProps">
                     <div class="text-[#1D1B20] relative w-fit">
-                        {{ slotProps.data.name }}
+                        <span @click.stop="handle_select_by_name(slotProps.data.id, true)">{{ slotProps.data.name }}</span>
                         <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
                             <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
                                 <EditIconSVG class="w-3 h-4" />
@@ -97,7 +97,7 @@
                                 value: slotProps.data.numbers.slice(1).join(', '),
                                 pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
                             }"
-                            class="absolute -right-3 top-5 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> 
+                            class="absolute -right-3 top-3 bg-[#49454F] text-white text-[10px] py-[1px] px-2 rounded-xl font-medium"> 
                             + {{ slotProps.data.total_numbers -1 }}
                         </span>
                     </div>
@@ -151,7 +151,7 @@
                     </Column>
                     <Column field="name" header="" class="text-left" style="width: 30%;">
                         <template #body="slotProps">
-                            <span class="text-[#1D1B20] pl-4">
+                            <span class="text-[#1D1B20] pl-4" @click.stop="handle_select_by_number(slotProps.data.number_id, slotProps.data.id, false)">
                                 {{ format_contact_type(slotProps.data.type) }}
                             </span>
                         </template>
@@ -227,21 +227,29 @@
             </template>
         </DataTable>
     </div>
+    <ConfirmationModal ref="confirmationModal" :title="confirmation_title" :is-disabled="false" @confirm="handle_confirm_modal" @cancel="handle_cancel_modal">
+        <p v-if="current_action === 'trash'" class="text-lg font-semibold">{{ message_text }}</p>
+        <div v-if="current_action === 'add' || current_action === 'move'" class="flex flex-col gap-4">
+            <p class="text-lg font-semibold">{{ message_text }}</p>
+            <MultiSelect v-model="target_groups_ui" :options="custom_groups_options" optionLabel="name" 
+                display="chip" class="w-full mx-auto" placeholder="Choose many..." :maxSelectedLabels="4" 
+            />
+            <Message v-if="current_action === 'move'" severity="error" class="mb-1"><span class="font-bold">Warning:</span> This action will replace the current group of this numbers with the selected ones!</Message>
+        </div>
+    </ConfirmationModal>
 </template>
 
 <script setup lang="ts">
     const props = defineProps({
-        selectedGroup: { type: String, required: true },
+        selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },
         isCustomGroup: { type: Boolean, required: true },
         dncTotalNumbers: { type: [Number, null], required: true },
         systemGroups: { type: Object as PropType<SystemGroup | null>, required: true },
-        customGroups: { type: Array as PropType<CustomGroup[]>, required: true }
+        customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
     })
 
-    const confirm = useConfirm()
-    const toast = useToast()
-
-    const updatedSelectedGroup = computed(() => props.selectedGroup);
+    const updatedSelectedGroups = computed(() => props.selectedGroups)
+    const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
     const page = ref(1)    
     const show = ref(10)
     const with_groups = ref(true)
@@ -256,7 +264,9 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile', 'updateMessage'])
+    const filterDropdownRef = ref()
+
+    const emit = defineEmits(['uploadFile', 'update:filters'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -281,11 +291,11 @@
         [key: string]: ContactRow;
     }
 
-    const { data: all_contacts_data, error, isLoading,isSuccess, isError, refetch } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroup,search) 
+    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroupsID,search) 
+    const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
-    const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
-    const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroup, false)
+    const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroupsID, false)
 
     const contacts_data = computed(() => {
         if(!all_contacts_data?.value?.result) return { contacts: [], total_numbers: 0 }
@@ -348,6 +358,7 @@
         expandedRows.value = {};
         Object.keys(indeterminate_contacts.value).forEach((key) => indeterminate_contacts.value[key] = false);
         indeterminate_all.value = false;
+        filterDropdownRef.value.reset_selected_filters()
     }
 
     // Handle pagination
@@ -392,84 +403,150 @@
 
     const get_number_groups = (groups: string) => groups === null ? [] : groups.trim().split(/\s*,\s*/);
 
-    // These next 2 functions will be deleted in the future
-    const target_groups = computed(() => {
-        if(custom_groups.value.length) {
-            return custom_groups.value.map((group: CustomGroup) => group.id).slice(0, 2)
-        }
-    })
-
-    const hardcoded_contact_data = computed(() => {
-        const contact = contacts_data.value.contacts.find((c: any) => c.number_groups !== "0" && c.number_groups !== null && c.number_groups?.length < 5)
-        if(contact) return { number_id: contact.number_id, group_id: contact.number_groups };
-        else return null;
-    })
-
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
-    const message_text = ref('');
-    const confirm_modal = (data_to_send: SendNumberToTrash) => {
-        const many_numbers = data_to_send.number_ids.length > 1;
-        message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
-                                          : 'Are you sure you want to send this number to Trash?';
-
-        emit('updateMessage', message_text.value)
-        confirm.require({
-            header: 'Confirmation',
-            rejectProps: {
-                label: 'No',
-                severity: 'secondary'
-            },
-            acceptProps: {
-                label: 'Yes'
-            },
-            accept: () => {
-                sendNumberToTrash(data_to_send, {
-                    onSuccess: (response: { result: true } | APIResponseError) => {
-                        if(response.result) {
-                            reset_selected_contacts();
-                            show_success_toast('Success!', many_numbers ? 'Numbers removed!' : 'Number removed!')
-                        } else {
-                            show_error_toast('Oops...', 'Something went wrong...')
-                        }
-                    },
-                    onError: () => show_error_toast('Oops...', 'Something went wrong...')
-                })
-            }
-        });
-    };
-
-    /* ----- Group actions ----- */
+    /* ----- Trash and Groups actions ----- */
+    const target_groups_ui = ref<SelectOption[]>([])
+    const confirmationModal = ref()
     const disabled_groups_action_btn = computed(() => selected_contacts.value.length === 0 && selected_numbers.value.length === 0);
+    const disabled_move_to_group_btn = computed(() => (selected_contacts.value.length === 0 && selected_numbers.value.length === 0) || updatedSelectedGroupsID.value.length > 1);
+    const confirmation_title = ref('')
+    const message_text = ref('');
 
-    const handle_group_action = (action: 'add' | 'move' | 'trash') => {
+    type CurrentAction = 'add' | 'move' | 'trash' | ''
+    const current_action = ref<CurrentAction>('')
+
+    type SelectedNumberIds = { number_id: string }[]
+
+    const custom_groups_options = computed(() => {
+        if (custom_groups.value?.length) {
+            return custom_groups.value.filter((group: CustomGroup) => updatedSelectedGroupsID.value.includes(group.id) ? null : group).map((group: CustomGroup) => {
+                return {
+                    name: group.group_name,
+                    code: group.id
+                }
+            })
+        }
+        return []
+    })
+
+    const reset_confirmation_modal_state = () => {
+        current_action.value = ''
+        target_groups_ui.value = []
+    }
+
+    const handle_group_action = (action: CurrentAction) => {
+        if(action === 'add') {
+            current_action.value = 'add'
+            confirmation_title.value = 'Add to group'
+            message_text.value = 'Are you sure you want to add the numbers to this group(s)?'
+        } else if(action === 'move') {
+            current_action.value = 'move'
+            confirmation_title.value = 'Move to group'
+            message_text.value = 'Are you sure you want to move the numbers to this group(s)?'
+        } else {
+            current_action.value = 'trash'
+            confirmation_title.value = 'Confirmation'
+
+            const many_numbers = selected_numbers.value.length > 1;
+            message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
+                                              : 'Are you sure you want to send this number to Trash?';
+        }
+        confirmationModal.value?.open()
+    }
+
+    const handle_confirm_modal = () => {
         const numbers_id: { number_id: string }[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
 
-        if(action === 'move') {
-            //TODO: Add functionality to move numbers to a group, need to work with the contact number groups
-            console.log('currently not working D:')
-            return
-            const data_to_send: MoveNumberToGroup = {
-                number_id: [{ number_id: hardcoded_contact_data?.value?.number_id }],
-                groups: target_groups?.value,
-                current_group_id: hardcoded_contact_data?.value?.group_id
-            }
+        switch(current_action.value) {
+            case 'add':
+                handle_add_to_group(numbers_id)
+                break;
+            case 'move':
+                handle_move_to_group(numbers_id)
+                break;
+            case 'trash':
+                handle_send_to_trash(numbers_id)
+                break;
+            default:
+                break;
+        }  
+    };
 
-            moveNumberToGroup(data_to_send)
-        } else if(action === 'add') {
-            const data_to_send: AddNumberToGroup = {
-                number_id: numbers_id,
-                groups: target_groups?.value
-            }
+    const handle_cancel_modal = () => {
+        reset_confirmation_modal_state()
+    }
 
-            addNumberToGroup(data_to_send)
-        } else {
-            const data_to_send: SendNumberToTrash = {
-                number_ids: numbers_id.map((number) => number.number_id)
-            }
-
-            confirm_modal(data_to_send)
+    const handle_add_to_group = (numbers_id: SelectedNumberIds) => {
+        const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
+        if(formatted_target_groups.length === 0) {
+            show_error_toast('Invalid', 'Please select at least one group...')
+            return;
         }
+
+        const data_to_send: AddNumberToGroup = {
+            number_id: numbers_id,
+            groups: formatted_target_groups,
+        }
+
+        addNumberToGroup(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts()
+                    show_success_toast('Success!', 'Numbers added!')
+                } else {
+                    show_error_toast('Error', 'Something failed while adding numbers...')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something failed while adding numbers...')
+        })
+        reset_confirmation_modal_state()
+    }
+
+    const handle_move_to_group = (numbers_id: SelectedNumberIds) => {
+        const formatted_target_groups = target_groups_ui.value.map((group: SelectOption) => group.code)
+        if(formatted_target_groups.length === 0) {
+            show_error_toast('Invalid', 'Please select at least one group...')
+            return;
+        }
+        
+        const data_to_send: MoveNumberToGroup = {
+            number_id: numbers_id,
+            groups: formatted_target_groups,
+            current_group_id: updatedSelectedGroupsID.value[0]
+        }
+
+        moveNumberToGroup(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts()
+                    show_success_toast('Success!', 'Numbers moved!')
+                } else {
+                    show_error_toast('Oops...', 'Something failed while moving numbers...')
+                }
+            },
+            onError: () => show_error_toast('Oops...', 'Something failed while moving numbers...')
+        })
+        reset_confirmation_modal_state()
+    }
+
+    const handle_send_to_trash = (numbers_id: SelectedNumberIds) => {
+        const data_to_send: SendNumberToTrash = {
+            number_ids: numbers_id.map((number) => number.number_id)
+        }
+
+        sendNumberToTrash(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts();
+                    show_success_toast('Success!', data_to_send.number_ids.length > 1 ? 'Numbers removed!' : 'Number removed!')
+                } else {
+                    show_error_toast('Oops...', 'Something went wrong...')
+                }
+            },
+            onError: () => show_error_toast('Oops...', 'Something went wrong...')
+        })
+        current_action.value = ''
     }
 
     // It's used in the tooltip
@@ -507,6 +584,24 @@
         }, []) : [];
     }
 
+    const handle_select_by_name = (contact_id: string, from_parent: boolean) => {
+        if(selected_contacts.value.includes(contact_id)) {
+            selected_contacts.value = selected_contacts.value.filter((c_id: string) => c_id !== contact_id);
+        } else {
+            selected_contacts.value.push(contact_id);
+        }
+        handle_select_checkbox(contact_id, from_parent);
+    }
+
+    const handle_select_by_number = (number_id: string, contact_id: string, from_parent: boolean) => {
+        if(selected_numbers.value.includes(number_id)) {
+            selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
+        } else {
+            selected_numbers.value.push(number_id);
+        }
+        handle_select_checkbox(contact_id, from_parent);
+    }
+
     // Here we handle the checkboxes of every contact and its numbers
     const handle_select_checkbox = (contact_id: string, from_parent: boolean) => {
         if(from_parent) { // Contact checkbox
@@ -523,7 +618,7 @@
                     selected_numbers.value = selected_numbers.value.filter((n_id: string) => n_id !== number_id);
                 }
             });
-            
+
             if (!(is_selected && is_expanded)) { // Handle the row expansion
                 if (is_selected || is_expanded) {
                     toggleRow(contact_id);
@@ -561,24 +656,39 @@
         return [{ '!bg-[#E9DDFF]': selected_contacts.value.includes(data.id) }];
     };
 
+    defineExpose({ reset_selected_contacts })
+
     const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
 
     /* ----- Filters ----- */
-    const ALL = computed(() => ({ name: 'All', count: contacts_data.value?.total_numbers }));
     const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
         if(!system_groups.value) return []
         return [
-            { id: '1', name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
-            { id: '2', name: 'Trash', count: system_groups.value?.trash ?? 0 },
-            { id: '3', name: 'DNC', count: props.dncTotalNumbers ?? 0 }
-        ]
+            { id: CONTACTS_ALL, name: 'All', count: system_groups.value?.not_trash ?? 0 },
+            { id: UNASSIGNED, name: 'Unassigned', count: system_groups.value?.unassigned ?? 0 },
+            { id: TRASH, name: 'Trash', count: system_groups.value?.trash ?? 0 }
+        ].filter((group: FilterOption) => group.id !== updatedSelectedGroupsID.value[0])
     })
-    const FILTERS_CUSTOM_GROUPS = computed(() => custom_groups.value.map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count })))
 
-    const filters = ref<string[]>([]);
+    const FILTERS_CUSTOM_GROUPS = computed(() => {
+        return custom_groups.value.filter((group: CustomGroup) => group.id !== updatedSelectedGroupsID.value[0]).map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count }))
+    })
 
-    const handleUpdateFilters = (filters: string[]) => {
-        console.log(filters);
+    const handleUpdateFilters = (selected_filters: string[]) => {
+        const all_filters = [...FILTERS_SYSTEM_GROUPS.value, ...FILTERS_CUSTOM_GROUPS.value];
+
+        const selected_filters_formatted = selected_filters.map((filter_id: string) => {
+            const current_filter = all_filters.find((filter: FilterOption) => filter.id === filter_id);
+            if(current_filter) {
+                return {
+                    group_name: current_filter.name,
+                    group_id: current_filter.id,
+                    is_custom: !SYSTEM_GROUPS.includes(current_filter.id)
+                }
+            }
+        })
+        // Emit the selected groups to the parent component, and in the first position we always have the selected group
+        emit('update:filters', [updatedSelectedGroups.value[0], ...selected_filters_formatted]);
     }
 </script>
 

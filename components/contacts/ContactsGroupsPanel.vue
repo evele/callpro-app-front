@@ -6,7 +6,7 @@
             <ul class="flex flex-col default-groups-ul">
                 <li v-for="button in defaultGroupsButtons" :key="button.group_id">
                     <GroupButton :group-name="button.text" :contacts-count="button.value"
-                        :active="activeButton === button.group_id" @click="setActiveButton(button.text, button.group_id)">
+                        :active="active_buttons.includes(button.group_id)" @click="setActiveButton(button.text, button.group_id)">
                         <template #icon>
                             <component :is="button.icon" :alt="button.text" />
                         </template>
@@ -19,7 +19,8 @@
 
         <div class="second-section flex flex-col">
             <GroupButton group-name="My Groups"
-                :contacts-count="isSuccessCG && CGData?.result ? CGData?.custom_groups.length : 0" :active="activeButton === 'custom'"
+                :contacts-count="isSuccessCG && CGData?.result ? CGData?.custom_groups.length : 0" 
+                :active="active_buttons.some((group: string) => group !== 'all' && group !== 'unassigned' && group !== 'trash')"
             >
                 <template #icon>
                     <MyGroupsSVG alt="My Groups" />
@@ -31,12 +32,14 @@
                 <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
                     :key="group.id">
 
-                    <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id)">
+                    <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id)"
+                        :class="[ active_buttons.includes(group.id) ? 'bg-[#d8cbeb]' : 'bg-[#EADDFF]']"
+                    >
                         <div class="flex items-center user-group-data">
                             {{ group.group_name }}
                             <span class="contacts-count">{{ group.count }}</span>
                         </div>
-                        <EditIconSVG @click.stop="openEditDialog(group)" />
+                        <EditIconSVG class="text-[#1D192B]" @click.stop="openEditDialog(group)" />
                     </Button>
                 </li>
             </ul>
@@ -46,7 +49,7 @@
             <PlusSVG class="plus-icon" />
             <span class="add-new-text">Add new</span>
         </Button>
-        <ModalContacts ref="modalContacts" :selected-group="selectedGroup" :group-to-edit="selected_group_to_edit" />
+        <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
     </section>
 </template>
 
@@ -58,7 +61,7 @@ import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
 
 const props = defineProps({
-    selectedGroup: { type: String, required: false, default: 'all' }
+    selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },
 })
 
 const emit = defineEmits(['selectedGroup'])
@@ -69,11 +72,10 @@ const defaultGroupsButtons = [
     { text: 'Trash', value: Math.floor(Math.random() * 100), icon: TrashSVG, group_id: TRASH }
 ];
 
-const activeButton = ref<string>(props.selectedGroup);
+const active_buttons = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
 
 const setActiveButton = (button_name: string, button_group_id: string) => {
     const is_custom = !defaultGroupsButtons.some(button => button.group_id === button_group_id)
-    activeButton.value = is_custom ? 'custom' : button_group_id;
 
     emit('selectedGroup', button_name, button_group_id, is_custom);
 };
@@ -159,8 +161,7 @@ const openEditDialog = (group: CustomGroup) => {
 }
 
 .user-group-container {
-    max-height: 94px;
-    overflow-y: scroll;
+    overflow-y: auto;
     gap: 5px;
     padding: 0;
 }

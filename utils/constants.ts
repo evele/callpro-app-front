@@ -20,6 +20,8 @@ export const CONTACTS_ALL = 'all'
 export const UNASSIGNED = 'unassigned'
 export const TRASH = 'trash'
 
+export const SYSTEM_GROUPS = [CONTACTS_ALL, UNASSIGNED, TRASH]
+
 /* ---- PAGE Dahsboard, Sms ---- */
 export const COMPLETED = 'COMPLETED'
 export const ACTIVE = 'ACTIVE'
