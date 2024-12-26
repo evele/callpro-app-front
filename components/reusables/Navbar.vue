@@ -1,6 +1,6 @@
 <template>
   <aside>
-    <div class="flex flex-col w-[250px] border border-[#DED8E1] justify-between pt-14 sticky top-0 left-0 h-screen z-[1000]">
+    <div class="flex flex-col w-[250px] border border-[#DED8E1] justify-between pt-14 sticky top-0 h-screen z-[1000]">
       <div class="flex flex-col items-center gap-14">
         <NuxtLink to="dashboard">
           <img src="@/assets/png/thecallpro.png" alt="The CallPro Logo"  class="w-[120px] h-9 mx-auto" />
