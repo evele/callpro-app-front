@@ -13,9 +13,19 @@
 </script>
 
 <style scoped>
-    .item1 { grid-area: header; }
+    .item1 { 
+        grid-area: header; 
+        height:6.5rem;
+        border-bottom: 2px solid #DED8E1;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+    }
     .item2 { grid-area: menu; }
-    .item3 { grid-area: main; }
+    .item3 { 
+        grid-area: main; 
+        background-color: var(--p-purple-100);
+    }
 
     .grid-container {
         display: grid;
@@ -29,15 +39,6 @@
 
     .grid-container > div {
     background-color: rgba(255, 255, 255, 0.99);
-    }
-
-    .item1 {
-        height:6.5rem;
-        border-bottom: 2px solid #DED8E1;
-    }
-
-    .item3 {
-        background-color: var(--p-purple-100);
     }
 
 </style>
