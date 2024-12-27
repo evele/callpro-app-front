@@ -173,7 +173,7 @@ async function register() {
         if (response.result) {
             show_success_toast('Success', 'User registered successfully');
         } else {
-            if(response.validation_error?.email) {
+            if(response.validation_error?.email === 'duplicated_email') {
                 duplicate_email.value = true
             }
             show_error_toast('Error', response.error || 'Something failed while trying to register');
