@@ -5,6 +5,7 @@ export const CONVERT_TEXT_TO_SPEECH_URL = "/audios/tts_convertion"
 export const SAVE_AUDIO_URL = "/audios/save_audio"
 export const DELETE_AUDIO_URL = "/audios/delete_audio"
 export const DOWNLOAD_AUDIO_URL = "/audios/download_audio_file"
+export const UPLOAD_AUDIO_URL = "/audios/upload_audio_file"
 
 /* ----- Auth Store ----- */
 export const LOGIN_URL = "/jwtauth/login"

@@ -30,6 +30,12 @@ export const useDeleteAudio = () => {
   })
 }
 
+export const useUploadAudio = () => {
+  return useMutation({
+    mutationFn: (audio_data: FormData) => uploadAudio(audio_data),
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
