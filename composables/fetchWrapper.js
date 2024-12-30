@@ -22,7 +22,7 @@ const request = (method) => {
       requestOptions.body = body;
     } else if (body) {
       requestOptions.headers['Content-Type'] = 'application/json';
-      requestOptions.body = JSON.stringify(body);
+      requestOptions.body = JSON.stringify( );
     }
 
     try {

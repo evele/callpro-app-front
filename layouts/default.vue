@@ -38,7 +38,7 @@
     }
 
     .grid-container > div {
-    background-color: rgba(255, 255, 255, 0.99);
+        background-color: rgba(255, 255, 255, 0.99);
     }
 
 </style>
