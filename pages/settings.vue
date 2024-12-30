@@ -1,149 +1,329 @@
 <template>
-    <div>
-        <p class="text-title">Settings page</p>
-        <span v-if="isLoading">Loading...</span>
-        <span v-else-if="isError">Error: {{ error?.message }}</span>
+    <div class="bg-white rounded-2xl my-4 mx-6">
+        <Tabs v-model:value="selected_tab">
+            <div class="flex justify-between py-7 px-12 border-b">
+                <TabList class="flex items-center">
+                    <Tab value="voice" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Voice settings</Tab>
+                    <Tab value="text" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Text settings</Tab>
+                    <Tab value="general" class="text-lg rounded border-none py-0 px-[10px] h-8">General settings</Tab>
+                </TabList>
 
-        <button type="button" class="button is-primary" @click="load_settings">Load settings</button>
+                <Button v-if="selected_tab === 'voice'" class="w-32 h-9 ml-auto transition-opacity" :class="[show_save_voice_settings_button ? 'opacity-1' : 'opacity-0']" 
+                    @click="handle_save_voice_settings" :disabled="disabled_save_voice_settings_button">
+                    {{ is_saving_voice_settings ? 'Saving...' : 'Save' }}
+                </Button>
 
-        <div v-if="isSuccess" style="padding: 10px 0 2rem 1rem;">
-            <p v-if="isFetching">Updating data...</p>
-            <div v-if="settings?.result && settings && 'settings' in settings">
-                <div>
-                    <h2 style="font-weight: bold;">Voice settings:</h2>
-                    <p class="setting-label">Caller ID: <span class="setting-value"> {{ settings.settings.caller_id }}</span></p>
-                    <p class="setting-label">Static Intro: <span class="setting-value"> {{ format_value(settings.settings.static_intro) }}</span></p>
-                    <p class="setting-label">Repeat: <span class="setting-value"> {{ format_value(settings.settings.repeat) }}</span></p>
-                    <p class="setting-label">Offer Do Not Call (DNC) Response: <span class="setting-value"> {{ format_value(settings.settings.offer_dnc) }}</span></p>
-                    <p class="setting-label">Retries: <span class="setting-value"> {{ settings.settings.retries }}</span></p>
-                    <p class="setting-label">Call Speed: <span class="setting-value"> {{ settings.settings.call_speed }}</span></p>
-                    <p class="setting-label">ADM Detection ID: <span class="setting-value"> {{ format_value(settings.settings.amd_detection) }}</span></p>
-                    <p class="setting-label">Broadcast Confirmation Email: <span class="setting-value"> {{ format_value(settings.settings.email_on_finish) }}</span></p>
-                    <p class="setting-label">Number When Completed: <span class="setting-value"> {{ format_value(settings.settings.number_when_completed_status) }}</span></p>
-                    <p class="setting-label">Call Time Guard: <span class="setting-value"> {{ format_value(settings.settings.time_guard) }}</span></p>
-                    <p class="setting-label">Time Zones: <span class="setting-value"> {{ format_tz(settings.settings.time_zone) }}</span></p>
-                    <button type="button" class="button is-info" @click="save_voice_settings">{{ !isPending ? 'Save Voice Settings' : 'Saving...' }}</button>
-                
-                    <div style="margin-top: 10px;">
-                        <span v-if="updateVoiceIsError" style="color: red;">Error: {{ updateVoiceError?.message }}</span>
-                        <span v-if="updateVoiceIsSuccess" style="color: green;">Voice settings successfully updated!</span>
-                    </div>
-                </div>
-                <div>
-                    <h2 style="font-weight: bold;">Text settings:</h2>
-                    <div v-if="settings?.text_settings !== undefined">
-                        <p class="setting-label">Text message caller ID: <span class="setting-value"> {{ settings.text_settings.text_caller_id }}</span></p>
-                        <p class="setting-label">Chat: <span class="setting-value"> {{ format_value(settings.text_settings.chat) }}</span></p>
-                        <p class="setting-label">Offer Opt Out Response: <span class="setting-value"> {{ format_value(settings.text_settings.sms_dnc) }}</span></p>
-                        
-                        <button type="button" class="button is-info" @click="save_text_settings">{{ !updateTextIsPending ? 'Save Text Settings' : 'Saving...' }}</button>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <span v-if="updateTextIsError" style="color: red;">Error: {{ updateTextError?.message }}</span>
-                        <span v-if="updateTextIsSuccess" style="color: green;">Voice settings successfully updated!</span>
-                    </div>
-                </div>
+                <Button v-if="selected_tab === 'text'" class="w-32 h-9 ml-auto transition-opacity" :class="[show_save_text_settings_button ? 'opacity-1' : 'opacity-0']" 
+                    @click="handle_save_text_settings" :disabled="disabled_save_text_settings_button">
+                    {{ is_saving_text_settings ? 'Saving...' : 'Save' }}
+                </Button>
+
+                <Button v-if="selected_tab === 'general'" class="w-32 h-9 ml-auto transition-opacity" :class="[show_save_general_settings_button ? 'opacity-1' : 'opacity-0']" 
+                    @click="handle_check_tz_change_before_save" :disabled="disabled_save_general_settings_button">
+                    {{ is_saving_general_settings ? 'Saving...' : 'Save' }}
+                </Button>
             </div>
-        </div>
+
+            <TabPanels class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl">
+                <TabPanel value="voice">
+                    <SettingsSkeleton v-if="isLoading || is_loading_did" />
+                    <VoiceSettings v-else 
+                        :voice-settings="voice_settings"
+                        :call-pro-numbers="call_pro_numbers"
+                        :toll-free-numbers="toll_free_numbers"
+                        @updateVoiceSettings="handle_update_voice_settings" 
+                        @hasError="handle_voice_settings_error" 
+                    />
+                </TabPanel>
+                <TabPanel value="text">
+                    <TextSettings v-if="!is_loading_did"
+                        :text-settings="text_settings" 
+                        :call-pro-numbers="call_pro_numbers"
+                        :toll-free-numbers="toll_free_numbers"
+                        @updateTextSettings="handle_update_text_settings"
+                    />
+                </TabPanel>
+                <TabPanel value="general">
+                    <GeneralSettings 
+                        :general-settings="general_settings" 
+                        @updateGeneralSettings="handle_update_general_settings" 
+                    />
+                </TabPanel>
+            </TabPanels>
+        </Tabs>
     </div>
+
+    <Dialog v-model:visible="visible" pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-full max-w-[32rem] p-8" pt:mask:class="bg-white bg-opacity-70">
+        <template #container>
+            <div class="flex flex-col justify-center items-center gap-4">
+                <div class="relative">
+                    <CircleEmptySVG class="w-[72px] h-[72px] text-[#009951]" />
+                    <CheckSVG class="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[50px] h-[50px] text-[#009951]" />
+                </div>
+                <span class="text-black text-lg leading-none">Ready!</span>
+            </div>
+        </template>
+    </Dialog>
+
+    <ConfirmationModal ref="confirmationModal" title="Change Timezone" max-width="680px" @confirm="handle_confirmation_modal">
+        <p class="text-lg font-semibold">Scheduled broadcasts will be send with new time zone. Are you sure you want to change it?</p>
+    </ConfirmationModal>
+
+    <Toast />
 </template>
 
 <script setup lang="ts">
-    const { data: settings, isSuccess, error, isLoading, isFetching, isError, refetch } = useFetchSettings()
-    const { mutate: updateVoiceSettings, isPending, isError: updateVoiceIsError, error: updateVoiceError, isSuccess: updateVoiceIsSuccess } = useUpdateVoiceSettings()
-    const { mutate: updateTextSettings, isPending: updateTextIsPending, isError: updateTextIsError, error: updateTextError, isSuccess: updateTextIsSuccess } = useUpdateTextSettings()
-    
-    const generalStore = useGeneralStore()
+    const { data: did_numbers, isLoading: is_loading_did } = useFetchDidAndTollFreeNumbers()
+    const { data: settings, isLoading } = useFetchSettings()
+    const { mutate: updateVoiceSettings, isPending: is_saving_voice_settings } = useUpdateVoiceSettings()
+    const { mutate: updateTextSettings, isPending: is_saving_text_settings } = useUpdateTextSettings()
+    const { mutate: updateGeneralSettings, isPending: is_saving_general_settings } = useUpdateGeneralSettings()
 
-    const load_settings = () => {
-        refetch()
+    const toast = useToast()
+    const visible = ref(false)
+    const selected_tab = ref('voice')
+    const confirmationModal = ref();
+
+    /* ----- Begin Voice Settings ----- */
+    const voice_settings = computed(() => {
+        if(!settings?.value?.result) return null;
+        const { time_guard, time_zone, call_window_end, call_window_start, ...filteredSettings } = settings.value.settings
+        return filteredSettings
+    })
+
+    const user_admin_settings = computed(() => {
+        if(!settings?.value?.result) return null;
+        return settings.value.user_admin_settings
+    })
+
+    const voice_settings_ui = ref<VoiceSettingsUI | null>(null)
+    const show_save_voice_settings_button = ref(false)
+    const has_error_voice = ref(false)
+    const disabled_save_voice_settings_button = computed(() => has_error_voice.value || is_saving_voice_settings.value || !show_save_voice_settings_button.value)
+
+    const voice_settings_mounted = ref(false)
+    const handle_update_voice_settings = (voice_settings: VoiceSettingsUI) => {
+        if(!voice_settings_mounted.value) { // Prevents the first update (when settings are loaded) from being sent
+            voice_settings_mounted.value = true
+            return;
+        }
+        show_save_voice_settings_button.value = true
+        voice_settings_ui.value = voice_settings
     }
 
-    const format_value = (value: ZeroOrOne) => {
-        return value == '1' ? ON : OFF;
-    }
-
-    const format_date_time = (time: string) => {
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const day = String(currentDate.getDate()).padStart(2, '0');
-
-        const formattedDate = `${year}-${month}-${day} ${time.slice(0, 5)}`;
-
-        return formattedDate;
-    }
-
-    const format_tz = (value: OneToNine) => {
-        if(!generalStore.timezones?.length) return '';
-        const tz = generalStore.timezones?.find((tz: Timezone) => tz.zones_id == value)?.display;
-        return tz;
-    }
-
-    const save_voice_settings = () => {
-        if( settings?.value && 'result' in settings.value && settings.value.result) {
-            const voice_settings: VoiceSettingsToSave = {
-                'caller_id': settings.value.settings.caller_id,
-                'static_intro': settings.value.settings.static_intro,
-                'static_intro_library_id': settings.value.settings.static_intro_library_id,
-                'repeat': settings.value.settings.repeat,
-                'repeat_audio': settings.value.settings.repeat_audio,
-                'repeat_library_id': settings.value.settings.repeat_library_id,
-                'offer_dnc': settings.value.settings.offer_dnc,
-                // 'retries': settings.value.settings.retries,
-                'retries': '2',
-                'call_speed': settings.value.settings.call_speed,
-                'amd_detection': settings.value.settings.amd_detection,
-                'email_on_finish': settings.value.settings.email_on_finish,
-                'number_when_completed_status': settings.value.settings.number_when_completed_status,
-                'number_when_completed': settings.value.settings.number_when_completed,
-                'time_guard': settings.value.settings.time_guard,
-                'time_zone': settings.value.settings.time_zone,
-                'call_window_start': format_date_time(settings.value.settings.call_window_start),
-                'call_window_end': format_date_time(settings.value.settings.call_window_end)
-            }
-
-            const dataToSend: VoiceSettingsDataToSave = {
-                'settings': voice_settings,
-                'cid_confirm': settings.value.user_admin_settings.cid_confirm
-            }
-            updateVoiceSettings(dataToSend)
+    const format_voice_settings_to_save = (voice_settings_ui: VoiceSettingsUI) => {
+        let caller_id
+        if(voice_settings_ui.caller_id_selected === '1') {
+            caller_id = voice_settings_ui.call_pro_number
+        } else if(voice_settings_ui.caller_id_selected === '2') {
+            caller_id = voice_settings_ui.toll_free_number
         } else {
-            console.log('falló save voice settings')
+            caller_id = voice_settings_ui.caller_id
+        }
+
+        const formatted_settings: VoiceSettings = {
+            amd_detection: voice_settings_ui.amd_detection ? '1' : '0',
+            call_speed: voice_settings_ui.call_speed ?? '5',
+            caller_id: format_number_to_send(caller_id),
+            email_on_finish: voice_settings_ui.email_on_finish ? '1' : '0',
+            number_when_completed: format_number_to_send(voice_settings_ui.number_when_completed),
+            number_when_completed_status: voice_settings_ui.number_when_completed_status ? '1' : '0',
+            offer_dnc: voice_settings_ui.offer_dnc ? '1' : '0',
+            repeat: voice_settings_ui.repeat ? '1' : '0',
+            repeat_audio: "system",
+            repeat_library_id: null,
+            retries: voice_settings_ui.retries ?? '1',
+            static_intro: voice_settings_ui.static_intro ? '1' : '0',
+            static_intro_library_id: 0,
+        }
+
+        return formatted_settings
+    }
+
+    const handle_save_voice_settings = () => {
+        if(!voice_settings_ui.value) return;
+
+        const voice_settings_to_save: VoiceSettings = format_voice_settings_to_save(voice_settings_ui.value)
+
+        const dataToSend: VoiceSettingsDataToSave = {
+            'settings': voice_settings_to_save,
+            'cid_confirm': user_admin_settings?.value?.cid_confirm ?? '0',
+        }
+
+        updateVoiceSettings(dataToSend, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_save_voice_settings_button.value = false
+                    visible.value = true
+                    setTimeout(() => visible.value = false, 2000)
+                } else {
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving voice settings', life: 3000 })
+                }
+            },
+            onError: () =>  toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving voice settings', life: 3000 })
+        })
+    }
+
+    const handle_voice_settings_error = (hasError: boolean) => has_error_voice.value = hasError
+    /* ----- End Voice Settings ----- */
+
+    /* ----- Begin Text Settings ----- */
+    const text_settings = computed(() => {
+        if(!settings?.value?.result) return null;
+        return settings.value.text_settings
+    })
+
+    const text_settings_ui = ref<TextSettingsUI | null>(null)
+    const show_save_text_settings_button = ref(false)
+    const disabled_save_text_settings_button = computed(() => is_saving_text_settings.value || !show_save_text_settings_button.value)
+
+    const text_settings_mounted = ref(false)
+    const handle_update_text_settings = (text_settings: TextSettingsUI) => {
+        if(!text_settings_mounted.value) { // Prevents the first update (when settings are loaded) from being sent
+            text_settings_mounted.value = true
+            return;
+        }
+        show_save_text_settings_button.value = true
+        text_settings_ui.value = text_settings
+    }
+
+    const format_text_settings_to_save = (text_settings_ui: TextSettingsUI) => {
+        let caller_id
+        if(text_settings_ui.text_caller_id_selected === '2') {
+            caller_id = text_settings_ui.toll_free_number
+        } else {
+            caller_id = text_settings_ui.call_pro_number
+        }
+
+        const formatted_settings: TextSettings = {
+            text_caller_id: format_number_to_send(caller_id),
+            chat: text_settings_ui.chat ? '1' : '0',
+            sms_dnc: text_settings_ui.sms_dnc ? '1' : '0'
+        }
+        return formatted_settings
+    }
+
+    const handle_save_text_settings = () => {
+        if(!text_settings_ui.value) return;
+
+        const text_settings_to_save: TextSettings = format_text_settings_to_save(text_settings_ui.value)
+
+        const dataToSend: TextSettingsDataToSave = {
+            'settings': text_settings_to_save
+        }
+
+        updateTextSettings(dataToSend, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_save_text_settings_button.value = false
+                    text_settings_mounted.value = false
+                    visible.value = true
+                    setTimeout(() => visible.value = false, 2000)
+                } else {
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving text settings', life: 3000 })
+                }
+            },
+            onError: () =>  toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving text settings', life: 3000 })
+        })
+    }
+    /* ----- End Text Settings ----- */
+
+    /* ----- Begin General Settings ----- */
+    const general_settings = computed(() => {
+        if(!settings?.value?.result) return null;
+        const { time_guard, time_zone, call_window_end, call_window_start } = settings.value.settings
+        return { time_guard, time_zone, call_window_end, call_window_start }
+    })
+
+    const general_settings_formatted = ref<GeneralSettings | null>(null)
+    const show_save_general_settings_button = ref(false)
+    const disabled_save_general_settings_button = computed(() => is_saving_general_settings.value || !show_save_general_settings_button.value)
+
+    const general_settings_mounted = ref(false)
+    const handle_update_general_settings = (general_settings: GeneralSettings) => {
+        if(!general_settings_mounted.value) { // Prevents the first update (when settings are loaded) from being sent
+            general_settings_mounted.value = true
+            return;
+        }
+        show_save_general_settings_button.value = true
+        general_settings_formatted.value = general_settings
+    }
+
+    const handle_check_tz_change_before_save = () => {
+        if(!general_settings_formatted.value) return;
+
+        const current_tz = general_settings.value?.time_zone
+        const selected_tz = general_settings_formatted.value?.time_zone
+
+        if(current_tz !== selected_tz) {
+            confirmationModal.value?.open()
+        } else {
+            handle_save_general_settings()
         }
     }
 
-    const save_text_settings = () => {
-        if( settings?.value && 'result' in settings.value && settings.value.result) {
-            const dataToSend: TextSettingsDataToSave = {
-                'settings': {
-                    'text_caller_id': settings.value.text_settings.text_caller_id,
-                    //'chat': settings.value.text_settings.chat,
-                    'chat': '0',
-                    'sms_dnc': settings.value.text_settings.sms_dnc
-                },
-            }
-            updateTextSettings(dataToSend)
-        } else {
-            console.log('falló save text settings')
-        }
-    }
+    const handle_confirmation_modal = () => handle_save_general_settings()
 
+    const handle_save_general_settings = () => {
+        if(!general_settings_formatted.value) return;
+
+        const general_settings_to_save: GeneralSettings = { ...general_settings_formatted.value }
+
+        const dataToSend: GeneralSettingsDataToSave = {
+            'settings': general_settings_to_save
+        }
+
+        updateGeneralSettings(dataToSend, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_save_general_settings_button.value = false
+                    general_settings_mounted.value = false
+                    visible.value = true
+                    setTimeout(() => visible.value = false, 2000)
+                } else {
+                    toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving general settings', life: 3000 })
+                }
+            },
+            onError: () =>  toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while general text settings', life: 3000 })
+        })
+    }
+    /* ----- End General Settings ----- */
+
+    /* ----- Begin Did Numbers ----- */
+    const call_pro_numbers = computed(() => {
+        if(!did_numbers?.value?.result) return ['8888899050'];
+        if(!did_numbers.value.did_numbers.length) return ['8888899050'];
+        return did_numbers.value.did_numbers.map((did: DidNumber) => did.number)
+    })
+
+    const toll_free_numbers = computed(() => {
+        if(!did_numbers?.value?.result) return [];
+        if(!did_numbers.value.toll_free_numbers.length) return [];
+        return did_numbers.value.toll_free_numbers.map((toll_free: DidNumber) => toll_free.number)
+    })
+
+    /* ----- End Did Numbers ----- */
 </script>
 
-<style scoped>
-    .text-title {
-        text-align: center;
-        font-size: 24px;
-        font-weight: bold;
-    }
-    .setting-label {
-        font-weight: 600;
-        line-height: 10px;
-        margin: 1.5rem 6px 1.5rem 0;
-    }
-    .setting-value {
-        margin-right: 10px;
-        color: rgb(133, 133, 237);
+<style scoped lang="scss">
+    :deep(.p-tabs) {
+        .p-tablist {
+            .p-tablist-content {
+                align-items: center;
+            }
+
+            .p-tablist-tab-list {
+                border: none;
+                align-items: center;
+
+                .p-tab-active {
+                    background-color: rgba(208, 188, 255, 0.16);
+                    color: #6750A4;
+                }
+                .p-tablist-active-bar {
+                    display: none;
+                }
+            }
+        }
     }
 </style>

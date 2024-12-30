@@ -13,7 +13,7 @@
       <div class="p-4">
         <Divider class="!h-[2.5px] bg-[#DED8E1] rounded-full"/>
         <ul class="flex flex-col p-0 items-center gap-4">
-          <NavLink name="Settings" :icon="SettingsSVG" />
+          <NavLink name="Settings" route="settings" :icon="SettingsSVG" />
           <NavLink name="Logout" :icon="LogoutSVG" />
         </ul>
       </div>

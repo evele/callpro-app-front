@@ -68,6 +68,7 @@ export const GET_MONTHLY_GROUPS_PLANS_URL = "/packages/get_package_monthly_group
 export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
 export const UPDATE_VOICE_SETTINGS_URL = "/settings/save_audio_settings"
 export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
+export const UPDATE_GENERAL_SETTINGS_URL = "/settings/save_general_settings"
 
 /* ----- SMS Store ----- */
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"

@@ -212,7 +212,7 @@
             numbers: numbers_to_send.map((number: any) => {
                 return {
                     ...number,
-                    number: number.number.replace(/\D/g, ''),
+                    number: format_number_to_send(number.number),
                     number_groups: number.number_groups.length > 0 ? number.number_groups.map((group: number_groups_option) => group.code) : null,
                     type: number.type.code
                 }

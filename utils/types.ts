@@ -5,7 +5,7 @@ export type ZeroOrOne = '0' | '1';
 export type OneOrTwo = '1' | '2';
 export type OneToFour = '1' | '2' | '3' | '4';
 export type OneToNine = OneToFour | '5' | '6' | '7' | '8' | '9';
-export type CallSpeed = 5 | 20 | 50 | 100 | 200 | 999;
+export type CallSpeed = '5' | '20' | '50' | '100' | '200' | '999';
 export type SelectOption = { name: string; code: string };
 export type StringOrNumber = string | number;
 export type StringOrNull = string | null;
@@ -295,33 +295,34 @@ export type AreaCodes = {
   available: ZeroOrOne;
 }
 
-export type Settings = {
-  amd_detection: ZeroOrOne;
-  call_speed: CallSpeed;
+export type GeneralSettings = {
   call_window_end: string;
   call_window_start: string;
-  caller_id: string;
-  chat: ZeroOrOne;
-  email_on_finish: ZeroOrOne;
-  number_when_completed: string;
-  number_when_completed_status: ZeroOrOne;
-  offer_dnc: ZeroOrOne;
-  opt: ZeroOrOne;
-  repeat: ZeroOrOne;
-  repeat_audio: 'system' | 'library' | 'broadcast' | null;
-  repeat_library_id: NumberOrNull;
-  retries: '1' | '2' | '3' | '4';
-  root_user_id: number;
-  static_intro: ZeroOrOne;
-  static_intro_library_id: NumberOrNull;
-  text_caller_id: string;
   time_guard: ZeroOrOne;
   time_zone: OneToNine;
 }
 
+export type VoiceSettings = {
+  caller_id: string;
+  static_intro: ZeroOrOne;
+  static_intro_library_id: NumberOrNull;
+  repeat: ZeroOrOne;
+  repeat_audio: 'system' | 'library' | 'broadcast' | null;
+  repeat_library_id: NumberOrNull;
+  offer_dnc: ZeroOrOne;
+  retries: OneToFour;
+  call_speed: CallSpeed;
+  amd_detection: ZeroOrOne,
+  email_on_finish: ZeroOrOne;
+  number_when_completed: string;
+  number_when_completed_status: ZeroOrOne;
+}
+
+export type Settings = GeneralSettings & VoiceSettings;
+
 export type TextSettings = {
   chat: ZeroOrOne;
-  root_user_id: number;
+  root_user_id?: number;
   sms_dnc: ZeroOrOne;
   text_caller_id: string;
 }
@@ -344,28 +345,40 @@ export type UserAdminSettings = {
   voice_price: number;
 }
 
-export type VoiceSettingsToSave = {
-  caller_id: string;
-  static_intro: ZeroOrOne;
-  static_intro_library_id: NumberOrNull;
-  repeat: ZeroOrOne;
-  repeat_audio: 'system' | 'library' | 'broadcast' | null;
-  repeat_library_id: NumberOrNull;
-  offer_dnc: ZeroOrOne;
-  retries: '1' | '2' | '3' | '4';
-  call_speed: CallSpeed;
-  amd_detection: ZeroOrOne,
-  email_on_finish: ZeroOrOne;
-  number_when_completed: string;
-  number_when_completed_status: ZeroOrOne;
-  time_guard: ZeroOrOne;
-  time_zone: OneToNine;
-  call_window_start: string;
-  call_window_end: string;
+export type VoiceSettingsUI = {
+  caller_id_selected: undefined | OneOrTwo | '3',
+  caller_id: string,
+  call_pro_number: string,
+  toll_free_number: string,
+  static_intro: boolean,
+  repeat: boolean,
+  offer_dnc: boolean,
+  retries: undefined | OneToFour,
+  call_speed: undefined | CallSpeed,
+  amd_detection: boolean,
+  email_on_finish: boolean,
+  number_when_completed_status: boolean,
+  number_when_completed: string,
+}
+
+export type TextSettingsUI = {
+  text_caller_id_selected: undefined | OneOrTwo,
+  text_caller_id: string,
+  call_pro_number: string,
+  toll_free_number: string,
+  chat: boolean,
+  sms_dnc: boolean
+}
+
+export type GeneralSettingsUI = {
+  call_window_start: Date | null,
+  call_window_end: Date | null,
+  time_guard: boolean,
+  time_zone: undefined | OneToNine 
 }
 
 export type VoiceSettingsDataToSave = {
-  settings: VoiceSettingsToSave;
+  settings: VoiceSettings;
   cid_confirm: ZeroOrOne;
 }
 
@@ -375,6 +388,10 @@ export type TextSettingsDataToSave = {
     chat: ZeroOrOne;
     sms_dnc: ZeroOrOne;
   }
+}
+
+export type GeneralSettingsDataToSave = {
+  settings: GeneralSettings;
 }
 
 /* ----- Audio ----- */
