@@ -7,9 +7,7 @@
             </header>
         </template>
 
-        <div v-if="section_to_show === 'upload'">
-            <h3>Soon...</h3>
-        </div>
+        <UploadAudio v-if="section_to_show === 'upload'" @close="handleClose" @success="handleSuccess" @error="handleError" />
         <AddAudioTTS v-if="section_to_show === 'tts'" @close="handleClose" @success="handleSuccess" @error="handleError" />
         <CallInCodes v-if="section_to_show === 'call_in'" @close="handleClose" @success="handleSuccess" @error="handleError" />
             

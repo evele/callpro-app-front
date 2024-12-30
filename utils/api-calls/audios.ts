@@ -64,3 +64,8 @@ export async function downloadAudio(file_name: AudioToDownload):Promise<boolean>
     }
     return true
 }
+
+/* ----- Upload Audio ----- */
+export async function uploadAudio(data: FormData):Promise<uploadAudioResponse | APIResponseError> {
+    return await fetchWrapper.post(UPLOAD_AUDIO_URL, data) as uploadAudioResponse | APIResponseError;
+}

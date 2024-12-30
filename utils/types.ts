@@ -377,6 +377,7 @@ export type TextSettingsDataToSave = {
   }
 }
 
+/* ----- Audio ----- */
 export type Tts_Convert = {
   full_file_url:string,
   file_name: string
@@ -421,7 +422,7 @@ export type AudioInfoToSave = {
 
 export type AudioToSave = {
   action: 'create' | 'update',
-  audio_info: AudioInfoToSave | AudioInfoToSave[]
+  audio_info: AudioInfoToSave[]
 }
 
 export type AudioToDelete = {
@@ -430,4 +431,26 @@ export type AudioToDelete = {
 
 export type CreateCallInCodeResponse = APIResponseSuccess & {
   call_in_code: number;
+}
+
+export type uploadAudioResponse = APIResponseSuccess & {
+  data: {
+    full_file_url: string;
+    upload_data: {
+      client_name: string;
+      file_ext: string;
+      file_name: string;
+      file_path: string;
+      file_size: number;
+      file_type: string;
+      full_path: string;
+      image_height: number | null;
+      image_size_str: string;
+      image_type: string;
+      image_width: number | null;
+      is_image: boolean;
+      orig_name: string;
+      raw_name: string;
+    }
+  }
 }
