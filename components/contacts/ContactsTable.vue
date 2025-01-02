@@ -26,7 +26,7 @@
                             <InputIcon>
                                 <SearchSVG class="text-[#757575]" />
                             </InputIcon>
-                            <InputText class="py-2 w-full" placeholder="Search by Name, Phone or Group" />
+                            <InputText class="py-2 w-full" placeholder="Search by Name or Phone" v-model="search" />
                         </IconField>
 
                         <div class="flex gap-4">
@@ -248,13 +248,13 @@
         customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
     })
 
-    const updatedSelectedGroups = computed(() => props.selectedGroups)
-    const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
+    const updatedSelectedGroups = ref(props.selectedGroups)
+    const updatedSelectedGroupsID = ref(props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
     const page = ref(1)    
     const show = ref(10)
     const with_groups = ref(true)
     const is_custom_group = computed(() => props.isCustomGroup)
-    const search = ref("")
+    const search = useDebouncedRef("", 500)
     const total_records = ref()
 
     const expandedRows = ref<{ [key: string]: boolean }>({});
@@ -290,6 +290,18 @@
     type GroupedContacts = {
         [key: string]: ContactRow;
     }
+
+    watch(() => props.selectedGroups, (newVal: ContactSelectedGroup[]) => {
+        console.log('aca', props.selectedGroups)
+        if (newVal) {
+            console.log('newVal', newVal)
+            search.value = ''
+            page.value = 1
+            updatedSelectedGroups.value = newVal
+            updatedSelectedGroupsID.value = newVal.map((group: ContactSelectedGroup) => group.group_id)
+            reset_selected_contacts()
+        }
+    })
 
     const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroupsID,search) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
@@ -366,6 +378,8 @@
         page.value = event.page + 1
         reset_selected_contacts()
     }
+
+    
 
     // When the expand button is clicked, it expands the row and shows the contact numbers and its data
     const toggleRow = (id: string) => {
