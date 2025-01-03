@@ -40,8 +40,7 @@
     <ModalContacts 
         ref="modalContacts" 
         :selected-group="selected_groups[0].group_id"
-        :selected-contact="selected_contact" 
-        @updateMessage="handle_update_message" 
+        :selected-contact="selected_contact"
         @reset="handle_reset_values"
         @update:table="handle_update_table"
     />

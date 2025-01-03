@@ -3,7 +3,7 @@
         <Chip v-for="number in contact_numbers" :key="number.id" class="bg-[#1D192B] text-white text-sm hover:cursor-pointer" @click="navitage_to_number(number.id)">
             <template #default>
                 <span class="rounded-full py-[2px] px-[6px] bg-white text-black text-xs mr-1"
-                    :class="{ 'bg-emerald-200': contact.numbers.id === number.id }"
+                    :class="{ 'bg-emerald-300': contact.numbers.id === number.id }"
                 >
                     {{ contact_numbers.findIndex((item: ContactNumber) => item.id === number.id) + 1 }}
                 </span>

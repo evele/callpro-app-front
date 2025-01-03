@@ -40,7 +40,7 @@
     const selected_contact = computed(() => props.selectedContact)
     const visible = ref(false)
 
-    const emit = defineEmits(['updateMessage', 'reset', 'update:table'])
+    const emit = defineEmits(['reset', 'update:table'])
 
     const section_to_show = ref<ContactsModalSectionToShow>('')
     const selected_option = ref('')
