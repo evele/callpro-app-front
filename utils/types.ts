@@ -44,6 +44,15 @@ export type ContactSelectedGroup = {
   is_custom: boolean 
 }
 
+export type AllContactsQueryParams = {
+  page: number,
+  show: number,
+  with_groups: boolean,
+  is_custom_group: boolean,
+  group_id: string[],
+  filter: string,
+}
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number

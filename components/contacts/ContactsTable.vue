@@ -11,6 +11,7 @@
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
             :totalRecords="total_records"
+            :first="(page - 1) * 10"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
             :rowClass="rowClass"
@@ -248,8 +249,8 @@
         customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
     })
 
-    const updatedSelectedGroups = ref(props.selectedGroups)
-    const updatedSelectedGroupsID = ref(props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
+    const updatedSelectedGroups = computed(() => props.selectedGroups)
+    const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
     const page = ref(1)    
     const show = ref(10)
     const with_groups = ref(true)
@@ -265,6 +266,15 @@
     const numbers_ids = ref<string[]>([])
 
     const filterDropdownRef = ref()
+
+    const query_params = computed<AllContactsQueryParams>(() => ({
+        page: page.value,
+        show: show.value,
+        with_groups: with_groups.value,
+        is_custom_group: is_custom_group.value,
+        group_id: updatedSelectedGroupsID.value,
+        filter: search.value
+    }))
 
     const emit = defineEmits(['uploadFile', 'update:filters'])
 
@@ -291,19 +301,7 @@
         [key: string]: ContactRow;
     }
 
-    watch(() => props.selectedGroups, (newVal: ContactSelectedGroup[]) => {
-        console.log('aca', props.selectedGroups)
-        if (newVal) {
-            console.log('newVal', newVal)
-            search.value = ''
-            page.value = 1
-            updatedSelectedGroups.value = newVal
-            updatedSelectedGroupsID.value = newVal.map((group: ContactSelectedGroup) => group.group_id)
-            reset_selected_contacts()
-        }
-    })
-
-    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroupsID,search) 
+    const { data: all_contacts_data, isLoading } = useFetchAllContacts(query_params) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
@@ -363,7 +361,14 @@
     });
 
     // Reset checkboxes and expanded row
-    const reset_selected_contacts = () => {
+    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true) => {
+        if(reset_page) {
+            page.value = 1;
+        }
+        if(reset_search) {
+            search.value = '';
+        }
+
         all_selected.value = false;
         selected_contacts.value = [];
         selected_numbers.value = [];
@@ -376,10 +381,12 @@
     // Handle pagination
     const onPageChange = (event: any) => {
         page.value = event.page + 1
-        reset_selected_contacts()
+        reset_selected_contacts(false, false)
     }
 
-    
+    watch(() => search.value, () => {
+        page.value = 1;
+    })
 
     // When the expand button is clicked, it expands the row and shows the contact numbers and its data
     const toggleRow = (id: string) => {
