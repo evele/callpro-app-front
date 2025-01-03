@@ -18,7 +18,7 @@
 
     const router = useRouter();
     const currentRoute = router.currentRoute;
-    const is_active = (route: string) => currentRoute.value.name == route ? "nav-link--active" : "";
+    const is_active = (route: string) => currentRoute.value.name == route ? "nav-link--active shadow-lg" : "";
     
     const authStore = useAuthStore()
     const logout = () => {

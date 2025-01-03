@@ -15,9 +15,7 @@
             @update:table="emit('update:table')"
         />
 
-        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess"
-            @error="handleError" @updateMessage="handleUpdateMessage" 
-        />
+        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess" @error="handleError" />
 
         <SaveCustomGroups v-if="section_to_show === 'new_group'" :group-to-edit="group_to_edit" 
             @close="handleClose" @success="handleSuccess" @error="handleError" 
@@ -95,6 +93,4 @@
     const handleError = (error: string) => show_error_toast('Error', error)
 
     const handleChangeTitle = (title: string) => upload_title.value = title
-
-    const handleUpdateMessage = (message: string) => emit('updateMessage', message)
 </script>

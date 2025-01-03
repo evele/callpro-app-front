@@ -20,19 +20,11 @@ export async function getCustomGroups(): Promise<CustomGroupsAPIResponse | APIRe
 }
 
 /* ----- Move Number To Group ----- */
-type MoveNumberToGroupAPIResponse = {
-    result: true
-}
-
-export async function moveNumberToGroups(data: MoveNumberToGroup): Promise<MoveNumberToGroupAPIResponse | APIResponseError>{    
-    return await fetchWrapper.post(MOVE_NUMBER_TO_GROUP_URL, data) as MoveNumberToGroupAPIResponse | APIResponseError
+export async function moveNumberToGroups(data: MoveNumberToGroup): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(MOVE_NUMBER_TO_GROUP_URL, data) as APIResponseSuccess | APIResponseError
 }
 
 /* ----- Add Number To Group ----- */
-type AddNumberToGroupAPIResponse = {
-    result: true  
-}
-
-export async function addNumberToGroups(data: AddNumberToGroup): Promise<AddNumberToGroupAPIResponse | APIResponseError>{    
-    return await fetchWrapper.post(ADD_NUMBER_TO_GROUP_URL, data) as AddNumberToGroupAPIResponse | APIResponseError
+export async function addNumberToGroups(data: AddNumberToGroup): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(ADD_NUMBER_TO_GROUP_URL, data) as APIResponseSuccess | APIResponseError
 }

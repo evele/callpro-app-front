@@ -206,12 +206,12 @@
         
         const data_to_send: AudioToSave = {
             action: 'update',
-            audio_info: {
+            audio_info: [{
                 audio_id: selected_audio.value.id,
                 file_name: selected_audio.value.file_name,
                 length: selected_audio.value.length,
                 name: audio_name.value
-            }
+            }]
         }
 
         saveAudio(data_to_send, {

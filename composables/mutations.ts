@@ -30,6 +30,12 @@ export const useDeleteAudio = () => {
   })
 }
 
+export const useUploadAudio = () => {
+  return useMutation({
+    mutationFn: (audio_data: FormData) => uploadAudio(audio_data),
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
@@ -171,6 +177,16 @@ export const useUpdateTextSettings = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: TextSettingsDataToSave) => updateTextSettings(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['settings'] })
+    },
+  }) 
+}
+
+export const useUpdateGeneralSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: GeneralSettingsDataToSave) => updateGeneralSettings(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
     },

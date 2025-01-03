@@ -8,11 +8,6 @@
 
             <span class="block mb-3 text-[#1D1B20]">Filters</span>
             <ul class="list-none p-0 m-0 flex flex-col gap-4">
-                <div class="flex items-center pl-2 gap-4 hover:cursor-pointer" @click.prevent="handleSelectAll()">
-                    <Checkbox v-model="all" :binary="true" :value="all" />
-                    <span class="text-sm">{{ allContacts.name }}</span>
-                    <span class="text-xs text-[#49454F] font-medium ml-auto">{{ allContacts.count }}</span>
-                </div>
                 <div v-for="filter in filtersSystem" :key="filter.id" class="flex items-center pl-2 gap-4 hover:cursor-pointer" @click.prevent="handleSelect(filter.id)">
                     <Checkbox v-model="selected_filters" :inputId="filter.id" :value="filter.id" />
                     <span class="text-sm">{{ filter.name }}</span>
@@ -34,7 +29,6 @@
 
 <script setup lang="ts">
     const props = defineProps({
-        allContacts: { type: Object, required: true },
         filtersSystem: { type: Array as PropType<FilterOption[]>, required: true, default: [] },
         filtersCustom: { type: Array as PropType<FilterOption[]>, required: false, default: [] }
     })
@@ -46,22 +40,7 @@
         popover.value?.toggle(event)
     }
 
-    const all = ref(false)
     const selected_filters = ref<string[]>([])
-
-    const all_filters = computed<FilterOption[]>(() => {
-        return props.filtersSystem.concat(props.filtersCustom)
-    })
-
-    const handleSelectAll = () => {
-        all.value = !all.value
-        if (selected_filters.value.length === all_filters.value.length) {
-            selected_filters.value = []
-        } else {
-            selected_filters.value = all_filters.value.map((filter: FilterOption) => filter.id)
-        }
-        emit('update:filters', selected_filters.value)
-    }
 
     const handleSelect = (id: string) => {
         const index = selected_filters.value.indexOf(id)
@@ -70,9 +49,12 @@
         } else {
             selected_filters.value.splice(index, 1)
         }
-        all.value = selected_filters.value.length === all_filters.value.length
         emit('update:filters', selected_filters.value)
     }
+
+    const reset_selected_filters = () => selected_filters.value = []
+
+    defineExpose({ reset_selected_filters })
 </script>
 
 <style scoped lang="scss">
