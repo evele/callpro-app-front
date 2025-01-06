@@ -38,6 +38,11 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+export type validateConfirmationCode = {
+  confirmation_code: number;
+  root_id: string;
+}
+
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 

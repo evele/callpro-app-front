@@ -21,7 +21,14 @@ type UserRegister = {
   agreeToTerms: boolean;
 }
 
+type phoneLaunchAccount = {
+  user: number;
+  password: string;
+}
+
 type RegisterResponseSuccess = APIResponseSuccess & { message: string }
+
+type BindPhonelaunchAccountResponse = APIResponseSuccess & { root_id: string }
 
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
@@ -66,5 +73,11 @@ export const useAuthStore = defineStore("AuthStore", {
     async registerUser(dataToSend:UserRegister): Promise<RegisterResponseSuccess | APIResponseError> {
         return await fetchWrapper.post(CREATE_USER_URL, dataToSend) as RegisterResponseSuccess | APIResponseError;        
     },
+    async bindPhonelaunchAccount(dataToSend:phoneLaunchAccount): Promise<BindPhonelaunchAccountResponse | APIResponseError> {
+        return await fetchWrapper.post(BIND_PHONE_LAUNCH_ACCOUNT_URL, dataToSend) as BindPhonelaunchAccountResponse | APIResponseError;        
+    },
+    async validateConfirmationCode(dataToSend:validateConfirmationCode): Promise<APIResponseSuccess | APIResponseError> {
+        return await fetchWrapper.post(VALIDATE_CONFIRMATION_CODE_URL, dataToSend) as APIResponseSuccess | APIResponseError;        
+    }
   },
 })
