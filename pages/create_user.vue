@@ -151,7 +151,6 @@ const duplicate_email = ref(false)
 
 const authStore = useAuthStore();
 onMounted(() => {
-    console.log(authStore.ivr_bind, authStore.root_id)
     if(authStore.ivr_bind) {
         ivr_bind.value = authStore.ivr_bind
         root_id.value = authStore.root_id
