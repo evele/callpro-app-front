@@ -1,11 +1,11 @@
 <template>
     <div class="bg-[#E6E0E9] flex items-center justify-center min-h-screen">
-        <Card class="w-full max-w-[850px] flex flex-col items-center justify-center font-normal gap-10">
+        <Card class="w-full max-w-[850px] flex flex-col items-center justify-center font-normal gap-8">
             <!-- Bloque de logo y texto -->
             <template #header>
                 <div class="mt-14 flex flex-col items-center">
                     <img alt="user header" src="@/assets/png/thecallpro.png"
-                        class="w-[196px] flex-shrink-0 bg-cover bg-center" />
+                        class="w-[196px] bg-cover bg-center" />
                     <p v-if="current_step === 1" class="text-xl font-semibold text-[#4f378b] mt-6">Log in to your Phone Launch Account</p>
                     <p v-else class="text-xl font-semibold text-[#4f378b] mt-6">Verify your phone launch account.</p>
                 </div>
@@ -13,7 +13,7 @@
             <template #content>
                 <!-- First step form -->
                 <form v-if="current_step === 1" @keydown.enter.prevent="next"
-                    class="flex flex-col gap-10 w-full max-w-[520px] sm:w-[90vw] mx-auto">
+                    class="flex flex-col gap-6 w-full max-w-[520px] sm:w-[90vw] mx-auto">
 
                     <div class="relative flex flex-col items-start gap-2 w-full">
                         <label for="phonelaunch">Phone Launch Account</label>
@@ -46,7 +46,7 @@
 
                 <!-- Second step form -->
                 <form v-if="current_step === 2" @keydown.enter.prevent="next">
-                    <Message severity="info" class="mb-4">You will recive a call with a confirmation code.</Message>
+                    <Message severity="info" class="mb-4">{{ info_message }}</Message>
                     <div class="flex flex-col items-start gap-2 w-full">
                         <InputNumber 
                             v-model="confirmation_code" 
@@ -58,11 +58,13 @@
                             :invalid="confirmation_code_error_message.length > 0"
                         />
                         <p class="text-red-500">{{ confirmation_code_error_message }}</p>
-                        <p class="mx-auto text-xs font-semibold">Didn't recieve?
-                            <router-link to="/login" class="text-[#4f378b] ml-2">
-                                Resend Code
-                            </router-link>
-                        </p>
+                        <div class="mx-auto text-xs font-semibold flex items-center gap-2">
+                            <span>Didn't recieve?</span>
+                            <Button @click="handle_resend_code" class="text-[#4f378b] flex items-center gap-1 bg-transparent border-none p-0 text-xs">
+                                <RenewSVG v-if="!is_sending_new_code" class="h-4 w-4" />
+                                {{ is_sending_new_code ? 'Sending a new code...' : 'Resend Code'}}
+                            </Button>
+                        </div>
                     </div>
                 </form>
             </template>
@@ -71,7 +73,7 @@
                 <div class="flex flex-col gap-4 mt-10">
                     <Button type="button" 
                         class="flex justify-center items-center py-2 w-[300px] mx-auto font-bold"
-                        :disabled="is_loading" @click="next">
+                        :disabled="is_loading || is_sending_new_code" @click="next">
                         <ProgressSpinner v-if="is_loading" strokeWidth="8" fill="transparent" class="h-6 w-6 light-spinner"
                             animationDuration=".5s" aria-label="loading"                             
                         />
@@ -94,6 +96,7 @@
 
 <script setup lang="ts">
     import { useAuthStore } from "@/stores"
+    import RenewSVG from "~/components/svgs/RenewSVG.vue";
 
     definePageMeta({
         layout: false,
@@ -108,12 +111,15 @@
     const number_error_message = ref('');
     const password_error_message = ref('');
     const confirmation_code_error_message = ref('');
+    const info_message = ref('You will recive a call with a confirmation code.')
 
     const is_loading = ref(false)
+    const is_sending_new_code = ref(false)
     const current_step = ref(1);
+    const ivr_user = ref('')
     const root_id = ref('')
 
-    const { show_error_toast } = usePrimeVueToast();
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     watchEffect(() => {
         if (phone_launch_number.value) {
@@ -153,6 +159,7 @@
         is_loading.value = false
 
         if(response.result) {
+            ivr_user.value = response.ivr_user
             root_id.value = response.root_id
             current_step.value = 2
         } else {
@@ -178,6 +185,9 @@
         if(response.result) {
             router.push('/create_user')
         } else {
+            if(response.error) {
+                confirmation_code_error_message.value = response.error
+            }
             show_error_toast('Error', "Something went wrong, please check your code and try again.")
         }
     }
@@ -187,6 +197,21 @@
             confirm_first_step()
         } else {
             confirm_second_step()
+        }
+    }
+
+    const handle_resend_code = async () => {
+        if(is_sending_new_code.value || ivr_user.value === '') return
+
+        is_sending_new_code.value = true
+        const response = await authStore.resendIVRCode({ ivr_user: ivr_user.value })
+        is_sending_new_code.value = false
+
+        if(response.result) {
+            info_message.value = 'You will recive a call with a new confirmation code.'
+            show_success_toast('Success', 'A new confirmation code has been sent.')
+        } else {
+            show_error_toast('Error', 'Something went wrong, please try again.')
         }
     }
 </script>

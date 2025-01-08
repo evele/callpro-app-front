@@ -2,24 +2,14 @@ import { defineStore } from "pinia"
 
 type AuthState = {
   user: User | null;
+  ivr_bind: boolean;
+  root_id: string | null;
 };
 
 type PasswordRecoveryResponse = {
   result: true;
   message?: string;
 };
-
-type UserRegister = {
-  firstName: string;
-  lastName: string;
-  address: string;
-  phone: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  timezone: string;
-  agreeToTerms: boolean;
-}
 
 type phoneLaunchAccount = {
   user: number;
@@ -28,12 +18,22 @@ type phoneLaunchAccount = {
 
 type RegisterResponseSuccess = APIResponseSuccess & { message: string }
 
-type BindPhonelaunchAccountResponse = APIResponseSuccess & { root_id: string }
+type BindPhonelaunchAccountResponseSuccess = APIResponseSuccess & {
+  ivr_user: string;
+  root_id: string 
+}
+
+type ValidateConfirmationCodeResponseSuccess = APIResponseSuccess & {
+  ivr_bind: true;
+  root_id: string
+}
 
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
     return {
       user: JSON.parse(localStorage.getItem("user") ?? "null"),
+      ivr_bind: false,
+      root_id: null
     }
   },
   getters: {
@@ -73,11 +73,19 @@ export const useAuthStore = defineStore("AuthStore", {
     async registerUser(dataToSend:UserRegister): Promise<RegisterResponseSuccess | APIResponseError> {
         return await fetchWrapper.post(CREATE_USER_URL, dataToSend) as RegisterResponseSuccess | APIResponseError;        
     },
-    async bindPhonelaunchAccount(dataToSend:phoneLaunchAccount): Promise<BindPhonelaunchAccountResponse | APIResponseError> {
-        return await fetchWrapper.post(BIND_PHONE_LAUNCH_ACCOUNT_URL, dataToSend) as BindPhonelaunchAccountResponse | APIResponseError;        
+    async bindPhonelaunchAccount(dataToSend:phoneLaunchAccount): Promise<BindPhonelaunchAccountResponseSuccess | APIResponseError> {
+        return await fetchWrapper.post(BIND_PHONE_LAUNCH_ACCOUNT_URL, dataToSend) as BindPhonelaunchAccountResponseSuccess | APIResponseError;        
     },
-    async validateConfirmationCode(dataToSend:validateConfirmationCode): Promise<APIResponseSuccess | APIResponseError> {
-        return await fetchWrapper.post(VALIDATE_CONFIRMATION_CODE_URL, dataToSend) as APIResponseSuccess | APIResponseError;        
-    }
+    async validateConfirmationCode(dataToSend:validateConfirmationCode): Promise<ValidateConfirmationCodeResponseSuccess | APIResponseError> {
+        const response = await fetchWrapper.post(VALIDATE_CONFIRMATION_CODE_URL, dataToSend) as ValidateConfirmationCodeResponseSuccess | APIResponseError;
+        if(response.result) {
+          this.ivr_bind = response.ivr_bind
+          this.root_id = response.root_id
+        }
+        return response
+    },
+    async resendIVRCode(dataToSend: { ivr_user: string }): Promise<APIResponseSuccess | APIResponseError> {
+      return await fetchWrapper.post(RESEND_IVR_CODE_URL, dataToSend) as APIResponseSuccess | APIResponseError;        
+  },
   },
 })

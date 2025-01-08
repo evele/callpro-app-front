@@ -68,7 +68,7 @@
 
                         <div class="flex flex-col items-start gap-1 w-full">
                             <label for="timezone">Timezone</label>
-                            <Select id="timezone" v-model="timezone" :options="timezones" optionLabel="name" placeholder="Select a timezone"
+                            <Select id="timezone" v-model="timezone" :options="timezones" optionLabel="name" optionValue="code" placeholder="Select a timezone"
                                 class="w-full py-[5px] border border-[#d9d9d9]"
                             ></Select>
                         </div>
@@ -120,11 +120,6 @@
 import { useAuthStore } from "@/stores"
 
 const generalStore = useGeneralStore()
-const format_tz = (value: OneToNine) => {
-    if (!generalStore.timezones?.length) return '';
-    const tz = generalStore.timezones?.find((tz: Timezone) => tz.zones_id == value)?.display;
-    return tz;
-}
 
 const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
@@ -141,22 +136,41 @@ const phone = ref('');
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
-const timezone = ref('');
+const timezone = ref<OneToNine | null>(null);
 const agreeToTerms = ref(false);
 const notRobot = ref(false);
+const ivr_bind = ref(false)
+const root_id = ref<string | null>(null)
+
 const canRegister = computed(() => {
-    return agreeToTerms.value && notRobot.value && firstName.value && lastName.value && password.value && confirmPassword.value && password.value === confirmPassword.value;
+    return agreeToTerms.value && notRobot.value && firstName.value && lastName.value && timezone.value && password.value && confirmPassword.value && password.value === confirmPassword.value;
 });
+
 const isPending = ref(false);
 const duplicate_email = ref(false)
 
 const authStore = useAuthStore();
+onMounted(() => {
+    console.log(authStore.ivr_bind, authStore.root_id)
+    if(authStore.ivr_bind) {
+        ivr_bind.value = authStore.ivr_bind
+        root_id.value = authStore.root_id
+    }
+})
+
+onBeforeUnmount(() => {
+    authStore.ivr_bind = false
+    authStore.root_id = null
+})
 
 async function register() {
-    console.log('Registering user', { firstName, lastName, address, phone, email, password });
     duplicate_email.value = false
-    isPending.value = true;
-    const dataToSend = {
+    if(timezone.value === null) {
+        show_error_toast('Error', 'Please select a timezone');
+        return;
+    }
+
+    const dataToSend: UserRegister = {
         firstName: firstName.value,
         lastName: lastName.value,
         address: address.value,
@@ -165,9 +179,14 @@ async function register() {
         password: password.value,
         confirmPassword: confirmPassword.value,
         timezone: timezone.value,
-        agreeToTerms: agreeToTerms.value,
+        agreeToTerms: agreeToTerms.value ? '1' : '0',
+        notRobot: notRobot.value ? '1' : '0',
+        ivr_bind: ivr_bind.value,
+        root_id: root_id.value
     };
+
     try {
+        isPending.value = true;
         const response: APIResponseSuccess & { message: string } | APIResponseError = await authStore.registerUser(dataToSend)
 
         if (response.result) {
