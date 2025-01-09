@@ -9,9 +9,11 @@ jobs:
   build_develop:
     runs-on: ubuntu-latest
     steps:
+      # 1. Clona el repositorio
       - name: Checkout code
         uses: actions/checkout@v2
 
+      # 2. Configura Node.js y PNPM
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -20,6 +22,7 @@ jobs:
       - name: Setup pnpm
         run: corepack enable
 
+      # 3. Instala dependencias y genera la aplicación
       - name: Install dependencies and build
         env:
           NUXT_ENV: test
@@ -28,18 +31,7 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm generate -o .output/public
 
-      - name: Debug build artifacts
-        run: |
-          echo "Listing .output directory:"
-          ls -la .output
-          echo "Listing public directory:"
-          ls -la .output/public
-
-      - name: Copy firebase.json to build directory
-        run: |
-          echo "Ensuring firebase.json is included in the build artifacts."
-          cp firebase.json .output/public/
-
+      # 4. Guarda los artefactos generados
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -50,22 +42,24 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_develop
     steps:
+      # 1. Descarga los artefactos generados
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
           name: nuxt-output
 
+      # 2. Autentica con Firebase
+      - name: Authenticate with Firebase
+        run: |
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $HOME/firebase-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-key.json"
+
+      # 3. Instala Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Debugging Verify downloaded artifacts
-        run: |
-          echo "Listing downloaded artifacts:"
-          ls -la
-
+      # 4. Realiza el despliegue en Firebase Hosting
       - name: Deploy to Firebase Hosting
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           echo "Deploying from directory $(pwd)"
-          firebase deploy --project test-thecallproportal --only hosting:test-thecallproportal --token ${{ secrets.FIREBASE_TOKEN }}
+          firebase deploy --project the-callpro-system --only hosting:test-thecallproportal
