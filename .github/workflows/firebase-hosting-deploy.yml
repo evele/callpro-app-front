@@ -62,9 +62,15 @@ jobs:
           echo "Root files:"
           ls -la
 
-      # 4. Mueve al directorio raíz del proyecto
-      - name: Move to project root
-        run: cd ..
+      # 3. Determine project root
+      - name: Determine project root
+      run: |
+        PROJECT_ROOT=$(git rev-parse --show-toplevel)
+        echo "Project Root: ${PROJECT_ROOT}"
+
+      # 4. Navigate to project root
+      - name: Navigate to project root
+      run: cd "${PROJECT_ROOT}"
 
       # 5. Realiza el despliegue en Firebase Hosting
       - name: Deploy to Firebase Hosting
