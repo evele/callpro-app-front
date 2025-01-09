@@ -10,11 +10,9 @@ jobs:
   build_develop:
     runs-on: ubuntu-latest
     steps:
-      # 1. Clona el repositorio
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # 2. Configura Node.js y PNPM
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
@@ -23,7 +21,6 @@ jobs:
       - name: Setup pnpm
         run: corepack enable
 
-      # 3. Instala dependencias y genera la aplicación
       - name: Install dependencies and build
         env:
           NUXT_ENV: test
@@ -32,7 +29,6 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm generate -o .output/public
 
-      # 4. Guarda los artefactos generados
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -44,27 +40,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_develop
     steps:
-      # 1. Descarga los artefactos generados
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
           name: nuxt-output
 
-      # 2. Instala Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      # 3. Verifica los archivos en el directorio
-      - name: Debugging Verify firebase.json
+      - name: Debugging List project files
         run: |
           echo "Current directory:"
           pwd
           echo "Root files:"
           ls -la
+          echo "nuxt-output directory:"
+          ls -la nuxt-output
 
-      # 6. Realiza el despliegue en Firebase Hosting
+      - name: Move artifacts to root
+        run: mv nuxt-output/* .
+
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        working-directory: /
         run: firebase deploy --only hosting:test-thecallproportal --token ${{ secrets.FIREBASE_TOKEN }}
