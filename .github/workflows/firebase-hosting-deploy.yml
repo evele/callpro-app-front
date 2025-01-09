@@ -53,6 +53,14 @@ jobs:
       # 2. Instala Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
+      
+      # 3. Debugging: Lista archivos y verifica firebase.json
+    - name: Debugging: Verify firebase.json
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Root files:"
+        ls -la
 
       # 3. Realiza el despliegue en Firebase Hosting
       - name: Deploy to Firebase Hosting
