@@ -73,4 +73,4 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           echo "Deploying from directory $(pwd)"
-          firebase deploy --project test-thecallproportal --only hosting:test-thecallproportal --token ${{ secrets.FIREBASE_TOKEN }}
+          firebase deploy --project the-callpro-system --only hosting:test-thecallproportal
