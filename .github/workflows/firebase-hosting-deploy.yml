@@ -62,17 +62,17 @@ jobs:
           echo "Root files:"
           ls -la
 
-      # 3. Determine project root
+      # 4. Determina la raíz del proyecto
       - name: Determine project root
-      run: |
-        PROJECT_ROOT=$(git rev-parse --show-toplevel)
-        echo "Project Root: ${PROJECT_ROOT}"
+        run: |
+          PROJECT_ROOT=$(git rev-parse --show-toplevel)
+          echo "PROJECT_ROOT=${PROJECT_ROOT}" >> $GITHUB_ENV
 
-      # 4. Navigate to project root
+      # 5. Navega a la raíz del proyecto
       - name: Navigate to project root
-      run: cd "${PROJECT_ROOT}"
+        run: cd $PROJECT_ROOT
 
-      # 5. Realiza el despliegue en Firebase Hosting
+      # 6. Realiza el despliegue en Firebase Hosting
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
