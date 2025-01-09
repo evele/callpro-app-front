@@ -66,4 +66,6 @@ jobs:
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: firebase deploy --only hosting:test-thecallproportal --token $FIREBASE_TOKEN
+         run: |
+          cd $(git rev-parse --show-toplevel)
+          firebase deploy --only hosting:test-thecallproportal --token $FIREBASE_TOKEN
