@@ -31,9 +31,9 @@ jobs:
       - name: Debug build artifacts
         run: |
           echo "Listing .output directory:"
-          ls -la .output || echo "No .output directory found."
+          ls -la .output
           echo "Listing public directory:"
-          ls -la .output/public || echo "No public directory found."
+          ls -la .output/public
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
@@ -53,21 +53,19 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Ensure firebase.json exists
+      - name: Move build to root directory
         run: |
-          if [ ! -f firebase.json ]; then
-            echo "firebase.json not found in root. Attempting to copy from source directory."
-            cp path/to/firebase.json ./firebase.json || echo "firebase.json missing in source."
-          fi
+          echo "Moving build artifacts to root directory"
+          mv nuxt-output/* .
 
-      - name: Debugging Verify files
+      - name: Debugging Verify files in root
         run: |
           echo "Current directory:"
           pwd
           echo "Root files:"
           ls -la
-          echo "Checking firebase.json:"
-          ls firebase.json || echo "firebase.json missing"
+          echo "Public directory:"
+          ls -la public || echo "Public directory missing"
 
       - name: Deploy to Firebase Hosting
         env:
