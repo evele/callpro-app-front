@@ -39,7 +39,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: nuxt-output
-          path: .output/public/*
+          path: .output/public
 
   deploy_to_test:
     runs-on: ubuntu-latest
@@ -58,12 +58,6 @@ jobs:
           echo "Listing downloaded artifacts:"
           ls -la
 
-      - name: Move downloaded artifacts to root
-        run: |
-          echo "Moving artifacts to root"
-          mkdir -p public
-          mv * public || echo "No files to move"
-
       - name: Ensure firebase.json exists
         run: |
           if [ ! -f firebase.json ]; then
@@ -74,4 +68,6 @@ jobs:
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-        run: firebase deploy --only hosting:test-thecallproportal --token ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          echo "Deploying from directory $(pwd)"
+          firebase deploy --only hosting:test-thecallproportal --token ${{ secrets.FIREBASE_TOKEN }}
