@@ -53,21 +53,21 @@ jobs:
       # 2. Instala Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
-      
-      # 3. Debugging: Lista archivos y verifica firebase.json
+
+      # 3. Verifica los archivos en el directorio
       - name: Debugging Verify firebase.json
         run: |
           echo "Current directory:"
           pwd
           echo "Root files:"
           ls -la
-          
-      # 3. Move to project root (fix)
+
+      # 4. Mueve al directorio raíz del proyecto
       - name: Move to project root
         run: cd ..
 
-      # 3. Realiza el despliegue en Firebase Hosting
+      # 5. Realiza el despliegue en Firebase Hosting
       - name: Deploy to Firebase Hosting
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-         run: firebase deploy --only hosting:test-thecallproportal --token $FIREBASE_TOKEN
+        run: firebase deploy --only hosting:test-thecallproportal --token ${{ secrets.FIREBASE_TOKEN }}
