@@ -1,4 +1,4 @@
-name: CI/CD for Test Environment
+name: Deploy to Firebase Hosting
 
 on:
   push:
@@ -6,61 +6,24 @@ on:
       - develop
 
 jobs:
-  build_develop:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
+      - name: Login to Firebase
+        uses: firebase/action-gcp-auth@v0
         with:
-          node-version: lts/*
-
-      - name: Setup pnpm
-        run: corepack enable
-
-      - name: Install dependencies and build
-        env:
+          project_id: the-callpro-system
+      - name: Install dependencies
+        run: npm install
+      - name: Build Nuxt app
+        env: 
           NUXT_ENV: test
           NUXT_PUBLIC_TEST_URL: http://devp.thecallpro.com/api
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm generate -o .output/public
-          
-      - name: Debug build artifacts
-        run: |
-          echo "Listing .output directory:"
-          ls -la .output
-          echo "Listing public directory:"
-          ls -la .output/public
-
-      - name: Ensure firebase.json is included in the build directory
-        run: |
-          echo "Ensuring firebase.json is included in the build artifacts."
-          cp firebase.json .output/public/
-      
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: nuxt-output
-          path: .output/public
-
-  deploy_to_test:
-    runs-on: ubuntu-latest
-    needs: build_develop
-    steps:
-      - name: Download build artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: nuxt-output
-      
-      - name: Install Firebase CLI
-        run: npm install -g firebase-tools
-
+        run: npm run generate
       - name: Deploy to Firebase Hosting
-        env:
-          FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
-        run: |
-          echo "Deploying from directory $(pwd)"
-          firebase deploy --token $FIREBASE_AUTH_TOKEN --project the-callpro-system --only hosting:test-thecallproportal
+        uses: firebase/action-hosting-deploy@v0
+        with:
+          project: the-callpro-system
+          site: test-thecallproportal 
+          source: .output/public
