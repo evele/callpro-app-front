@@ -27,16 +27,19 @@ jobs:
         run: |
           pnpm install --frozen-lockfile
           pnpm generate -o .output/public
+          
       - name: Debug build artifacts
         run: |
           echo "Listing .output directory:"
           ls -la .output
           echo "Listing public directory:"
           ls -la .output/public
-      - name: Copy firebase.json to build directory
+
+      - name: Ensure firebase.json is included in the build directory
         run: |
           echo "Ensuring firebase.json is included in the build artifacts."
           cp firebase.json .output/public/
+      
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -47,26 +50,27 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_develop
     steps:
-      - name: Setup pnpm
-        run: corepack enable
-
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
           name: nuxt-output
+      
+      - name: Setup pnpm
+        run: corepack enable
 
-      - name: Login to Firebase
-        uses: firebase/action-gcp-auth@v0
-        with:
-          project_id: the-callpro-system
+      - name: Authenticate with Firebase
+        run: |
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $HOME/firebase-key.json
+          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-key.json"
 
       - name: Install Firebase CLI
         run: pnpm install -g firebase-tools
 
-      - name: Debugging Verify downloaded artifacts
+      - name: Verify downloaded artifacts
         run: |
           echo "Listing downloaded artifacts:"
           ls -la
+
       - name: Deploy to Firebase Hosting
         run: |
           echo "Deploying from directory $(pwd)"
