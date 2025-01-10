@@ -47,17 +47,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: build_develop
     steps:
+      - name: Setup pnpm
+        run: corepack enable
+
       - name: Download build artifacts
         uses: actions/download-artifact@v3
         with:
           name: nuxt-output
 
-      - name: Authenticate with Firebase
-        run: |
-          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" > $HOME/firebase-key.json
-          export GOOGLE_APPLICATION_CREDENTIALS="$HOME/firebase-key.json"
+      - name: Login to Firebase
+        uses: firebase/action-gcp-auth@v0
+        with:
+          project_id: the-callpro-system
+
       - name: Install Firebase CLI
-        run: npm install -g firebase-tools
+        run: pnpm install -g firebase-tools
 
       - name: Debugging Verify downloaded artifacts
         run: |
