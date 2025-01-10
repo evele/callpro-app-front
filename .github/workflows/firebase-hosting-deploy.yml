@@ -9,31 +9,38 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      # Checkout del repositorio
+      # Clonar el repositorio
       - uses: actions/checkout@v2
-      
-      # Configurar autenticación con Google Cloud
+
+      # Autenticación con Google Cloud
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
           credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
-      
+
       # Instalar Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
-      
-      # Instalar dependencias de Nuxt
+
+      # Verificar autenticación y proyectos
+      - name: Debug Firebase Project Access
+        run: |
+          echo "Listando proyectos accesibles..."
+          firebase projects:list
+
+      # Instalar dependencias
       - name: Install dependencies
         run: npm install
-      
+
       # Generar la aplicación Nuxt
       - name: Build Nuxt app
         env:
           NUXT_ENV: test
           NUXT_PUBLIC_TEST_URL: http://devp.thecallpro.com/api
         run: npm run generate
-      
+
       # Desplegar a Firebase Hosting
       - name: Deploy to Firebase Hosting
         run: |
+          echo "Iniciando despliegue..."
           firebase deploy --project the-callpro-system --only hosting:test-thecallproportal
