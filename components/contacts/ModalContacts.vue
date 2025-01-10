@@ -7,7 +7,7 @@
             </header>
         </template>
 
-        <AddNewContact v-if="section_to_show === 'new_contact'" @close="handleClose" @success="handleSuccess" @error="handleError" />
+        <AddNewContact v-if="section_to_show === 'new_contact'" @close="handleClose" @success="handleSuccess" @error="handleError" @info="handleInfo" />
 
         <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess" @error="handleError" />
 
@@ -71,13 +71,15 @@
 
     defineExpose({ open });
 
-    const { show_success_toast, show_error_toast } = usePrimeVueToast();
+    const { show_success_toast, show_error_toast, show_info_toast } = usePrimeVueToast();
 
     const handleClose = () => close()
 
     const handleSuccess = (message: string) => show_success_toast('Success', message)
 
     const handleError = (error: string) => show_error_toast('Error', error)
+
+    const handleInfo = (info: string) => show_info_toast('Notice', info)
 
     const handleChangeTitle = (title: string) => upload_title.value = title
 </script>
