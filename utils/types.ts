@@ -351,6 +351,7 @@ export type VoiceSettingsUI = {
   call_pro_number: string,
   toll_free_number: string,
   static_intro: boolean,
+  static_intro_audio_selected: undefined | Audio
   repeat: boolean,
   offer_dnc: boolean,
   retries: undefined | OneToFour,

@@ -88,6 +88,7 @@
     const voice_settings = computed(() => {
         if(!settings?.value?.result) return null;
         const { time_guard, time_zone, call_window_end, call_window_start, ...filteredSettings } = settings.value.settings
+        filteredSettings['static_intro_audio_selected'] = settings.value.static_intro_audio_selected
         return filteredSettings
     })
 

@@ -7,6 +7,7 @@ type SettingsAPIResponse = {
     settings: Settings,
     text_settings: TextSettings,    
     user_admin_settings: UserAdminSettings
+    static_intro_audio_selected: Audio | false 
 }
 
 export async function getSettings(): Promise<SettingsAPIResponse | APIResponseError>{    

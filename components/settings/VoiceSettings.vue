@@ -25,6 +25,16 @@
             <label class="text-lg font-medium">Static audio introduction</label>
             <ToggleSwitch v-model="voice_settings.static_intro" class="scale-125" />
         </div>
+        <div v-if="voice_settings.static_intro" class="flex justify-between items-center mt-7">
+            <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected.name}}</p>
+            <Button @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected.id)" 
+                class="w-7 h-7 bg-[#e7e0ec] rounded-full] text-[#1D1B20] border-none hover:scale-110 transition-transform"
+            >
+                <template #icon>
+                    <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
+                </template>
+            </Button>
+        </div>
     </SettingSection>
     <Divider />
 
@@ -88,9 +98,13 @@
             />
         </div>
     </SettingSection>
+
+    <StaticIntroModal ref="staticIntroModalRef" />
 </template>
 
 <script setup lang="ts">
+    import EditIconSVG from '../svgs/EditIconSVG.vue'
+
     const props = defineProps({
         voiceSettings: { type: [Object, null] as PropType<VoiceSettings | null>, required: true, default: null },
         callProNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
@@ -112,6 +126,7 @@
         call_pro_number: '',
         toll_free_number: '',
         static_intro: false,
+        static_intro_audio_selected: undefined,
         repeat: false,
         offer_dnc: false,
         retries: undefined,
@@ -146,6 +161,7 @@
 
             voice_settings.caller_id = props.voiceSettings.caller_id
             voice_settings.static_intro = props.voiceSettings.static_intro === '1'
+            voice_settings.static_intro_audio_selected = props.voiceSettings.static_intro_audio_selected
             voice_settings.repeat = props.voiceSettings.repeat === '1'
             voice_settings.offer_dnc = props.voiceSettings.offer_dnc === '1'
             voice_settings.retries = props.voiceSettings.retries
@@ -155,6 +171,7 @@
             voice_settings.number_when_completed_status = props.voiceSettings.number_when_completed_status === '1'
             voice_settings.number_when_completed = props.voiceSettings.number_when_completed
         }
+        console.log(voice_settings)
     })
 
     const selected_call_pro = computed({
@@ -221,4 +238,9 @@
     watch(hasError, (newVal: boolean) => {
         emit('hasError', newVal)
     })
+
+    const staticIntroModalRef = ref()
+    const handle_open_static_intro_modal = (audio_id: number) => {
+        staticIntroModalRef.value?.open(audio_id)
+    }
 </script>
