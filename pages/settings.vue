@@ -85,10 +85,15 @@
     const confirmationModal = ref();
 
     /* ----- Begin Voice Settings ----- */
-    const voice_settings = computed(() => {
+    const voice_settings = computed((): VoiceSettingsWithAudio | null => {
         if(!settings?.value?.result) return null;
-        const { time_guard, time_zone, call_window_end, call_window_start, ...filteredSettings } = settings.value.settings
-        filteredSettings['static_intro_audio_selected'] = settings.value.static_intro_audio_selected
+        const { time_guard, time_zone, call_window_end, call_window_start, ...remainingSettings } = settings.value.settings
+
+        const filteredSettings: VoiceSettingsWithAudio = {
+            ...remainingSettings,
+            static_intro_audio_selected: settings.value.static_intro_audio_selected || null,
+        }
+
         return filteredSettings
     })
 
@@ -135,7 +140,7 @@
             repeat_library_id: null,
             retries: voice_settings_ui.retries ?? '1',
             static_intro: voice_settings_ui.static_intro ? '1' : '0',
-            static_intro_library_id: 0,
+            static_intro_library_id: voice_settings_ui.static_intro_library_id ?? null,
         }
 
         return formatted_settings

@@ -322,6 +322,8 @@ export type VoiceSettings = {
   number_when_completed_status: ZeroOrOne;
 }
 
+export type VoiceSettingsWithAudio = VoiceSettings & { static_intro_audio_selected: Audio | null }
+
 export type Settings = GeneralSettings & VoiceSettings;
 
 export type TextSettings = {
@@ -355,7 +357,8 @@ export type VoiceSettingsUI = {
   call_pro_number: string,
   toll_free_number: string,
   static_intro: boolean,
-  static_intro_audio_selected: undefined | Audio
+  static_intro_library_id: undefined | NumberOrNull
+  static_intro_audio_selected: undefined | Audio | null
   repeat: boolean,
   offer_dnc: boolean,
   retries: undefined | OneToFour,
@@ -434,6 +437,12 @@ export type TextToConvert = {
   text: string, 
   temp: boolean    
 }
+
+export type ProcessedAudio = Audio & {
+  position: number;
+  created_at: string;
+  last_used: string;
+};
 
 export type AudioInfoToSave = {
   audio_id?: number;
