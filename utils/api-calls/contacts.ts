@@ -42,10 +42,6 @@ export async function getUserCustomGroups(): Promise<UserCustomGroupsAPIResponse
 }
 
 /* ----- Save Contact ----- */
-type SaveContactAPIResponse = {
-    result: true,    
-}
-
 export async function saveContact(data: ContactToSaveData): Promise<SaveContactAPIResponse | APIResponseError>{    
     return await fetchWrapper.post(SAVE_CONTACT_URL, data)  as SaveContactAPIResponse | APIResponseError
 }

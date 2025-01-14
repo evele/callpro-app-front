@@ -80,7 +80,7 @@
     const form_action = ref('')
     const has_phone_number_error = ref(false)
 
-    const emit = defineEmits(['close', 'success', 'error'])
+    const emit = defineEmits(['close', 'success', 'error', 'info'])
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError } = useFetchUserCustomGrups()
     const { mutate: saveContact, isPending, reset } = useSaveContact() 
@@ -225,17 +225,17 @@
             save_contact: true
         }
 
-        type res_success = {
-            result: true  
-        }
-        
         saveContact(data_to_send, {
-            onSuccess: (data: res_success | APIResponseError) => {
+            onSuccess: (data: SaveContactAPIResponse | APIResponseError) => {
                 if(data.result) {
                     reset_contact()
                     form_action.value = 'clear'
                     queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
-                    emit('success', 'Contact saved successfully.')
+                    if(data?.already_exists) {
+                        emit('info', 'Number already in contacts')
+                    } else {
+                        emit('success', 'Contact saved successfully.')
+                    }
                     emit('close')
                 } else if(data.validation_error) {
                     emit('error', data.validation_error ?? 'Something failed, please try again.')
