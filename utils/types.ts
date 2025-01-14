@@ -38,6 +38,10 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+export type SaveContactAPIResponse = APIResponseSuccess & {
+  already_exists?: string[]
+}
+
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 
