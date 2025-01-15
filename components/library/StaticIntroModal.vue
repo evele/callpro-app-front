@@ -17,13 +17,16 @@
             </IconField>
 
             <div class="flex items-center gap-4">
-                <Button class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg">
+                <Button 
+                    @click="handle_open_submodal('upload')"
+                    class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg"
+                >
                     <UploadAudioSVG class="text-[#757575] w-5 h-5" />
                     <span class="font-semibold text-sm">Upload audio file</span>
                 </Button>
 
                 <Button
-                    @click="console.log(user_audios)"
+                    @click="handle_open_submodal('tts')"
                     class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg"
                 >
                     <TextSVG class="text-[#757575] w-5 h-5" />
@@ -109,6 +112,8 @@
     </ConfirmationModal>
 
     <AudioPlayer v-if="visible" :current-audio="audio_playing" @action="handle_player_action" />
+
+    <StaticIntroSubModal ref="staticIntroSubModal" :section-to-show="submodal_section_to_show" @update:audios="refetch" />
 </template>
 
 <script setup lang="ts">
@@ -127,9 +132,9 @@
     const user_audios = computed((): Audio[] => {
         if(allAudiosData.value && allAudiosData.value.result) {
             if(search.value) {
-                return allAudiosData.value.audios.filter((audio: Audio) => audio.name.toLowerCase().includes(search.value.toLowerCase()))
+                return [...allAudiosData.value.audios].filter((audio: Audio) => audio.name.toLowerCase().includes(search.value.toLowerCase())).reverse()
             }
-            return allAudiosData.value.audios
+            return [...allAudiosData.value.audios].reverse()
         }
         return []
     })
@@ -238,5 +243,17 @@
         })
         selected_audio_to_edit.value = null
         audio_name.value = ''
+    }
+
+    /* ----- Submodal ----- */
+    const submodal_section_to_show = ref<'upload' | 'tts' | ''>('')
+    const staticIntroSubModal = ref()
+    
+    const handle_open_submodal = (section: 'upload' | 'tts') => {
+        if(!section) return
+
+        submodal_section_to_show.value = section
+        audio_playing.value = null
+        staticIntroSubModal?.value?.open_modal()
     }
 </script>
