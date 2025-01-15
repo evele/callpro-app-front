@@ -4,10 +4,9 @@
             Your browser does not support the audio element.
         </audio>
         
-
-        <section v-if="show_controls" class="w-full bg-[#F5EFF7] fixed bottom-0 left-0  flex flex-col sm:flex-row sm:justify-between px-6 py-4 sm:gap-10">
+        <section v-if="show_controls" class="bg-[#F5EFF7] fixed bottom-0 right-0 flex flex-col sm:flex-row sm:justify-between px-6 py-4 sm:gap-10 audio-player-width">
             <div class="hidden sm:flex gap-2 items-center sm:w-[15%] order-1">
-                <div class="w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
+                <div class="min-w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                     <MusicSVG class="w-5 h-5" />
                 </div>
                 <span class="font-semibold text-[#3B383E] text-xs sm:text-sm">{{ current_audio?.name }}</span>
@@ -179,5 +178,9 @@
     &:hover .p-slider-handle {
         opacity: 1;
     }
+}
+
+.audio-player-width {
+  width: calc(100% - 250px);
 }
 </style>
