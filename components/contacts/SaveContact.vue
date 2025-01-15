@@ -18,26 +18,26 @@
     <form @submit.prevent class="new-contact-form flex flex-col gap-5 sm:gap-6">
         <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
             <div class="w-full">
-                <label for="contact-name" class="text-lg text-black">Name</label>
+                <label for="contact-name" class="text-dark-3">Name</label>
                 <InputText type="text" id="contact-name" v-model="contact.first_name" placeholder="Enter Name" class="w-full mt-1" />
             </div>
 
             <div class="w-full">
-                <label for="contact-surname" class="text-lg text-black">Surname</label>
+                <label for="contact-surname" class="text-dark-3">Surname</label>
                 <InputText type="text" id="contact-surname" v-model="contact.last_name" placeholder="Enter Surname" class="w-full mt-1" />
             </div>
         </div>
 
         <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
             <div class="w-full">
-                <label for="contact-phone" class="text-lg text-black">Phone {{current_position + 1}}*</label>
+                <label for="contact-phone" class="text-dark-3">Phone {{current_position + 1}}*</label>
                 <PhoneInput :key="contact.numbers.id" class="mt-[2px]" :model-value="contact.numbers.number" @update:modelValue="(v: string) => contact.numbers.number = v" 
                     :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
             </div>
 
             <div class="relative w-full flex">
                 <div class="w-full">
-                    <label class="text-lg text-black">Type*</label>
+                    <label class="text-dark-3">Type*</label>
                     <Select v-model="contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" optionValue="code" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
                 </div>
                 <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
@@ -47,11 +47,11 @@
         <div class="w-full">
             <p v-if="CGIsError" class="text-red">Custom groups fetch failed D:</p>
             <div v-if="CGIsLoading" class="w-full">
-                <label class="text-lg text-black">Groups</label>
+                <label class="text-dark-3">Groups</label>
                 <Skeleton height="2rem" borderRadius="16px"></Skeleton>
             </div>
             <div v-if="CGIsSuccess" class="w-full">
-                <label class="text-lg text-black">Groups</label>
+                <label class="text-dark-3">Groups</label>
                 <span class="text-red" v-if="!userCustomGroups?.result">Custom groups fetch failed D:</span>
                 <MultiSelect v-else v-model="contact.numbers.number_groups" :options="custom_groups_options" optionLabel="name" optionValue="code"
                     display="chip" class="w-full mt-1" placeholder="-" />
@@ -60,7 +60,7 @@
 
         <div class="w-full">
             <div>
-                <label for="contact-notes" class="text-lg text-black">Notes</label>
+                <label for="contact-notes" class="text-dark-3">Notes</label>
                 <Textarea v-model="contact.numbers.notes" id="contact-notes" cols="50" rows="4" placeholder="Enter text" class="w-full no-resize rounded-2xl mt-1" />
                 <p class="text-[#757575] text-xs mt-2">*This information is mandatory to create a new contact</p>
             </div>
