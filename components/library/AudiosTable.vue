@@ -15,7 +15,7 @@
         </div>
 
         <section>
-            <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 6px"></ProgressBar>
+            <ProgressBar v-if="isFetching || isPendingDelete" mode="indeterminate" style="height: 6px"></ProgressBar>
             <DataTable
                 :value="search.length ? filtered_audios : user_audios"
                 dataKey="id" 
@@ -53,7 +53,7 @@
                             <Button class="bg-[#E7E0EC] py-1 px-2 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="edit_audio(slotProps.data.id)">
                                 <EditIconSVG />
                             </Button>
-                            <Button class="bg-[#E7E0EC] p-1 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="delete_modal(slotProps.data.id)">
+                            <Button class="bg-[#E7E0EC] p-1 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="confirm_delete(slotProps.data.id)">
                                 <TrashSVG />
                             </Button>
                         </div>
@@ -80,14 +80,9 @@
             </form>
         </Dialog>
 
-        <ConfirmDialog :visible="show_confirm" class="confirm-dialog">
-            <template #message>
-                <div class="flex flex-col mt-4 mb-6 gap-2">
-                    <p class="text-lg font-semibold">Are you sure you want to delete "{{ selected_audio ? selected_audio.name : 'this audio' }}"?</p>
-                    <ProgressBar v-if="isPendingDelete" mode="indeterminate" style="height: 5px"></ProgressBar>
-                </div>
-            </template>
-        </ConfirmDialog>
+        <ConfirmationModal ref="confirmationModal" title="Confirmation" @confirm="delete_audio">
+            <p class="text-lg font-semibold">Are you sure you want to delete "{{ selected_audio ? selected_audio.name : 'this audio' }}"?</p>
+        </ConfirmationModal>
 
         <Toast />
     </div>
@@ -97,7 +92,6 @@
 <script setup lang="ts">
     import type { QueryObserverResult } from '@tanstack/vue-query'
 
-    const confirm = useConfirm();
     const toast = useToast();
     const show_older = ref(false)
     const selected_audio_file_name = ref('')
@@ -111,7 +105,7 @@
     const selected_audio = ref<Audio | null>(null)
     const show_edit_audio = ref(false)
     const audio_name = ref('')
-    const show_confirm = ref(false)
+    const confirmationModal = ref()
     const search = ref('')
 
     type ProcessedAudio = Audio & {
@@ -147,26 +141,10 @@
     const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 })
     const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 })
 
-    const delete_modal = (audio_id: number) => {
+    const confirm_delete = (audio_id: number) => {
         selected_audio.value = user_audios.value.find((audio: Audio) => audio.id === audio_id) ?? null
         if(!selected_audio.value) return
-        show_confirm.value = true
-        confirm.require({
-            header: 'Confirmation',
-            rejectProps: {
-                label: 'No',
-                severity: 'secondary'
-            },
-            acceptProps: {
-                label: 'Yes',
-            },
-            accept: () => {
-                delete_audio()
-            },
-            reject: () => {
-                show_confirm.value = false
-            }
-        });
+        confirmationModal.value?.open()
     };
 
     const download_audio = (audio_id: number) => {
@@ -244,11 +222,9 @@
                 } else {
                     show_error_toast('Oops...', response.error ?? 'Something failed!')
                 }
-                show_confirm.value = false
             },
             onError: () => {
                 show_error_toast('Oops...', 'Something failed!')
-                show_confirm.value = false
             }
         })
     }
