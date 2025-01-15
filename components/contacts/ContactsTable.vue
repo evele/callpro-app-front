@@ -11,6 +11,7 @@
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
             :totalRecords="total_records"
+            :first="(page - 1) * 10"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
             :rowClass="rowClass"
@@ -26,7 +27,7 @@
                             <InputIcon>
                                 <SearchSVG class="text-[#757575]" />
                             </InputIcon>
-                            <InputText class="py-2 w-full" placeholder="Search by Name, Phone or Group" />
+                            <InputText class="py-2 w-full" placeholder="Search by Name or Phone" v-model="search" />
                         </IconField>
 
                         <div class="flex gap-4">
@@ -256,7 +257,7 @@
     const show = ref(10)
     const with_groups = ref(true)
     const is_custom_group = computed(() => props.isCustomGroup)
-    const search = ref("")
+    const search = useDebouncedRef("", 500)
     const total_records = ref()
 
     const expandedRows = ref<{ [key: string]: boolean }>({});
@@ -268,6 +269,15 @@
 
     const emit = defineEmits(['uploadFile', 'update:filters', 'update:contactToEdit'])
     const filterDropdownRef = ref()
+
+    const query_params = computed<AllContactsQueryParams>(() => ({
+        page: page.value,
+        show: show.value,
+        with_groups: with_groups.value,
+        is_custom_group: is_custom_group.value,
+        group_id: updatedSelectedGroupsID.value,
+        filter: search.value
+    }))
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -292,7 +302,7 @@
         [key: string]: ContactRow;
     }
 
-    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroupsID,search) 
+    const { data: all_contacts_data, isLoading } = useFetchAllContacts(query_params) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
@@ -352,7 +362,14 @@
     });
 
     // Reset checkboxes and expanded row
-    const reset_selected_contacts = () => {
+    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true) => {
+        if(reset_page) {
+            page.value = 1;
+        }
+        if(reset_search) {
+            search.value = '';
+        }
+
         all_selected.value = false;
         selected_contacts.value = [];
         selected_numbers.value = [];
@@ -365,8 +382,12 @@
     // Handle pagination
     const onPageChange = (event: any) => {
         page.value = event.page + 1
-        reset_selected_contacts()
+        reset_selected_contacts(false, false)
     }
+
+    watch(() => search.value, () => {
+        page.value = 1;
+    })
 
     // When the expand button is clicked, it expands the row and shows the contact numbers and its data
     const toggleRow = (id: string) => {

@@ -38,10 +38,23 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+export type SaveContactAPIResponse = APIResponseSuccess & {
+  already_exists?: string[]
+}
+
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 
   is_custom: boolean 
+}
+
+export type AllContactsQueryParams = {
+  page: number,
+  show: number,
+  with_groups: boolean,
+  is_custom_group: boolean,
+  group_id: string[],
+  filter: string,
 }
 
 // Interface for a phone number and its associated groups
