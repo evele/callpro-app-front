@@ -117,7 +117,7 @@ const openEditDialog = (group: CustomGroup) => {
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     background-color: #FFF;
     gap: 12px;
-    padding: 28px 0 0 0;
+    padding: 26px 0 26px 0;
 
     .first-section {
         padding: 0 16px;
