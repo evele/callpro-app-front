@@ -13,7 +13,7 @@ export type NumberOrNull = number | null;
 export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
-export type ContactsModalSectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
+export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 'upload';
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type FilterOption = { id: string, name: string, count: number }
 
@@ -76,6 +76,13 @@ export type Contact = {
   numbers: PhoneNumber[]; // Array of phone numbers associated with the contact
 }
 
+export type ContactToEdit = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  numbers: ContactNumberWithReceivedGroups[]
+}
+
 export type ContactPhoneNumber = PhoneNumber & {
   id: number;
   first_name: string;
@@ -98,21 +105,30 @@ export type ContactGroup = {
   phone_launch_id: NumberOrNull;
 };
 
-export type ContactNumber = {
-  id: 'new' | number,
+export type ReceivedNumberGroups = { number_groups: StringOrNull }
+
+export type ContactNumberWithoutGroups = {
+  id: string,
   number: string,
   notes: string,
   type: '' | OneToFour,
+}
+
+export type ContactNumberWithReceivedGroups = ContactNumberWithoutGroups & ReceivedNumberGroups;
+
+export type ContactNumber = ContactNumberWithoutGroups & {
   number_groups: string[]
 }
 
 export type ContactToSave = {
+  contact_id: StringOrNull,
   first_name: string,
   last_name: string,
   numbers: ContactNumber[]
 }
 
 export type ContactBeforeToSave = {
+  contact_id: StringOrNull,
   first_name: string,
   last_name: string,
   numbers: ContactNumber
