@@ -13,9 +13,18 @@
 
         <div v-else :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
             <label class="text-lg font-medium w-48">Enter Caller ID</label>
-            <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
-                :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
-            />
+            <div class="relative">
+                <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
+                    :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
+                />
+                <Transition v-if="voice_settings.caller_id_selected == '3'" name="fade">
+                    <Button type="button" @click="console.log('holaaa')" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
+                        <template #icon>
+                            <PlusSVG class="w-[14px] h-[14px]" />
+                        </template>
+                    </Button>
+                </Transition>
+            </div>
         </div>
     </SettingSection>
     <Divider/>
@@ -94,7 +103,8 @@
     const props = defineProps({
         voiceSettings: { type: [Object, null] as PropType<VoiceSettings | null>, required: true, default: null },
         callProNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
-        tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] }
+        tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
+        cidConfirm: { type: String as PropType<'0' | '1'>, required: true, default: '0' }
     })
 
     const emit = defineEmits(['updateVoiceSettings', 'hasError'])
@@ -222,3 +232,12 @@
         emit('hasError', newVal)
     })
 </script>
+
+<style scoped>
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity 0.8s;
+    }
+    .fade-enter-from, .fade-leave-to {
+        opacity: 0;
+    }
+</style>
