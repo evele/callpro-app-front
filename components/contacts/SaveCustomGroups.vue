@@ -1,14 +1,14 @@
 <template>
     <div class="flex flex-col gap-[38px]">
         <div class="flex flex-col gap-2 w-full">
-            <label for="group-name" class="text-xl leading-6 text-left">Group Name*</label>
+            <label for="group-name" class="leading-6 text-left text-dark-3">Group Name*</label>
             <InputText id="group-name" class="w-full text-sm border border-gray-300 bg-white" autocomplete="off"
                 placeholder="Enter Name" v-model="groupName" 
             />
         </div>
 
         <div class="flex flex-col gap-2 w-full">
-            <label for="group-name" class="text-xl leading-6 text-left">Phone Launch ID</label>
+            <label for="group-name" class="leading-6 text-left text-dark-3">Phone Launch ID</label>
             <InputText id="launch-id" class="w-full text-sm border border-gray-300 bg-white" autocomplete="off"
                 placeholder="Enter a number ID" v-model="launchIDString" 
             />
