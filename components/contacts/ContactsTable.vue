@@ -170,16 +170,20 @@
 
                     <Column field="groups" header="" class="text-center" style="width: 25%; padding-left: 0;">
                         <template #body="slotProps">
-                            <div class="relative flex justify-center gap-1 items-center">
-                                <span v-if="slotProps.data.group.length > 0" class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px]">{{ slotProps.data?.group[0] }}</span>
-                                <span v-if="slotProps.data.group.length > 1"
-                                    v-tooltip.top="{
-                                        value: get_number_group_name(slotProps.data.group.slice(1)).join(', '),
-                                        pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
-                                    }"
-                                    class="absolute right-10 bg-[#49454F] text-white px-2 rounded-xl font-medium leading-none h-4"> 
-                                    ...
-                                </span>
+                            <div class="flex justify-center gap-1 items-center">
+                                <p v-if="slotProps.data.group.length > 0" 
+                                    class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px] relative"
+                                >
+                                    {{ get_number_group_name([slotProps.data?.group[0]])[0] }}
+                                    <span v-if="slotProps.data.group.length > 1"
+                                        v-tooltip.top="{
+                                            value: get_number_group_name(slotProps.data.group.slice(1)).join(', '),
+                                            pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
+                                        }"
+                                        class="absolute -right-7 bg-[#49454F] text-white px-2 rounded-xl font-medium leading-none h-4"> 
+                                        ...
+                                    </span>
+                                </p>
                             </div>
                         </template>
                     </Column>
