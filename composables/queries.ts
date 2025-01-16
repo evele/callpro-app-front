@@ -44,12 +44,13 @@ export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:
 }
 
 /* ----- Audios ----- */
-export function useFetchGetAllAudios(showOlder:Ref<boolean>) {
+export function useFetchGetAllAudios(showOlder:Ref<boolean>, is_enabled: boolean = true) {
   const dataToSend = computed(() => ({ show_all_audios: showOlder.value }));
 
   return useQuery({
       queryKey: ['user_all_audios', dataToSend],
-      queryFn: () => getUserAllAudios(dataToSend.value),      
+      queryFn: () => getUserAllAudios(dataToSend.value),
+      enabled: is_enabled,    
     });
 }
 

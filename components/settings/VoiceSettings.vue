@@ -25,6 +25,19 @@
             <label class="text-lg font-medium">Static audio introduction</label>
             <ToggleSwitch v-model="voice_settings.static_intro" class="scale-125" />
         </div>
+        <div v-if="voice_settings.static_intro" class="flex justify-between items-center mt-7">
+            <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected?.name}}</p>
+            <div class="flex items-center gap-2">
+                <span v-if="static_intro_error" class="text-red-500">{{ static_intro_error_message }}</span>
+                <Button @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected?.id)" 
+                    class="w-7 h-7 bg-[#e7e0ec] rounded-full] text-[#1D1B20] border-none hover:scale-110 transition-transform"
+                >
+                    <template #icon>
+                        <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
+                    </template>
+                </Button>
+            </div>
+        </div>
     </SettingSection>
     <Divider />
 
@@ -88,11 +101,15 @@
             />
         </div>
     </SettingSection>
+
+    <StaticIntroModal ref="staticIntroModalRef" @update:selected-audio="handle_audio_selection" />
 </template>
 
 <script setup lang="ts">
+    import EditIconSVG from '../svgs/EditIconSVG.vue'
+
     const props = defineProps({
-        voiceSettings: { type: [Object, null] as PropType<VoiceSettings | null>, required: true, default: null },
+        voiceSettings: { type: [Object, null] as PropType<VoiceSettingsWithAudio | null>, required: true, default: null },
         callProNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
         tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] }
     })
@@ -105,6 +122,8 @@
     const number_when_completed_empty = ref(false)
     const number_when_completed_error = ref(false)
     const number_when_completed_error_message = ref('')
+    const static_intro_error = ref(false)
+    const static_intro_error_message = ref('')
 
     const voice_settings = reactive<VoiceSettingsUI>({
         caller_id_selected: undefined,
@@ -112,6 +131,8 @@
         call_pro_number: '',
         toll_free_number: '',
         static_intro: false,
+        static_intro_library_id: undefined,
+        static_intro_audio_selected: undefined,
         repeat: false,
         offer_dnc: false,
         retries: undefined,
@@ -146,6 +167,8 @@
 
             voice_settings.caller_id = props.voiceSettings.caller_id
             voice_settings.static_intro = props.voiceSettings.static_intro === '1'
+            voice_settings.static_intro_library_id = props.voiceSettings.static_intro_library_id
+            voice_settings.static_intro_audio_selected = props.voiceSettings.static_intro_audio_selected
             voice_settings.repeat = props.voiceSettings.repeat === '1'
             voice_settings.offer_dnc = props.voiceSettings.offer_dnc === '1'
             voice_settings.retries = props.voiceSettings.retries
@@ -214,11 +237,32 @@
             number_when_completed_error_message.value = ''
         }
 
+        if(updatedSettings.static_intro && !updatedSettings.static_intro_library_id) {
+            static_intro_error.value = true
+            static_intro_error_message.value = 'Static intro audio is required'
+        } else {
+            static_intro_error.value = false
+            static_intro_error_message.value = ''
+        }
+
         emit('updateVoiceSettings', updatedSettings)
     })
 
-    const hasError = computed(() => (caller_id_empty.value || number_when_completed_empty.value) || (caller_id_error.value || number_when_completed_error.value))
+    const hasError = computed(() => {
+        return (caller_id_empty.value || number_when_completed_empty.value) ||
+               (caller_id_error.value || number_when_completed_error.value || static_intro_error.value)
+    })
     watch(hasError, (newVal: boolean) => {
         emit('hasError', newVal)
     })
+
+    const staticIntroModalRef = ref()
+    const handle_open_static_intro_modal = (audio_id: number | undefined) => {
+        staticIntroModalRef.value?.open(audio_id)
+    }
+
+    const handle_audio_selection = (selected_audio: Audio) => {
+        voice_settings.static_intro_library_id = selected_audio.id
+        voice_settings.static_intro_audio_selected = selected_audio
+    }
 </script>

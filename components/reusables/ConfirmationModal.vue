@@ -12,7 +12,7 @@
                 <Button @click="close" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[300px] hover:bg-[#E5E5E5]">
                     Cancel
                 </Button>
-                <Button @click="handle_confirm" :disabled="isDisabled" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E]">
+                <Button @click="handle_confirm" :disabled="isDisabled" class="bg-[#653494] border-white text-white w-full sm:max-w-[300px] hover:bg-[#4A1D6E] disabled:bg-[#653494]">
                     Confirm
                 </Button>
             </footer>
