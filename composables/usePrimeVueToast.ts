@@ -20,5 +20,14 @@ export function usePrimeVueToast() {
         });
     };
 
-    return { show_success_toast, show_error_toast };
+    const show_info_toast = (title: string, message: string) => {
+        toast.add({ 
+            severity: 'info', 
+            summary: title, 
+            detail: message, 
+            life: 3000 
+        });
+    }
+
+    return { show_success_toast, show_error_toast, show_info_toast };
 }

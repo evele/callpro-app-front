@@ -7,7 +7,13 @@
             </header>
         </template>
 
-        <AddNewContact v-if="section_to_show === 'new_contact'" @close="handleClose" @success="handleSuccess" @error="handleError" />
+        <SaveContact v-if="section_to_show === 'contact'" 
+            :selected-contact="selected_contact" 
+            @close="handleClose" 
+            @success="handleSuccess" 
+            @error="handleError"
+            @update:table="emit('update:table')"
+        />
 
         <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess" @error="handleError" />
 
@@ -26,18 +32,23 @@
 <script setup lang="ts">
     const props = defineProps({
         selectedGroup: { type: String, required: true },
-        groupToEdit: { type: Object, required: false, default: null }
+        groupToEdit: { type: Object, required: false, default: null },
+        selectedContact: { type: Object as PropType<ContactToEdit | null>, required: false, default: null }
     })
 
     const group_to_edit = ref()
+    const selected_contact = computed(() => props.selectedContact)
     const visible = ref(false)
+
+    const emit = defineEmits(['reset', 'update:table'])
 
     const section_to_show = ref<ContactsModalSectionToShow>('')
     const selected_option = ref('')
     const upload_title = ref('Upload new file')
+    const contact_title = computed(() => selected_contact.value ? 'Edit contact' : 'Add new contact')
 
     const menuOptions = computed(() => [
-        { id: 'new_contact', text: "Add new contact" },
+        { id: 'contact', text: contact_title.value },
         { id: 'new_group', text: "Add new Group" }, // TODO: check about edit group
         { id: 'dnc', text: "Add new DNC" },
         { id: 'upload', text: upload_title.value },
@@ -46,6 +57,7 @@
     const handleOptionSelected = (selectedOption: ContactsModalSectionToShow) => {
         selected_option.value = selectedOption
         section_to_show.value = selectedOption
+        emit('reset', true)
 
         if(upload_title.value !== 'Upload new file') {
             upload_title.value = 'Upload new file';
@@ -66,18 +78,21 @@
     const close = () => {
         section_to_show.value = '';
         selected_option.value = ''
+        emit('reset', true)
         visible.value = false;
     }
 
     defineExpose({ open });
 
-    const { show_success_toast, show_error_toast } = usePrimeVueToast();
+    const { show_success_toast, show_error_toast, show_info_toast } = usePrimeVueToast();
 
     const handleClose = () => close()
 
     const handleSuccess = (message: string) => show_success_toast('Success', message)
 
     const handleError = (error: string) => show_error_toast('Error', error)
+
+    const handleInfo = (info: string) => show_info_toast('Notice', info)
 
     const handleChangeTitle = (title: string) => upload_title.value = title
 </script>

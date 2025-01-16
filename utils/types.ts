@@ -13,7 +13,7 @@ export type NumberOrNull = number | null;
 export type BooleanOrNull = boolean | null;
 export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
-export type ContactsModalSectionToShow = '' | 'new_contact' | 'new_group' | 'dnc' | 'upload';
+export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 'upload';
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type FilterOption = { id: string, name: string, count: number }
 
@@ -38,6 +38,7 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+
 export type validateConfirmationCode = {
   confirmation_code: number;
   root_id: string;
@@ -58,10 +59,23 @@ export type UserRegister = {
   root_id: string | null;
 }
 
+export type SaveContactAPIResponse = APIResponseSuccess & {
+  already_exists?: string[]
+}
+
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 
   is_custom: boolean 
+}
+
+export type AllContactsQueryParams = {
+  page: number,
+  show: number,
+  with_groups: boolean,
+  is_custom_group: boolean,
+  group_id: string[],
+  filter: string,
 }
 
 // Interface for a phone number and its associated groups
@@ -81,6 +95,13 @@ export type Contact = {
   first_name: string; // First name of the contact
   last_name: string; // Last name of the contact
   numbers: PhoneNumber[]; // Array of phone numbers associated with the contact
+}
+
+export type ContactToEdit = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  numbers: ContactNumberWithReceivedGroups[]
 }
 
 export type ContactPhoneNumber = PhoneNumber & {
@@ -105,21 +126,30 @@ export type ContactGroup = {
   phone_launch_id: NumberOrNull;
 };
 
-export type ContactNumber = {
-  id: 'new' | number,
+export type ReceivedNumberGroups = { number_groups: StringOrNull }
+
+export type ContactNumberWithoutGroups = {
+  id: string,
   number: string,
   notes: string,
   type: '' | OneToFour,
+}
+
+export type ContactNumberWithReceivedGroups = ContactNumberWithoutGroups & ReceivedNumberGroups;
+
+export type ContactNumber = ContactNumberWithoutGroups & {
   number_groups: string[]
 }
 
 export type ContactToSave = {
+  contact_id: StringOrNull,
   first_name: string,
   last_name: string,
   numbers: ContactNumber[]
 }
 
 export type ContactBeforeToSave = {
+  contact_id: StringOrNull,
   first_name: string,
   last_name: string,
   numbers: ContactNumber

@@ -19,6 +19,7 @@
         <ContactsTable ref="contactsTableRef"
             :selected-groups="selected_groups" 
             @uploadFile="open_contacts_modal"
+            @update:contactToEdit="handle_edit_contact"
             :dnc-total-numbers="total_dnc_count" 
             :is-custom-group="is_custom_group" 
             :system-groups="system_groups"
@@ -36,7 +37,13 @@
         </div>
     </div>
 
-    <ModalContacts ref="modalContacts" :selected-group="selected_groups[0].group_id" />
+    <ModalContacts 
+        ref="modalContacts" 
+        :selected-group="selected_groups[0].group_id"
+        :selected-contact="selected_contact"
+        @reset="handle_reset_values"
+        @update:table="handle_update_table"
+    />
 
     <Toast />
 </template>
@@ -45,6 +52,7 @@
     const modalContacts = ref()
     const selected_groups = ref<ContactSelectedGroup[]>([{ group_name: 'All', group_id: CONTACTS_ALL, is_custom: false }])
     const is_custom_group = ref(false)
+    const selected_contact = ref<ContactToEdit | null>(null)
     const contactsTableRef = ref()
     // TODO: review logic between selected_group, selected_tab, editing group
 
@@ -92,16 +100,29 @@
         modalContacts.value.open(section);
     }
 
+    const handle_reset_values = () => {
+        selected_contact.value = null
+    }
+
+    const handle_update_table = () => {
+        contactsTableRef.value?.reset_selected_contacts()
+    }
+
     /* ----- Contacts Groups Panel ----- */
     const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean) => {
+        contactsTableRef.value?.reset_selected_contacts()
         selected_groups.value = [{ group_name: button_name, group_id: button_group_id, is_custom: is_custom }]
         is_custom_group.value = is_custom
-        contactsTableRef.value?.reset_selected_contacts()
     }
 
     /* ----- Contacts Table ----- */
     const handle_filters_selection = (selected_filters: {group_name: string, group_id: string, is_custom: boolean}[]) => {
         selected_groups.value = selected_filters
+    }
+
+    const handle_edit_contact = (contact: ContactToEdit) => {
+        selected_contact.value = contact
+        open_contacts_modal('contact')
     }
 </script>
 

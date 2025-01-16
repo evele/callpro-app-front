@@ -11,6 +11,7 @@
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
             :totalRecords="total_records"
+            :first="(page - 1) * 10"
             @page="onPageChange($event)"
             v-model:expandedRows="expandedRows"
             :rowClass="rowClass"
@@ -26,7 +27,7 @@
                             <InputIcon>
                                 <SearchSVG class="text-[#757575]" />
                             </InputIcon>
-                            <InputText class="py-2 w-full" placeholder="Search by Name, Phone or Group" />
+                            <InputText class="py-2 w-full" placeholder="Search by Name or Phone" v-model="search" />
                         </IconField>
 
                         <div class="flex gap-4">
@@ -77,7 +78,9 @@
                     <div class="text-[#1D1B20] relative w-fit">
                         <span @click.stop="handle_select_by_name(slotProps.data.id, true)">{{ slotProps.data.name }}</span>
                         <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
-                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white" 
+                                @click="handle_edit_contact(slotProps.data.id)"
+                            >
                                 <EditIconSVG class="w-3 h-4" />
                             </Button>
                             <Button class="bg-gray-200 py-1 px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
@@ -254,7 +257,7 @@
     const show = ref(10)
     const with_groups = ref(true)
     const is_custom_group = computed(() => props.isCustomGroup)
-    const search = ref("")
+    const search = useDebouncedRef("", 500)
     const total_records = ref()
 
     const expandedRows = ref<{ [key: string]: boolean }>({});
@@ -264,9 +267,17 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
+    const emit = defineEmits(['uploadFile', 'update:filters', 'update:contactToEdit'])
     const filterDropdownRef = ref()
 
-    const emit = defineEmits(['uploadFile', 'update:filters'])
+    const query_params = computed<AllContactsQueryParams>(() => ({
+        page: page.value,
+        show: show.value,
+        with_groups: with_groups.value,
+        is_custom_group: is_custom_group.value,
+        group_id: updatedSelectedGroupsID.value,
+        filter: search.value
+    }))
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -291,7 +302,7 @@
         [key: string]: ContactRow;
     }
 
-    const { data: all_contacts_data, isLoading } = useFetchAllContacts(page,show,with_groups,is_custom_group,updatedSelectedGroupsID,search) 
+    const { data: all_contacts_data, isLoading } = useFetchAllContacts(query_params) 
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
@@ -351,7 +362,14 @@
     });
 
     // Reset checkboxes and expanded row
-    const reset_selected_contacts = () => {
+    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true) => {
+        if(reset_page) {
+            page.value = 1;
+        }
+        if(reset_search) {
+            search.value = '';
+        }
+
         all_selected.value = false;
         selected_contacts.value = [];
         selected_numbers.value = [];
@@ -364,8 +382,12 @@
     // Handle pagination
     const onPageChange = (event: any) => {
         page.value = event.page + 1
-        reset_selected_contacts()
+        reset_selected_contacts(false, false)
     }
+
+    watch(() => search.value, () => {
+        page.value = 1;
+    })
 
     // When the expand button is clicked, it expands the row and shows the contact numbers and its data
     const toggleRow = (id: string) => {
@@ -659,6 +681,26 @@
     defineExpose({ reset_selected_contacts })
 
     const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
+
+    /* ----- Edit Contact Section ----- */
+    const handle_edit_contact = (contact_id: number) => {
+        const contact_with_numbers = contacts_data.value.contacts.filter((contact: ContactPhoneNumber) => contact.id == contact_id)
+        const contact_to_edit = contact_with_numbers.reduce((acc: any, contact: ContactPhoneNumber) => {
+            acc.id = contact.id
+            acc.first_name = contact.first_name
+            acc.last_name = contact.last_name
+            acc.numbers.push({
+                id: contact.number_id,
+                number: contact.number,
+                notes: contact.notes,
+                type: contact.type,
+                number_groups: contact.number_groups
+            })
+            return acc
+        }, { first_name: '', last_name: '', numbers: [] })
+
+        emit('update:contactToEdit', contact_to_edit)
+    }
 
     /* ----- Filters ----- */
     const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
