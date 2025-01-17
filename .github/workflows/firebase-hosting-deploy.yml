@@ -16,7 +16,7 @@ jobs:
       - name: Authenticate with Google Cloud
         uses: google-github-actions/auth@v1
         with:
-          credentials_json: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+          credentials_json: ${{ secrets.FIREBASE_SEVICE_ACCOUNT }}
 
       # Instalar Firebase CLI
       - name: Install Firebase CLI

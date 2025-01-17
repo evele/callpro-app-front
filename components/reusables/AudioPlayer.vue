@@ -21,7 +21,7 @@
                     </Button>
                     <Button class="bg-[#2C2C2C] border-none hover:bg-[#636262] hover:scale-105 transition-all" @click="toggle_play_pause">
                         <template v-if="!is_playing" #icon>
-                            <PlaySVG class="pl-[2px] w-4 h-4 text-white" />
+                            <PlaySVG class="pl-[2px] w-6 h-6 text-white" />
                         </template>
                         <template v-else #icon>
                             <PauseSVG class="w-5 h-5 text-white" />

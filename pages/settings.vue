@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded-2xl my-4 mx-6">
+    <div class="bg-white rounded-2xl mt-4 mb-6 mx-6 relative shadow-lg">
         <Tabs v-model:value="selected_tab">
             <div class="flex justify-between py-7 px-12 border-b">
                 <TabList class="flex items-center">
@@ -24,7 +24,7 @@
                 </Button>
             </div>
 
-            <TabPanels class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl">
+            <TabPanels ref="scrollableContainer" class="max-h-[75vh] overflow-y-auto pl-14 pr-10 rounded-2xl" @scroll="handle_scroll">
                 <TabPanel value="voice">
                     <SettingsSkeleton v-if="isLoading || is_loading_did" />
                     <VoiceSettings v-else 
@@ -51,6 +51,18 @@
                 </TabPanel>
             </TabPanels>
         </Tabs>
+
+        <Transition>
+            <Button 
+                v-show="show_scroll_button && !isLoading" 
+                class="absolute -bottom-3 w-8 h-8 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform" 
+                @click="scrollDown"
+            >
+                <template #icon>
+                    <ChevronDownSVG class="w-5 h-5 text-white" />
+                </template>
+            </Button>
+        </Transition>
     </div>
 
     <Dialog v-model:visible="visible" pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-full max-w-[32rem] p-8" pt:mask:class="bg-white bg-opacity-70">
@@ -85,9 +97,15 @@
     const confirmationModal = ref();
 
     /* ----- Begin Voice Settings ----- */
-    const voice_settings = computed(() => {
+    const voice_settings = computed((): VoiceSettingsWithAudio | null => {
         if(!settings?.value?.result) return null;
-        const { time_guard, time_zone, call_window_end, call_window_start, ...filteredSettings } = settings.value.settings
+        const { time_guard, time_zone, call_window_end, call_window_start, ...remainingSettings } = settings.value.settings
+
+        const filteredSettings: VoiceSettingsWithAudio = {
+            ...remainingSettings,
+            static_intro_audio_selected: settings.value.static_intro_audio_selected || null,
+        }
+
         return filteredSettings
     })
 
@@ -134,7 +152,7 @@
             repeat_library_id: null,
             retries: voice_settings_ui.retries ?? '1',
             static_intro: voice_settings_ui.static_intro ? '1' : '0',
-            static_intro_library_id: 0,
+            static_intro_library_id: voice_settings_ui.static_intro_library_id ?? null,
         }
 
         return formatted_settings
@@ -303,6 +321,27 @@
     })
 
     /* ----- End Did Numbers ----- */
+
+    const scrollableContainer = ref<any>(null)
+    const show_scroll_button = ref(true)
+
+    const handle_scroll = (event: Event) => {
+        const target = event.target as HTMLElement;
+        const is_at_bottom = target.scrollHeight - target.scrollTop <= target.clientHeight;
+        show_scroll_button.value = !is_at_bottom
+    }
+
+    const scrollDown = () => {
+        if (scrollableContainer.value) {
+            const container = scrollableContainer.value.$el;
+            if (container) {
+                container.scrollBy({
+                    top: 400,
+                    behavior: "smooth",
+                });
+            }
+        }
+    };
 </script>
 
 <style scoped lang="scss">
@@ -325,5 +364,17 @@
                 }
             }
         }
+    }
+
+    .v-enter-active {
+        transition: opacity 0.5s ease;
+    }
+    .v-leave-active {
+        transition: opacity 0.3s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+        opacity: 0;
     }
 </style>

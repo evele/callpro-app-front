@@ -15,7 +15,7 @@
         </div>
 
         <section>
-            <ProgressBar v-if="isFetching" mode="indeterminate" style="height: 6px"></ProgressBar>
+            <ProgressBar v-if="isFetching || isPendingDelete" mode="indeterminate" style="height: 6px"></ProgressBar>
             <DataTable
                 :value="search.length ? filtered_audios : user_audios"
                 dataKey="id" 
@@ -53,7 +53,7 @@
                             <Button class="bg-[#E7E0EC] py-1 px-2 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="edit_audio(slotProps.data.id)">
                                 <EditIconSVG />
                             </Button>
-                            <Button class="bg-[#E7E0EC] p-1 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="delete_modal(slotProps.data.id)">
+                            <Button class="bg-[#E7E0EC] p-1 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="confirm_delete(slotProps.data.id)">
                                 <TrashSVG />
                             </Button>
                         </div>
@@ -80,14 +80,9 @@
             </form>
         </Dialog>
 
-        <ConfirmDialog :visible="show_confirm" class="confirm-dialog">
-            <template #message>
-                <div class="flex flex-col mt-4 mb-6 gap-2">
-                    <p class="text-lg font-semibold">Are you sure you want to delete "{{ selected_audio ? selected_audio.name : 'this audio' }}"?</p>
-                    <ProgressBar v-if="isPendingDelete" mode="indeterminate" style="height: 5px"></ProgressBar>
-                </div>
-            </template>
-        </ConfirmDialog>
+        <ConfirmationModal ref="confirmationModal" title="Confirmation" @confirm="delete_audio">
+            <p class="text-lg font-semibold">Are you sure you want to delete "{{ selected_audio ? selected_audio.name : 'this audio' }}"?</p>
+        </ConfirmationModal>
 
         <Toast />
     </div>
@@ -97,7 +92,6 @@
 <script setup lang="ts">
     import type { QueryObserverResult } from '@tanstack/vue-query'
 
-    const confirm = useConfirm();
     const toast = useToast();
     const show_older = ref(false)
     const selected_audio_file_name = ref('')
@@ -107,18 +101,11 @@
     const { mutate: deleteAudio, isPending: isPendingDelete } = useDeleteAudio()
     const { refetch: download_audio_bro } = useDownloadAudio(selected_audio_file_name)
 
-    const audio_playing = ref<Audio | null>(null)
     const selected_audio = ref<Audio | null>(null)
     const show_edit_audio = ref(false)
     const audio_name = ref('')
-    const show_confirm = ref(false)
+    const confirmationModal = ref()
     const search = ref('')
-
-    type ProcessedAudio = Audio & {
-        position: number;
-        created_at: string;
-        last_used: string;
-    };
 
     const user_audios = computed((): ProcessedAudio[] => {
         if(allAudiosData.value && allAudiosData.value.result) {
@@ -138,6 +125,10 @@
         return []
     })
 
+    /* ----- Audio Player ----- */
+    const { audio_playing, handle_player_action } = useAudioPlayer(user_audios)
+    /* ----- Audio Player ----- */
+
     const filtered_audios = computed((): ProcessedAudio[] => {
         return user_audios.value.filter((audio: ProcessedAudio) => {
             return audio.name.toLowerCase().includes(search.value.toLowerCase())
@@ -147,26 +138,10 @@
     const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 })
     const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 })
 
-    const delete_modal = (audio_id: number) => {
+    const confirm_delete = (audio_id: number) => {
         selected_audio.value = user_audios.value.find((audio: Audio) => audio.id === audio_id) ?? null
         if(!selected_audio.value) return
-        show_confirm.value = true
-        confirm.require({
-            header: 'Confirmation',
-            rejectProps: {
-                label: 'No',
-                severity: 'secondary'
-            },
-            acceptProps: {
-                label: 'Yes',
-            },
-            accept: () => {
-                delete_audio()
-            },
-            reject: () => {
-                show_confirm.value = false
-            }
-        });
+        confirmationModal.value?.open()
     };
 
     const download_audio = (audio_id: number) => {
@@ -244,11 +219,9 @@
                 } else {
                     show_error_toast('Oops...', response.error ?? 'Something failed!')
                 }
-                show_confirm.value = false
             },
             onError: () => {
                 show_error_toast('Oops...', 'Something failed!')
-                show_confirm.value = false
             }
         })
     }
@@ -256,70 +229,6 @@
     const rowClass = (data: any) => {
         return [{ '!bg-[#D0BCFF]': audio_playing.value && audio_playing.value?.id === data.id }];
     };
-
-    /* ----- Audio Player ----- */
-    const is_audio_playing = ref(false)
-    const is_audio_loading = ref(false)
-    const is_audio_paused = ref(false)
-    const is_audio_error = ref(false)
-    const show_controls = ref(false)
-
-    const reset_states = () => {
-        is_audio_playing.value = false
-        is_audio_loading.value = false
-        is_audio_paused.value = false
-        is_audio_error.value = false
-    }
-
-    watch(() => audio_playing.value, (newVal: Audio | null) => {
-        if(!newVal) {
-            audio_playing.value = null
-            return
-        }
-        reset_states()
-    })
-
-    const select_previous_audio = () => {
-        if(!audio_playing.value) return
-        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
-        const new_position = (current_position === 0) ? user_audios.value.length - 1 : current_position - 1
-        audio_playing.value = user_audios.value[new_position]
-    }
-
-    const select_next_audio = () => {
-        if(!audio_playing.value) return
-        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
-        const new_position = (current_position === user_audios.value.length - 1) ? 0 : current_position + 1
-        audio_playing.value = user_audios.value[new_position]
-    }
-
-    const handle_player_action = (action: string) => {
-        reset_states()
-        switch(action) {
-            case 'loading':
-                is_audio_loading.value = true
-                break
-            case 'play':
-                is_audio_playing.value = true
-                break
-            case 'pause':
-                is_audio_paused.value = true
-                break
-            case 'error':
-                is_audio_error.value = true
-                show_error_toast('Sorry!', "This audio can't be played");
-                break
-            case 'prev':
-                select_previous_audio()
-                break
-            case 'next':
-                select_next_audio()
-                break
-            default:
-                break
-        }
-    }
-    /* ----- Audio Player ----- */
 </script>
 
 <style scoped lang="scss">

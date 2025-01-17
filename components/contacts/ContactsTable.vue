@@ -78,7 +78,9 @@
                     <div class="text-[#1D1B20] relative w-fit">
                         <span @click.stop="handle_select_by_name(slotProps.data.id, true)">{{ slotProps.data.name }}</span>
                         <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
-                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
+                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white" 
+                                @click="handle_edit_contact(slotProps.data.id)"
+                            >
                                 <EditIconSVG class="w-3 h-4" />
                             </Button>
                             <Button class="bg-gray-200 py-1 px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
@@ -168,16 +170,20 @@
 
                     <Column field="groups" header="" class="text-center" style="width: 25%; padding-left: 0;">
                         <template #body="slotProps">
-                            <div class="relative flex justify-center gap-1 items-center">
-                                <span v-if="slotProps.data.group.length > 0" class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px]">{{ slotProps.data?.group[0] }}</span>
-                                <span v-if="slotProps.data.group.length > 1"
-                                    v-tooltip.top="{
-                                        value: get_number_group_name(slotProps.data.group.slice(1)).join(', '),
-                                        pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
-                                    }"
-                                    class="absolute right-10 bg-[#49454F] text-white px-2 rounded-xl font-medium leading-none h-4"> 
-                                    ...
-                                </span>
+                            <div class="flex justify-center gap-1 items-center">
+                                <p v-if="slotProps.data.group.length > 0" 
+                                    class="rounded-xl bg-[#EBFFEE] text-xs font-semibold text-[#49454F] px-2 pt-[2px] pb-[3px] relative"
+                                >
+                                    {{ get_number_group_name([slotProps.data?.group[0]])[0] }}
+                                    <span v-if="slotProps.data.group.length > 1"
+                                        v-tooltip.top="{
+                                            value: get_number_group_name(slotProps.data.group.slice(1)).join(', '),
+                                            pt: { text: 'text-sm font-light', root: 'max-w-[400px]'}
+                                        }"
+                                        class="absolute -right-7 bg-[#49454F] text-white px-2 rounded-xl font-medium leading-none h-4"> 
+                                        ...
+                                    </span>
+                                </p>
                             </div>
                         </template>
                     </Column>
@@ -265,6 +271,7 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
+    const emit = defineEmits(['uploadFile', 'update:filters', 'update:contactToEdit'])
     const filterDropdownRef = ref()
 
     const query_params = computed<AllContactsQueryParams>(() => ({
@@ -275,8 +282,6 @@
         group_id: updatedSelectedGroupsID.value,
         filter: search.value
     }))
-
-    const emit = defineEmits(['uploadFile', 'update:filters'])
 
     /* ----- Types ----- */
     type FormattedContact = { // This is the data that is shown in the expanded row
@@ -680,6 +685,26 @@
     defineExpose({ reset_selected_contacts })
 
     const action_button_style = 'bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-gray-100 hover:shadow-lg border-none';
+
+    /* ----- Edit Contact Section ----- */
+    const handle_edit_contact = (contact_id: number) => {
+        const contact_with_numbers = contacts_data.value.contacts.filter((contact: ContactPhoneNumber) => contact.id == contact_id)
+        const contact_to_edit = contact_with_numbers.reduce((acc: any, contact: ContactPhoneNumber) => {
+            acc.id = contact.id
+            acc.first_name = contact.first_name
+            acc.last_name = contact.last_name
+            acc.numbers.push({
+                id: contact.number_id,
+                number: contact.number,
+                notes: contact.notes,
+                type: contact.type,
+                number_groups: contact.number_groups
+            })
+            return acc
+        }, { first_name: '', last_name: '', numbers: [] })
+
+        emit('update:contactToEdit', contact_to_edit)
+    }
 
     /* ----- Filters ----- */
     const FILTERS_SYSTEM_GROUPS = computed<FilterOption[]>(() => {
