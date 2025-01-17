@@ -101,18 +101,11 @@
     const { mutate: deleteAudio, isPending: isPendingDelete } = useDeleteAudio()
     const { refetch: download_audio_bro } = useDownloadAudio(selected_audio_file_name)
 
-    const audio_playing = ref<Audio | null>(null)
     const selected_audio = ref<Audio | null>(null)
     const show_edit_audio = ref(false)
     const audio_name = ref('')
     const confirmationModal = ref()
     const search = ref('')
-
-    type ProcessedAudio = Audio & {
-        position: number;
-        created_at: string;
-        last_used: string;
-    };
 
     const user_audios = computed((): ProcessedAudio[] => {
         if(allAudiosData.value && allAudiosData.value.result) {
@@ -131,6 +124,10 @@
         }
         return []
     })
+
+    /* ----- Audio Player ----- */
+    const { audio_playing, handle_player_action } = useAudioPlayer(user_audios)
+    /* ----- Audio Player ----- */
 
     const filtered_audios = computed((): ProcessedAudio[] => {
         return user_audios.value.filter((audio: ProcessedAudio) => {
@@ -232,70 +229,6 @@
     const rowClass = (data: any) => {
         return [{ '!bg-[#D0BCFF]': audio_playing.value && audio_playing.value?.id === data.id }];
     };
-
-    /* ----- Audio Player ----- */
-    const is_audio_playing = ref(false)
-    const is_audio_loading = ref(false)
-    const is_audio_paused = ref(false)
-    const is_audio_error = ref(false)
-    const show_controls = ref(false)
-
-    const reset_states = () => {
-        is_audio_playing.value = false
-        is_audio_loading.value = false
-        is_audio_paused.value = false
-        is_audio_error.value = false
-    }
-
-    watch(() => audio_playing.value, (newVal: Audio | null) => {
-        if(!newVal) {
-            audio_playing.value = null
-            return
-        }
-        reset_states()
-    })
-
-    const select_previous_audio = () => {
-        if(!audio_playing.value) return
-        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
-        const new_position = (current_position === 0) ? user_audios.value.length - 1 : current_position - 1
-        audio_playing.value = user_audios.value[new_position]
-    }
-
-    const select_next_audio = () => {
-        if(!audio_playing.value) return
-        const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
-        const new_position = (current_position === user_audios.value.length - 1) ? 0 : current_position + 1
-        audio_playing.value = user_audios.value[new_position]
-    }
-
-    const handle_player_action = (action: string) => {
-        reset_states()
-        switch(action) {
-            case 'loading':
-                is_audio_loading.value = true
-                break
-            case 'play':
-                is_audio_playing.value = true
-                break
-            case 'pause':
-                is_audio_paused.value = true
-                break
-            case 'error':
-                is_audio_error.value = true
-                show_error_toast('Sorry!', "This audio can't be played");
-                break
-            case 'prev':
-                select_previous_audio()
-                break
-            case 'next':
-                select_next_audio()
-                break
-            default:
-                break
-        }
-    }
-    /* ----- Audio Player ----- */
 </script>
 
 <style scoped lang="scss">
