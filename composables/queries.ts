@@ -239,6 +239,15 @@ export const useFetchSettings = () => {
   })
 }
 
+export const useFetchCallerIDNumbers = (enabled: boolean = true) => {
+  return useQuery({
+    queryKey: ['caller_id_numbers'],
+    queryFn: () => getCallerIDNumbers(),
+    enabled,
+    refetchOnWindowFocus: false,
+  })
+}
+
 /* ----- Sms ----- */
 export const useFetchSms = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPage>, search:Ref<string>) => {
   const dataToSend = computed(() => ({

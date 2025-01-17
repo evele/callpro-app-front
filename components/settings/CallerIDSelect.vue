@@ -1,0 +1,70 @@
+<template>
+    <div class="relative">
+        <Select 
+            v-model="localModelValue" 
+            :options="callerIdNumbers"
+            optionLabel="caller_id"
+            class="w-[294px]" 
+            :placeholder="isLoading ? 'Loading...' : 'Select number'" 
+            :loading="isLoading"
+        >
+            <template #value="slotProps">
+                <div v-if="slotProps.value && existsInCallerIdNumbers(localModelValue)" class="flex items-center w-full justify-between">
+                    <span>{{ format_number_to_show(slotProps.value.caller_id) }}</span>
+                    <VerifiedSVG v-if="slotProps.value.status === CallerIDStatus.CONFIRMED" class="w-4 h-4 text-verified" />
+                    <PendingSVG v-if="slotProps.value.status === CallerIDStatus.PENDING" class="w-4 h-4 text-pending" />
+                    <UnverifiedSVG v-if="slotProps.value.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-unverified" />
+                </div>
+                <span v-else>
+                    {{ slotProps.placeholder }}
+                </span>
+            </template>
+
+            <template #option="slotProps">
+                <div class="flex items-center w-full justify-between">
+                    <div>{{ format_number_to_show(slotProps.option.caller_id) }}</div>
+                    <VerifiedSVG v-if="slotProps.option.status === CallerIDStatus.CONFIRMED" class="w-4 h-4 text-verified" />
+                    <PendingSVG v-if="slotProps.option.status === CallerIDStatus.PENDING" class="w-4 h-4 text-pending" />
+                    <UnverifiedSVG v-if="slotProps.option.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-unverified" />
+                </div>
+            </template>
+        </Select>
+        <span v-if="error_message.length" class="text-[12px] text-red-500 absolute left-1 -bottom-6">{{ error_message }}</span>
+    </div>
+</template>
+
+<script setup lang="ts">
+    import VerifiedSVG from '../svgs/VerifiedSVG.vue'
+    import PendingSVG from '../svgs/PendingSVG.vue'
+    import UnverifiedSVG from '../svgs/UnverifiedSVG.vue'
+
+    const props = defineProps<{
+        modelValue: string;
+        isLoading: boolean;
+        callerIdNumbers: CallerID[];
+    }>();
+    
+    const emit = defineEmits(['update:modelValue', 'update:error']);
+
+    const localModelValue = ref<string | CallerID>(props.modelValue);
+    const error_message = ref<string>('');
+
+    watch(() => localModelValue.value, () => {
+        if(typeof localModelValue.value === 'string' || !localModelValue.value.caller_id) return;
+        if(localModelValue.value.status !== CallerIDStatus.CONFIRMED) {
+            error_message.value = 'You need a verified number to send a new broadcast';
+            emit('update:error', true);
+        } else {
+            error_message.value = '';
+            emit('update:error', false);
+        }
+        emit('update:modelValue', localModelValue.value)
+    });
+
+    const existsInCallerIdNumbers = (callerId: string | CallerID) => {
+        if(typeof callerId === 'object') {
+            return props.callerIdNumbers.some((item: CallerID) => item.caller_id === callerId.caller_id);
+        }
+        return props.callerIdNumbers.some((item: CallerID) => item.caller_id === callerId);
+    }
+</script>

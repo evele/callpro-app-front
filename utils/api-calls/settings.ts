@@ -28,3 +28,8 @@ export async function updateTextSettings(data: TextSettingsDataToSave): Promise<
 export async function updateGeneralSettings(data: GeneralSettingsDataToSave): Promise<APIResponseSuccess | APIResponseError>{    
     return await fetchWrapper.post(UPDATE_GENERAL_SETTINGS_URL, data) as APIResponseSuccess | APIResponseError
 }
+
+/* ----- Get caller id numbers ----- */
+export async function getCallerIDNumbers(): Promise<CallerIDFetchAPIRsponse | APIResponseError>{    
+    return await fetchWrapper.get(GET_CALLER_ID_NUMBERS_URL) as CallerIDFetchAPIRsponse | APIResponseError
+}

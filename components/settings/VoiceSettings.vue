@@ -12,19 +12,26 @@
         </div>
 
         <div v-else :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium w-48">Enter Caller ID</label>
-            <div class="relative">
-                <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
-                    :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
+            <label class="text-lg font-medium w-48">{{ cidConfirm == '1' ? 'Select Caller ID' : 'Enter Caller ID' }}</label>
+
+            <div v-if="cidConfirm == '1'" class="relative">
+                <CallerIDSelect 
+                    :model-value="voice_settings.caller_id"
+                    :is-loading="isLoadingCallerID" 
+                    :caller-id-numbers="caller_id_numbers"
+                    @update:modelValue="handle_caller_id_selection"
+                    @update:error="handle_caller_id_number_error"
                 />
-                <Transition v-if="voice_settings.caller_id_selected == '3'" name="fade">
-                    <Button type="button" @click="console.log('holaaa')" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
-                        <template #icon>
-                            <PlusSVG class="w-[14px] h-[14px]" />
-                        </template>
-                    </Button>
-                </Transition>
+                <Button type="button" @click="console.log('holaaa')" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
+                    <template #icon>
+                        <PlusSVG class="w-[14px] h-[14px]" />
+                    </template>
+                </Button>
             </div>
+
+            <PhoneInput v-else class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
+                :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
+            />
         </div>
     </SettingSection>
     <Divider/>
@@ -124,6 +131,7 @@
         cidConfirm: { type: String as PropType<'0' | '1'>, required: true, default: '0' }
     })
 
+    const { data: callerIDNumbers, isLoading: isLoadingCallerID, refetch: getCallerIDNumbers } = useFetchCallerIDNumbers(false)
     const emit = defineEmits(['updateVoiceSettings', 'hasError'])
 
     const caller_id_empty = ref(false)
@@ -155,6 +163,10 @@
 
     onMounted(() => {
         if(props.voiceSettings) {
+            if(props.cidConfirm === '1') {
+                getCallerIDNumbers()
+            }
+
             if(props.callProNumbers.includes(props.voiceSettings.caller_id)) {
                 voice_settings.caller_id_selected = '1'
                 const db_number = props.callProNumbers.find((number: string) => number === props.voiceSettings?.caller_id)
@@ -275,13 +287,21 @@
         voice_settings.static_intro_library_id = selected_audio.id
         voice_settings.static_intro_audio_selected = selected_audio
     }
-</script>
 
-<style scoped>
-    .fade-enter-active, .fade-leave-active {
-        transition: opacity 0.8s;
+    /* ----- Caller ID Section ----- */
+    const caller_id_numbers = computed((): CallerID[] => {
+        if(!callerIDNumbers?.value?.result) return []
+        return callerIDNumbers.value.caller_ids
+    })
+
+    const handle_caller_id_selection = (caller_id: CallerID) => {
+        if(!caller_id) return
+        console.log(caller_id, 'caller_id')
+        voice_settings.caller_id = caller_id.caller_id
     }
-    .fade-enter-from, .fade-leave-to {
-        opacity: 0;
+
+    const handle_caller_id_number_error = (error: boolean) => {
+       console.log(error)
+       caller_id_error.value = error
     }
-</style>
+</script>

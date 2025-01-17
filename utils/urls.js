@@ -69,6 +69,7 @@ export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
 export const UPDATE_VOICE_SETTINGS_URL = "/settings/save_audio_settings"
 export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
 export const UPDATE_GENERAL_SETTINGS_URL = "/settings/save_general_settings"
+export const GET_CALLER_ID_NUMBERS_URL = "/settings/get_caller_id_numbers"
 
 /* ----- SMS Store ----- */
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"
