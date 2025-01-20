@@ -129,9 +129,9 @@
 <style scoped>
 .main-container {
     background-color: var(--body-background);
-    overflow-x: hidden;
     display: grid;
-    grid-template-columns: 1fr auto;
+    justify-content: space-around;
+    grid-template-columns: minmax(auto, 1200px) minmax(auto, 280px);
     padding: 0 30px;
 }
 </style>
