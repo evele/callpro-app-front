@@ -111,7 +111,8 @@ const openEditDialog = (group: CustomGroup) => {
 
 <style scoped lang="scss">
 .container {
-    max-width: 250px;
+    width: 100%;
+    min-width: 250px;
     min-height: 500px;
     border-radius: 16px;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
