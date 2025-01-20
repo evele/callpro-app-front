@@ -2,7 +2,7 @@
     <div class="relative">
         <Select 
             v-model="localModelValue" 
-            :options="callerIdNumbers"
+            :options="formatted_caller_id_numbers"
             optionLabel="caller_id"
             class="w-[294px]" 
             :placeholder="isLoading ? 'Loading...' : 'Select number'" 
@@ -12,8 +12,8 @@
                 <div v-if="slotProps.value && existsInCallerIdNumbers(localModelValue)" class="flex items-center w-full justify-between">
                     <span>{{ format_number_to_show(slotProps.value.caller_id) }}</span>
                     <VerifiedSVG v-if="slotProps.value.status === CallerIDStatus.CONFIRMED" class="w-4 h-4 text-verified" />
-                    <PendingSVG v-if="slotProps.value.status === CallerIDStatus.PENDING" class="w-4 h-4 text-pending" />
-                    <UnverifiedSVG v-if="slotProps.value.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-unverified" />
+                    <PendingSVG v-if="slotProps.value.status === CallerIDStatus.PENDING || slotProps.value.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-pending" />
+                    <RejectedSVG v-if="slotProps.value.status === CallerIDStatus.REJECTED" class="w-4 h-4 text-unverified" />
                 </div>
                 <span v-else>
                     {{ slotProps.placeholder }}
@@ -24,8 +24,8 @@
                 <div class="flex items-center w-full justify-between">
                     <div>{{ format_number_to_show(slotProps.option.caller_id) }}</div>
                     <VerifiedSVG v-if="slotProps.option.status === CallerIDStatus.CONFIRMED" class="w-4 h-4 text-verified" />
-                    <PendingSVG v-if="slotProps.option.status === CallerIDStatus.PENDING" class="w-4 h-4 text-pending" />
-                    <UnverifiedSVG v-if="slotProps.option.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-unverified" />
+                    <PendingSVG v-if="slotProps.option.status === CallerIDStatus.PENDING || slotProps.option.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-pending" />
+                    <RejectedSVG v-if="slotProps.option.status === CallerIDStatus.REJECTED" class="w-4 h-4 text-unverified" />
                 </div>
             </template>
         </Select>
@@ -36,7 +36,7 @@
 <script setup lang="ts">
     import VerifiedSVG from '../svgs/VerifiedSVG.vue'
     import PendingSVG from '../svgs/PendingSVG.vue'
-    import UnverifiedSVG from '../svgs/UnverifiedSVG.vue'
+    import RejectedSVG from '../svgs/RejectedSVG.vue'
 
     const props = defineProps<{
         modelValue: string;
@@ -48,6 +48,16 @@
 
     const localModelValue = ref<string | CallerID>(props.modelValue);
     const error_message = ref<string>('');
+
+    const formatted_caller_id_numbers = computed((): CallerIDExt[] => {
+        return props.callerIdNumbers.map((item: CallerID) => {
+            return {
+                ...item,
+                caller_id: item.caller_id.split('#')[0],
+                ext: item.caller_id.split('#')[1] || ''
+            }
+        })
+    })
 
     watch(() => localModelValue.value, () => {
         if(typeof localModelValue.value === 'string' || !localModelValue.value.caller_id) return;
@@ -61,10 +71,10 @@
         emit('update:modelValue', localModelValue.value)
     });
 
-    const existsInCallerIdNumbers = (callerId: string | CallerID) => {
+    const existsInCallerIdNumbers = (callerId: string | CallerIDExt) => {
         if(typeof callerId === 'object') {
-            return props.callerIdNumbers.some((item: CallerID) => item.caller_id === callerId.caller_id);
+            return formatted_caller_id_numbers.value.some((item: CallerIDExt) => item.caller_id === callerId.caller_id);
         }
-        return props.callerIdNumbers.some((item: CallerID) => item.caller_id === callerId);
+        return formatted_caller_id_numbers.value.some((item: CallerIDExt) => item.caller_id === callerId);
     }
 </script>

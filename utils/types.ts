@@ -191,6 +191,8 @@ export type CallerID = {
   user_id: string;
 }
 
+export type CallerIDExt = CallerID & { ext: string; }
+
 export enum CallerIDStatus {
   CONFIRMED = 'CONFIRMED',
   PENDING = 'PENDING',

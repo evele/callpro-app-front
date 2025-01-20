@@ -22,7 +22,8 @@ export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
 export const GET_BROADCAST_DETAIL_URL = "/broadcast/get_broadcast_detail"
 
 /* ----- Caller ID Store ----- */
-export const GET_CALLER_IDS_URL = "/caller_id/get_caller_ids"
+export const GET_CALLER_ID_NUMBERS_URL = "/caller_id/get_caller_id_numbers"
+export const SAVE_CALLER_ID_NUMBER_URL = "/caller_id/save_caller_id_number"
 
 /* ----- Call In Codes Store ----- */
 export const GET_USER_CALL_IN_CODES_URL = "/call_in_codes/get_user_call_in_codes"
@@ -69,7 +70,6 @@ export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
 export const UPDATE_VOICE_SETTINGS_URL = "/settings/save_audio_settings"
 export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
 export const UPDATE_GENERAL_SETTINGS_URL = "/settings/save_general_settings"
-export const GET_CALLER_ID_NUMBERS_URL = "/settings/get_caller_id_numbers"
 
 /* ----- SMS Store ----- */
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"

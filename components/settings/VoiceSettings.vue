@@ -22,7 +22,7 @@
                     @update:modelValue="handle_caller_id_selection"
                     @update:error="handle_caller_id_number_error"
                 />
-                <Button type="button" @click="console.log('holaaa')" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
+                <Button type="button" @click="handle_open_caller_id_modal" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
                     <template #icon>
                         <PlusSVG class="w-[14px] h-[14px]" />
                     </template>
@@ -119,6 +119,7 @@
     </SettingSection>
 
     <StaticIntroModal ref="staticIntroModalRef" @update:selected-audio="handle_audio_selection" />
+    <CallerIDModal ref="callerIDModalRef" />
 </template>
 
 <script setup lang="ts">
@@ -278,6 +279,7 @@
         emit('hasError', newVal)
     })
 
+    /* ----- Static Intro Section ----- */
     const staticIntroModalRef = ref()
     const handle_open_static_intro_modal = (audio_id: number | undefined) => {
         staticIntroModalRef.value?.open(audio_id)
@@ -289,6 +291,7 @@
     }
 
     /* ----- Caller ID Section ----- */
+    const callerIDModalRef = ref()
     const caller_id_numbers = computed((): CallerID[] => {
         if(!callerIDNumbers?.value?.result) return []
         return callerIDNumbers.value.caller_ids
@@ -301,7 +304,10 @@
     }
 
     const handle_caller_id_number_error = (error: boolean) => {
-       console.log(error)
        caller_id_error.value = error
+    }
+
+    const handle_open_caller_id_modal = () => {
+        callerIDModalRef.value?.open(voice_settings.caller_id)
     }
 </script>

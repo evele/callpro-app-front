@@ -57,6 +57,17 @@ export const useDeleteCallInCode = () => {
   }) 
 }
 
+/* ----- Caller ID ----- */
+export const useSaveCallerIDNumber = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:{ caller_id: string }) => saveCallerIDNumber(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['caller_id_numbers'] })
+    },
+  }) 
+}
+
 /* ----- Contacts ----- */
 export const useSaveContact = () => {
   const queryClient = useQueryClient()
