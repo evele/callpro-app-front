@@ -54,13 +54,7 @@
                         :class="{ '!bg-[#ebddff]': selected_audio_id === audio.id }"
                     >
                         <td class="text-center">
-                            <Checkbox
-                                :model-value="selected_audio_id === audio.id"
-                                :inputId="'audio-' + audio.id"
-                                :binary="true"
-                                :value="audio.id"
-                                @click="handle_audio_selection(audio.id)"
-                            />
+                            <RadioButton v-model="selected_audio_id" :inputId="'audio-' + audio.id" :name="'audio-' + audio.name" :value="audio.id" />
                         </td>
 
                         <td>{{ audio.name }}</td>
@@ -189,11 +183,6 @@
     defineExpose({ open })
 
     const { show_error_toast, show_success_toast } = usePrimeVueToast();
-
-    const handle_audio_selection = (audio_id: number) => {
-        if(selected_audio_id.value === audio_id) return
-        selected_audio_id.value = audio_id
-    }
 
     const disabled_edit_audio_btn = computed(() => audio_name.value === '')
 
