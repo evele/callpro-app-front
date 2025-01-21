@@ -1,10 +1,10 @@
 <template>
-    <div class="w-full table-container max-w-[44rem] rounded-2xl py-5 px-4 text-sm bg-white">
+    <div class="w-full table-container rounded-2xl py-5 px-4 text-sm bg-white">
         <DataTable 
             :value="formatted_contacts"
             scrollable 
             tableStyle="min-width: 50rem"
-            class="table" 
+            class="table m-auto w-full" 
             :paginator="show_pagination" 
             :rows="10" 
             dataKey="id"
@@ -851,12 +851,5 @@
 
     .table-container {
         box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-
-        @media (min-width: 980px) {
-            max-width: 800px;
-        }
-        @media (min-width: 1100px) {
-            max-width: 850px;
-        }
     }
 </style>
