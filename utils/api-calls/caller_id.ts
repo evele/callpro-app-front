@@ -15,3 +15,13 @@ type CallerIDToSave = {
 export async function saveCallerIDNumber(data: CallerIDToSave): Promise<saveCallerIDNumberResponseSuccess | APIResponseError>{    
     return await fetchWrapper.post(SAVE_CALLER_ID_NUMBER_URL, data) as saveCallerIDNumberResponseSuccess | APIResponseError
 }
+
+/* ----- Verify caller id number ----- */
+export async function verifyCallerIDNumber(data: CallerIDToVerify): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(VERIFY_CALLER_ID_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Delete caller id number ----- */
+export async function deleteCallerIDNumber(data: CallerIDToDelete): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(DELETE_CALLER_ID_NUMBER_URL, data) as APIResponseSuccess | APIResponseError
+}

@@ -68,6 +68,26 @@ export const useSaveCallerIDNumber = () => {
   }) 
 }
 
+export const useVerifyCallerIDNumber = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:CallerIDToVerify) => verifyCallerIDNumber(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['caller_id_numbers'] })
+    },
+  }) 
+}
+
+export const useDeleteCallerIDNumber = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:CallerIDToDelete) => deleteCallerIDNumber(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['caller_id_numbers'] })
+    },
+  }) 
+}
+
 /* ----- Contacts ----- */
 export const useSaveContact = () => {
   const queryClient = useQueryClient()

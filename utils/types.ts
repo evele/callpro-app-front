@@ -184,6 +184,7 @@ export type UserCustomGroup = {
   root_user_id: number,
 }
 
+/* ----- START CALLER ID TYPES ----- */
 export type CallerID = {
   id: string;
   caller_id: string;
@@ -199,6 +200,16 @@ export enum CallerIDStatus {
   UNVERIFIED = 'UNVERIFIED',
   REJECTED = 'REJECTED'
 }
+
+export type CallerIDToVerify = {
+  caller_id: string;
+  status: CallerIDStatus.REJECTED;
+}
+
+export type CallerIDToDelete = {
+  caller_id: string;
+}
+/* ----- END CALLER ID TYPES ----- */
 
 export type BroadcastDashboardData ={
   ACTIVE: number;

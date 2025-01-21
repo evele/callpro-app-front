@@ -24,6 +24,9 @@ export const GET_BROADCAST_DETAIL_URL = "/broadcast/get_broadcast_detail"
 /* ----- Caller ID Store ----- */
 export const GET_CALLER_ID_NUMBERS_URL = "/caller_id/get_caller_id_numbers"
 export const SAVE_CALLER_ID_NUMBER_URL = "/caller_id/save_caller_id_number"
+export const VERIFY_CALLER_ID_URL = "/caller_id/verify_caller_id"
+export const CONFIRM_CALLER_ID_NUMBER_URL = "/caller_id/confirm_caller_id_number"
+export const DELETE_CALLER_ID_NUMBER_URL = "/caller_id/delete_caller_id_number"
 
 /* ----- Call In Codes Store ----- */
 export const GET_USER_CALL_IN_CODES_URL = "/call_in_codes/get_user_call_in_codes"

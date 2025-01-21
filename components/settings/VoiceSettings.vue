@@ -2,7 +2,7 @@
     <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
         <div class="flex justify-between gap-2 items-center">
             <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" @change="handle_select_change" />
         </div>
 
         <div v-if="voice_settings.caller_id_selected !== '3'" class="flex justify-between items-center mt-7">
@@ -15,7 +15,7 @@
             <label class="text-lg font-medium w-48">{{ cidConfirm == '1' ? 'Select Caller ID' : 'Enter Caller ID' }}</label>
 
             <div v-if="cidConfirm == '1'" class="relative">
-                <CallerIDSelect 
+                <CallerIDSelect
                     :model-value="voice_settings.caller_id"
                     :is-loading="isLoadingCallerID" 
                     :caller-id-numbers="caller_id_numbers"
@@ -45,7 +45,7 @@
             <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected?.name}}</p>
             <div class="flex items-center gap-2">
                 <span v-if="static_intro_error" class="text-red-500">{{ static_intro_error_message }}</span>
-                <Button @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected?.id)" 
+                <Button @click="console.log(voice_settings.caller_id, caller_id_error)" 
                     class="w-7 h-7 bg-[#e7e0ec] rounded-full] text-[#1D1B20] border-none hover:scale-110 transition-transform"
                 >
                     <template #icon>
@@ -119,7 +119,7 @@
     </SettingSection>
 
     <StaticIntroModal ref="staticIntroModalRef" @update:selected-audio="handle_audio_selection" />
-    <CallerIDModal ref="callerIDModalRef" />
+    <CallerIDModal ref="callerIDModalRef" @update:deleted_number="handle_delete_caller_id" />
 </template>
 
 <script setup lang="ts">
@@ -161,6 +161,8 @@
         number_when_completed_status: false,
         number_when_completed: '',
     });
+
+    const temp_selected_caller_id = ref('')
 
     onMounted(() => {
         if(props.voiceSettings) {
@@ -243,6 +245,19 @@
         { name: 'MAX', code: '999' },
     ]
 
+    const handle_select_change = (event: { originalEvent: PointerEvent, value: '1' | '2' | '3' }) => {
+        if(props.cidConfirm == '1') {
+            if(event.value === '1') {
+                voice_settings.caller_id = selected_call_pro.value
+            } else if(event.value === '2') {
+                voice_settings.caller_id = selected_toll_free.value
+            } else {
+                voice_settings.caller_id = temp_selected_caller_id.value
+            }
+            caller_id_error.value = false
+        }
+    }
+
     watch(voice_settings, (updatedSettings: VoiceSettingsUI) => {
         if(updatedSettings.caller_id_selected === '3' && updatedSettings.caller_id === '') {
             caller_id_empty.value = true
@@ -299,7 +314,7 @@
 
     const handle_caller_id_selection = (caller_id: CallerID) => {
         if(!caller_id) return
-        console.log(caller_id, 'caller_id')
+        temp_selected_caller_id.value = caller_id.caller_id
         voice_settings.caller_id = caller_id.caller_id
     }
 
@@ -309,5 +324,13 @@
 
     const handle_open_caller_id_modal = () => {
         callerIDModalRef.value?.open(voice_settings.caller_id)
+    }
+
+    const handle_delete_caller_id = (deleted_number: string) => {
+        if(!deleted_number) return
+        if(voice_settings.caller_id === deleted_number) {
+            temp_selected_caller_id.value = ''
+            voice_settings.caller_id = ''
+        }
     }
 </script>
