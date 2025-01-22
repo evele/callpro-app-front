@@ -55,7 +55,7 @@
                         :class="{ '!bg-[#ebddff]': selected_caller_id?.id === number.id }"
                     >
                         <td class="text-center">
-                            <RadioButton v-model="selected_caller_id" :inputId="'ID-' + number.id" :name="'ID-' + number.name" :value="number" />
+                            <RadioButton v-model="selected_caller_id" :inputId="'ID-' + number.id" :value="number" />
                         </td>
 
                         <td>{{ format_number_to_show(number.caller_id) }}</td>
@@ -136,7 +136,7 @@
 
     const visible = ref(false)
     const new_number = ref('')
-    const new_ext = ref<string | null>(null)
+    const new_ext = ref('')
     const form_action = ref('')
     const has_phone_number_error = ref(false)
     const confirmationModal = ref()
@@ -182,7 +182,7 @@
     const close = () => {
         selected_caller_id.value = null
         new_number.value = ''
-        new_ext.value = null
+        new_ext.value = ''
         visible.value = false;
     }
 
@@ -194,8 +194,8 @@
 
     // To keep the selected number in sync with the list
     watch(() => caller_id_numbers.value, () => {
-        if(selected_caller_id.value) {
-            selected_caller_id.value = caller_id_numbers.value.find((item: CallerIDExt) => item.id === selected_caller_id.value.id) || null
+        if(selected_caller_id.value?.id) {
+            selected_caller_id.value = caller_id_numbers.value.find((item: CallerIDExt) => item.id === selected_caller_id.value?.id) || null
         }
     })
 
@@ -203,7 +203,7 @@
     const add_new_number = () => {
         form_action.value = ''
         let caller_id_to_save
-        if(new_ext.value) {
+        if(new_ext.value !== '') {
             caller_id_to_save = format_number_to_send(new_number.value) + '#' + new_ext.value
         } else {
             caller_id_to_save = format_number_to_send(new_number.value)
@@ -221,7 +221,7 @@
             onSuccess: (response: saveCallerIDNumberResponseSuccess | APIResponseError) => {
                 if(response.result) {
                     new_number.value = ''
-                    new_ext.value = null
+                    new_ext.value = ''
                     form_action.value = 'clear'
                     show_success_toast('success', response.success_message)
                     getCallerIDNumbers()
@@ -248,7 +248,7 @@
 
         const data_to_send: CallerIDToVerify = {
             caller_id: caller_id_to_save,
-            status: selected_caller_id.value.status
+            status: CallerIDStatus.REJECTED
         }
 
         verify_caller_id(data_to_send, {
@@ -274,6 +274,8 @@
     }
 
     const confirm_delete_number = () => {
+        if(!selected_caller_id.value) return
+
         const data_to_send: CallerIDToDelete = {
             caller_id: selected_caller_id.value.caller_id
         }
@@ -283,7 +285,7 @@
                 if(response.result) {
                     show_success_toast('success', 'Number deleted successfully.')
                     getCallerIDNumbers()
-                    emit('update:deleted_number', selected_caller_id.value.caller_id)
+                    emit('update:deleted_number', selected_caller_id.value?.caller_id)
                     selected_caller_id.value = null
                 } else {
                     show_error_toast('error', 'Something failed while deleting the number...')

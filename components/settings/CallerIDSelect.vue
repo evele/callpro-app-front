@@ -11,7 +11,7 @@
         >
             <template #value="slotProps">
                 <div v-if="slotProps.value && existsInCallerIdNumbers(localModelValue)" class="flex items-center w-full justify-between">
-                    <span>{{ format_number_to_show(slotProps.value.caller_id) }}</span>
+                    <span class="leading-snug">{{ format_number_to_show(slotProps.value.caller_id) }}</span>
                     <VerifiedSVG v-if="slotProps.value.status === CallerIDStatus.CONFIRMED" class="w-4 h-4 text-verified" />
                     <PendingSVG v-if="slotProps.value.status === CallerIDStatus.PENDING || slotProps.value.status === CallerIDStatus.UNVERIFIED" class="w-4 h-4 text-pending" />
                     <RejectedSVG v-if="slotProps.value.status === CallerIDStatus.REJECTED" class="w-4 h-4 text-unverified" />
@@ -47,7 +47,7 @@
     
     const emit = defineEmits(['update:modelValue', 'update:error']);
 
-    const localModelValue = ref<string | CallerID>('');
+    const localModelValue = ref<CallerIDExt | null>(null);
     const error_message = ref<string>('');
 
     const statusPriority = {
@@ -69,40 +69,27 @@
                     })
     })
 
-    const existsInCallerIdNumbers = (callerId: string | CallerIDExt) => {
+    const existsInCallerIdNumbers = (callerId: string | null | CallerIDExt ) => {
+        if(!callerId) return false;
         if(typeof callerId === 'object') {
             return formatted_caller_id_numbers.value.some((item: CallerIDExt) => item.caller_id === callerId?.caller_id);
         }
         return formatted_caller_id_numbers.value.some((item: CallerIDExt) => item.caller_id === callerId);
     }
 
-    onMounted(() => {
-        if(!props.isLoading) {
-            if(!props.modelValue) {
-                error_message.value = 'Caller ID is required';
-                emit('update:error', true)
-            } else {
-                localModelValue.value = formatted_caller_id_numbers.value.find((item: CallerIDExt) => item.caller_id === props.modelValue);
-            }
-        }
-    })
+    const emit_error = (message: string) => {
+        error_message.value = message;
+        emit('update:error', true);
+    }
 
-    watch(() => props.isLoading, () => {
-        if(!props.isLoading) {
-            if(!existsInCallerIdNumbers(props.modelValue)) {
-                error_message.value = 'Caller ID is required';
-                emit('update:error', true)
-            } else {
-                localModelValue.value = formatted_caller_id_numbers.value.find((item: CallerIDExt) => item.caller_id === props.modelValue);
-            }
-        }
-    })
+    const find_number_to_show = () => {
+        localModelValue.value = formatted_caller_id_numbers.value.find((item: CallerIDExt) => item.caller_id === props.modelValue) || formatted_caller_id_numbers.value[0];
+    }
 
     watch(() => localModelValue.value, () => {
-        if(typeof localModelValue.value === 'string' || !localModelValue.value?.caller_id) return;
+        if(!localModelValue.value?.caller_id) return;
         if(localModelValue.value?.status !== CallerIDStatus.CONFIRMED) {
-            error_message.value = 'You need a verified number to send a new broadcast';
-            emit('update:error', true);
+            emit_error('You need a verified number to send a new broadcast')
         } else {
             error_message.value = '';
             emit('update:error', false);
@@ -110,10 +97,25 @@
         emit('update:modelValue', localModelValue.value)
     });
 
-    watch(() => props.modelValue, () => {
-        if(!props.modelValue) {
-            error_message.value = 'Caller ID is required';
-            emit('update:error', true)
-        }
-    })
+    watch(
+        () => ({ isLoading: props.isLoading, modelValue: props.modelValue }),
+        ({ isLoading, modelValue }: { isLoading: boolean, modelValue: string}) => {
+            if (isLoading) return
+
+            if (!modelValue || !existsInCallerIdNumbers(modelValue)) {
+                emit_error('Caller ID is required')
+            } else {
+                find_number_to_show()
+            }
+        },
+        { immediate: true }
+    );
 </script>
+
+<style scoped lang="scss">
+    :deep(.p-select) {
+        .p-select-label {
+            padding-right: 0;
+        }
+    }
+</style>

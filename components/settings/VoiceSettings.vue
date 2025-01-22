@@ -45,7 +45,7 @@
             <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected?.name}}</p>
             <div class="flex items-center gap-2">
                 <span v-if="static_intro_error" class="text-red-500">{{ static_intro_error_message }}</span>
-                <Button @click="console.log(voice_settings.caller_id, caller_id_error)" 
+                <Button @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected?.id)" 
                     class="w-7 h-7 bg-[#e7e0ec] rounded-full] text-[#1D1B20] border-none hover:scale-110 transition-transform"
                 >
                     <template #icon>
@@ -245,7 +245,7 @@
         { name: 'MAX', code: '999' },
     ]
 
-    const handle_select_change = (event: { originalEvent: PointerEvent, value: '1' | '2' | '3' }) => {
+    const handle_select_change = (event: { originalEvent: Event, value: any }) => {
         if(props.cidConfirm == '1') {
             if(event.value === '1') {
                 voice_settings.caller_id = selected_call_pro.value
