@@ -41,5 +41,14 @@
         background-color: rgba(255, 255, 255, 0.99);
     }
 
+    /*
+    .grid-container > .item2 {
+        overflow-y: auto; 
+    }
+
+    .grid-container > .item3 {
+        height: calc(100vh - 6.5rem); 
+    }*/
+
 </style>
   
