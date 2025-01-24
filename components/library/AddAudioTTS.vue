@@ -4,45 +4,48 @@
             the message here to have it converted to audio.
         </InfoPanel>  
         <textarea v-model="text_to_convert" placeholder="Enter text"
-            class="h-24 px-4 py-3 bg-white rounded-[10px] border border-[#d9d9d9] text-[#1e1e1e] text-base font-normal">
+            class="h-24 px-4 py-3 bg-white rounded-[10px] border border-[#d9d9d9] text-dark-3 text-base font-normal">
         </textarea>          
         <!-- area preview aduio conver -->
-        <div class="justify-start items-center inline-flex">                
-                <button type="button" @click="convert_Text"
-                    class="w-[170px] self-stretch px-10 py-[9px] bg-[#322f35] rounded-xl shadow text-center text-white text-sm font-medium"
-                    :disabled="isConverting">
-                    {{ isConverting ? 'Converting...' : 'Convert' }}
-                </button>                
-        </div>
-        <ul v-if="convertedAudios?.length" class="ml-2 is-flex is-flex-direction-column is-gap-1">
+               
+        <Button 
+            type="button" 
+            @click="convert_Text"
+            class="w-[170px] px-10 py-[9px] bg-white rounded-xl shadow-lg text-center text-sm font-medium text-dark-3 border-[#767676] hover:bg-gray-200 disabled:bg-white"
+            :disabled="isConverting"
+        >
+            {{ isConverting ? 'Converting...' : 'Convert' }}
+        </Button>                
 
-            <li v-for="(audio, index) in convertedAudios" :key="index" class="is-flex is-gap-2">
+        <ul v-if="convertedAudios?.length" class="ml-2">
+
+            <li v-for="(audio, index) in convertedAudios" :key="index">
                 <!-- area preview aduio conver -->
-                <div class="px-2.5 py-[5px] justify-start items-center gap-[30px] inline-flex">
+                <div class="py-[5px] justify-start items-center gap-[30px] inline-flex">
                     <!-- Condicional para mostrar el nombre o el input -->
-                    <div v-if="editingIndex === index"
-                        class="w-[371px] flex flex-col  justify-start items-start gap-2">
-                        <div class="self-stretch text-[#1e1e1e] text-base font-normal font-['Inter']">Audio Name
-                        </div>
+                    <div v-if="editingIndex === index" class="flex flex-col justify-start items-start gap-2">
+                        <p class="text-dark-3">Audio Name</p>
                         <!-- input and close -->
                         <div class="flex flex-row items-center gap-[29px]">
                             <!-- Input editable para cambiar el nombre -->
-                            <div
-                                class="w-[371px] px-4 py-3 bg-white rounded-[30px] border border-[#d9d9d9] justify-start items-center inline-flex">
-                                <input v-model="audioNameTemp" @blur="saveAudioName(index)"
-                                    @keyup.enter="saveAudioName(index)"
-                                    class="grow shrink basis-0 text-[#1e1e1e] text-base font-normal font-['Inter'] underline bg-transparent" />
-                            </div>
+                            <InputText 
+                                type="text" 
+                                id="tts-audio-name" 
+                                v-model="audioNameTemp" 
+                                @blur="saveAudioName(index)"
+                                @keyup.enter="saveAudioName(index)"
+                                class="text-dark-3 w-fit sm:w-[330px]" 
+                            />
+                           
                             <!-- Botón CloseSVG para cancelar la edición -->
-                            <div @click="cancelEditing()"
-                                class="w-6 h-6 p-1 bg-[#e7e0ec] rounded-[10px] flex justify-center items-center cursor-pointer">
+                            <div @click="cancelEditing()" class="w-6 h-6 p-1 bg-[#e7e0ec] rounded-[10px] flex justify-center items-center cursor-pointer">
                                 <CloseSVG class="w-6 h-6" />
                             </div>
                         </div>
                     </div>
                     <!-- Mostrar el nombre si no está en modo de edición -->
                     <div v-else @click="startEditing(index, audio.name)"
-                        class="text-[#65558f] text-base font-normal font-['Inter'] underline cursor-pointer">
+                        class="text-[#65558f] font-['Inter'] underline cursor-pointer">
                         {{ audio.name }}
                     </div>
 
@@ -50,21 +53,33 @@
                     <div v-if="editingIndex !== index"
                         class="w-[138px] py-px justify-center items-center gap-3.5 flex">
                         <!-- play -->
-                        <div class="w-6 h-6  bg-[#653494] rounded-[10px] justify-center items-center flex">
-                            <PlaySVG class="w-6 h-6 bg-[#653494] text-white rounded-[10px]" />
-                        </div>
+                        <Button 
+                            type="button" 
+                            class="w-6 h-6 bg-[#653494] rounded-[12px] justify-center items-center flex hover:scale-110 transition-transform"
+                            @click="handle_play_audio(audio)"
+                        >
+                            <template #icon>
+                                <PlaySVG class="w-6 h-6 bg-[#653494] text-white rounded-[10px]" />
+                            </template>
+                        </Button>
                         <!-- download -->
-                        <div class="w-6 h-6 bg-[#e7e0ec] rounded-[10px] justify-center items-center flex">
-                            <DownloadSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
-                        </div>
+                        <Button 
+                            type="button" 
+                            class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform"
+                            @click="handle_download_audio(audio.file_name)"    
+                        >
+                            <template #icon>
+                                <DownloadSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
+                            </template>
+                        </Button>
                         <!-- edit -->
-                        <Button @click="startEditing(index, audio.name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[10px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
+                        <Button @click="startEditing(index, audio.name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
                             <template #icon>
                                 <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
                             </template>
                         </Button>
                         <!-- trash -->
-                        <Button @click="handle_delete(audio.file_name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[10px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
+                        <Button @click="handle_delete(audio.file_name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
                             <template #icon>
                                 <TrashSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
                             </template>
@@ -80,6 +95,10 @@
             {{ isPendingSave ? 'Saving...' : 'Save' }}
         </Button>
     </footer>
+
+    <Teleport to="body">
+        <AudioPlayer :current-audio="audio_playing" @action="handle_player_action" :from-modal="true" />
+    </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -89,12 +108,15 @@ import DownloadSVG from '~/components/svgs/DownloadSVG.vue';
 import EditIconSVG from '~/components/svgs/EditIconSVG.vue';
 import PlaySVG from '~/components/svgs/PlaySVG.vue';
 import TrashSVG from '~/components/svgs/TrashSVG.vue';
+import type { QueryObserverResult } from '@tanstack/vue-query'
+
+const authStore = useAuthStore()
 
 const audio_id: Ref<string | null> = ref(null);
 const audio_url: Ref<string | null> = ref(null);
 const text_to_convert = ref('');
+const selected_audio_file_name = ref('')
 // TODO: audios convertidos pensnado en que sean mas de uno...
-type Tts_Convert_with_name = Tts_Convert & { name: string }
 const convertedAudios = ref<Tts_Convert_with_name[]>([]);
 // Variables audio Name edit
 const editingIndex = ref<number | null>(null); // indice del audio en edición
@@ -103,6 +125,30 @@ let originalExtension = ""; // para almacenar la extension original del archivo
 
 const { mutate: createTextToSpeech, isPending: isConverting } = useConvertTextToSpeech()
 const { mutate: saveAudio, isPending: isPendingSave } = useSaveAudio()
+const { refetch: download_audio } = useDownloadAudio(selected_audio_file_name)
+
+/* ----- Audio Player ----- */
+const handle_play_audio = (audio: Tts_Convert_with_name) => {
+    const user_id = authStore.user?.id ?? 1
+
+    const audio_to_play: Audio = {
+        id: 1,
+        user_id: user_id,
+        name: audio.name,
+        created_at: '',
+        last_used: '',
+        file_name: audio.file_name,
+        length: 0,
+        is_delete: 'N',
+        full_file_url: audio.full_file_url,
+    }
+
+    if(!audio) return
+    audio_playing.value = audio_to_play
+}
+
+const { audio_playing, handle_player_action } = useAudioPlayer(null)
+/* ----- Audio Player ----- */
 
 const { show_error_toast } = usePrimeVueToast();
 const emit = defineEmits(['close', 'success', 'error'])
@@ -214,4 +260,22 @@ const save_audios = () => {
     })
 }
 
+//Download audio
+const handle_download_audio = (audio_name: string) => {
+    if(!audio_name) {
+        show_error_toast('Error', "Sorry, this audio is not available for download.")
+        return;
+    }
+    
+    selected_audio_file_name.value = audio_name
+    download_audio()
+            .then((result: QueryObserverResult) => {
+                if(!result.data) {
+                    show_error_toast('Sorry!', 'This audio is not available for download');
+                }
+            })
+            .catch(() => {
+                show_error_toast('Sorry!', 'This audio is not available for download');
+            });
+}
 </script>

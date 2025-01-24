@@ -105,7 +105,7 @@
         </div>
     </ConfirmationModal>
 
-    <AudioPlayer v-if="visible" :current-audio="audio_playing" @action="handle_player_action" />
+    <AudioPlayer v-if="visible" :current-audio="audio_playing" @action="handle_player_action" :from-modal="true" />
 
     <StaticIntroSubModal ref="staticIntroSubModal" :section-to-show="submodal_section_to_show" @update:audios="refetch" />
 </template>
@@ -134,6 +134,7 @@
     })
 
     const handle_play_audio = (audio: Audio) => {
+        console.log(audio)
         if(!audio) return
         audio_playing.value = audio
     }

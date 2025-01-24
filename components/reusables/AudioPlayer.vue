@@ -4,7 +4,11 @@
             Your browser does not support the audio element.
         </audio>
         
-        <section v-if="show_controls" class="bg-[#F5EFF7] fixed bottom-0 right-0 flex flex-col sm:flex-row sm:justify-between px-6 py-4 sm:gap-10 audio-player-width">
+        <section 
+            v-if="show_controls" 
+            class="bg-[#F5EFF7] fixed bottom-0 right-0 flex flex-col sm:flex-row sm:justify-between px-6 py-4 sm:gap-10"
+            :class="[fromModal ? 'w-full z-[1200]' : 'audio-player-width z-[100]']"
+        >
             <div class="hidden sm:flex gap-2 items-center sm:w-[15%] order-1">
                 <div class="min-w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
                     <MusicSVG class="w-5 h-5" />
@@ -37,7 +41,7 @@
                 <div class="flex items-center w-full gap-6">
                     <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(current_time) }}</span>
                     <Slider v-model="track_progress" @change="handle_track_progress" class="w-full h-2" />
-                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(current_audio?.length) }}</span>
+                    <span class="text-[#79747E] text-sm font-semibold">{{ format_seconds(audio?.duration) }}</span>
                 </div>
             </div>
 
@@ -74,6 +78,11 @@
             default: null
         },
         disabledNextPrev: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
+        fromModal: {
             type: Boolean,
             required: false,
             default: false

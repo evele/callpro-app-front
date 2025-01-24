@@ -1,4 +1,4 @@
-export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>) => {
+export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]> | null) => {
     const { show_error_toast } = usePrimeVueToast()
 
     const audio_playing = ref<Audio | null>(null)
@@ -16,6 +16,7 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
     }
 
     watch(() => audio_playing.value, (newVal: Audio | null) => {
+        console.log(audio_playing.value)
         if(!newVal) {
             audio_playing.value = null
             return
@@ -24,14 +25,15 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
     })
 
     const select_previous_audio = () => {
-        if(!audio_playing.value) return
+        if(!audio_playing.value || !user_audios || user_audios.value?.length <= 1) return
         const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
         const new_position = (current_position === 0) ? user_audios.value.length - 1 : current_position - 1
         audio_playing.value = user_audios.value[new_position]
+
     }
 
     const select_next_audio = () => {
-        if(!audio_playing.value) return
+        if(!audio_playing.value || !user_audios || user_audios.value?.length <= 1) return
         const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_playing?.value?.id)
         const new_position = (current_position === user_audios.value.length - 1) ? 0 : current_position + 1
         audio_playing.value = user_audios.value[new_position]
