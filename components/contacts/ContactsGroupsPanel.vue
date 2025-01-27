@@ -1,9 +1,9 @@
 <template>
     <section class="container flex flex-col">
-        <div class="first-section">
-            <h4 class="groups-title">Groups</h4>
+        <div>
+            <h4 class="groups-title">System Groups</h4>
 
-            <ul class="flex flex-col default-groups-ul">
+            <ul class="mt-3 flex flex-col default-groups-ul">
                 <li v-for="button in defaultGroupsButtons" :key="button.group_id">
                     <GroupButton :group-name="button.text" :contacts-count="button.value"
                         :active="active_buttons.includes(button.group_id)" @click="setActiveButton(button.text, button.group_id)">
@@ -15,18 +15,11 @@
             </ul>
         </div>
 
-        <Divider class="divider" />
+        <Divider class="my-0 divider" />
 
-        <div class="second-section flex flex-col">
-            <GroupButton group-name="My Groups"
-                :contacts-count="isSuccessCG && CGData?.result ? CGData?.custom_groups.length : 0" 
-                :active="active_buttons.some((group: string) => group !== 'all' && group !== 'unassigned' && group !== 'trash')"
-            >
-                <template #icon>
-                    <MyGroupsSVG alt="My Groups" />
-                </template>
-            </GroupButton>
-            <ul class="user-group-container flex flex-col">
+        <div class="flex flex-col">
+            <h4 class="groups-title">My Groups</h4>
+            <ul class="user-group-container mt-4 flex flex-col">
                 <li v-if="isLoadingCG">Loading...</li>
                 <li v-if="isErrorCG">Error loading groups.</li>
                 <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
@@ -44,11 +37,6 @@
                 </li>
             </ul>
         </div>
-
-        <Button class="add-new-btn mx-auto" @click="open_modal">
-            <PlusSVG class="plus-icon" />
-            <span class="add-new-text">Add new</span>
-        </Button>
         <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
     </section>
 </template>
@@ -57,7 +45,6 @@
 import EditIconSVG from "@/components/svgs/EditIconSVG.vue"
 import AllSVG from "@/components/svgs/AllSVG.vue";
 import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
-import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
 
 const props = defineProps({
@@ -90,15 +77,6 @@ const selected_group_to_edit = reactive({
     launchID: ''
 })
 
-const open_modal = () => {
-    Object.assign(selected_group_to_edit, {
-        groupID: "",
-        groupName:null,
-        launchID: null
-    });    
-    modalContacts.value.open('new_group');
-}
-
 const openEditDialog = (group: CustomGroup) => {
     Object.assign(selected_group_to_edit, {
         groupID: group.id,
@@ -112,26 +90,17 @@ const openEditDialog = (group: CustomGroup) => {
 <style scoped lang="scss">
 .container {
     width: 100%;
-    min-width: 250px;
-    min-height: 500px;
+    min-width: 220px;
     border-radius: 16px;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     background-color: #FFF;
     gap: 12px;
-    padding: 26px 0 26px 0;
-
-    .first-section {
-        padding: 0 16px;
-    }
+    justify-content: space-between;
+    padding: 20px 16px;
 
     .divider {
         background: #CAC4D0;
         height: 0.5px;
-    }
-
-    .second-section {
-        padding: 0 16px;
-        gap: 10px;
     }
 
     .contacts-count {
@@ -142,7 +111,8 @@ const openEditDialog = (group: CustomGroup) => {
 }
 
 .groups-title {
-    font-size: 20px;
+    color: #89a43d;
+    font-size: 18px;
     font-weight: 600;
     line-height: 140%;
 }
@@ -165,6 +135,9 @@ const openEditDialog = (group: CustomGroup) => {
     overflow-y: auto;
     gap: 5px;
     padding: 0;
+    flex: 1 1 auto;
+    min-height: 150px;
+    max-height: calc(100vh - 743px);
 }
 
 .user-group-btn {

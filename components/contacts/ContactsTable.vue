@@ -3,7 +3,7 @@
         <DataTable 
             :value="formatted_contacts"
             scrollable 
-            tableStyle="min-width: 50rem"
+            :scrollHeight="table_height.toString()+'px'"
             class="table m-auto w-full" 
             :paginator="show_pagination" 
             :rows="10" 
@@ -247,6 +247,11 @@
 </template>
 
 <script setup lang="ts">
+  
+
+    const { width, height } = useWindowSize() // TODO: maybe exported in a composable?
+    const table_height = computed(()=> height.value - 402)
+   
     const props = defineProps({
         selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },
         isCustomGroup: { type: Boolean, required: true },
@@ -748,7 +753,7 @@
     .p-datatable-thead, .p-datatable-header-cell {
         background-color: #9A83DB;
         line-height: 28px;
-    
+ 
         &:first-child {
             border-top-left-radius: 6px;
         }
