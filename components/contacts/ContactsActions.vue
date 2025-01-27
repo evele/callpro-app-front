@@ -1,5 +1,5 @@
 <template>
-    <section class="flex flex-col gap-2 w-full min-w-[250px] rounded-2xl bg-white p-[14px] shadow-lg">
+    <section class="flex flex-col gap-2 w-full min-w-[220px] rounded-2xl bg-white p-[14px] shadow-lg">
         <ContactsActionBtn v-for="option in OPTIONS" :key="option.id" :text="option.text"
             :count="option.count" :icon="option.icon" :icon-color="option.iconColor" @click="emit('click', option.id);"
         />

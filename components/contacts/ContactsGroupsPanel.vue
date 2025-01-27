@@ -1,6 +1,6 @@
 <template>
     <section class="container flex flex-col">
-        <div class="px-4">
+        <div>
             <h4 class="groups-title">System Groups</h4>
 
             <ul class="mt-3 flex flex-col default-groups-ul">
@@ -17,9 +17,9 @@
 
         <Divider class="my-0 divider" />
 
-        <div class="px-3 flex flex-col">
+        <div class="flex flex-col">
             <h4 class="groups-title">My Groups</h4>
-            <ul class="user-group-container mt-4 flex flex-col h-[221px]">
+            <ul class="user-group-container mt-4 flex flex-col">
                 <li v-if="isLoadingCG">Loading...</li>
                 <li v-if="isErrorCG">Error loading groups.</li>
                 <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
@@ -37,11 +37,6 @@
                 </li>
             </ul>
         </div>
-
-        <Button class="add-new-btn mx-auto" @click="open_modal">
-            <PlusSVG class="plus-icon" />
-            <span class="add-new-text">Add new</span>
-        </Button>
         <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
     </section>
 </template>
@@ -50,7 +45,6 @@
 import EditIconSVG from "@/components/svgs/EditIconSVG.vue"
 import AllSVG from "@/components/svgs/AllSVG.vue";
 import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
-import MyGroupsSVG from "@/components/svgs/MyGroupsSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
 
 const props = defineProps({
@@ -83,15 +77,6 @@ const selected_group_to_edit = reactive({
     launchID: ''
 })
 
-const open_modal = () => {
-    Object.assign(selected_group_to_edit, {
-        groupID: "",
-        groupName:null,
-        launchID: null
-    });    
-    modalContacts.value.open('new_group');
-}
-
 const openEditDialog = (group: CustomGroup) => {
     Object.assign(selected_group_to_edit, {
         groupID: group.id,
@@ -105,13 +90,13 @@ const openEditDialog = (group: CustomGroup) => {
 <style scoped lang="scss">
 .container {
     width: 100%;
-    min-width: 250px;
-    min-height: 500px;
+    min-width: 220px;
     border-radius: 16px;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
     background-color: #FFF;
     gap: 12px;
-    padding: 26px 0 26px 0;
+    justify-content: space-between;
+    padding: 20px 16px;
 
     .divider {
         background: #CAC4D0;
@@ -150,6 +135,9 @@ const openEditDialog = (group: CustomGroup) => {
     overflow-y: auto;
     gap: 5px;
     padding: 0;
+    flex: 1 1 auto;
+    min-height: 150px;
+    max-height: calc(100vh - 743px);
 }
 
 .user-group-btn {

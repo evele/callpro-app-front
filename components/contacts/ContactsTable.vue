@@ -4,7 +4,6 @@
             :value="formatted_contacts"
             scrollable 
             :scrollHeight="table_height.toString()+'px'"
-            tableStyle="min-width: 50rem"
             class="table m-auto w-full" 
             :paginator="show_pagination" 
             :rows="10" 
@@ -251,7 +250,7 @@
   
 
     const { width, height } = useWindowSize() // TODO: maybe exported in a composable?
-    const table_height = computed(()=> height.value - 420)
+    const table_height = computed(()=> height.value - 402)
    
     const props = defineProps({
         selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },

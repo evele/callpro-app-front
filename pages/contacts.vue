@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-white py-1 pl-8 mb-4 flex gap-3 items-center flex-wrap">
+    <section class="bg-white py-1 pl-8 flex gap-3 items-center flex-wrap">
         <p v-if="selected_groups.length > 3" class="text-2xl font-semibold">{{ selected_groups.length }} groups selected</p>
         <div v-else v-for="(group, index) in selected_groups" :key="group.group_id" class="flex gap-3 items-center">
             <p class="text-2xl font-semibold">{{ group.group_name }} {{ selected_groups.length > 1 && index < selected_groups.length - 1 && !group.is_custom ? ',' : '' }}
@@ -131,7 +131,18 @@
     background-color: var(--body-background);
     display: grid;
     justify-content: space-around;
-    grid-template-columns: minmax(auto, 1200px) minmax(auto, 280px);
-    padding: 0 30px;
+    grid-template-columns: minmax(auto, 1200px) minmax(auto, 220px);
+}
+
+@media (min-width: 1440px) {
+    .main-container {
+        grid-template-columns: minmax(auto, 1200px) minmax(auto, 250px);
+    }
+}
+
+@media (min-width: 1920px) {
+    .main-container {
+        grid-template-columns: minmax(auto, 1200px) minmax(auto, 280px);
+    }
 }
 </style>
