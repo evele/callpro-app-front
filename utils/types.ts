@@ -432,10 +432,13 @@ export type Tts_Convert = {
   full_file_url:string,
   file_name: string
 }
+
+export type Tts_Convert_with_name = Tts_Convert & { name: string }
+
 // TODO: Ver Audio y AudioAUX para extender o algo similar
 export type Audio = {
   id: number;
-  user_id: number;
+  user_id: number | string;
   name: string;
   created_at: string;
   last_used: string;
@@ -510,3 +513,14 @@ export type uploadAudioResponse = APIResponseSuccess & {
     }
   }
 }
+
+export type FetchedAudio = {
+  data: {
+    audio_full_url: string,
+    audio_id: number,
+    get: Audio[],
+    name: string
+  }
+}
+
+export type APIResponseUserAudio = APIResponseSuccess & FetchedAudio

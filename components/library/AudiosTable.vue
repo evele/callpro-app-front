@@ -20,28 +20,36 @@
                 :value="search.length ? filtered_audios : user_audios"
                 dataKey="id" 
                 class="audios-table"
-                v-model:selection="audio_playing"
-                selectionMode="single"
+                v-model:selection="audio_to_play"
+                :selectionMode="is_audio_loading ? undefined : 'single'"
                 :rowClass="rowClass"
             >
                 <Column field="position" header="#" class="text-center">
                     <template #body="slotProps">
                         <div class="w-3 mx-auto">
-                            <PlayFilledSVG v-if="audio_playing?.id === slotProps.data.id" class="play-icon" />
+                            <ProgressSpinner 
+                                v-if="is_audio_loading && audio_to_play?.id === slotProps.data.id" 
+                                class="w-5 h-5" 
+                                strokeWidth="8" 
+                                fill="transparent" 
+                                animationDuration=".5s" 
+                                aria-label="Loading audio" 
+                            />
+                            <PlayFilledSVG v-else-if="!is_audio_loading && audio_to_play?.id === slotProps.data.id" class="play-icon" />
                             <span v-else class="font-bold">{{ slotProps.data.position }}</span>
                         </div>
                     </template>
                 </Column>
                 <Column field="name" header="Name">
                     <template #body="slotProps">
-                        <span class="font-bold" :class="[{ 'text-[#6750A4]': audio_playing?.id === slotProps.data.id }]">{{ slotProps.data.name }}</span>
+                        <span class="font-bold" :class="[{ 'text-[#6750A4]': audio_to_play?.id === slotProps.data.id }]">{{ slotProps.data.name }}</span>
                     </template>
                 </Column>
                 <Column field="created_at" header="Date Created" class="text-center"></Column>
                 <Column field="last_used" header="Last Used" class="text-center"></Column>
                 <Column field="length" header="Length" class="text-center">
                     <template #body="slotProps">
-                        <span :class="[{ 'font-bold': audio_playing?.id === slotProps.data.id }]">{{ format_seconds(slotProps.data.length) }}</span>
+                        <span :class="[{ 'font-bold': audio_to_play?.id === slotProps.data.id }]">{{ format_seconds(slotProps.data.length) }}</span>
                     </template>
                 </Column>
                 <Column field="" header="" class="text-center max-w-32">
@@ -126,7 +134,7 @@
     })
 
     /* ----- Audio Player ----- */
-    const { audio_playing, handle_player_action } = useAudioPlayer(user_audios)
+    const { audio_playing, audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(user_audios)
     /* ----- Audio Player ----- */
 
     const filtered_audios = computed((): ProcessedAudio[] => {
@@ -227,7 +235,7 @@
     }
 
     const rowClass = (data: any) => {
-        return [{ '!bg-[#D0BCFF]': audio_playing.value && audio_playing.value?.id === data.id }];
+        return [{ '!bg-[#D0BCFF]': audio_to_play.value && audio_to_play.value?.id === data.id }];
     };
 </script>
 
