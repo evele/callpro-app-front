@@ -57,6 +57,7 @@
                             type="button" 
                             class="w-6 h-6 bg-[#653494] rounded-[12px] justify-center items-center flex hover:scale-110 transition-transform"
                             @click="handle_play_audio(audio)"
+                            :disabled="is_audio_loading"
                         >
                             <template #icon>
                                 <PlaySVG class="w-6 h-6 bg-[#653494] text-white rounded-[10px]" />
@@ -79,12 +80,18 @@
                             </template>
                         </Button>
                         <!-- trash -->
-                        <Button @click="handle_delete(audio.file_name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
+                        <Button 
+                            type="button"
+                            class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform"
+                            @click="handle_delete(audio.file_name)" 
+                            :disabled="is_audio_loading"    
+                        >
                             <template #icon>
                                 <TrashSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
                             </template>
                         </Button>
                     </div>
+                    <p v-show="is_audio_loading && audio_to_play_hook?.file_name == audio.file_name">Loading audio...</p>
                 </div>
             </li>
         </ul>
@@ -129,10 +136,11 @@ const { refetch: download_audio } = useDownloadAudio(selected_audio_file_name)
 
 /* ----- Audio Player ----- */
 const handle_play_audio = (audio: Tts_Convert_with_name) => {
+    if(!audio) return
     const user_id = authStore.user?.id ?? 1
 
     const audio_to_play: Audio = {
-        id: 1,
+        id: Math.floor(Math.random() * 100000) + 1 + Date.now(),
         user_id: user_id,
         name: audio.name,
         created_at: '',
@@ -143,11 +151,10 @@ const handle_play_audio = (audio: Tts_Convert_with_name) => {
         full_file_url: audio.full_file_url,
     }
 
-    if(!audio) return
-    audio_playing.value = audio_to_play
+    audio_to_play_hook.value = audio_to_play
 }
 
-const { audio_playing, handle_player_action } = useAudioPlayer(null)
+const { audio_playing, audio_to_play: audio_to_play_hook, handle_player_action, is_audio_loading } = useAudioPlayer(null)
 /* ----- Audio Player ----- */
 
 const { show_error_toast } = usePrimeVueToast();

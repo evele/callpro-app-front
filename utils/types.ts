@@ -513,3 +513,14 @@ export type uploadAudioResponse = APIResponseSuccess & {
     }
   }
 }
+
+export type FetchedAudio = {
+  data: {
+    audio_full_url: string,
+    audio_id: number,
+    get: Audio[],
+    name: string
+  }
+}
+
+export type APIResponseUserAudio = APIResponseSuccess & FetchedAudio

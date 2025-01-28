@@ -1,17 +1,12 @@
-type ShowOlderFilter ={
+type ShowOlderFilter = {
     show_all_audios: boolean,
 }
 
-type FilterAudio ={
-    audio_id: StringOrNull,
-    audio_full_url: StringOrNull,
-    called_from:string
+type FilterAudio = {
+    audio_id: StringOrNumber,
+    audio_full_url: string
 }
 
-type APIResponseConvertedAudios = {
-    result: true,
-    audios: AudioAux[],
-}
 type APIResponseAllAudios = {
     result: true,
     audios: Audio[],
@@ -23,8 +18,8 @@ export async function getUserAllAudios(data:ShowOlderFilter):Promise<APIResponse
 }
 
 //enabled: false,
-export async function getUserConvertedAudios(data:FilterAudio):Promise<APIResponseConvertedAudios | APIResponseError> { 
-    return await fetchWrapper.post(GET_AUDIO_URL, data) as APIResponseConvertedAudios | APIResponseError;
+export async function getUserAudio(data:FilterAudio):Promise<APIResponseUserAudio | APIResponseError> { 
+    return await fetchWrapper.post(GET_AUDIO_URL, data) as APIResponseUserAudio | APIResponseError;
 }
 
 /* ----- Save Audio ----- */
