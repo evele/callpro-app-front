@@ -7,7 +7,7 @@
         <section 
             v-if="show_controls" 
             class="bg-[#F5EFF7] fixed bottom-0 right-0 flex flex-col sm:flex-row sm:justify-between px-6 py-4 sm:gap-10"
-            :class="[fromModal ? 'w-full z-[1200]' : 'audio-player-width z-[100]']"
+            :class="[audiosStore.from_modal ? 'w-full z-[1200]' : 'audio-player-width z-[100]']"
         >
             <div class="hidden sm:flex gap-2 items-center sm:w-[15%] order-1">
                 <div class="min-w-12 h-12 rounded-[10px] bg-[#D0BCFF] flex items-center justify-center">
@@ -72,27 +72,18 @@
     import NextSVG from '~/components/svgs/NextSVG.vue';
 
     const props = defineProps({
-        currentAudio: {
-            type: Object as PropType<Audio | null>,
-            required: false,
-            default: null
-        },
         disabledNextPrev: {
-            type: Boolean,
-            required: false,
-            default: false
-        },
-        fromModal: {
             type: Boolean,
             required: false,
             default: false
         }
     });
 
+    const audiosStore = useAudiosStore();
     const emit = defineEmits(['action']);
 
     const audio = ref<HTMLAudioElement | null>(null);
-    const current_audio = computed(() => props.currentAudio);
+    const current_audio = computed(() => audiosStore.audio_playing);
     const show_controls = ref(false);
 
     const volume = ref(50);
