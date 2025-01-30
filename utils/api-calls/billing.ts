@@ -117,3 +117,12 @@ type InvoiceDataResponse = {
 export async function getInvoiceDataToPrint(data:{trx_id: number}):Promise<InvoiceDataResponse | APIResponseError>{
   return await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL,data) as InvoiceDataResponse  | APIResponseError
 }
+
+type BillingHistoryResponse = {
+  result: true;
+  transactions: Transaction[];
+}
+
+export async function getBillingHistory():Promise<BillingHistoryResponse | APIResponseError>{
+  return await fetchWrapper.get(GET_BILLING_HISTORY_URL) as BillingHistoryResponse | APIResponseError
+}

@@ -98,6 +98,14 @@ export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
     queryFn: () => getInvoiceDataToPrint(dataToSend.value),      
   })
 }
+
+export const useFetchBillingHistory = () => {
+  return useQuery({
+    queryKey: ['user_billing_history'],
+    queryFn: () => getBillingHistory(),
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({

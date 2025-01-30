@@ -524,3 +524,17 @@ export type FetchedAudio = {
 }
 
 export type APIResponseUserAudio = APIResponseSuccess & FetchedAudio
+
+/* ----- Billing ----- */
+export type Transaction = {
+  amount: string;
+  b_name: StringOrNull;
+  description: StringOrNull;
+  parent_id: StringOrNull;
+  s_name: StringOrNull;
+  soft_delete: StringOrNull;
+  soft_deleted: StringOrNull;
+  time_stamp: string;
+  type: 'CHARGE' | 'PAYMENT' | 'BROADCAST' | 'SMS';
+  user_id: string;
+}
