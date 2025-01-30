@@ -506,6 +506,11 @@ export const MyPreset = definePreset(Aura, {
         fileupload: {
             headerPadding: 0,
             contentPadding: 0,
+        },
+
+        datatable: {
+            headerPadding: 0,
+            headerBorderWidth: 0,
         }
     }
     

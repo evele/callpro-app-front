@@ -60,7 +60,21 @@
                         <td>{{ audio.name }}</td>
 
                         <td class="text-center">
-                            <Button class="bg-primary p-0 hover:scale-110 transition-transform" @click="handle_play_audio(audio)">
+                            <ProgressSpinner 
+                                v-if="is_audio_loading && audio_to_play?.id === audio.id" 
+                                class="w-5 h-5" 
+                                strokeWidth="8" 
+                                fill="transparent" 
+                                animationDuration=".5s" 
+                                aria-label="Loading audio" 
+                            />
+                            <Button 
+                                v-else
+                                type="button"
+                                class="bg-primary p-0 hover:scale-110 transition-transform" 
+                                @click="handle_play_audio(audio)"
+                                :disabled="is_audio_loading"
+                            >
                                 <PlaySVG class="w-7 h-7 text-white" />
                             </Button>
                         </td>
@@ -105,7 +119,7 @@
         </div>
     </ConfirmationModal>
 
-    <AudioPlayer v-if="visible" :current-audio="audio_playing" @action="handle_player_action" />
+    <AudioPlayer v-if="visible" :current-audio="audio_playing" @action="handle_player_action" :from-modal="true" />
 
     <StaticIntroSubModal ref="staticIntroSubModal" :section-to-show="submodal_section_to_show" @update:audios="refetch" />
 </template>
@@ -135,11 +149,11 @@
 
     const handle_play_audio = (audio: Audio) => {
         if(!audio) return
-        audio_playing.value = audio
+        audio_to_play.value = audio
     }
 
     /* ----- Audio Player ----- */
-    const { audio_playing, handle_player_action } = useAudioPlayer(user_audios)
+    const { audio_playing, audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(user_audios)
     /* ----- Audio Player ----- */
 
     const selected_audio_id = ref<number | null>(null)

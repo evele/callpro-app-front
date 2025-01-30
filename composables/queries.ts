@@ -54,16 +54,18 @@ export function useFetchGetAllAudios(showOlder:Ref<boolean>, is_enabled: boolean
     });
 }
 
-export const useFetchGetAudio = (audio_id: Ref<StringOrNull>, audio_full_url:Ref<StringOrNull>, called_from: string) => {
-  const dataToSend = computed(() => ({ 
-    audio_id: audio_id.value, 
-    audio_full_url: audio_full_url.value,
-    called_from
-  }))
+export const useFetchGetAudio = (audio: Ref<Audio | null>) => {
+  const dataToSend = computed(() => {
+    return {
+      audio_id: audio.value?.id || '',
+      audio_full_url: audio.value?.full_file_url || '',
+    }
+  })
 
   return useQuery({
-    queryKey: ['user_converted_audio', dataToSend],
-    queryFn: () => getUserConvertedAudios(dataToSend.value),
+    queryKey: ['fetched_audio_to_play', dataToSend],
+    queryFn: () => getUserAudio(dataToSend.value),
+    enabled: false
   })
 }
 

@@ -1,8 +1,8 @@
 <template>
-    <section class="bg-white py-5 pl-8 mb-4 flex gap-3 items-center flex-wrap">
-        <p v-if="selected_groups.length > 3" class="text-[25px] font-semibold">{{ selected_groups.length }} groups selected</p>
+    <section class="bg-white py-1 pl-8 flex gap-3 items-center flex-wrap">
+        <p v-if="selected_groups.length > 3" class="text-2xl font-semibold">{{ selected_groups.length }} groups selected</p>
         <div v-else v-for="(group, index) in selected_groups" :key="group.group_id" class="flex gap-3 items-center">
-            <p class="text-[25px] font-semibold">{{ group.group_name }} {{ selected_groups.length > 1 && index < selected_groups.length - 1 && !group.is_custom ? ',' : '' }}
+            <p class="text-2xl font-semibold">{{ group.group_name }} {{ selected_groups.length > 1 && index < selected_groups.length - 1 && !group.is_custom ? ',' : '' }}
                 <span v-if="group.is_custom" class="text-[#939091] text-[21px] font-light italic ml-1">
                     #{{ group.group_id }}
                 </span>
@@ -10,7 +10,7 @@
             <Button v-if="group.is_custom" @click="console.log('edit_group')" class="rounded-full p-0 bg-[#E8DEF8] w-[32px] h-[32px] border-none shadow-md hover:scale-110 transition-transform">
                 <EditIconSVG class="text-[#1E1E1E] w-4 h-4" />
             </Button>
-            <span v-if="selected_groups.length > 1 && index < selected_groups.length - 1 && group.is_custom" class="text-[25px] font-semibold">,</span>
+            <span v-if="selected_groups.length > 1 && index < selected_groups.length - 1 && group.is_custom" class="text-2xl font-semibold">,</span>
         </div>
         
     </section>
@@ -131,7 +131,18 @@
     background-color: var(--body-background);
     display: grid;
     justify-content: space-around;
-    grid-template-columns: minmax(auto, 1200px) minmax(auto, 280px);
-    padding: 0 30px;
+    grid-template-columns: minmax(auto, 1200px) minmax(auto, 220px);
+}
+
+@media (min-width: 1440px) {
+    .main-container {
+        grid-template-columns: minmax(auto, 1200px) minmax(auto, 250px);
+    }
+}
+
+@media (min-width: 1920px) {
+    .main-container {
+        grid-template-columns: minmax(auto, 1200px) minmax(auto, 280px);
+    }
 }
 </style>
