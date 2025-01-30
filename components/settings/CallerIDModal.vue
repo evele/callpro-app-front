@@ -2,7 +2,7 @@
     <Dialog v-model:visible="visible" modal :draggable="false" :closable="false" class="w-full max-w-[700px] mx-4">
         <template #header>
             <header class="w-full flex justify-between pb-5 px-8">
-                <h2 class="flex items-center gap-4 font-bold text-2xl text-black">Select Static Intro</h2>
+                <h2 class="flex items-center gap-4 font-bold text-2xl text-black">Caller IDs</h2>
                 <Button @click="handle_close_modal" class="bg-transparent border-none text-black hover:bg-gray-200"><CloseSVG /></Button>
             </header>
             <Divider class="absolute left-0 top-[75px]" />
@@ -48,11 +48,13 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <tr v-if="caller_id_numbers.length"
+                    <tr 
+                        v-if="caller_id_numbers.length"
                         v-for="number in caller_id_numbers"
                         :key="number.id"
-                        class="pt-4 pb-[15px] h-[70px] odd:bg-[#f4f4f4] even:bg-white"
+                        class="pt-4 pb-[15px] h-[70px] odd:bg-[#f4f4f4] even:bg-white cursor-pointer hover:bg-[#efe9f7]"
                         :class="{ '!bg-[#ebddff]': selected_caller_id?.id === number.id }"
+                        @click="selected_caller_id = number"
                     >
                         <td class="text-center">
                             <RadioButton v-model="selected_caller_id" :inputId="'ID-' + number.id" :value="number" />
