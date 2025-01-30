@@ -107,10 +107,12 @@ export const useFetchCallInCodes = () => {
 }
 
 /* ----- Caller ID ----- */
-export const useFetchCallerID = () => {
+export const useFetchCallerIDNumbers = (enabled: boolean = true) => {
   return useQuery({
-    queryKey: ['caller_id'],
-    queryFn: () => getCallerID()
+    queryKey: ['caller_id_numbers'],
+    queryFn: () => getCallerIDNumbers(),
+    enabled,
+    refetchOnWindowFocus: false,
   })
 }
 
