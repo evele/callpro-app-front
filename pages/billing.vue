@@ -9,11 +9,5 @@
 </template>
 
 <script setup lang="ts">
-    const { data, error, isLoading, isError, refetch, isSuccess } = useFetchInvoices()
-
-    const load_data = () => {
-        refetch()
-    }
-
     const show_credits = ref(true)
 </script>
