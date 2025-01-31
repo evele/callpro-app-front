@@ -42,6 +42,10 @@ export type SaveContactAPIResponse = APIResponseSuccess & {
   already_exists?: string[]
 }
 
+export type CallerIDFetchAPIRsponse = APIResponseSuccess & {
+  caller_ids: CallerID[]
+}
+
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 
@@ -180,12 +184,32 @@ export type UserCustomGroup = {
   root_user_id: number,
 }
 
+/* ----- START CALLER ID TYPES ----- */
 export type CallerID = {
   id: string;
   caller_id: string;
-  status: 'PENDING' | 'CONFIRMED' | 'UNVERIFIED' | 'REJECTED';
+  status: CallerIDStatus;
   user_id: string;
 }
+
+export type CallerIDExt = CallerID & { ext: string; }
+
+export enum CallerIDStatus {
+  CONFIRMED = 'CONFIRMED',
+  PENDING = 'PENDING',
+  UNVERIFIED = 'UNVERIFIED',
+  REJECTED = 'REJECTED'
+}
+
+export type CallerIDToVerify = {
+  caller_id: string;
+  status: CallerIDStatus.REJECTED;
+}
+
+export type CallerIDToDelete = {
+  caller_id: string;
+}
+/* ----- END CALLER ID TYPES ----- */
 
 export type BroadcastDashboardData ={
   ACTIVE: number;

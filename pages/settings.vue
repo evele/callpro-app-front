@@ -31,6 +31,7 @@
                         :voice-settings="voice_settings"
                         :call-pro-numbers="call_pro_numbers"
                         :toll-free-numbers="toll_free_numbers"
+                        :cid-confirm="user_admin_settings?.cid_confirm"
                         @updateVoiceSettings="handle_update_voice_settings" 
                         @hasError="handle_voice_settings_error" 
                     />

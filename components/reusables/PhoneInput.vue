@@ -1,14 +1,14 @@
 <template>
     <div v-if="!is_international" class="relative w-full flex">
         <InputMask ref="phoneNumberRef" :model-value="localPhoneNumberModel" :invalid="show_phone_number_error || numberError.length > 0" @keyup="handleKeyup" @update:model-value="updateLocalPhoneNumberModel"
-        mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 rounded-[30px] transition-colors" 
+        mask="(999) 999-9999" placeholder="(___) ___ - ____" fluid class="w-full py-2 px-4 transition-colors" :class="borderRadius"
         />
         <span v-if="show_phone_number_error || numberError.length" class="text-red-500 absolute left-0 top-full">{{ numberError.length ? numberError : 'Invalid area code' }}</span>
     </div>
     
     <div v-else class="relative w-full flex">
         <InputText ref="intPhoneNumberRef" :model-value="localIntPhoneNumberModel" :invalid="show_int_phone_number_error || numberError.length > 0" maxlength="20" @update:model-value="updateLocalIntPhoneNumberModel"
-            class="w-full py-2 px-4 rounded-[30px] transition-colors" />
+            class="w-full py-2 px-4 transition-colors" :class="borderRadius" />
         <span v-if="show_int_phone_number_error || numberError.length" class="text-red-500 absolute left-0 top-full">{{ numberError.length ? numberError : 'Invalid phone number' }}</span>
     </div>
 </template>
@@ -19,7 +19,8 @@
     const props = defineProps({
         modelValue: { type: String, default: '' },
         numberError: { type: String, required: false, default: '' },
-        formAction: { type: String, required: false, default: '' }
+        formAction: { type: String, required: false, default: '' },
+        borderRadius: { type: String, required: false, default: 'rounded-[30px]' }
     });
 
     onMounted(() => {
