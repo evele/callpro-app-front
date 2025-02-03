@@ -1,8 +1,59 @@
 <template>
-    <div>
-        <button type="button" @click="console.log(formatted_invoices_data)">
-            Click me
-        </button>
+    <div class="flex flex-col">
+        <div class="flex-grow overflow-hidden">
+            <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px"></ProgressBar>
+
+            <DataTable v-else
+                :value="formatted_invoices_data" 
+                scrollable
+                scrollHeight="384px"
+                dataKey="id" 
+                class="invoices-table"
+                stripedRows
+                v-model:selection="selected_invoices"
+                selectionMode="multiple"
+                :rowClass="rowClass"
+            >
+
+            <Column selectionMode="multiple" :headerStyle="[{ width: '3rem' }, selected_header_style]"></Column>
+
+            <Column field="name" header="Invoice" :headerStyle="selected_header_style">
+                <template #body="slotProps">
+                    <div class="flex items-center gap-3">
+                        <PDFSVG class="text-grey-secondary" />
+                        <span class="text-sm text-dark-2 font-medium">{{ slotProps.data.name }}</span>
+                    </div>
+                </template>
+            </Column>
+
+            <Column field="date" header="Billing Date" class="text-center min-w-[150px]" :headerStyle="selected_header_style">
+                <template #body="slotProps">
+                    <span class="text-sm text-grey-5">{{ slotProps.data.date }}</span>
+                </template>
+            </Column>
+
+            <Column field="purchase_type" header="Purchase Type" class="text-center" :headerStyle="selected_header_style">
+                <template #body="slotProps">
+                    <span 
+                        class="text-sm font-black" 
+                        :class="[slotProps.data.class]"
+                    >
+                        {{ slotProps.data.purchase_type }}
+                    </span>
+                </template>
+            </Column>
+
+            <Column field="description" header="Description" class="text-center" :headerStyle="selected_header_style">
+                <template #body="slotProps">
+                    <span class="text-sm text-grey-5 font-black">{{ slotProps.data.description }}</span>
+                </template>
+            </Column>
+            </DataTable>
+        </div>
+        <Button type="button" class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform">
+            See more
+            <ArrowRightSVG class="w-4 h-4" />
+        </Button>
     </div>
 </template>
 
@@ -12,11 +63,99 @@
         isLoading: boolean
     }>()
 
-    const formatted_invoices_data = computed(() => {
-        return [...props.invoicesData].reverse()
+    type FormattedInvoice = {
+        id: string,
+        name: string,
+        date: string,
+        purchase_type: string,
+        description: string
+        class: string
+    }
+
+    const formatted_invoices_data = computed((): FormattedInvoice[] => {
+        return [...props.invoicesData].map((invoice: Invoice) => {
+            const [invoice_type, text_color] = kind_of_type(invoice.package_type)
+            return {
+                id: invoice.id,
+                name: 'Invoice-' + invoice.id,
+                date: format_timestamp(invoice.time_stamp),
+                purchase_type: invoice_type,
+                description: get_invoice_description(invoice.invoice_data),
+                class: text_color
+            }
+        }).reverse()
     })
+
+    const kind_of_type = (type: StringOrNull) => {
+        switch (type) {
+            case null:
+                return ['Other', 'text-grey-5']
+            case 'PAUG':
+                return ['PAUG', 'text-secondary-hover']
+            case 'GROUPS':
+                return ['Monthly Plan', 'text-primary']
+            case 'CREDITS':
+                return ['Credits', 'text-[#E1FF8D]']
+            default:
+                return ['Other', 'text-grey-5']
+        }
+    }
+
+    const get_invoice_description = (desc: string) => {
+        if(!desc) return ''
+        let splitted_description = desc.split(':')
+        return splitted_description[1] ? splitted_description[1].trimStart() : splitted_description[0]
+    }
+
+    const selected_invoices = ref([])
+
+    const all_selected = computed(() => selected_invoices.value.length === formatted_invoices_data.value.length)
+    const selected_header_style = computed(() => all_selected.value ? { backgroundColor: '#9A83DB', color: '#fff' } : {})
+
+    const rowClass = (data: any) => {
+        return [{ '!bg-[#E9DDFF]': selected_invoices.value.some((invoice: FormattedInvoice) => invoice.id === data.id) }];
+    };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
+    :deep(.invoices-table) {
+        min-width: 30rem;
 
+        .p-datatable-thead, .p-datatable-header-cell {
+            background-color: rgb(233, 231, 235);
+
+            &:first-child {
+                border-top-left-radius: 6px;
+            }
+            &:last-child {
+                border-top-right-radius: 6px;
+            }
+        }
+
+        tr {
+            th:not(:nth-child(2)) {
+                .p-datatable-column-header-content {
+                    display: flex;
+                    justify-content: center;
+                }
+            }
+        }
+
+
+        td {
+            height: 69px;
+        }
+    }
+
+    :deep(.p-checkbox) {
+        border: none;
+        width: 18px;
+        height: 18px;
+        .p-checkbox-input, .p-checkbox-box {
+            border: 2px solid #49454F;
+            border-radius: 1.5px;
+            width: 18px;
+            height: 18px;
+        }
+    }
 </style>

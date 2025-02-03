@@ -3,18 +3,20 @@
         <h2 class="text-2xl font-semibold">Plans and Billing</h2>
     </section>
 
-    <div class="p-6 mb-10 min-h-28">Aca los cards</div>
+    <div class="p-6 mb-10 min-h-56">Aca los cards</div>
 
     <div class="bg-white rounded-2xl mt-4 mb-6 mx-6 relative shadow-lg">
         <Tabs v-model:value="selected_tab">
-            <div class="flex justify-between pt-7 pb-3 px-12">
+            <div class="flex justify-between pt-7 pb-3 pl-10 pr-12">
                 <TabList class="flex items-center">
                     <Tab value="billing" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Billing history</Tab>
-                    <Tab value="invoices" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Invoices</Tab>
+                    <Tab value="invoices" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10" :disabled="isLoadingInvoices">
+                        Invoices
+                    </Tab>
                 </TabList>
             </div>
 
-            <TabPanels class="pl-12 pr-8 rounded-2xl">
+            <TabPanels class="pl-10 pr-8 rounded-2xl">
                 <TabPanel value="billing">
                     <BillingHistoryTable :billing-data="billing_data" :is-loading="isLoadingBilling" />
                 </TabPanel>

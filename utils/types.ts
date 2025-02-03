@@ -559,6 +559,7 @@ export enum TransactionType {
 }
 
 export type Transaction = {
+  id: string;
   amount: string;
   b_name: StringOrNull;
   description: StringOrNull;
@@ -640,9 +641,10 @@ couponDb: CouponDb;
 }
 
 export type Invoice = {
-id: number;
+id: string;
 confirmation_number: number;
 user_id: number;
+package_type: StringOrNull;
 payment_method_data: PaymentMethodData;
 total: number;
 response_data: ResponseData | string; // Puede ser un string serializado o un objeto

@@ -10,22 +10,22 @@
                 class="billing-table"
                 stripedRows
             >
-                <Column field="description" header="Description">
+                <Column field="description" header="Description" class="w-[34%]">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="date" header="Date">
+                <Column field="date" header="Date" class="w-[22%]">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="credits_used" header="Total credits used">
+                <Column field="credits_used" header="Total credits used" class="w-[22%]">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
                 </Column>
-                <Column field="credits_remaining" header="Total credits remaining">
+                <Column field="credits_remaining" header="Total credits remaining" class="w-[22%]">
                     <template #body>
                         <Skeleton></Skeleton>
                     </template>
@@ -79,7 +79,7 @@
                 </Column>
             </DataTable>
         </div>
-        <Button type="button" class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end">
+        <Button type="button" class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform">
             See more
             <ArrowRightSVG class="w-4 h-4" />
         </Button>
@@ -99,6 +99,7 @@
         return [...props.billingData].map((transaction: Transaction) => {
             balance += Number(transaction.amount)
             return {
+                id: transaction.id,
                 description: get_transaction_description_to_show(transaction),
                 date: format_timestamp(transaction.time_stamp),
                 credits_used: transaction.amount,
