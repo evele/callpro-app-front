@@ -46,6 +46,7 @@ export const date_time_to_string = (time:StringOrNull = null) => {
 }
 
 export const format_number_to_show = function (number: string) {
+  if(!number) return '';
   if (number.slice(0, 1) != "+") {
     return "(" + number.slice(0, 3) + ") " + number.slice(3, 6) + "-" + number.slice(6)
   }

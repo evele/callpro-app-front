@@ -47,11 +47,13 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    <tr v-if="user_audios.length"
+                    <tr 
+                        v-if="user_audios.length"
                         v-for="audio in user_audios"
                         :key="audio.id"
-                        class="pt-4 pb-[15px] h-[70px] odd:bg-[#f4f4f4] even:bg-white"
+                        class="pt-4 pb-[15px] h-[70px] odd:bg-[#f4f4f4] even:bg-white cursor-pointer hover:bg-[#efe9f7]"
                         :class="{ '!bg-[#ebddff]': selected_audio_id === audio.id }"
+                        @click="selected_audio_id = audio.id"
                     >
                         <td class="text-center">
                             <RadioButton v-model="selected_audio_id" :inputId="'audio-' + audio.id" :name="'audio-' + audio.name" :value="audio.id" />
@@ -72,7 +74,7 @@
                                 v-else
                                 type="button"
                                 class="bg-primary p-0 hover:scale-110 transition-transform" 
-                                @click="handle_play_audio(audio)"
+                                @click.stop="handle_play_audio(audio)"
                                 :disabled="is_audio_loading"
                             >
                                 <PlaySVG class="w-7 h-7 text-white" />
@@ -81,7 +83,7 @@
 
                         <td class="text-center">
                             <Button
-                                @click="handle_open_edit_audio_modal(audio)"
+                                @click.stop="handle_open_edit_audio_modal(audio)"
                                 class="w-7 h-7 bg-[#e7e0ec] rounded-full text-[#1D1B20] border-none hover:scale-110 transition-transform"
                             >
                                 <template #icon>

@@ -2,7 +2,7 @@
     <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
         <div class="flex justify-between gap-2 items-center">
             <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
+            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" @change="handle_select_change" />
         </div>
 
         <div v-if="voice_settings.caller_id_selected !== '3'" class="flex justify-between items-center mt-7">
@@ -12,8 +12,24 @@
         </div>
 
         <div v-else :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium w-48">Enter Caller ID</label>
-            <PhoneInput class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
+            <label class="text-lg font-medium w-48">{{ cidConfirm == '1' ? 'Select Caller ID' : 'Enter Caller ID' }}</label>
+
+            <div v-if="cidConfirm == '1'" class="relative">
+                <CallerIDSelect
+                    :model-value="voice_settings.caller_id"
+                    :is-loading="isLoadingCallerID" 
+                    :caller-id-numbers="caller_id_numbers"
+                    @update:modelValue="handle_caller_id_selection"
+                    @update:error="handle_caller_id_number_error"
+                />
+                <Button type="button" @click="handle_open_caller_id_modal" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
+                    <template #icon>
+                        <PlusSVG class="w-[14px] h-[14px]" />
+                    </template>
+                </Button>
+            </div>
+
+            <PhoneInput v-else class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
                 :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
             />
         </div>
@@ -103,6 +119,7 @@
     </SettingSection>
 
     <StaticIntroModal ref="staticIntroModalRef" @update:selected-audio="handle_audio_selection" />
+    <CallerIDModal ref="callerIDModalRef" @update:deleted_number="handle_delete_caller_id" />
 </template>
 
 <script setup lang="ts">
@@ -111,9 +128,11 @@
     const props = defineProps({
         voiceSettings: { type: [Object, null] as PropType<VoiceSettingsWithAudio | null>, required: true, default: null },
         callProNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
-        tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] }
+        tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
+        cidConfirm: { type: String as PropType<'0' | '1'>, required: true, default: '0' }
     })
 
+    const { data: callerIDNumbers, isLoading: isLoadingCallerID, refetch: getCallerIDNumbers } = useFetchCallerIDNumbers(false)
     const emit = defineEmits(['updateVoiceSettings', 'hasError'])
 
     const caller_id_empty = ref(false)
@@ -143,8 +162,14 @@
         number_when_completed: '',
     });
 
+    const temp_selected_caller_id = ref('')
+
     onMounted(() => {
         if(props.voiceSettings) {
+            if(props.cidConfirm === '1') {
+                getCallerIDNumbers()
+            }
+
             if(props.callProNumbers.includes(props.voiceSettings.caller_id)) {
                 voice_settings.caller_id_selected = '1'
                 const db_number = props.callProNumbers.find((number: string) => number === props.voiceSettings?.caller_id)
@@ -220,6 +245,19 @@
         { name: 'MAX', code: '999' },
     ]
 
+    const handle_select_change = (event: { originalEvent: Event, value: any }) => {
+        if(props.cidConfirm == '1') {
+            if(event.value === '1') {
+                voice_settings.caller_id = selected_call_pro.value
+            } else if(event.value === '2') {
+                voice_settings.caller_id = selected_toll_free.value
+            } else {
+                voice_settings.caller_id = temp_selected_caller_id.value
+            }
+            caller_id_error.value = false
+        }
+    }
+
     watch(voice_settings, (updatedSettings: VoiceSettingsUI) => {
         if(updatedSettings.caller_id_selected === '3' && updatedSettings.caller_id === '') {
             caller_id_empty.value = true
@@ -256,6 +294,7 @@
         emit('hasError', newVal)
     })
 
+    /* ----- Static Intro Section ----- */
     const staticIntroModalRef = ref()
     const handle_open_static_intro_modal = (audio_id: number | undefined) => {
         staticIntroModalRef.value?.open(audio_id)
@@ -264,5 +303,34 @@
     const handle_audio_selection = (selected_audio: Audio) => {
         voice_settings.static_intro_library_id = selected_audio.id
         voice_settings.static_intro_audio_selected = selected_audio
+    }
+
+    /* ----- Caller ID Section ----- */
+    const callerIDModalRef = ref()
+    const caller_id_numbers = computed((): CallerID[] => {
+        if(!callerIDNumbers?.value?.result) return []
+        return callerIDNumbers.value.caller_ids
+    })
+
+    const handle_caller_id_selection = (caller_id: CallerID) => {
+        if(!caller_id) return
+        temp_selected_caller_id.value = caller_id.caller_id
+        voice_settings.caller_id = caller_id.caller_id
+    }
+
+    const handle_caller_id_number_error = (error: boolean) => {
+       caller_id_error.value = error
+    }
+
+    const handle_open_caller_id_modal = () => {
+        callerIDModalRef.value?.open(voice_settings.caller_id)
+    }
+
+    const handle_delete_caller_id = (deleted_number: string) => {
+        if(!deleted_number) return
+        if(voice_settings.caller_id === deleted_number) {
+            temp_selected_caller_id.value = ''
+            voice_settings.caller_id = ''
+        }
     }
 </script>
