@@ -3,7 +3,9 @@
         <h2 class="text-2xl font-semibold">Plans and Billing</h2>
     </section>
 
-    <div class="p-6 mb-10 min-h-56">Aca los cards</div>
+    <div class="p-6 mb-10">
+        <CardsSection />
+    </div>
 
     <div class="bg-white rounded-2xl mt-4 mb-6 mx-6 relative shadow-lg">
         <Tabs v-model:value="selected_tab">
@@ -33,6 +35,7 @@
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
 
     const selected_tab = ref('billing')
+    const show_credits = ref(true)
 
     const billing_data = computed(() => {
         if(!billingData?.value?.result) return []
@@ -67,3 +70,4 @@
         }
     }
 </style>
+
