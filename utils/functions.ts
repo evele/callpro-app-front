@@ -117,3 +117,8 @@ export const formatFileSize = (bytes:number) => {
   return `${formattedSize}${sizes[i]}`;
 };
 
+export const format_price = (price: number) => {
+  if(typeof price !== 'number') return '';
+  return price.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+}
+

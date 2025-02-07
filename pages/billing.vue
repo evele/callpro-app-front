@@ -3,30 +3,35 @@
         <h2 class="text-2xl font-semibold">Plans and Billing</h2>
     </section>
 
-    <div class="p-6 mb-10">
+    <div v-if="section_to_show === 'main'" class="p-6">
         <CardsSection />
+
+        <div class="bg-white rounded-2xl mt-4 relative shadow-lg">
+            <Tabs v-model:value="selected_tab">
+                <div class="flex justify-between pt-7 pb-3 pl-10 pr-12">
+                    <TabList class="flex items-center">
+                        <Tab value="billing" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Billing history</Tab>
+                        <Tab value="invoices" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10" :disabled="isLoadingInvoices">
+                            Invoices
+                        </Tab>
+                    </TabList>
+                </div>
+
+                <TabPanels class="pl-10 pr-8 rounded-2xl">
+                    <TabPanel value="billing">
+                        <BillingHistoryTable :billing-data="billing_data" :is-loading="isLoadingBilling" />
+                    </TabPanel>
+                    <TabPanel value="invoices">
+                        <InvoicesTable :invoices-data="invoices_data" :is-loading="isLoadingInvoices" />
+                    </TabPanel>
+                </TabPanels>
+            </Tabs>
+        </div>
     </div>
 
-    <div class="bg-white rounded-2xl mt-4 mb-6 mx-6 relative shadow-lg">
-        <Tabs v-model:value="selected_tab">
-            <div class="flex justify-between pt-7 pb-3 pl-10 pr-12">
-                <TabList class="flex items-center">
-                    <Tab value="billing" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10">Billing history</Tab>
-                    <Tab value="invoices" class="text-lg rounded border-none py-0 px-[10px] h-8 mr-10" :disabled="isLoadingInvoices">
-                        Invoices
-                    </Tab>
-                </TabList>
-            </div>
-
-            <TabPanels class="pl-10 pr-8 rounded-2xl">
-                <TabPanel value="billing">
-                    <BillingHistoryTable :billing-data="billing_data" :is-loading="isLoadingBilling" />
-                </TabPanel>
-                <TabPanel value="invoices">
-                    <InvoicesTable :invoices-data="invoices_data" :is-loading="isLoadingInvoices" />
-                </TabPanel>
-            </TabPanels>
-        </Tabs>
+    <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
+        <div class="bg-white rounded-2xl w-full h-[750px] shadow-lg"></div>
+        <ContainerRight />
     </div>
 </template>
 
@@ -35,7 +40,9 @@
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
 
     const selected_tab = ref('billing')
-    const show_credits = ref(true)
+
+    type SectionToShow = 'main' | 'buy_credits'
+    const section_to_show = ref<SectionToShow>('main')
 
     const billing_data = computed(() => {
         if(!billingData?.value?.result) return []
@@ -70,4 +77,3 @@
         }
     }
 </style>
-
