@@ -45,6 +45,23 @@ export const date_time_to_string = (time:StringOrNull = null) => {
     return formattedDate;
 }
 
+// Get the date in timestamp format and return it in 'MM/DD/YYYY | HH:MM AM/PM' format
+export const format_timestamp = (date_to_format: string) => {
+    if(!date_to_format) return ''
+    const date = new Date(date_to_format);
+    
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    }).format(date).replace(',', ' |');
+
+    return formattedDate
+}
+
 export const format_number_to_show = function (number: string) {
   if(!number) return '';
   if (number.slice(0, 1) != "+") {

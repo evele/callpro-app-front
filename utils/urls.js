@@ -16,6 +16,7 @@ export const CREATE_USER_URL = "/jwtauth/create_user"
 /* ----- Billing Store ----- */
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
 export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
+export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
