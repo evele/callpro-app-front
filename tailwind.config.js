@@ -23,6 +23,8 @@ module.exports = {
           'dark-blue': '#1D192B',
           'secondary-hover': '#5B7906',
           'grey-4': '#79747E',
+          'grey-5': '#797676',
+          'grey-6': '#CAC4D0',
           'grey-9': '#5A5A5A',
           'green-positive-primary': '#009951',
           verified: '#009951',
