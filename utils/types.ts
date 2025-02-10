@@ -653,3 +653,5 @@ coupon_details: CouponDetails | string; // Puede ser un string serializado o un 
 invoice_data: string;
 time_stamp: string;
 }
+
+export type SelectedBillingType = 'credit' | 'plan';

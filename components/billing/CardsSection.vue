@@ -3,7 +3,7 @@
         <BillingCardContainer v-show="show_credits" title="Your plan" type="credits">
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
-                    <CoinsSVG />
+                    <CreditsCoinsSVG />
                     <div class="w-[60%]">
                         <p class="flex items-center gap-3"><span class="font-semibold text-2xl">2000</span>numbers</p>
                     </div>
