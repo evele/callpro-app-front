@@ -667,6 +667,16 @@ export enum ExpiryState {
   EXPIRED = 'EXPIRY_STATE_EXPIRED',
 }
 
+export enum CardType {
+  VISA = 'Visa',
+  MASTERCARD = 'Mastercard',
+  AMERICAN_EXPRESS = 'American Express',
+  DISCOVER = 'Discover',
+  JCB = 'JCB',
+  DINERS_CLUB = 'Diners Club',
+  UNKNOWN = 'Unknown'
+}
+
 export type UserCurrentPlanData = {
   active: ZeroOrOne | null;
   auto_renew: ZeroOrOne | null;
@@ -689,7 +699,7 @@ export type CC_CARD = {
   cvv: string;
   expiry: string;
   expiry_state: ExpiryState;
-  first_four: string;
+  card_type: CardType;
   last_four: string;
   id: number;
   is_default: ZeroOrOne;

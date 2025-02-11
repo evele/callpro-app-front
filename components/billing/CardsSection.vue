@@ -60,10 +60,17 @@
         <BillingCardContainer v-if="default_cc_card" title="Payment method" type="card">
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
-                    <VisaSVG />
+                    <div v-if="!card_type || card_type === CardType.UNKNOWN" class="w-[75px]"></div>
+                    <component v-else :is="get_card_icon(card_type)" />
+
                     <p class="font-semibold text-lg flex flex-col">
-                        Visa ending in {{ default_cc_card?.last_four }}
-                        <span class="text-grey-4 text-base font-normal">Expiry 01/26</span>
+                        {{ card_type }} ending in {{ default_cc_card?.last_four }}
+                        <span v-if="default_cc_card.expiry_state === ExpiryState.EXPIRED" class="text-danger font-medium text-sm">
+                            This card has expired
+                        </span>
+                        <span v-if="default_cc_card.expiry_state === ExpiryState.NEAR_TO_EXPIRE" class="text-pending font-medium text-sm">
+                            This card is about to expire
+                        </span>
                     </p>
                     
                     <Tag 
@@ -87,6 +94,9 @@
 </template>
 
 <script setup lang="ts">
+    import MastercardSVG from '../svgs/MastercardSVG.vue';
+    import VisaSVG from '../svgs/VisaSVG.vue';
+
     const props = defineProps<{
         userPlanAndBalance: { user_current_plan: UserCurrentPlanData, balance_data: NumberOrNull } | null,
         userCardsData: CC_CARD[],
@@ -107,6 +117,41 @@
         if(!props.userCardsData) return null
         return props.userCardsData.find((card: CC_CARD) => card.is_default == '1') || null
     })
+
+    const card_type = computed(() => {
+        if(!default_cc_card) return CardType.UNKNOWN
+        return default_cc_card.value?.card_type
+    })
+
+    const get_card_icon = (card_type: CardType) => {
+        switch (card_type) {
+            case CardType.MASTERCARD:
+                return MastercardSVG
+            case CardType.VISA:
+                return VisaSVG
+            default:
+                return 'div'
+        }
+
+        //TODO: Get the rest of the card icons
+
+        // switch (card_type) {
+        //     case CardType.MASTERCARD:
+        //         return 'MastercardSVG'
+        //     case CardType.VISA:
+        //         return 'VisaSVG'
+        //     case CardType.AMERICAN_EXPRESS:
+        //         return 'AmericanExpressSVG'
+        //     case CardType.DISCOVER:
+        //         return 'DiscoverSVG'
+        //     case CardType.JCB:
+        //         return 'JCBSVG'
+        //     case CardType.DINERS_CLUB:
+        //         return 'DinersClubSVG'
+        //     default:
+        //         return 'div'
+        // }
+    }
 </script>
 
 <style scoped lang="scss">
