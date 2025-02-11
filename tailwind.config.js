@@ -14,6 +14,7 @@ module.exports = {
         },
         colors: {
           primary: '#653494',
+          'dark-primary-container': '#4F378B',
           danger: '#C00F0C',
           'danger-2': '#900B09',
           'danger-light': '#fbd5d5', // Color más claro si lo necesitas
@@ -24,19 +25,24 @@ module.exports = {
 
           'dark-blue': '#1D192B',
           'secondary-hover': '#5B7906',
+
+          'grey-secondary': '#757575',
           'grey-4': '#79747E',
           'grey-5': '#797676',
           'grey-6': '#CAC4D0',
+          'grey-7': '#B3B3B3',
+          'grey-8': '#D9D9D9',
           'grey-9': '#5A5A5A',
-          'green-positive-primary': '#009951',
+
           verified: '#009951',
           pending: '#FFA629',
           unverified: '#C00F0C',
-          'secondary-hover': '#5B7906',
-          'grey-secondary': '#757575',
-          'grey-5': '#797676',
+          
           'green-positive-primary': '#009951',
-          'purple-main': '#65558F'
+          'green-positive-secondary': '#14AE5C',
+          'purple-main': '#65558F',
+
+          'card-background': '#E6E0E9',
         },
         boxShadow: {
           'popover': '0px -4px 4px 0px rgba(0, 0, 0, 0.25), 0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
