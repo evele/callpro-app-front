@@ -653,3 +653,48 @@ coupon_details: CouponDetails | string; // Puede ser un string serializado o un 
 invoice_data: string;
 time_stamp: string;
 }
+
+export enum PackageType {
+  CREDITS_PLAN = 'CREDITS',
+  GROUPS_PLAN = 'GROUPS',
+  PAUG_PLAN = 'PAUG',
+  FREE_PLAN = 'FREE'
+}
+
+export enum ExpiryState {
+  OK = 'EXPIRY_STATE_OK',
+  NEAR_TO_EXPIRE = 'EXPIRY_STATE_NEAR_TO_EXPIRE',
+  EXPIRED = 'EXPIRY_STATE_EXPIRED',
+}
+
+export type UserCurrentPlanData = {
+  active: ZeroOrOne | null;
+  auto_renew: ZeroOrOne | null;
+  credits: NumberOrNull;
+  current_package_id: NumberOrNull;
+  current_package_type: PackageType;
+  end_date: StringOrNull;
+  start_date: StringOrNull;
+  time_stamp: StringOrNull;
+  id: NumberOrNull
+  numbers: NumberOrNull;
+  payment_history_id: NumberOrNull;
+  pending_downgrade_package_id: NumberOrNull;
+  price: NumberOrNull;
+  root_user_id: number;
+}
+
+export type CC_CARD = {
+  cc_name: string;
+  cvv: string;
+  expiry: string;
+  expiry_state: ExpiryState;
+  first_four: string;
+  last_four: string;
+  id: number;
+  is_default: ZeroOrOne;
+  number: string;
+  status: ZeroOrOne;
+  time_stamp: string;
+  user_id: number;
+}

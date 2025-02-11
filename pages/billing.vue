@@ -4,7 +4,11 @@
     </section>
 
     <div v-if="section_to_show === 'main'" class="p-6">
-        <CardsSection />
+        <CardsSection 
+            :user-plan-and-balance="user_plan_and_balance" 
+            :user-cards-data="user_cards_data"
+            :is-loading="is_loading_data" 
+        />
 
         <div class="bg-white rounded-2xl mt-4 relative shadow-lg">
             <Tabs v-model:value="selected_tab">
@@ -19,7 +23,7 @@
 
                 <TabPanels class="pl-10 pr-8 rounded-2xl">
                     <TabPanel value="billing">
-                        <BillingHistoryTable :billing-data="billing_data" :is-loading="isLoadingBilling" />
+                        <BillingHistoryTable :billing-data="billing_history_data" :is-loading="isLoadingBillingHistory" />
                     </TabPanel>
                     <TabPanel value="invoices">
                         <InvoicesTable :invoices-data="invoices_data" :is-loading="isLoadingInvoices" />
@@ -36,7 +40,9 @@
 </template>
 
 <script setup lang="ts">
-    const { data: billingData, isLoading: isLoadingBilling } = useFetchBillingHistory()
+    const { data: userPlanAndBalance, isLoading: isLoadingUserPlan } = useFetchUserPlanAndBalance()
+    const { data: userCardsData, isLoading: isLoadingUserCards } = useFetchUserCards()
+    const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
 
     const selected_tab = ref('billing')
@@ -44,15 +50,27 @@
     type SectionToShow = 'main' | 'buy_credits'
     const section_to_show = ref<SectionToShow>('main')
 
-    const billing_data = computed(() => {
-        if(!billingData?.value?.result) return []
-        return billingData.value.transactions
+    const user_plan_and_balance = computed(() => {
+        if(!userPlanAndBalance?.value?.result) return null
+        return userPlanAndBalance.value
+    })
+
+    const user_cards_data = computed(() => {
+        if(!userCardsData?.value?.result) return []
+        return userCardsData.value.cards
+    })
+    
+    const billing_history_data = computed(() => {
+        if(!billingHistoryData?.value?.result) return []
+        return billingHistoryData.value.transactions
     })
 
     const invoices_data = computed(() => {
         if(!invoicesData?.value?.result) return []
         return invoicesData.value.invoices
     })
+
+    const is_loading_data = computed(() => isLoadingUserPlan.value || isLoadingUserCards.value)
 </script>
 
 <style scoped lang="scss">

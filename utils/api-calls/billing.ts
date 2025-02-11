@@ -1,5 +1,4 @@
-type APIResponseInvoices = {
-  result: true;
+type APIResponseInvoices = APIResponseSuccess & {
   invoices: Invoice[];
   }
 
@@ -27,8 +26,7 @@ type InvoiceCoupon = {
   coupon_details: CouponDetails;
 };
 
-type InvoiceDataResponse = {
-  result: true;
+type InvoiceDataResponse = APIResponseSuccess & {
   invoice_data: InvoiceData;
   invoice_coupon: InvoiceCoupon[];  
 }
@@ -37,11 +35,27 @@ export async function getInvoiceDataToPrint(data:{trx_id: number}):Promise<Invoi
   return await fetchWrapper.post(GET_INVOICE_DATA_TO_PRINT_URL,data) as InvoiceDataResponse  | APIResponseError
 }
 
-type BillingHistoryResponse = {
-  result: true;
+type BillingHistoryResponse = APIResponseSuccess & {
   transactions: Transaction[];
 }
 
 export async function getBillingHistory():Promise<BillingHistoryResponse | APIResponseError>{
   return await fetchWrapper.get(GET_BILLING_HISTORY_URL) as BillingHistoryResponse | APIResponseError
+}
+
+type UserPlanAndBalanceResponse = APIResponseSuccess & {
+  user_current_plan: UserCurrentPlanData;
+  balance_data: NumberOrNull;
+}
+
+export async function getUserPlanAndBalance():Promise<UserPlanAndBalanceResponse | APIResponseError>{
+  return await fetchWrapper.get(GET_USER_PLAN_AND_BALANCE_URL) as UserPlanAndBalanceResponse | APIResponseError
+}
+
+type UserCardsResponse = APIResponseSuccess & {
+  cards: CC_CARD[];
+}
+
+export async function getUserCards():Promise<UserCardsResponse | APIResponseError>{
+  return await fetchWrapper.get(GET_USER_CC_CARDS_URL) as UserCardsResponse | APIResponseError
 }
