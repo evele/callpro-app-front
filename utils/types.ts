@@ -38,6 +38,27 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+
+export type validateConfirmationCode = {
+  confirmation_code: number;
+  root_id: string;
+}
+
+export type UserRegister = {
+  firstName: string;
+  lastName: string;
+  address: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  timezone: OneToNine;
+  agreeToTerms: '0' | '1';
+  notRobot: '0' | '1';
+  ivr_bind: boolean;
+  root_id: string | null;
+}
+
 export type SaveContactAPIResponse = APIResponseSuccess & {
   already_exists?: string[]
 }

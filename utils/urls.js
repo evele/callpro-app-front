@@ -12,6 +12,9 @@ export const LOGIN_URL = "/jwtauth/login"
 export const FORGOT_PASSWORD_URL ="/jwtauth/forgot_password"
 export const RESET_PASSWORD_URL = "/jwtauth/reset_password"
 export const CREATE_USER_URL = "/jwtauth/create_user"
+export const BIND_PHONE_LAUNCH_ACCOUNT_URL = "/jwtauth/login_ivr"
+export const VALIDATE_CONFIRMATION_CODE_URL = "/jwtauth/validate_confirmation_code"
+export const RESEND_IVR_CODE_URL = "/jwtauth/resend_code"
 
 /* ----- Billing Store ----- */
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
