@@ -28,6 +28,12 @@ type ValidateConfirmationCodeResponseSuccess = APIResponseSuccess & {
   root_id: string
 }
 
+type resetPasswordData = {
+  new_password: string, 
+  new_password_confirm: string, 
+  token: string
+}
+
 export const useAuthStore = defineStore("AuthStore", {
   state: (): AuthState => {
     return {
@@ -64,11 +70,11 @@ export const useAuthStore = defineStore("AuthStore", {
       localStorage.removeItem("user")
       location.reload()
     },
-    async sendRecoveryPass(email: string): Promise<PasswordRecoveryResponse | APIResponseError> {
-      return await fetchWrapper.post(FORGOT_PASSWORD_URL, { email }) as PasswordRecoveryResponse | APIResponseError;
+    async sendRecoveryPass(email: string): Promise<PasswordRecoveryResponse | APIResponseError & { email_error: string }> {
+      return await fetchWrapper.post(FORGOT_PASSWORD_URL, { email }) as PasswordRecoveryResponse | APIResponseError & { email_error: string };
     },    
-    async resetPassword(new_password: string, new_password_confirm: string, token: string) {
-      return await fetchWrapper.post(RESET_PASSWORD_URL, { new_password, new_password_confirm, token })
+    async resetPassword(data: resetPasswordData): Promise<RegisterResponseSuccess | APIResponseError> {
+      return await fetchWrapper.post(RESET_PASSWORD_URL, data) as RegisterResponseSuccess | APIResponseError 
     },
     async registerUser(dataToSend:UserRegister): Promise<RegisterResponseSuccess | APIResponseError> {
         return await fetchWrapper.post(CREATE_USER_URL, dataToSend) as RegisterResponseSuccess | APIResponseError;        

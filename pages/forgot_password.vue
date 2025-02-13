@@ -22,7 +22,7 @@
                     <div class="flex flex-col items-start w-full max-w-[520px] gap-2 relative">
                         <label for="email">Email</label>
                         <InputText id="email" class="w-full py-3 border h-10 placeholder-grey-7" autocomplete="off"
-                            placeholder="Enter your email" v-model="email" />
+                            placeholder="Enter your email" v-model="email" :invalid="email_error.length > 0" />
                         <p v-if="email && !isEmailValid" class="text-danger text-sm absolute mt-1 left-0 top-full">
                             Please enter a valid email.
                         </p>
@@ -39,7 +39,7 @@
                 <div class="flex sm:flex-row flex-col justify-center items-center gap-12 my-12 ">
                     <router-link to="/login">
                         <Button type="button"
-                            class="text-dark-3 font-medium bg-white flex w-80 justify-center items-center py-2 px-4 hover:bg-gray-1asdasd00">
+                            class="text-dark-3 font-medium bg-white flex w-80 justify-center items-center py-2 px-4 hover:bg-gray-100">
                             Take me to Login
                         </Button>
                     </router-link>
@@ -51,6 +51,7 @@
                 </div>
             </template>
         </Card>
+        <Toast />
     </div>
 </template>
 <script setup lang="ts">
@@ -79,6 +80,7 @@ const { show_success_toast, show_error_toast } = usePrimeVueToast();
 async function requestPasswordReset() {
     email_error.value = ""
     isSending.value = true
+    showSuccessMessage.value = false
     try {
         const response = await authStore.sendRecoveryPass(email.value)
         if ("result" in response && response.result) {
@@ -89,7 +91,7 @@ async function requestPasswordReset() {
             if(response.email_error) {
                 email_error.value = response.email_error
             }
-            show_error_toast('Error', response.errors || response.email_error || 'Invalid email or something went wrong.');
+            show_error_toast('Error', response.error || response.email_error || 'Invalid email or something went wrong.');
         }
     } catch (error) {
         show_error_toast('Error', 'Something went wrong, please try again.');
