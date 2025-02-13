@@ -33,6 +33,10 @@
         <div class="bg-white rounded-2xl w-full h-[750px] shadow-lg"></div>
         <ContainerRight />
     </div>
+
+    <section v-if="section_to_show === 'checkout_form'" class="p-6">
+        <CheckoutSection />
+    </section>
 </template>
 
 <script setup lang="ts">
@@ -41,8 +45,8 @@
 
     const selected_tab = ref('billing')
 
-    type SectionToShow = 'main' | 'buy_credits'
-    const section_to_show = ref<SectionToShow>('main')
+    type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
+    const section_to_show = ref<SectionToShow>('checkout_form')
 
     const billing_data = computed(() => {
         if(!billingData?.value?.result) return []
