@@ -78,7 +78,7 @@
         </template>
         <template #footer>
             <Button 
-                @click="handle_confirm_purchase" 
+                @click="open_confirm" 
                 :disabled="!selected_card" 
                 class="bg-primary text-sm rounded-xl font-medium h-10 border-white text-white w-full hover:bg-[#4A1D6E] shadow-xl disabled:hover:bg-primary"
             >
@@ -86,11 +86,23 @@
             </Button>
         </template>
     </Card>
+
+    <ConfirmationPurchase 
+        :is-visible="show_confirmation_modal" 
+        @close="close_confirm" 
+        @confirm="handle_confirm" 
+        title="Confirm your purchase" 
+        message="Are you sure you want to confirm this purchase?"  
+        :isProcessingConfirm="is_purchasing"
+    />
+    <MessageReady :is-visible="show_ready_message" />
 </template>
 
 <script setup lang="ts">
 
-import CreditCardPreview from './CreditCardPreview.vue';
+const show_confirmation_modal = ref(false)
+const show_ready_message = ref(false)
+const is_purchasing = ref(false)
 
 const selected_card = ref(null)
 const card_options = ref([
@@ -105,8 +117,22 @@ const open_modal = () => {
     console.log('open modal')
 }
 
-const handle_confirm_purchase = () => {
-    console.log('open modal')
+const open_confirm = () => {
+    show_confirmation_modal.value = true
+}
+
+const close_confirm = () => show_confirmation_modal.value = false
+
+const handle_confirm = () => {
+    is_purchasing.value = true
+    setTimeout(() => {
+        is_purchasing.value = false
+        show_confirmation_modal.value = false
+        show_ready_message.value = true
+        setTimeout(() => {
+            show_ready_message.value = false
+        }, 2000)
+    }, 2000)
 }
 
 </script>
