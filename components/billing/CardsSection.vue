@@ -84,6 +84,7 @@
                 <Button 
                     type="button"
                     class="bg-dark-blue text-white rounded-xl hover:bg-gray-700"
+                    @click="emit('hide-cards', true)"
                 >
                     <EditIconSVG class="w-4 h-4" />
                     Edit
@@ -102,6 +103,8 @@
         userCardsData: CC_CARD[],
         isLoading: boolean
     }>()
+
+    const emit = defineEmits(['hide-cards'])
 
     const current_plan = computed(() => {
         if(!props.userPlanAndBalance) return null

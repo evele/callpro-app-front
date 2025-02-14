@@ -1,6 +1,16 @@
 <template>
     <div class="flex flex-col">
         <div class="flex-grow overflow-hidden">
+
+            <div v-if="!props.showSeeMore" class="w-full mt-2 mb-6">
+                <IconField class="w-full max-w-[300px]">
+                    <InputIcon>
+                        <SearchSVG class="text-grey-secondary" />
+                    </InputIcon>
+                    <InputText class="py-2 w-full text-sm" placeholder="Search by description name" v-model="search" />
+                </IconField>
+            </div>
+
             <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px"></ProgressBar>
 
             <DataTable v-if="isLoading" 
@@ -35,7 +45,7 @@
             <DataTable v-else
                 :value="formatted_billing_data" 
                 scrollable
-                scrollHeight="384px"
+                :scrollHeight="props.showSeeMore ? '384px' : '450px'"
                 dataKey="id" 
                 class="billing-table"
                 stripedRows
@@ -79,7 +89,12 @@
                 </Column>
             </DataTable>
         </div>
-        <Button type="button" class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform">
+        <Button 
+            v-show="props.showSeeMore"
+            type="button" 
+            class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform"
+            @click="emit('hide-cards', false)"
+        >
             See more
             <ArrowRightSVG class="w-4 h-4" />
         </Button>
@@ -89,8 +104,13 @@
 <script setup lang="ts">
     const props = defineProps<{
         billingData: Transaction[],
-        isLoading: boolean
+        isLoading: boolean,
+        showSeeMore: boolean
     }>()
+
+    const emit = defineEmits(['hide-cards'])
+
+    const search = ref('')
 
     const fake_data = ref(new Array(4));
 
