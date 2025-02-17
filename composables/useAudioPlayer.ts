@@ -1,7 +1,7 @@
-export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]> | null) => {
+export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]> | null, from_modal: boolean = false) => {
     const { show_error_toast } = usePrimeVueToast()
+    const audiosStore = useAudiosStore();
 
-    const audio_playing = ref<Audio | null>(null)
     const audio_to_play = ref<Audio | null>(null)
     const is_audio_playing = ref(false)
     const is_audio_loading = ref(false)
@@ -42,7 +42,7 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
     };
 
     watch(() => audio_to_play.value, () => {
-        audio_playing.value = null
+        audiosStore.audio_playing = null
         if(audio_to_play.value) {
             handleRefetch()
         }
@@ -52,13 +52,16 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
     watch(
         () => ({ new_audio: audio_fetched.value, isLoading: isLoading.value }),
         ({ new_audio, isLoading }: { new_audio: FetchedAudio | null, isLoading: boolean}) => {
+            reset_states()
             if(!new_audio) {
                 if(isLoading) return handle_player_action('loading')
                 return
             }
 
+            audiosStore.from_modal = from_modal
+
             if(audio_to_play.value !== null) {
-                audio_playing.value = {
+                audiosStore.audio_playing = {
                     id: audio_to_play.value.id,
                     user_id: audio_to_play.value.user_id,
                     name: audio_to_play.value.name,
@@ -76,7 +79,7 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
 
     const select_previous_audio = () => {
         if(!audio_to_play.value || !user_audios || user_audios.value?.length <= 1) return
-        audio_playing.value = null
+        audiosStore.audio_playing = null
         const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_to_play?.value?.id)
         const new_position = (current_position === 0) ? user_audios.value.length - 1 : current_position - 1
         audio_to_play.value = user_audios.value[new_position]
@@ -85,7 +88,7 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
 
     const select_next_audio = () => {
         if(!audio_to_play.value || !user_audios || user_audios.value?.length <= 1) return
-        audio_playing.value = null
+        audiosStore.audio_playing = null
         const current_position = user_audios.value.findIndex((audio: Audio) => audio.id === audio_to_play?.value?.id)
         const new_position = (current_position === user_audios.value.length - 1) ? 0 : current_position + 1
         audio_to_play.value = user_audios.value[new_position]
@@ -119,7 +122,6 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
     }
 
     return { 
-        audio_playing, 
         audio_to_play, 
         is_audio_playing, 
         is_audio_loading, 
