@@ -61,7 +61,7 @@
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
                     <div v-if="!card_type || card_type === CardType.UNKNOWN" class="w-[75px]"></div>
-                    <component v-else :is="get_card_icon(card_type)" />
+                    <component v-else :is="getCardIcon(card_type)" class="w-[75px] border border-gray-200 rounded-xl" />
 
                     <p class="font-semibold text-lg flex flex-col">
                         {{ card_type }} ending in {{ default_cc_card?.last_four }}
@@ -95,9 +95,6 @@
 </template>
 
 <script setup lang="ts">
-    import MastercardSVG from '../svgs/MastercardSVG.vue';
-    import VisaSVG from '../svgs/VisaSVG.vue';
-
     const props = defineProps<{
         userPlanAndBalance: { user_current_plan: UserCurrentPlanData, balance_data: NumberOrNull } | null,
         userCardsData: CC_CARD[],
@@ -105,6 +102,7 @@
     }>()
 
     const emit = defineEmits(['hide-cards'])
+    const { getCardIcon } = useCreditCards()
 
     const current_plan = computed(() => {
         if(!props.userPlanAndBalance) return null
@@ -125,36 +123,6 @@
         if(!default_cc_card) return CardType.UNKNOWN
         return default_cc_card.value?.card_type
     })
-
-    const get_card_icon = (card_type: CardType) => {
-        switch (card_type) {
-            case CardType.MASTERCARD:
-                return MastercardSVG
-            case CardType.VISA:
-                return VisaSVG
-            default:
-                return 'div'
-        }
-
-        //TODO: Get the rest of the card icons
-
-        // switch (card_type) {
-        //     case CardType.MASTERCARD:
-        //         return 'MastercardSVG'
-        //     case CardType.VISA:
-        //         return 'VisaSVG'
-        //     case CardType.AMERICAN_EXPRESS:
-        //         return 'AmericanExpressSVG'
-        //     case CardType.DISCOVER:
-        //         return 'DiscoverSVG'
-        //     case CardType.JCB:
-        //         return 'JCBSVG'
-        //     case CardType.DINERS_CLUB:
-        //         return 'DinersClubSVG'
-        //     default:
-        //         return 'div'
-        // }
-    }
 </script>
 
 <style scoped lang="scss">
