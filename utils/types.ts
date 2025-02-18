@@ -321,6 +321,12 @@ export type SendNumberToTrash = {
   number_ids: string[]; 
 }
 
+export type GroupToDelete = {
+  group_id: string;
+  numbers_to_trash: boolean;
+  rest_of_user_groups: string[];
+}
+
 /* ----- Packages ----- */
 export type PackageStep = {
   package_id: number;

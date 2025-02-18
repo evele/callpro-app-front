@@ -67,6 +67,8 @@ export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
 export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
 export const MOVE_NUMBER_TO_GROUP_URL = "/contacts/move_number_to_group"
 export const ADD_NUMBER_TO_GROUP_URL = "/contacts/add_number_to_group"
+export const DELETE_USER_GROUP_URL = "/contacts/delete_group"
+
 /* ---- General Store ----*/
 export const GET_AREA_CODES_AND_TIMEZONES_URL = "/general/get_area_codes_and_timezones"
 
