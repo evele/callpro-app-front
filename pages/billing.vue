@@ -34,8 +34,8 @@
     </div>
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
-        <div class="bg-white rounded-2xl w-full h-[750px] shadow-lg"></div>
-        <ContainerRight />
+        <MainPanel :selected_type="selected_type" />
+        <ContainerRight @update:selected_type="handle_select_type" />
     </div>
 </template>
 
@@ -48,7 +48,9 @@
     const selected_tab = ref('billing')
 
     type SectionToShow = 'main' | 'buy_credits'
-    const section_to_show = ref<SectionToShow>('main')
+    const section_to_show = ref<SectionToShow>('buy_credits')
+
+    const selected_type = ref<SelectedBillingType>('credit')
 
     const user_plan_and_balance = computed(() => {
         if(!userPlanAndBalance?.value?.result) return null
@@ -69,6 +71,10 @@
         if(!invoicesData?.value?.result) return []
         return invoicesData.value.invoices
     })
+
+    const handle_select_type = (type: SelectedBillingType) => {
+        selected_type.value = type
+    }
 
     const is_loading_data = computed(() => isLoadingUserPlan.value || isLoadingUserCards.value)
 </script>

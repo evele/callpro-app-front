@@ -675,6 +675,8 @@ invoice_data: string;
 time_stamp: string;
 }
 
+export type SelectedBillingType = 'credit' | 'plan';
+
 export enum PackageType {
   CREDITS_PLAN = 'CREDITS',
   GROUPS_PLAN = 'GROUPS',
