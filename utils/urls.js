@@ -12,11 +12,16 @@ export const LOGIN_URL = "/jwtauth/login"
 export const FORGOT_PASSWORD_URL ="/jwtauth/forgot_password"
 export const RESET_PASSWORD_URL = "/jwtauth/reset_password"
 export const CREATE_USER_URL = "/jwtauth/create_user"
+export const BIND_PHONE_LAUNCH_ACCOUNT_URL = "/jwtauth/login_ivr"
+export const VALIDATE_CONFIRMATION_CODE_URL = "/jwtauth/validate_confirmation_code"
+export const RESEND_IVR_CODE_URL = "/jwtauth/resend_code"
 
 /* ----- Billing Store ----- */
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
 export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
 export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
+export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
+export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
