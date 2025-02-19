@@ -30,6 +30,7 @@ module.exports = {
           'grey-5': '#797676',
           'grey-6': '#CAC4D0',
           'grey-9': '#5A5A5A',
+          'grey-14': '#767676',
           'green-positive-primary': '#009951',
           verified: '#009951',
           pending: '#FFA629',

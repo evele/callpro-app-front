@@ -8,7 +8,7 @@
 
         <span v-if="!is_hovering" class="text-[#79747E] text-[10px] leading-none">{{ text }}</span>
         <Skeleton v-if="count === null" size="1.6rem"></Skeleton>
-        <span v-if="count && !is_hovering" class="text-3xl font-semibold text-black leading-none">{{ count }}</span>
+        <span v-if="count !== null && !is_hovering" class="text-3xl font-semibold text-black leading-none">{{ count || '0' }}</span>
         <component v-if="!is_hovering" :is="icon" :style="{ color: iconColor }" class="absolute right-1 top-[18px] w-[72px] h-[72px]"/>
     </Button>
 </template>
