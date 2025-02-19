@@ -324,19 +324,19 @@ export type SendNumberToTrash = {
 /* ----- Packages ----- */
 export type PackageStep = {
   package_id: number;
-  price: number;
+  price: string;
   price_cents: number;
-  regular_price: number;
-  total: number;
+  regular_price: string;
+  Total: number;
   floor: number;
 }
 
 export type MonthlyGroupPlan = {
   id: number;
   ivr_input: NumberOrNull;
-  name: StringOrNumber;
+  name: string;
   numbers: number;
-  price: number;
+  price: string;
   public: ZeroOrOne;
   status: ZeroOrOne;
   term: number;

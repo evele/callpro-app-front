@@ -24,11 +24,13 @@
                     type="button" 
                     label="Change to Credits" 
                     class="bg-white tracking-wide leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100"
+                    @click="handle_select_credits"
                 />
                 <Button 
                     type="button"
                     label="Upgrade plan"
                     class="leading-[10px] tracking-wide font-semibold text-xs h-[28px]"
+                    @click="handle_select_plan"
                 />
             </template>
         </BillingCardContainer>
@@ -36,7 +38,7 @@
         <BillingCardContainer v-else title="Your plan" type="credits">
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
-                    <CoinsSVG />
+                    <CreditsCoinsSVG />
                     <div class="w-[60%]">
                         <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data }}</span>credits</p>
                     </div>
@@ -48,11 +50,13 @@
                     type="button" 
                     label="Select UMP" 
                     class="bg-white tracking-wide w-28 leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100"
+                    @click="handle_select_plan"
                 />
                 <Button 
                     type="button"
                     label="Add more credits"
                     class="leading-[10px] tracking-wide font-semibold text-xs h-[28px]"
+                    @click="handle_select_credits"
                 />
             </template>
         </BillingCardContainer>
@@ -101,6 +105,10 @@
         userPlanAndBalance: { user_current_plan: UserCurrentPlanData, balance_data: NumberOrNull } | null,
         userCardsData: CC_CARD[],
         isLoading: boolean
+    }>()
+
+    const emit = defineEmits<{
+        'update:selected_type': [value: SelectedBillingType]
     }>()
 
     const current_plan = computed(() => {
@@ -152,6 +160,9 @@
         //         return 'div'
         // }
     }
+
+    const handle_select_credits = () => emit('update:selected_type', 'credit')
+    const handle_select_plan = () => emit('update:selected_type', 'plan')
 </script>
 
 <style scoped lang="scss">

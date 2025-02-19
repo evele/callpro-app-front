@@ -1,6 +1,5 @@
 /* ----- System Groups ----- */
-type PackagesStepsAPIResponse = {
-    result: true,
+type PackagesStepsAPIResponse = APIResponseSuccess & {
     steps: PackageStep[],    
 }
 
@@ -9,8 +8,7 @@ export async function getPackagesSteps(): Promise<PackagesStepsAPIResponse | API
 }
 
 /* ----- Custom Groups ----- */
-type MonthlyGroupsPlansAPIResponse = {
-    result: true,
+type MonthlyGroupsPlansAPIResponse = APIResponseSuccess & {
     monthly_groups_plans: MonthlyGroupPlan[],    
 }
 

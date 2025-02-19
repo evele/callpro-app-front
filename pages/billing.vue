@@ -1,6 +1,6 @@
 <template>
     <section class="bg-white py-2 pl-8 flex gap-3 items-center flex-wrap">
-        <h2 class="text-2xl font-semibold">Plans and Billing</h2>
+        <h2 class="text-2xl font-semibold">Plans and Billing</h2><Button type="button" class="h-8" @click="section_to_show = 'main'">Volver</Button>
     </section>
 
     <div v-if="section_to_show === 'main'" class="p-6">
@@ -8,6 +8,7 @@
             :user-plan-and-balance="user_plan_and_balance" 
             :user-cards-data="user_cards_data"
             :is-loading="is_loading_data" 
+            @update:selected_type="handle_select_type"
         />
 
         <div class="bg-white rounded-2xl mt-4 relative shadow-lg">
@@ -35,7 +36,7 @@
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
         <MainPanel :selected_type="selected_type" />
-        <ContainerRight @update:selected_type="handle_select_type" />
+        <ContainerRight :selected_type="selected_type" @update:selected_type="handle_select_type" />
     </div>
 </template>
 
@@ -48,7 +49,7 @@
     const selected_tab = ref('billing')
 
     type SectionToShow = 'main' | 'buy_credits'
-    const section_to_show = ref<SectionToShow>('buy_credits')
+    const section_to_show = ref<SectionToShow>('main')
 
     const selected_type = ref<SelectedBillingType>('credit')
 
@@ -74,6 +75,7 @@
 
     const handle_select_type = (type: SelectedBillingType) => {
         selected_type.value = type
+        section_to_show.value = 'buy_credits'
     }
 
     const is_loading_data = computed(() => isLoadingUserPlan.value || isLoadingUserCards.value)

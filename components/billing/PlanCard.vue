@@ -13,8 +13,15 @@
 
                 <Divider class="bg-dark-4 h-[3px] rounded-full" />
 
-                <p class="text-xs text-dark-4 h-4">62% discount</p>
+                <p class="text-xs text-dark-4 h-4 font-medium">62% discount</p>
             </div>
         </template>
     </CardOptionContainer>
 </template>
+<script setup lang="ts">
+
+const props = defineProps<{
+    plan: MonthlyGroupPlan
+}>()
+
+</script>

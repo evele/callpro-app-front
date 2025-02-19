@@ -19,8 +19,8 @@
         color: #FFF;
     }
     .plan {
-        border: 0.3px solid rgba(101, 52, 148, 0.60);
-        background: radial-gradient(273.33% 318.02% at -68.84% -32.65%, #9747FF 0%, #F7F2FA 50.75%, #F7F2FA 100%);
+        border: 0.3px solid rgba(101, 52, 148, 0.10);
+        background: radial-gradient(273.33% 318.02% at -68.84% -32.65%, #9747FF 0%, #F7F2FA 60.75%, #F7F2FA 100%);
         width: 146px;
     }
 </style>
