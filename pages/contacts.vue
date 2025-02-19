@@ -4,11 +4,14 @@
         <div v-else v-for="(group, index) in selected_groups" :key="group.group_id" class="flex gap-3 items-center">
             <p class="text-2xl font-semibold">{{ group.group_name }} {{ selected_groups.length > 1 && index < selected_groups.length - 1 && !group.is_custom ? ',' : '' }}
                 <span v-if="group.is_custom" class="text-[#939091] text-[21px] font-light italic ml-1">
-                    #{{ group.group_id }}
+                    #{{ group.group_code==''?'unassigned':group.group_code }}
                 </span>
+                <Button v-else @click="open_contacts_modal(CONTACT)" icon="pi" variant="text" raised rounded aria-label="Bookmark" class="ml-5 bg-light-purple border-none w-6 h-6 hover:scale-125 transition-transform hover:bg-light-purple-2">
+                    <PlusSVG class="w-4 h-4 text-dark-3" />
+                </Button>
             </p>
-            <Button v-if="group.is_custom" @click="console.log('edit_group')" class="rounded-full p-0 bg-[#E8DEF8] w-[32px] h-[32px] border-none shadow-md hover:scale-110 transition-transform">
-                <EditIconSVG class="text-[#1E1E1E] w-4 h-4" />
+            <Button v-if="group.is_custom" @click="open_edit_group" class="rounded-full p-0 bg-[#E8DEF8] w-6 h-6 border-none shadow-md hover:scale-125 transition-transform hover:bg-light-purple-2">
+                <EditIconSVG class="text-dark-3 w-4 h-4" />
             </Button>
             <span v-if="selected_groups.length > 1 && index < selected_groups.length - 1 && group.is_custom" class="text-2xl font-semibold">,</span>
         </div>
@@ -28,7 +31,7 @@
         />
         <div class="flex flex-col gap-4">
             <ContactsActions 
-                @click="open_contacts_modal" 
+                @click="handle_contacts_action" 
                 :total-contacts-number="total_contacts_count" 
                 :total-groups-number="total_custom_groups_count" 
                 :total-dnc-number="total_dnc_count" 
@@ -41,6 +44,7 @@
         ref="modalContacts" 
         :selected-group="selected_groups[0].group_id"
         :selected-contact="selected_contact"
+        :group-to-edit="selected_group_to_edit"
         @reset="handle_reset_values"
         @update:table="handle_update_table"
     />
@@ -50,7 +54,12 @@
 
 <script setup lang="ts">
     const modalContacts = ref()
-    const selected_groups = ref<ContactSelectedGroup[]>([{ group_name: 'All', group_id: CONTACTS_ALL, is_custom: false }])
+    const selected_groups = ref<ContactSelectedGroup[]>([{ group_name: 'All', group_id: CONTACTS_ALL, is_custom: false, group_code:'' }])
+    const selected_group_to_edit = reactive({
+            groupID: '',
+            groupName: '',
+            launchID: ''
+    })
     const is_custom_group = ref(false)
     const selected_contact = ref<ContactToEdit | null>(null)
     const contactsTableRef = ref()
@@ -108,21 +117,42 @@
         contactsTableRef.value?.reset_selected_contacts()
     }
 
+    const handle_contacts_action = (action_id:ContactsModalSectionToShow) => {
+        console.log(action_id)
+        if (action_id == NEW_GROUP){
+            Object.assign(selected_group_to_edit, {
+            groupID: '',
+            groupName: '',
+            launchID: ''
+            });
+        }
+        open_contacts_modal(action_id)
+    }
+
+    const open_edit_group = () => {
+        Object.assign(selected_group_to_edit, {
+            groupID: selected_groups.value[0].group_id,
+            groupName: selected_groups.value[0].group_name,
+            launchID: selected_groups.value[0].group_code
+        });
+        open_contacts_modal(NEW_GROUP)
+    }
+
     /* ----- Contacts Groups Panel ----- */
-    const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean) => {
+    const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean, group_code:string) => {
         contactsTableRef.value?.reset_selected_contacts()
-        selected_groups.value = [{ group_name: button_name, group_id: button_group_id, is_custom: is_custom }]
+        selected_groups.value = [{ group_name: button_name, group_id: button_group_id, is_custom, group_code }]
         is_custom_group.value = is_custom
     }
 
     /* ----- Contacts Table ----- */
-    const handle_filters_selection = (selected_filters: {group_name: string, group_id: string, is_custom: boolean}[]) => {
+    const handle_filters_selection = (selected_filters: {group_name: string, group_id: string, is_custom: boolean, group_code: string}[]) => {
         selected_groups.value = selected_filters
     }
 
     const handle_edit_contact = (contact: ContactToEdit) => {
         selected_contact.value = contact
-        open_contacts_modal('contact')
+        open_contacts_modal(CONTACT)
     }
 </script>
 

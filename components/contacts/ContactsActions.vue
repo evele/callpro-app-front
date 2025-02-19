@@ -18,9 +18,9 @@
     })
 
     const OPTIONS = computed(() => [
-        { id: 'contact', text: "Total Contacts", count: props.totalContactsNumber, icon: ContactsSVG, iconColor: "#4F378B" },
-        { id: 'new_group', text: "Total Groups", count: props.totalGroupsNumber, icon: GroupsSVG, iconColor: "#009951" },
-        { id: 'dnc', text: "Total DNC", count: props.totalDncNumber, icon: DncSVG, iconColor: "#E5A000" },
+        { id: CONTACT, text: "Total Contacts", count: props.totalContactsNumber, icon: ContactsSVG, iconColor: "#4F378B" },
+        { id: NEW_GROUP, text: "Total Groups", count: props.totalGroupsNumber, icon: GroupsSVG, iconColor: "#009951" },
+        { id: DNC, text: "Total DNC", count: props.totalDncNumber, icon: DncSVG, iconColor: "#E5A000" },
     ])
 
     const emit = defineEmits(['click']);
