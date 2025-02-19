@@ -1,6 +1,6 @@
 <template>
     <section class="bg-white py-2 pl-8 flex gap-3 items-center flex-wrap">
-        <h2 class="text-2xl font-semibold">Plans and Billing</h2><Button type="button" class="h-8" @click="section_to_show = 'main'">Volver</Button>
+        <h2 class="text-2xl font-semibold">Plans and Billing</h2>
     </section>
 
     <div v-if="section_to_show === 'main'" class="p-6">
