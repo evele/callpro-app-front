@@ -28,17 +28,52 @@
                     <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id, group.group_code)"
                         :class="[ active_buttons.includes(group.id) ? 'bg-[#d8cbeb]' : 'bg-[#EADDFF]']"
                     >
-                        <div class="flex items-center user-group-data">
-                            {{ group.group_name }}
-                            <span class="contacts-count">{{ group.count }}</span>
+                        <div class="flex items-center user-group-data text-left">
+                            <p class="max-w-[80px] truncate">{{ group.group_name }}</p>
+                            <span class="contacts-count leading-none">{{ group.count }}</span>
                         </div>
-                        <EditIconSVG class="text-[#1D192B]" @click.stop="openEditDialog(group)" />
+
+                        <div class="flex gap-1">
+                            <Button 
+                                class="bg-white p-0 h-4 w-4 text-dark-3 border border-grey-14 hover:bg-gray-200"
+                                @click.stop="openEditDialog(group)"
+                            >
+                                <EditIconSVG class="w-[10px] h-[10px]" />
+                            </Button>
+                            <Button 
+                                class="bg-white p-0 h-4 w-4 text-dark-3 border border-grey-14 hover:bg-gray-200"
+                                @click.stop="handleDeleteGroup(group.id)"
+                            >
+                                <TrashSVG class="w-3 h-3" />
+                            </Button>
+                        </div>
                     </Button>
                 </li>
             </ul>
         </div>
-        <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
     </section>
+
+    <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
+
+    <ConfirmationModal 
+        ref="confirmationModal" 
+        title="Delete Group" 
+        :is-disabled="isDeletingGroup" 
+        :close-on-confirm="false" 
+        :is-loading="isDeletingGroup" 
+        :loading-text="'Deleting...'"
+        @confirm="handle_confirm_modal" 
+        @cancel="handle_cancel_modal"
+    >
+        <div class="flex flex-col gap-4">
+            <p class="text-lg font-semibold">Are you sure you want to delete this group?</p>
+            <div class="flex items-center gap-2">
+                <Checkbox v-model="numbers_to_trash_checkbox" inputId="trashCheckbox" binary />
+                <label for="trashCheckbox" class="text-pending font-medium">Also send numbers in this group to trash</label>
+            </div>
+            <Message severity="error" class="mb-1"><span class="font-bold">Warning:</span> This action can not be undone!</Message>
+        </div>
+    </ConfirmationModal>
 </template>
 
 <script setup lang="ts">
@@ -54,7 +89,7 @@ const props = withDefaults(defineProps<{
     selectedGroups: (): ContactSelectedGroup[] => [],
 })
 
-const emit = defineEmits(['selectedGroup'])
+const emit = defineEmits(['selectedGroup', 'update:table'])
 
 type GroupID = 'all' | 'unassigned' | 'trash'
 type DefaultGroupButton = {
@@ -82,6 +117,14 @@ const setActiveButton = (button_name: string, button_group_id: string, group_cod
 };
 
 const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG } = useFetchGetCustomGroups()
+const { mutate: deleteGroup, isPending: isDeletingGroup, } = useDeleteUserGroup()
+
+const custom_groups = computed(() => {
+    if(!CGData?.value?.result) return []
+    return CGData?.value.custom_groups
+})
+
+const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
 
 // TODO: probably want to move ModalContacts out of here. Its already in the contacts component
@@ -101,6 +144,49 @@ const openEditDialog = (group: CustomGroup) => {
     });
     modalContacts.value.open('new_group')
 };
+
+const confirmationModal = ref()
+const numbers_to_trash_checkbox = ref(false)
+const group_to_delete = ref('')
+
+const handleDeleteGroup = (group_id: string) => {
+    group_to_delete.value = group_id
+    confirmationModal.value?.open()
+};
+
+const handle_confirm_modal = () => {
+    const user_groups = custom_groups.value
+    const rest_of_user_groups = user_groups.map((group: CustomGroup) => group.id)
+
+    const data_to_send: GroupToDelete = {
+        group_id: group_to_delete.value,
+        numbers_to_trash: numbers_to_trash_checkbox.value,
+        rest_of_user_groups
+    }
+
+    deleteGroup(data_to_send, {
+        onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+            if(response.result) {
+                show_success_toast('Success!', 'Group deleted successfully.')
+                emit('update:table')
+                confirmationModal.value?.close()
+                numbers_to_trash_checkbox.value = false
+                group_to_delete.value = ''
+                setActiveButton('All', CONTACTS_ALL)
+            } else {
+                show_error_toast('Error', 'Something went wrong, please try again.')
+            }
+        },
+        onError: () => {
+            show_error_toast('Error', 'Something went wrong, please try again.')
+        }
+    })
+};
+
+const handle_cancel_modal = () => {
+    group_to_delete.value = ''
+    numbers_to_trash_checkbox.value = false
+}
 </script>
 
 <style scoped lang="scss">
@@ -120,7 +206,7 @@ const openEditDialog = (group: CustomGroup) => {
     }
 
     .contacts-count {
-        margin-left: 12px;
+        margin-left: 6px;
         color: #79747E;
         font-size: 11px;
     }
@@ -162,10 +248,8 @@ const openEditDialog = (group: CustomGroup) => {
     height: 35px;
     border: none;
     padding: 10px 12px;
-    gap: 8px;
 
     .user-group-data {
-        gap: 4px;
         font-size: 14px;
         font-weight: 500;
         color: #1D192B;
@@ -175,7 +259,6 @@ const openEditDialog = (group: CustomGroup) => {
             font-size: 12px;
             font-style: italic;
             font-weight: 400;
-            padding-top: .5px;
         }
     }
 }

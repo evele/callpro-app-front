@@ -28,3 +28,8 @@ export async function moveNumberToGroups(data: MoveNumberToGroup): Promise<APIRe
 export async function addNumberToGroups(data: AddNumberToGroup): Promise<APIResponseSuccess | APIResponseError>{    
     return await fetchWrapper.post(ADD_NUMBER_TO_GROUP_URL, data) as APIResponseSuccess | APIResponseError
 }
+
+/* ----- Delete Group ----- */
+export async function deleteUserGroup(data: GroupToDelete): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(DELETE_USER_GROUP_URL, data) as APIResponseSuccess | APIResponseError
+}

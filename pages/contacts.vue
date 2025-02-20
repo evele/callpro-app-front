@@ -36,7 +36,13 @@
                 :total-groups-number="total_custom_groups_count" 
                 :total-dnc-number="total_dnc_count" 
             />
-            <ContactsGroupsPanel :selected-groups="selected_groups" @selectedGroup="handle_group_selection" :system-groups="system_groups" />
+
+            <ContactsGroupsPanel 
+                :selected-groups="selected_groups" 
+                @selectedGroup="handle_group_selection" 
+                :system-groups="system_groups" 
+                @update:table="handle_update_table" 
+            />
         </div>
     </div>
 
