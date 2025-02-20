@@ -91,7 +91,7 @@
                 <Column field="blocked_by" header="Blocked by" class="text-center" headerStyle="min-width: 150px">
                     <template #body="slotProps">
                         <Chip v-if="slotProps.data.dnc == '1'" 
-                            label="You" class="bg-[#FFFBEB] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
+                            label="User" class="bg-[#FFFBEB] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"
                         />
                         <Chip v-else
                             label="Admin" class="bg-[#FEE9E7] min-w-[52px] text-[#49454F] text-xs font-bold h-6 rounded-[10px] px-2"

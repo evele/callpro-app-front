@@ -53,8 +53,8 @@ onMounted(() => {
 })
 
 const save_new_group = () => {
-    if (!groupName.value || !launchID.value) {
-        emit('error', 'Group Name and Phone Launch ID are required.')
+    if (!groupName.value) {
+        emit('error', 'Group Name is required.')
         return;
     }
     const dataToSend: ContactGroup = {

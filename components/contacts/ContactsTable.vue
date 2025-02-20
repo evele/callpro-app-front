@@ -1,10 +1,10 @@
 <template>
-    <div class="w-full table-container rounded-2xl py-5 px-4 text-sm bg-white">
+    <div class="w-full table-container rounded-2xl py-5 px-4 text-sm bg-white relative">
         <DataTable 
             :value="formatted_contacts"
             scrollable 
             :scrollHeight="table_height.toString()+'px'"
-            class="table m-auto w-full" 
+            class="table m-auto w-full h-full" 
             :paginator="show_pagination" 
             :rows="show" 
             dataKey="id"
@@ -248,6 +248,14 @@
                 </div>
             </template>
         </DataTable>
+
+        <Button v-show="!formatted_contacts.length" type="button" class="absolute bottom-6 left-6"  
+            :class="action_button_style" @click="emit('uploadFile', 'upload')"
+        >
+            <UploadSVG class="w-5 h-5 text-[#757575]" />
+            <span class="font-semibold">Upload file</span>
+        </Button>
+
     </div>
     <ConfirmationModal ref="confirmationModal" :title="confirmation_title" :is-disabled="false" @confirm="handle_confirm_modal" @cancel="handle_cancel_modal">
         <p v-if="current_action === 'trash'" class="text-lg font-semibold">{{ message_text }}</p>
@@ -775,7 +783,9 @@
     .p-datatable-table {
         border-collapse: collapse;
         width: 100%;
+        position: relative;
     }
+    padding-bottom: 65px;
 
     .p-datatable-thead, .p-datatable-header-cell {
         background-color: #9A83DB;
@@ -825,6 +835,9 @@
     .p-datatable-paginator-bottom {
         border: none;
         margin-top: 15px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
 
         .p-paginator-prev, .p-paginator-page, .p-paginator-next {
             background-color: transparent;
