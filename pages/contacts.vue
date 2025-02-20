@@ -105,7 +105,7 @@
     }
 
     const handle_update_table = () => {
-        contactsTableRef.value?.reset_selected_contacts()
+        contactsTableRef.value?.reset_selected_contacts(true, true, false)
     }
 
     /* ----- Contacts Groups Panel ----- */

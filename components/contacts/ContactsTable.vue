@@ -6,7 +6,7 @@
             :scrollHeight="table_height.toString()+'px'"
             class="table m-auto w-full" 
             :paginator="show_pagination" 
-            :rows="10" 
+            :rows="show" 
             dataKey="id"
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
@@ -39,25 +39,40 @@
                         </div>
                     </div>
                     
-                    <div v-if="!updatedSelectedGroupsID.includes(TRASH)" class="flex items-center gap-2 relative">
-                        <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
-                            <PlusRoundedSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
-                        </Button>
+                    <div class="flex justify-between items-center w-full">
+                        <div v-if="!updatedSelectedGroupsID.includes(TRASH)" class="flex items-center gap-2 relative">
+                            <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                                <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
+                                <PlusRoundedSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
+                            </Button>
 
-                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_move_to_group_btn">
-                            <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
-                            <MoveSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
-                        </Button>
+                            <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_move_to_group_btn">
+                                <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                                <MoveSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
+                            </Button>
 
-                        <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="STTIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
-                            <TrashSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
-                        </Button>
-                        <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
+                            <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                                <ProgressSpinner v-if="STTIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                                <TrashSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
+                            </Button>
+                            <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
+                        </div>
+
+                        <div class="flex items-center gap-4 ml-auto">
+                            <label for="my-select" class="text-base font-medium text-black">Show</label>
+                            <Select 
+                                id="my-select"
+                                v-model="show" 
+                                :options="items_per_page_options" 
+                                optionLabel="name" 
+                                optionValue="code" 
+                                class="min-w-[70px] rounded-md" 
+                                placeholder="Select" 
+                            />
+                        </div>
                     </div>
                 </header>
             </template>
@@ -328,6 +343,14 @@
 
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
 
+    const items_per_page_options = [
+        { name: '10', code: 10 },
+        { name: '25', code: 25 },
+        { name: '50', code: 50 },
+        { name: '100', code: 100 },
+        { name: 'All', code: 100000 },
+    ]
+
     // Contacts that are shown in the main table
     const formatted_contacts = computed(() => {
         total_records.value = contacts_data.value.total_numbers;
@@ -371,12 +394,15 @@
     });
 
     // Reset checkboxes and expanded row
-    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true) => {
+    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true, reset_show: boolean = true) => {
         if(reset_page) {
             page.value = 1;
         }
         if(reset_search) {
             search.value = '';
+        }
+        if(reset_show) {
+            show.value = 10;
         }
 
         all_selected.value = false;
@@ -391,7 +417,7 @@
     // Handle pagination
     const onPageChange = (event: any) => {
         page.value = event.page + 1
-        reset_selected_contacts(false, false)
+        reset_selected_contacts(false, false, false)
     }
 
     watch(() => search.value, () => {
@@ -523,7 +549,7 @@
         addNumberToGroup(data_to_send, {
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
-                    reset_selected_contacts()
+                    reset_selected_contacts(true, true, false)
                     show_success_toast('Success!', 'Numbers added!')
                 } else {
                     show_error_toast('Error', 'Something failed while adding numbers...')
@@ -550,7 +576,7 @@
         moveNumberToGroup(data_to_send, {
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
-                    reset_selected_contacts()
+                    reset_selected_contacts(true, true, false)
                     show_success_toast('Success!', 'Numbers moved!')
                 } else {
                     show_error_toast('Oops...', 'Something failed while moving numbers...')
@@ -569,7 +595,7 @@
         sendNumberToTrash(data_to_send, {
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
-                    reset_selected_contacts();
+                    reset_selected_contacts(true, true, false);
                     show_success_toast('Success!', data_to_send.number_ids.length > 1 ? 'Numbers removed!' : 'Number removed!')
                 } else {
                     show_error_toast('Oops...', 'Something went wrong...')
