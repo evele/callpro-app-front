@@ -38,6 +38,27 @@ export type LoginResponseSuccess = {
   message: string;
 };
 
+
+export type validateConfirmationCode = {
+  confirmation_code: number;
+  root_id: string;
+}
+
+export type UserRegister = {
+  firstName: string;
+  lastName: string;
+  address: string;
+  phone: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  timezone: OneToNine;
+  agreeToTerms: '0' | '1';
+  notRobot: '0' | '1';
+  ivr_bind: boolean;
+  root_id: string | null;
+}
+
 export type SaveContactAPIResponse = APIResponseSuccess & {
   already_exists?: string[]
 }
@@ -299,6 +320,12 @@ export type MoveNumberToGroup = AddNumberToGroup & {
 
 export type SendNumberToTrash = {
   number_ids: string[]; 
+}
+
+export type GroupToDelete = {
+  group_id: string;
+  numbers_to_trash: boolean;
+  rest_of_user_groups: string[];
 }
 
 /* ----- Packages ----- */
@@ -653,4 +680,61 @@ status: ZeroOrOne;
 coupon_details: CouponDetails | string; // Puede ser un string serializado o un objeto
 invoice_data: string;
 time_stamp: string;
+}
+
+export type SelectedBillingType = 'credit' | 'plan';
+
+export enum PackageType {
+  CREDITS_PLAN = 'CREDITS',
+  GROUPS_PLAN = 'GROUPS',
+  PAUG_PLAN = 'PAUG',
+  FREE_PLAN = 'FREE'
+}
+
+export enum ExpiryState {
+  OK = 'EXPIRY_STATE_OK',
+  NEAR_TO_EXPIRE = 'EXPIRY_STATE_NEAR_TO_EXPIRE',
+  EXPIRED = 'EXPIRY_STATE_EXPIRED',
+}
+
+export enum CardType {
+  VISA = 'Visa',
+  MASTERCARD = 'Mastercard',
+  AMERICAN_EXPRESS = 'American Express',
+  DISCOVER = 'Discover',
+  JCB = 'JCB',
+  DINERS_CLUB = 'Diners Club',
+  UNKNOWN = 'Unknown'
+}
+
+export type UserCurrentPlanData = {
+  active: ZeroOrOne | null;
+  auto_renew: ZeroOrOne | null;
+  credits: NumberOrNull;
+  current_package_id: NumberOrNull;
+  current_package_type: PackageType;
+  end_date: StringOrNull;
+  start_date: StringOrNull;
+  time_stamp: StringOrNull;
+  id: NumberOrNull
+  numbers: NumberOrNull;
+  payment_history_id: NumberOrNull;
+  pending_downgrade_package_id: NumberOrNull;
+  price: NumberOrNull;
+  root_user_id: number;
+}
+
+export type CC_CARD = {
+  cc_name: string;
+  cvv: string;
+  expiry: string;
+  expiry_state: ExpiryState;
+  card_type: CardType;
+  last_four: string;
+  id: number;
+  is_default: ZeroOrOne;
+  number: string;
+  status: ZeroOrOne;
+  time_stamp: string;
+  user_id: number;
 }

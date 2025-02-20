@@ -1,7 +1,7 @@
 <template>
     <section class="bg-white p-4 shadow-lg rounded-2xl w-[250px] min-h-[500px] flex flex-col justify-between">
         <div>
-            <h4 class="font-semibold text-xl">Recap</h4>
+            <h5 class="font-semibold text-xl">Recap</h5>
 
             <ul class="font-semibold text-dark-3 mt-10">
                 <li class="flex items-center justify-between">Credit Pack <span class="text-grey-5">{{ format_price(6250) }}</span></li>

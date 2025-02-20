@@ -248,18 +248,18 @@
 
 <script setup lang="ts">
   
-
-    const { height } = useWindowSize() // TODO: maybe exported in a composable?
+    const { width, height } = useWindowSize() // TODO: maybe exported in a composable?
     const table_height = computed(()=> Math.max(height.value - 402, 492))
-
-   
-    const props = defineProps({
-        selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },
-        isCustomGroup: { type: Boolean, required: true },
-        dncTotalNumbers: { type: [Number, null], required: true },
-        systemGroups: { type: Object as PropType<SystemGroup | null>, required: true },
-        customGroups: { type: Array as PropType<CustomGroup[]>, required: true },
-    })
+    
+    const props = withDefaults(defineProps<{
+        selectedGroups: ContactSelectedGroup[]
+        isCustomGroup: boolean
+        dncTotalNumbers: number | null
+        systemGroups: SystemGroup | null
+        customGroups: CustomGroup[]
+    }>(), {
+        selectedGroups: (): ContactSelectedGroup[] => [],
+    }
 
     const updatedSelectedGroups = computed(() => props.selectedGroups)
     const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
