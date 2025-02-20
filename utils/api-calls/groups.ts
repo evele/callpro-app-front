@@ -1,3 +1,8 @@
+/* ----- Save Group ----- */
+export async function saveGroupContacts(data: ContactGroup): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data) as APIResponseSuccess | APIResponseError
+}
+
 /* ----- System Groups ----- */
 type SystemGroupsAPIResponse = {
     result: true,

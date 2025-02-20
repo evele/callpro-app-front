@@ -124,7 +124,6 @@
     }
 
     const handle_contacts_action = (action_id:ContactsModalSectionToShow) => {
-        console.log(action_id)
         if (action_id == NEW_GROUP){
             Object.assign(selected_group_to_edit, {
             groupID: '',
