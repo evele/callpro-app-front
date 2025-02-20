@@ -1,12 +1,12 @@
 <template>
-    <div class="w-full table-container rounded-2xl py-5 px-4 text-sm bg-white">
+    <div class="w-full table-container rounded-2xl py-5 px-4 text-sm bg-white relative">
         <DataTable 
             :value="formatted_contacts"
             scrollable 
             :scrollHeight="table_height.toString()+'px'"
-            class="table m-auto w-full" 
+            class="table m-auto w-full h-full" 
             :paginator="show_pagination" 
-            :rows="10" 
+            :rows="show" 
             dataKey="id"
             paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
@@ -39,25 +39,55 @@
                         </div>
                     </div>
                     
-                    <div v-if="!updatedSelectedGroupsID.includes(TRASH)" class="flex items-center gap-2 relative">
-                        <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
-                            <PlusRoundedSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
-                        </Button>
+                    <div class="flex justify-between items-center w-full">
+                        <div v-if="!updatedSelectedGroupsID.includes(TRASH)" class="flex items-center gap-2 relative">
+                            <Button @click="handle_group_action('add')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                                <ProgressSpinner v-if="ATGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Adding number" />
+                                <PlusRoundedSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-bold tracking-wider leading-none pt-[2px]">{{ ATGIsPending ? 'Adding...' : 'Add to Group'}}</span>
+                            </Button>
 
-                        <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_move_to_group_btn">
-                            <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
-                            <MoveSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
-                        </Button>
+                            <Button @click="handle_group_action('move')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_move_to_group_btn">
+                                <ProgressSpinner v-if="MTGIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
+                                <MoveSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ MTGIsPending ? 'Moving...' : 'Move to Group' }}</span>
+                            </Button>
 
-                        <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
-                            <ProgressSpinner v-if="STTIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Moving number" />
-                            <TrashSVG v-else class="w-5 h-5" />
-                            <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
-                        </Button>
-                        <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
+                            <Button @click="handle_group_action('trash')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                                <ProgressSpinner v-if="STTIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Sending to trash" />
+                                <TrashSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ STTIsPending ? 'Sending...' : 'Send to Trash' }}</span>
+                            </Button>
+                            <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
+                        </div>
+
+                        <div v-if="updatedSelectedGroupsID.length && updatedSelectedGroupsID[0] === TRASH" class="flex items-center gap-2 relative">
+                            <Button @click="handle_group_action('delete')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                                <ProgressSpinner v-if="DCFIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Deleting forever" />
+                                <TrashSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ DCFIsPending ? 'Deleting...' : 'Delete Forever' }}</span>
+                            </Button>
+                            
+                            <Button @click="handle_group_action('restore')" class="rounded-md bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white" :disabled="disabled_groups_action_btn">
+                                <ProgressSpinner v-if="RCIsPending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Restoring Contact" />
+                                <RenewSVG v-else class="w-5 h-5" />
+                                <span class="text-sm font-semibold tracking-wider leading-none pt-[2px]">{{ RCIsPending ? 'Restoring...' : 'Restore' }}</span>
+                            </Button>
+                            <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
+                        </div>
+
+                        <div class="flex items-center gap-4 ml-auto">
+                            <label for="my-select" class="text-base font-medium text-black">Show</label>
+                            <Select 
+                                id="my-select"
+                                v-model="show" 
+                                :options="items_per_page_options" 
+                                optionLabel="name" 
+                                optionValue="code" 
+                                class="min-w-[70px] rounded-md" 
+                                placeholder="Select" 
+                            />
+                        </div>
                     </div>
                 </header>
             </template>
@@ -233,6 +263,14 @@
                 </div>
             </template>
         </DataTable>
+
+        <Button v-show="!formatted_contacts.length" type="button" class="absolute bottom-6 left-6"  
+            :class="action_button_style" @click="emit('uploadFile', 'upload')"
+        >
+            <UploadSVG class="w-5 h-5 text-[#757575]" />
+            <span class="font-semibold">Upload file</span>
+        </Button>
+
     </div>
     <ConfirmationModal ref="confirmationModal" :title="confirmation_title" :is-disabled="false" @confirm="handle_confirm_modal" @cancel="handle_cancel_modal">
         <p v-if="current_action === 'trash'" class="text-lg font-semibold">{{ message_text }}</p>
@@ -242,6 +280,10 @@
                 display="chip" class="w-full mx-auto" placeholder="Choose many..." :maxSelectedLabels="4" 
             />
             <Message v-if="current_action === 'move'" severity="error" class="mb-1"><span class="font-bold">Warning:</span> This action will replace the current group of this numbers with the selected ones!</Message>
+        </div>
+        <div v-if="current_action === 'delete'" class="flex flex-col gap-4">
+            <p class="text-lg font-semibold">{{ message_text }}</p>
+            <Message severity="error" class="mb-1"><span class="font-bold">Warning:</span> This action can not be undone!</Message>
         </div>
     </ConfirmationModal>
 </template>
@@ -259,7 +301,7 @@
         customGroups: CustomGroup[]
     }>(), {
         selectedGroups: (): ContactSelectedGroup[] => [],
-    }
+    })
 
     const updatedSelectedGroups = computed(() => props.selectedGroups)
     const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
@@ -316,6 +358,8 @@
     const { mutate: sendNumberToTrash, isPending: STTIsPending } = useSendNumberToTrash()
     const { mutate: moveNumberToGroup, isPending: MTGIsPending } = useMoveNumberToGroup()
     const { mutate: addNumberToGroup, isPending: ATGIsPending } = useAddNumberToGroup()
+    const { mutate: deleteContactForever, isPending: DCFIsPending } = useDeleteContactForever()
+    const { mutate: restoreContact, isPending: RCIsPending } = useRestoreContact()
     const { refetch: download } = useFetchDownloadContacts(updatedSelectedGroupsID, false)
 
     const contacts_data = computed(() => {
@@ -328,6 +372,14 @@
     const system_groups = computed<SystemGroup | null>(() => props.systemGroups)
 
     const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
+
+    const items_per_page_options = [
+        { name: '10', code: 10 },
+        { name: '25', code: 25 },
+        { name: '50', code: 50 },
+        { name: '100', code: 100 },
+        { name: 'All', code: 100000 },
+    ]
 
     // Contacts that are shown in the main table
     const formatted_contacts = computed(() => {
@@ -372,12 +424,15 @@
     });
 
     // Reset checkboxes and expanded row
-    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true) => {
+    const reset_selected_contacts = (reset_page: boolean = true, reset_search: boolean = true, reset_show: boolean = true) => {
         if(reset_page) {
             page.value = 1;
         }
         if(reset_search) {
             search.value = '';
+        }
+        if(reset_show) {
+            show.value = 10;
         }
 
         all_selected.value = false;
@@ -392,7 +447,7 @@
     // Handle pagination
     const onPageChange = (event: any) => {
         page.value = event.page + 1
-        reset_selected_contacts(false, false)
+        reset_selected_contacts(false, false, false)
     }
 
     watch(() => search.value, () => {
@@ -445,10 +500,10 @@
     const confirmation_title = ref('')
     const message_text = ref('');
 
-    type CurrentAction = 'add' | 'move' | 'trash' | ''
+    type CurrentAction = 'add' | 'move' | 'trash' | 'delete' | 'restore' | ''
     const current_action = ref<CurrentAction>('')
 
-    type SelectedNumberIds = { number_id: string }[]
+    type SelectedNumberIds = NumberIdObject[]
 
     const custom_groups_options = computed(() => {
         if (custom_groups.value?.length) {
@@ -468,27 +523,43 @@
     }
 
     const handle_group_action = (action: CurrentAction) => {
-        if(action === 'add') {
-            current_action.value = 'add'
-            confirmation_title.value = 'Add to group'
-            message_text.value = 'Are you sure you want to add the numbers to this group(s)?'
-        } else if(action === 'move') {
-            current_action.value = 'move'
-            confirmation_title.value = 'Move to group'
-            message_text.value = 'Are you sure you want to move the numbers to this group(s)?'
-        } else {
-            current_action.value = 'trash'
-            confirmation_title.value = 'Confirmation'
+        switch(action) {
+            case 'add':
+                current_action.value = 'add'
+                confirmation_title.value = 'Add to group'
+                message_text.value = 'Are you sure you want to add the numbers to this group(s)?'
+                break;
+            case 'move':
+                current_action.value = 'move'
+                confirmation_title.value = 'Move to group'
+                message_text.value = 'Are you sure you want to move the numbers to this group(s)?'
+                break;
+            case 'trash':
+                current_action.value = 'trash'
+                confirmation_title.value = 'Confirmation'
 
-            const many_numbers = selected_numbers.value.length > 1;
-            message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
-                                              : 'Are you sure you want to send this number to Trash?';
+                const many_numbers = selected_numbers.value.length > 1;
+                message_text.value = many_numbers ? 'Are you sure you want to send these numbers to Trash?'
+                                                : 'Are you sure you want to send this number to Trash?';
+                break;
+            case 'delete':
+                current_action.value = 'delete'
+                confirmation_title.value = 'Delete contact'
+                message_text.value = 'Are you sure you want to delete this contact(s) permanently?'
+                break;
+            case 'restore':
+                current_action.value = 'restore'
+                handle_confirm_modal()
+                return
+            default:
+                break;
         }
+
         confirmationModal.value?.open()
     }
 
     const handle_confirm_modal = () => {
-        const numbers_id: { number_id: string }[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
+        const numbers_id: NumberIdObject[] = selected_numbers.value.map((n_id: string) => ({ number_id: n_id }));
 
         switch(current_action.value) {
             case 'add':
@@ -499,6 +570,12 @@
                 break;
             case 'trash':
                 handle_send_to_trash(numbers_id)
+                break;
+            case 'delete':
+                handle_delete_contact(numbers_id)
+                break;
+            case 'restore':
+                handle_restore_contact(numbers_id)
                 break;
             default:
                 break;
@@ -524,7 +601,7 @@
         addNumberToGroup(data_to_send, {
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
-                    reset_selected_contacts()
+                    reset_selected_contacts(true, true, false)
                     show_success_toast('Success!', 'Numbers added!')
                 } else {
                     show_error_toast('Error', 'Something failed while adding numbers...')
@@ -551,7 +628,7 @@
         moveNumberToGroup(data_to_send, {
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
-                    reset_selected_contacts()
+                    reset_selected_contacts(true, true, false)
                     show_success_toast('Success!', 'Numbers moved!')
                 } else {
                     show_error_toast('Oops...', 'Something failed while moving numbers...')
@@ -570,13 +647,51 @@
         sendNumberToTrash(data_to_send, {
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
-                    reset_selected_contacts();
+                    reset_selected_contacts(true, true, false);
                     show_success_toast('Success!', data_to_send.number_ids.length > 1 ? 'Numbers removed!' : 'Number removed!')
                 } else {
                     show_error_toast('Oops...', 'Something went wrong...')
                 }
             },
             onError: () => show_error_toast('Oops...', 'Something went wrong...')
+        })
+        current_action.value = ''
+    }
+
+    const handle_restore_contact = (numbers_id: SelectedNumberIds) => {
+        const data_to_send: NumberIdArray = {
+            number_ids: numbers_id.map((number) => number.number_id)
+        }
+
+        restoreContact(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts(true, true, false);
+                    show_success_toast('Success!', data_to_send.number_ids.length > 1 ? 'Contacts restored!' : 'Contact restored!')
+                } else {
+                    show_error_toast('Error', 'Something went wrong while restoring contact...')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something went wrong while restoring contact...')
+        })
+        current_action.value = ''
+    }
+
+    const handle_delete_contact = (numbers_id: SelectedNumberIds) => {
+        const data_to_send: NumberIdArray = {
+            number_ids: numbers_id.map((number) => number.number_id)
+        }
+
+        deleteContactForever(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    reset_selected_contacts(true, true, false);
+                    show_success_toast('Success!', data_to_send.number_ids.length > 1 ? 'Contacts deleted!' : 'Contact deleted!')
+                } else {
+                    show_error_toast('Error', 'Something went wrong while deleting contact...')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something went wrong while deleting contact...')
         })
         current_action.value = ''
     }
@@ -749,7 +864,9 @@
     .p-datatable-table {
         border-collapse: collapse;
         width: 100%;
+        position: relative;
     }
+    padding-bottom: 65px;
 
     .p-datatable-thead, .p-datatable-header-cell {
         background-color: #9A83DB;
@@ -799,6 +916,9 @@
     .p-datatable-paginator-bottom {
         border: none;
         margin-top: 15px;
+        position: absolute;
+        bottom: 0;
+        width: 100%;
 
         .p-paginator-prev, .p-paginator-page, .p-paginator-next {
             background-color: transparent;

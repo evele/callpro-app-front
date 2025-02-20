@@ -83,6 +83,9 @@ export type AllContactsQueryParams = {
   filter: string,
 }
 
+export type NumberIdObject = { number_id: string }
+export type NumberIdArray = { number_ids: string[] }
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number
@@ -128,7 +131,7 @@ export type ContactDNC = {
 export type ContactGroup = {
   name: string;
   id: NumberOrNull;
-  phone_launch_id: NumberOrNull;
+  phone_launch_id: StringOrNumber;
 };
 
 export type ReceivedNumberGroups = { number_groups: StringOrNull }
@@ -310,7 +313,7 @@ export type CustomGroup = {
 }
 
 export type AddNumberToGroup = {
-  number_id: { number_id: string }[];
+  number_id: NumberIdObject[];
   groups: string[];
 }
 

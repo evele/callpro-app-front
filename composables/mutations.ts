@@ -125,6 +125,18 @@ export const useSaveUploadedContact = () => {
   })
 }
 
+export const useSaveGroupContacts = () =>{  
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:ContactGroup) => saveGroupContacts(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['group_contacts']})
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
+    },
+  })
+}
+
 export const useMoveNumberToGroup = () => {
   const queryClient = useQueryClient()
   return useMutation({
@@ -204,6 +216,30 @@ export const useRemoveNumberFromDNC = () => {
   })
 }
 
+export const useDeleteContactForever = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: NumberIdArray) => deleteContactForever(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
+export const useRestoreContact = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: NumberIdArray) => restoreContact(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
 /* ----- Settings ----- */
 export const useUpdateVoiceSettings = () => {
   const queryClient = useQueryClient()
@@ -233,16 +269,4 @@ export const useUpdateGeneralSettings = () => {
       queryClient.invalidateQueries({ queryKey: ['settings'] })
     },
   }) 
-}
-
-export const useSaveGroupContacts = () =>{  
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationFn: (data:ContactGroup) => fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({queryKey: ['group_contacts']})
-      queryClient.invalidateQueries({ queryKey: ['custom_groups'] });
-      queryClient.invalidateQueries({ queryKey: ['system_groups'] });
-    },
-  })
 }

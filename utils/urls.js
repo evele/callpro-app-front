@@ -54,6 +54,8 @@ export const ADD_DNC_CONTACT_URL = "/contacts/insert_dnc"
 export const SEND_CONTACT_TO_TRASH_URL = "/contacts/delete_numbers_contacts"
 export const SEND_NUMBER_TO_TRASH_URL = "/contacts/delete_numbers_contacts"  // TODO: check if should be the same
 export const REMOVE_NUMBER_FROM_DNC_URL = "/contacts/remove_number_from_dnc"
+export const DELETE_CONTACT_FOREVER_URL = "/contacts/delete_contact_forever"
+export const RESTORE_CONTACT_URL = "/contacts/undo_delete_numbers_list"
 
 /* ----- Dashboard Store ----- */
 export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"
