@@ -264,8 +264,9 @@
 <script setup lang="ts">
   
 
-    const { width, height } = useWindowSize() // TODO: maybe exported in a composable?
-    const table_height = computed(()=> height.value - 402)
+    const { height } = useWindowSize() // TODO: maybe exported in a composable?
+    const table_height = computed(()=> Math.max(height.value - 402, 492))
+
    
     const props = defineProps({
         selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },

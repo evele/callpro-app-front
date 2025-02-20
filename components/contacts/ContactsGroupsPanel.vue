@@ -6,7 +6,7 @@
             <ul class="mt-3 flex flex-col default-groups-ul">
                 <li v-for="button in defaultGroupsButtons" :key="button.group_id">
                     <GroupButton :group-name="button.text" :contacts-count="button.value"
-                        :active="active_buttons.includes(button.group_id)" @click="setActiveButton(button.text, button.group_id)">
+                        :active="active_buttons.includes(button.group_id)" @click="setActiveButton(button.text, button.group_id, '')">
                         <template #icon>
                             <component :is="button.icon" :alt="button.text" />
                         </template>
@@ -25,7 +25,7 @@
                 <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
                     :key="group.id">
 
-                    <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id)"
+                    <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id, group.group_code)"
                         :class="[ active_buttons.includes(group.id) ? 'bg-[#d8cbeb]' : 'bg-[#EADDFF]']"
                     >
                         <div class="flex items-center user-group-data">
@@ -61,14 +61,16 @@ const defaultGroupsButtons = [
 
 const active_buttons = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
 
-const setActiveButton = (button_name: string, button_group_id: string) => {
+const setActiveButton = (button_name: string, button_group_id: string, group_code: StringOrNumberOrNull) => {
     const is_custom = !defaultGroupsButtons.some(button => button.group_id === button_group_id)
 
-    emit('selectedGroup', button_name, button_group_id, is_custom);
+    emit('selectedGroup', button_name, button_group_id, is_custom, group_code);
 };
 
 const { data: CGData, isLoading: isLoadingCG, isSuccess: isSuccessCG, isError: isErrorCG, refetch: refetchGroupData } = useFetchGetCustomGroups()
 
+
+// TODO: probably want to move ModalContacts out of here. Its already in the contacts component
 const modalContacts = ref();
 
 const selected_group_to_edit = reactive({
