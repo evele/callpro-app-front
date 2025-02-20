@@ -1,14 +1,6 @@
 <template>
     <div class="flex items-center pl-[50px] pr-[25px] justify-between">
-        <div class="flex items-center gap-6">
-            <p class="text-[#79747E] text-sm">{{ current_route_name }} {{ currentSection ? '/' : '' }}
-                <span v-if="currentSection" class="text-black font-medium"> {{ currentSection }}</span>
-            </p>
-            <Select v-model="option_selected" :options="select_options" optionLabel="name" class="w-44 h-9 text-sm shadow-md" />
-        </div>
-        
         <span v-if="show_current_env() !== ''" class="text-white bg-[#F00] font-bold py-[2px] px-[10px] tracking-wide">{{ show_current_env() }}</span>
-
         <div class="flex gap-3 items-center">
             <Button class="bg-[#E1FF8D] w-28 h-11 text-[#1D192B] font-medium text-sm px-0 border-none hover:bg-[#cafa44] hover:scale-105 transition-all">
                 <CoinsSVG class="w-5 h-5" />

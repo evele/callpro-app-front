@@ -248,10 +248,9 @@
 
 <script setup lang="ts">
   
-
     const { width, height } = useWindowSize() // TODO: maybe exported in a composable?
-    const table_height = computed(()=> height.value - 402)
-
+    const table_height = computed(()=> Math.max(height.value - 402, 492))
+    
     const props = withDefaults(defineProps<{
         selectedGroups: ContactSelectedGroup[]
         isCustomGroup: boolean
@@ -260,7 +259,7 @@
         customGroups: CustomGroup[]
     }>(), {
         selectedGroups: (): ContactSelectedGroup[] => [],
-    })
+    }
 
     const updatedSelectedGroups = computed(() => props.selectedGroups)
     const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))

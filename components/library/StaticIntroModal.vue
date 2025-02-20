@@ -121,7 +121,7 @@
         </div>
     </ConfirmationModal>
 
-    <AudioPlayer v-if="visible" :current-audio="audio_playing" @action="handle_player_action" :from-modal="true" />
+    <AudioPlayer v-if="visible" @action="handle_player_action" />
 
     <StaticIntroSubModal ref="staticIntroSubModal" :section-to-show="submodal_section_to_show" @update:audios="refetch" />
 </template>
@@ -131,10 +131,11 @@
     import EditIconSVG from '../svgs/EditIconSVG.vue'
     import UploadAudioSVG from '../svgs/UploadAudioSVG.vue'
 
+    const audiosStore = useAudiosStore();
     const visible = ref(false)
     const show_older = ref(true)
 
-    const { data: allAudiosData, isFetching, isSuccess, refetch } = useFetchGetAllAudios(show_older, false)
+    const { data: allAudiosData, isFetching, refetch } = useFetchGetAllAudios(show_older, false)
     const { mutate: saveAudio, isPending: isPendingSave } = useSaveAudio()
 
     const emit = defineEmits(['update:selected-audio'])
@@ -155,7 +156,7 @@
     }
 
     /* ----- Audio Player ----- */
-    const { audio_playing, audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(user_audios)
+    const { audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(user_audios, true)
     /* ----- Audio Player ----- */
 
     const selected_audio_id = ref<number | null>(null)
@@ -177,7 +178,7 @@
         selected_audio_to_edit.value = null
         audio_name.value = ''
         search.value = ''
-        audio_playing.value = null
+        audiosStore.audio_playing = null
         visible.value = false;
     }
 
@@ -258,7 +259,7 @@
         if(!section) return
 
         submodal_section_to_show.value = section
-        audio_playing.value = null
+        audiosStore.audio_playing = null
         staticIntroSubModal?.value?.open_modal()
     }
 </script>

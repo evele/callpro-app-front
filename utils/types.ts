@@ -70,6 +70,7 @@ export type CallerIDFetchAPIRsponse = APIResponseSuccess & {
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 
+  group_code: string,
   is_custom: boolean 
 }
 

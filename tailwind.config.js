@@ -22,7 +22,6 @@ module.exports = {
           'dark-2': '#1D1B20',
           'dark-3': '#1E1E1E',
           'dark-4': '#383838',
-
           'dark-blue': '#1D192B',
           'secondary-hover': '#5B7906',
           'grey-main': '#49454F',
@@ -40,7 +39,9 @@ module.exports = {
           'grey-5': '#797676',
           'green-positive-primary': '#009951',
           'purple-main': '#65558F',
-          'light-purple-3': '#EDD9FF'
+          'light-purple-3': '#EDD9FF',
+          'light-purple': '#E8DEF8',
+          'light-purple-2': "#D0BCFF"
         },
         boxShadow: {
           'popover': '0px -4px 4px 0px rgba(0, 0, 0, 0.25), 0px 4px 4px 0px rgba(0, 0, 0, 0.25)',

@@ -19,6 +19,10 @@ export const CHAT_CONTACTS = 'chat_contacts'
 export const CONTACTS_ALL = 'all'
 export const UNASSIGNED = 'unassigned'
 export const TRASH = 'trash'
+export const CONTACT =  'contact'
+export const NEW_GROUP = 'new_group'
+export const DNC = 'dnc'
+export const UPLOAD = 'upload'
 
 export const SYSTEM_GROUPS = [CONTACTS_ALL, UNASSIGNED, TRASH]
 
