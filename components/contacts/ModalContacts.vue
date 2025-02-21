@@ -30,10 +30,13 @@
 </template>
 
 <script setup lang="ts">
-    const props = defineProps({
-        selectedGroup: { type: String, required: true },
-        groupToEdit: { type: Object, required: false, default: null },
-        selectedContact: { type: Object as PropType<ContactToEdit | null>, required: false, default: null }
+    const props = withDefaults(defineProps<{
+        selectedGroup: string,
+        groupToEdit?: SelectedGroupToEdit | null,
+        selectedContact?: ContactToEdit | null
+    }>(), {
+        groupToEdit: null,
+        selectedContact: null
     })
 
     const group_to_edit = ref()
@@ -44,7 +47,7 @@
     const selected_option = ref('')
     const upload_title = ref('Upload new file')
     const contact_title = computed(() => props.selectedContact ? 'Edit contact' : 'Add new contact')
-    const group_title = computed(() => props.groupToEdit.groupID ? 'Edit group' : 'Add new group')
+    const group_title = computed(() => props.groupToEdit?.groupID ? 'Edit group' : 'Add new group')
 
     const menuOptions = computed(() => [
         { id: CONTACT, text: contact_title.value },

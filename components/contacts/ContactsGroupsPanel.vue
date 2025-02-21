@@ -53,8 +53,6 @@
         </div>
     </section>
 
-    <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
-
     <ConfirmationModal 
         ref="confirmationModal" 
         title="Delete Group" 
@@ -89,8 +87,6 @@ const props = withDefaults(defineProps<{
     selectedGroups: (): ContactSelectedGroup[] => [],
 })
 
-const emit = defineEmits(['selectedGroup', 'update:table'])
-
 type GroupID = 'all' | 'unassigned' | 'trash'
 type DefaultGroupButton = {
     text: string
@@ -98,6 +94,12 @@ type DefaultGroupButton = {
     icon: object
     group_id: GroupID
 }
+
+const emit = defineEmits<{
+  (event: 'selectedGroup', button_name: string, button_group_id: string, is_custom: boolean, group_code: StringOrNull): void;
+  (event: 'update:table'): void;
+  (event: 'openContactsModal', group: SelectedGroupToEdit): void;
+}>();
 
 const system_groups = computed<SystemGroup | null>(() => props.systemGroups)
 const defaultGroupsButtons = computed<DefaultGroupButton[]>(() => {
@@ -110,7 +112,7 @@ const defaultGroupsButtons = computed<DefaultGroupButton[]>(() => {
 
 const active_buttons = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
 
-const setActiveButton = (button_name: string, button_group_id: string, group_code: StringOrNumberOrNull) => {
+const setActiveButton = (button_name: string, button_group_id: string, group_code: StringOrNull) => {
     const is_custom = !defaultGroupsButtons.value.some((button: DefaultGroupButton) => button.group_id === button_group_id)
 
     emit('selectedGroup', button_name, button_group_id, is_custom, group_code);
@@ -126,11 +128,7 @@ const custom_groups = computed(() => {
 
 const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
-
-// TODO: probably want to move ModalContacts out of here. Its already in the contacts component
-const modalContacts = ref();
-
-const selected_group_to_edit = reactive({
+const selected_group_to_edit = reactive<SelectedGroupToEdit>({
     groupID: '',
     groupName: '',
     launchID: ''
@@ -142,7 +140,7 @@ const openEditDialog = (group: CustomGroup) => {
         groupName: group.group_name,
         launchID: group.group_code
     });
-    modalContacts.value.open('new_group')
+    emit('openContactsModal', selected_group_to_edit)
 };
 
 const confirmationModal = ref()
