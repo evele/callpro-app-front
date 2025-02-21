@@ -53,7 +53,6 @@
                 <TrashSVG class="w-5 h-5" />
             </template>
         </ButtonWithIcon>
-        <ProgressBar v-if="props.isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
     </div>
 
     <div v-if="props.selectedGroups?.length && props.selectedGroups[0] === TRASH" class="flex items-center gap-2 relative">
@@ -82,7 +81,6 @@
                 <RenewSVG class="w-5 h-5" />
             </template>
         </ButtonWithIcon>
-        <ProgressBar v-if="props.isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
     </div>
 
     <ConfirmationModal ref="confirmationModal" :title="confirmation_title" :is-disabled="false" @confirm="handle_confirm_modal" @cancel="handle_cancel_modal">
@@ -106,7 +104,6 @@
         selectedGroups: string[],
         isCustomGroup: boolean,
         customGroups: CustomGroup[],
-        isLoading: boolean,
         selectedContacts: string[],
         selectedNumbers: string[],
     }>()

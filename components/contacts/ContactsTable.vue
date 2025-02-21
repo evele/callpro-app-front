@@ -5,10 +5,9 @@
             scrollable 
             :scrollHeight="table_height.toString()+'px'"
             class="table m-auto w-full h-full" 
-            :paginator="show_pagination" 
+            paginator
             :rows="show" 
             dataKey="id"
-            paginatorTemplate="PrevPageLink PageLinks NextPageLink"
             lazy
             :totalRecords="total_records"
             :first="(page - 1) * 10"
@@ -39,16 +38,16 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-between items-center w-full">
+                    <div class="flex justify-between items-center w-full relative">
                         <CTButtonsContainer 
                             :selected-groups="updatedSelectedGroupsID" 
                             :is-custom-group="is_custom_group"
                             :custom-groups="custom_groups"
-                            :is-loading="isLoading"
                             :selected-contacts="selected_contacts"
                             :selected-numbers="selected_numbers"
                             @update:table="reset_selected_contacts(true, true, false)"
                         />
+                        <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px" class="absolute w-full -bottom-4 left-0"></ProgressBar>
 
                         <div class="flex items-center gap-4 ml-auto">
                             <label for="my-select" class="text-base font-medium text-black">Show</label>
@@ -323,10 +322,7 @@
     })
 
     const custom_groups = computed(() => props.customGroups)
-
     const system_groups = computed<SystemGroup | null>(() => props.systemGroups)
-
-    const show_pagination = computed(() => contacts_data.value.contacts.length ? true : false);
 
     const items_per_page_options = [
         { name: '10', code: 10 },
@@ -669,13 +665,17 @@
         bottom: 0;
         width: 100%;
 
-        .p-paginator-prev, .p-paginator-page, .p-paginator-next {
+        .p-paginator-first, .p-paginator-prev, .p-paginator-page, .p-paginator-next, .p-paginator-last {
             background-color: transparent;
             border: none;
             border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
             cursor: pointer;
             transition: background-color 0.3s;
-            height: 35px;
+            height: 24px;
+            width: 24px;
+            min-width: 24px;
 
             &:hover {
                 background-color: #e6e2e2;
