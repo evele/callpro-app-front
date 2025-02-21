@@ -36,7 +36,7 @@ jobs:
       - name: Build Nuxt app
         env:
           NUXT_ENV: test
-          NUXT_PUBLIC_TEST_URL: http://devp.thecallpro.com/api
+          NUXT_PUBLIC_TEST_URL: https://devp.thecallpro.com/api
         run: npm run generate
 
       # Desplegar a Firebase Hosting
