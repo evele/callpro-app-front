@@ -321,6 +321,10 @@ export type MoveNumberToGroup = AddNumberToGroup & {
   current_group_id: string;
 }
 
+export type RemoveNumberFromGroup = NumberIdArray & {
+  group_id: string;
+}
+
 export type SendNumberToTrash = {
   number_ids: string[]; 
 }

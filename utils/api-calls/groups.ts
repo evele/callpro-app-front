@@ -34,6 +34,11 @@ export async function addNumberToGroups(data: AddNumberToGroup): Promise<APIResp
     return await fetchWrapper.post(ADD_NUMBER_TO_GROUP_URL, data) as APIResponseSuccess | APIResponseError
 }
 
+/* ----- Remove Number from Group ----- */
+export async function RemoveNumberfromGroup(data: RemoveNumberFromGroup): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(REMOVE_NUMBER_FROM_GROUP_URL, data) as APIResponseSuccess | APIResponseError
+}
+
 /* ----- Delete Group ----- */
 export async function deleteUserGroup(data: GroupToDelete): Promise<APIResponseSuccess | APIResponseError>{    
     return await fetchWrapper.post(DELETE_USER_GROUP_URL, data) as APIResponseSuccess | APIResponseError
