@@ -15,6 +15,7 @@ module.exports = {
         colors: {
           primary: '#653494',
           danger: '#C00F0C',
+          'danger-1': '#EC221F',
           'danger-2': '#900B09',
           'danger-light': '#fbd5d5', // Color más claro si lo necesitas
           success: '#14AE5C',
