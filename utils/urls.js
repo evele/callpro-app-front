@@ -54,6 +54,8 @@ export const ADD_DNC_CONTACT_URL = "/contacts/insert_dnc"
 export const SEND_CONTACT_TO_TRASH_URL = "/contacts/delete_numbers_contacts"
 export const SEND_NUMBER_TO_TRASH_URL = "/contacts/delete_numbers_contacts"  // TODO: check if should be the same
 export const REMOVE_NUMBER_FROM_DNC_URL = "/contacts/remove_number_from_dnc"
+export const DELETE_CONTACT_FOREVER_URL = "/contacts/delete_contact_forever"
+export const RESTORE_CONTACT_URL = "/contacts/undo_delete_numbers_list"
 
 /* ----- Dashboard Store ----- */
 export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"
@@ -67,6 +69,7 @@ export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
 export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
 export const MOVE_NUMBER_TO_GROUP_URL = "/contacts/move_number_to_group"
 export const ADD_NUMBER_TO_GROUP_URL = "/contacts/add_number_to_group"
+export const REMOVE_NUMBER_FROM_GROUP_URL = "/contacts/remove_contacts_from_group"
 export const DELETE_USER_GROUP_URL = "/contacts/delete_group"
 
 /* ---- General Store ----*/

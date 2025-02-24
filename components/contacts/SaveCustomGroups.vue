@@ -53,20 +53,24 @@ onMounted(() => {
 })
 
 const save_new_group = () => {
-    if (!groupName.value || !launchID.value) {
-        emit('error', 'Group Name and Phone Launch ID are required.')
+    if (!groupName.value) {
+        emit('error', 'Group Name is required.')
         return;
     }
     const dataToSend: ContactGroup = {
         name: groupName.value,
         id: groupID.value ? parseInt(groupID.value.toString(), 10) : null,
-        phone_launch_id: launchID.value ? parseInt(launchID.value.toString(), 10) : null
+        phone_launch_id: launchID.value ? parseInt(launchID.value.toString(), 10) : ''
     }
 
     saveGroupContacts(dataToSend, {
-        onSuccess: () => {
-            emit('success', 'Group saved successfully')
-            emit('close')
+        onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+            if(response.result) {
+                emit('success', 'Group saved successfully')
+                emit('close')
+            } else {
+                emit('error', response.error || 'Something went wrong...')
+            }
         },
         onError: () => {
             emit('error', 'Error saving group')

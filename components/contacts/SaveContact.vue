@@ -35,12 +35,10 @@
                     :number-error="number_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
             </div>
 
-            <div class="relative w-full flex">
-                <div class="w-full">
-                    <label class="text-dark-3">Type*</label>
-                    <Select v-model="contact.numbers.type" :invalid="type_error.length > 0" :options="type_options" optionLabel="name" optionValue="code" class="w-full mt-1" placeholder="-" :class="[{ invalid: type_error.length > 0 }]"></Select>
-                </div>
-                <p class="text-red-500 absolute left-0 top-full">{{ type_error }}</p>
+
+            <div class="w-full">
+                <label class="text-dark-3">Type</label>
+                <Select v-model="contact.numbers.type" :options="type_options" optionLabel="name" optionValue="code" class="w-full mt-1" placeholder="-"></Select>
             </div>
         </div>
 
@@ -94,7 +92,6 @@
     const queryClient = useQueryClient()
 
     const number_error = ref('');
-    const type_error = ref('');
     const form_action = ref('')
     const has_phone_number_error = ref(false)
     const is_editing = ref(false)
@@ -102,7 +99,7 @@
     const emit = defineEmits(['close', 'success', 'error', 'update:table'])
 
     const { data: userCustomGroups, isSuccess: CGIsSuccess, isError: CGIsError, isLoading: CGIsLoading } = useFetchUserCustomGrups()
-    const { mutate: saveContact, isPending, reset } = useSaveContact() 
+    const { mutate: saveContact, isPending } = useSaveContact() 
 
     const temp_random_id = () => `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     const is_custom_ID = (id: string) => /^\d+-[a-z0-9]{9}$/.test(id);
@@ -184,11 +181,8 @@
         return []
     })
 
-    watchEffect(() => {
-        if (contact.numbers.type) {
-            type_error.value = ''
-        }
-        if (contact.numbers.number) {
+    watch(() => contact.numbers.number, (newVal: string) => {
+        if(newVal) {
             number_error.value = ''
         }
     })
@@ -204,7 +198,7 @@
         }
     }
 
-    const validate_number_and_type = () => {
+    const validate_number = () => {
         let is_invalid = false
 
         if(contact_numbers.value.some((number: ContactNumber ) => number.number === format_number_to_send(contact.numbers.number) && number.id !== contact.numbers.id)) {
@@ -213,12 +207,9 @@
             return is_invalid
         }
 
-        if(!contact.numbers.number || !contact.numbers.type || has_phone_number_error.value) {
+        if(!contact.numbers.number || has_phone_number_error.value) {
             if(!contact.numbers.number) {
                 number_error.value = 'The Number field is required.'
-            }
-            if(!contact.numbers.type) {
-                type_error.value = 'The Type field is required.'
             }
             is_invalid = true
         }
@@ -226,7 +217,7 @@
     }
 
     const add_new = async () => {
-        if(validate_number_and_type()) return
+        if(validate_number()) return
 
         form_action.value = 'clear'
 
@@ -251,7 +242,7 @@
     }
 
     const go_next = async () => {
-        if(validate_number_and_type()) return
+        if(validate_number()) return
         form_action.value = 'clear'
 
         contact_numbers.value[current_position.value] = {
@@ -356,7 +347,7 @@
     const show_add_new_btn = computed(() => !contact_numbers.value.length || !is_in_previous_position.value)
 
     const save_contact = () => {
-        if(validate_number_and_type()) return
+        if(validate_number()) return
 
         let numbers_to_send = []
         if(is_in_previous_position.value) {
