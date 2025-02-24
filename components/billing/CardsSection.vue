@@ -40,7 +40,7 @@
                 <div class="flex pl-6 w-full justify-between items-center">
                     <CreditsCoinsSVG />
                     <div class="w-[60%]">
-                        <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data }}</span>credits</p>
+                        <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data ?? 0 }}</span>credits</p>
                     </div>
                 </div>
             </template>

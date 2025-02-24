@@ -24,7 +24,8 @@
 
                 <Divider class="bg-[#E8DEF8] h-[2px] rounded-full" />
 
-                <p v-show="formatted_step?.discount" class="text-xs text-light-purple-3 h-4 font-medium">{{ formatted_step?.discount_percent }}% discount</p>
+                <p v-if="formatted_step?.discount" class="text-xs text-light-purple-3 h-4 font-medium">{{ formatted_step?.discount_percent }}% discount</p>
+                <div v-else class="h-4"></div>
             </div>
         </template>
         

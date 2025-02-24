@@ -33,6 +33,6 @@
 
     const monthly_groups_plans = computed(() => {
         if(!MGP_Data?.value?.result) return []
-        return MGP_Data.value.monthly_groups_plans
+        return [...MGP_Data.value.monthly_groups_plans].sort((a, b) => Number(a.price) - Number(b.price))
     })
 </script>
