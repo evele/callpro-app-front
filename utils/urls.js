@@ -20,6 +20,8 @@ export const RESEND_IVR_CODE_URL = "/jwtauth/resend_code"
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
 export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
 export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
+export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
+export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
@@ -65,6 +67,8 @@ export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
 export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
 export const MOVE_NUMBER_TO_GROUP_URL = "/contacts/move_number_to_group"
 export const ADD_NUMBER_TO_GROUP_URL = "/contacts/add_number_to_group"
+export const DELETE_USER_GROUP_URL = "/contacts/delete_group"
+
 /* ---- General Store ----*/
 export const GET_AREA_CODES_AND_TIMEZONES_URL = "/general/get_area_codes_and_timezones"
 

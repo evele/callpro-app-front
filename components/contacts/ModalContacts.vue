@@ -7,21 +7,21 @@
             </header>
         </template>
 
-        <SaveContact v-if="section_to_show === 'contact'" 
-            :selected-contact="selected_contact" 
+        <SaveContact v-if="section_to_show === CONTACT" 
+            :selected-contact="selectedContact" 
             @close="handleClose" 
             @success="handleSuccess" 
             @error="handleError"
             @update:table="emit('update:table')"
         />
 
-        <DNCContacts v-if="section_to_show === 'dnc'" @close="close" @success="handleSuccess" @error="handleError" />
+        <DNCContacts v-if="section_to_show === DNC" @close="close" @success="handleSuccess" @error="handleError" />
 
-        <SaveCustomGroups v-if="section_to_show === 'new_group'" :group-to-edit="group_to_edit" 
+        <SaveCustomGroups v-if="section_to_show === NEW_GROUP" :group-to-edit="group_to_edit" 
             @close="handleClose" @success="handleSuccess" @error="handleError" 
         />
 
-        <UploadContacts v-if="section_to_show === 'upload'" :selected-group="selectedGroup" 
+        <UploadContacts v-if="section_to_show === UPLOAD" :selected-group="selectedGroup" 
             @close="handleClose" @success="handleSuccess" @error="handleError" @changeTitle="handleChangeTitle" 
         />
 
@@ -37,21 +37,20 @@
     })
 
     const group_to_edit = ref()
-    const selected_contact = computed(() => props.selectedContact)
     const visible = ref(false)
-
     const emit = defineEmits(['reset', 'update:table'])
 
     const section_to_show = ref<ContactsModalSectionToShow>('')
     const selected_option = ref('')
     const upload_title = ref('Upload new file')
-    const contact_title = computed(() => selected_contact.value ? 'Edit contact' : 'Add new contact')
+    const contact_title = computed(() => props.selectedContact ? 'Edit contact' : 'Add new contact')
+    const group_title = computed(() => props.groupToEdit.groupID ? 'Edit group' : 'Add new group')
 
     const menuOptions = computed(() => [
-        { id: 'contact', text: contact_title.value },
-        { id: 'new_group', text: "Add new Group" }, // TODO: check about edit group
-        { id: 'dnc', text: "Add new DNC" },
-        { id: 'upload', text: upload_title.value },
+        { id: CONTACT, text: contact_title.value },
+        { id: NEW_GROUP, text: group_title.value },
+        { id: DNC, text: "Add new DNC" },
+        { id: UPLOAD, text: upload_title.value },
     ]);
 
     const handleOptionSelected = (selectedOption: ContactsModalSectionToShow) => {
@@ -63,7 +62,7 @@
             upload_title.value = 'Upload new file';
         }
 
-        if(selectedOption === 'new_group') {
+        if(selectedOption === NEW_GROUP) {
             group_to_edit.value = null;
         }
     };

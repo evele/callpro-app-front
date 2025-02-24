@@ -106,6 +106,20 @@ export const useFetchBillingHistory = () => {
   })
 }
 
+export const useFetchUserPlanAndBalance = () => {
+  return useQuery({
+    queryKey: ['user_billing_data'],
+    queryFn: () => getUserPlanAndBalance(),
+  })
+}
+
+export const useFetchUserCards = () => {
+  return useQuery({
+    queryKey: ['user_cc_cards'],
+    queryFn: () => getUserCards(),
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({
