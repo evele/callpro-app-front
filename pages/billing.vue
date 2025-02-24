@@ -9,6 +9,7 @@
             :user-cards-data="user_cards_data"
             :is-loading="is_loading_data"
             @hide-cards="handle_hide_cards"
+            @update:selected_type="handle_select_type"
         />
 
         <div class="bg-white rounded-2xl relative shadow-lg" :class="{'mt-4': !hide_cards }">
@@ -64,7 +65,7 @@
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
         <MainPanel :selected_type="selected_type" />
-        <ContainerRight @update:selected_type="handle_select_type" />
+        <ContainerRight :selected_type="selected_type" @update:selected_type="handle_select_type" />
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
@@ -82,7 +83,7 @@
     const selected_card = ref<CC_CARD | null>(null)
 
     type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-    const section_to_show = ref<SectionToShow>('checkout_form')
+    const section_to_show = ref<SectionToShow>('main')
 
     const selected_type = ref<SelectedBillingType>('credit')
 
@@ -110,6 +111,7 @@
 
     const handle_select_type = (type: SelectedBillingType) => {
         selected_type.value = type
+        section_to_show.value = 'buy_credits'
     }
 
     const is_loading_data = computed(() => isLoadingUserPlan.value || isLoadingUserCards.value)

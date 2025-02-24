@@ -1,5 +1,5 @@
 <template>
-    <aside class="flex flex-col justify-center gap-4">
+    <aside class="flex flex-col justify-center gap-4 self-start">
         <PlanCardSummary v-show="selected_type === 'credit'">
             <template #content>
                 <div class="flex gap-6 w-full justify-center items-center">
@@ -45,12 +45,17 @@
 </template>
 
 <script setup lang="ts">
-    const selected_type = ref<SelectedBillingType>('credit')
+    const props = defineProps<{
+        selected_type: SelectedBillingType
+    }>()
 
-    const emit = defineEmits(['update:selected_type'])
+    const emit = defineEmits<{
+        'update:selected_type': [value: SelectedBillingType]
+    }>()
+
+    const selected_type = computed<SelectedBillingType>(() => props.selected_type)
 
     const handle_selected_type = (select_type: SelectedBillingType) => {
-        selected_type.value = select_type 
-        emit('update:selected_type', selected_type.value)
+        emit('update:selected_type', select_type)
     }
 </script>
