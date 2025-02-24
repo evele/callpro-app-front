@@ -8,6 +8,7 @@
                             type="button" 
                             class="bg-primary border-none rounded-full p-0 h-[18px] w-[18px] bg-gradient-to-b from-[#9747FF] to-[#532CB5] hover:scale-110 transition-transform" 
                             @click="open_modal"
+                            raised
                         >
                             <PlusSVG class="w-[14px] h-[14px] text-white" />
                         </Button>
