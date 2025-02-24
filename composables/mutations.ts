@@ -36,6 +36,17 @@ export const useUploadAudio = () => {
   })
 }
 
+/* ----- Billing ----- */
+export const useSaveDefaultCard = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:{ card_id: number }) => saveDefaultCard(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_cc_cards'] })
+    },
+  }) 
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()

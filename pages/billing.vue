@@ -77,12 +77,13 @@
     const { data: userCardsData, isLoading: isLoadingUserCards } = useFetchUserCards()
     const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
+    const { mutate: saveDefaultCard, isPending: isSavingDefaultCard } = useSaveDefaultCard()
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
 
     type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-    const section_to_show = ref<SectionToShow>('checkout_form')
+    const section_to_show = ref<SectionToShow>('main')
 
     const selected_type = ref<SelectedBillingType>('credit')
 
