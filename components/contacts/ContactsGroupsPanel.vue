@@ -170,7 +170,7 @@ const handle_confirm_modal = () => {
                 confirmationModal.value?.close()
                 numbers_to_trash_checkbox.value = false
                 group_to_delete.value = ''
-                setActiveButton('All', CONTACTS_ALL, '')
+                setActiveButton('All', CONTACTS_ALL,'')
             } else {
                 show_error_toast('Error', 'Something went wrong, please try again.')
             }

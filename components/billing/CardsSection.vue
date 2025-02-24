@@ -24,11 +24,13 @@
                     type="button" 
                     label="Change to Credits" 
                     class="bg-white tracking-wide leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100"
+                    @click="handle_select_credits"
                 />
                 <Button 
                     type="button"
                     label="Upgrade plan"
                     class="leading-[10px] tracking-wide font-semibold text-xs h-[28px]"
+                    @click="handle_select_plan"
                 />
             </template>
         </BillingCardContainer>
@@ -36,9 +38,9 @@
         <BillingCardContainer v-else title="Your plan" type="credits">
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
-                    <CoinsSVG />
+                    <CreditsCoinsSVG />
                     <div class="w-[60%]">
-                        <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data }}</span>credits</p>
+                        <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data ?? 0 }}</span>credits</p>
                     </div>
                 </div>
             </template>
@@ -48,11 +50,13 @@
                     type="button" 
                     label="Select UMP" 
                     class="bg-white tracking-wide w-28 leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100"
+                    @click="handle_select_plan"
                 />
                 <Button 
                     type="button"
                     label="Add more credits"
                     class="leading-[10px] tracking-wide font-semibold text-xs h-[28px]"
+                    @click="handle_select_credits"
                 />
             </template>
         </BillingCardContainer>
@@ -61,7 +65,7 @@
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
                     <div v-if="!card_type || card_type === CardType.UNKNOWN" class="w-[75px]"></div>
-                    <component v-else :is="get_card_icon(card_type)" />
+                    <component v-else :is="getCardIcon(card_type)" class="w-[75px] border border-gray-200 rounded-xl" />
 
                     <p class="font-semibold text-lg flex flex-col">
                         {{ card_type }} ending in {{ default_cc_card?.last_four }}
@@ -84,6 +88,7 @@
                 <Button 
                     type="button"
                     class="bg-dark-blue text-white rounded-xl hover:bg-gray-700"
+                    @click="emit('hide-cards', true)"
                 >
                     <EditIconSVG class="w-4 h-4" />
                     Edit
@@ -94,14 +99,18 @@
 </template>
 
 <script setup lang="ts">
-    import MastercardSVG from '../svgs/MastercardSVG.vue';
-    import VisaSVG from '../svgs/VisaSVG.vue';
-
     const props = defineProps<{
         userPlanAndBalance: { user_current_plan: UserCurrentPlanData, balance_data: NumberOrNull } | null,
         userCardsData: CC_CARD[],
         isLoading: boolean
     }>()
+
+    const emit = defineEmits<{
+        'update:selected_type': [value: SelectedBillingType],
+        'hide-cards': [value: boolean]
+    }>()
+
+    const { getCardIcon } = useCreditCards()
 
     const current_plan = computed(() => {
         if(!props.userPlanAndBalance) return null
@@ -123,35 +132,9 @@
         return default_cc_card.value?.card_type
     })
 
-    const get_card_icon = (card_type: CardType) => {
-        switch (card_type) {
-            case CardType.MASTERCARD:
-                return MastercardSVG
-            case CardType.VISA:
-                return VisaSVG
-            default:
-                return 'div'
-        }
+    const handle_select_credits = () => emit('update:selected_type', 'credit')
+    const handle_select_plan = () => emit('update:selected_type', 'plan')
 
-        //TODO: Get the rest of the card icons
-
-        // switch (card_type) {
-        //     case CardType.MASTERCARD:
-        //         return 'MastercardSVG'
-        //     case CardType.VISA:
-        //         return 'VisaSVG'
-        //     case CardType.AMERICAN_EXPRESS:
-        //         return 'AmericanExpressSVG'
-        //     case CardType.DISCOVER:
-        //         return 'DiscoverSVG'
-        //     case CardType.JCB:
-        //         return 'JCBSVG'
-        //     case CardType.DINERS_CLUB:
-        //         return 'DinersClubSVG'
-        //     default:
-        //         return 'div'
-        // }
-    }
 </script>
 
 <style scoped lang="scss">

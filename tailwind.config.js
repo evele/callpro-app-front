@@ -15,10 +15,12 @@ module.exports = {
         colors: {
           primary: '#653494',
           danger: '#C00F0C',
+          'danger-1': '#EC221F',
           'danger-2': '#900B09',
           'danger-light': '#fbd5d5', // Color más claro si lo necesitas
           success: '#14AE5C',
           'success-light': '#d5fbd5',
+          'light-2': '#F7F2FA',
           'dark-2': '#1D1B20',
           'dark-3': '#1E1E1E',
           'dark-4': '#383838',
@@ -28,6 +30,7 @@ module.exports = {
           'grey-4': '#79747E',
           'grey-5': '#797676',
           'grey-6': '#CAC4D0',
+          'grey-7': '#B3B3B3',
           'grey-9': '#5A5A5A',
           'grey-14': '#767676',
           'green-positive-primary': '#009951',

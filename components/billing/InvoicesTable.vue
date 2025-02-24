@@ -1,12 +1,34 @@
 <template>
     <div class="flex flex-col">
         <div class="flex-grow overflow-hidden">
+
+            <div v-if="!props.showSeeMore" class="flex justify-between items-center w-full mt-2 mb-6">
+                <IconField class="w-full max-w-[300px]">
+                    <InputIcon>
+                        <SearchSVG class="text-grey-secondary" />
+                    </InputIcon>
+                    <InputText class="py-2 w-full text-sm" placeholder="Search by invoice name" v-model="search" />
+                </IconField>
+
+                <Transition>
+                    <Button 
+                        v-show="selected_invoices.length > 0"
+                        type="button"
+                        @click="handle_download" 
+                        class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-dark-blue hover:bg-gray-100 hover:shadow-lg border-none"
+                    >
+                        <DownloadSVG />
+                        <span class="font-semibold text-sm">Download</span>
+                    </Button>
+                </Transition>
+            </div>
+
             <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px"></ProgressBar>
 
             <DataTable v-else
                 :value="formatted_invoices_data" 
                 scrollable
-                scrollHeight="384px"
+                :scrollHeight="props.showSeeMore ? '384px' : '450px'"
                 dataKey="id" 
                 class="invoices-table"
                 stripedRows
@@ -50,7 +72,12 @@
             </Column>
             </DataTable>
         </div>
-        <Button type="button" class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform">
+        <Button 
+            v-show="props.showSeeMore"
+            type="button" 
+            class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform"
+            @click="emit('hide-cards', false)"
+        >
             See more
             <ArrowRightSVG class="w-4 h-4" />
         </Button>
@@ -60,8 +87,13 @@
 <script setup lang="ts">
      const props = defineProps<{
         invoicesData: Invoice[],
-        isLoading: boolean
+        isLoading: boolean,
+        showSeeMore: boolean
     }>()
+
+    const emit = defineEmits(['hide-cards'])
+
+    const search = ref('')
 
     type FormattedInvoice = {
         id: string,
@@ -115,6 +147,10 @@
     const rowClass = (data: any) => {
         return [{ '!bg-[#E9DDFF]': selected_invoices.value.some((invoice: FormattedInvoice) => invoice.id === data.id) }];
     };
+
+    const handle_download = () => {
+        console.log('Downloaded invoices:', selected_invoices.value)
+    }
 </script>
 
 <style scoped lang="scss">
@@ -157,5 +193,15 @@
             width: 18px;
             height: 18px;
         }
+    }
+
+    .v-enter-active,
+    .v-leave-active {
+        transition: opacity 0.3s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+        opacity: 0;
     }
 </style>
