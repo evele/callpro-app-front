@@ -102,10 +102,6 @@
             {{ isPendingSave ? 'Saving...' : 'Save' }}
         </Button>
     </footer>
-
-    <Teleport to="body">
-        <AudioPlayer :current-audio="audio_playing" @action="handle_player_action" :from-modal="true" />
-    </Teleport>
 </template>
 
 <script setup lang="ts">
@@ -118,6 +114,7 @@ import TrashSVG from '~/components/svgs/TrashSVG.vue';
 import type { QueryObserverResult } from '@tanstack/vue-query'
 
 const authStore = useAuthStore()
+const audiosStore = useAudiosStore()
 
 const audio_id: Ref<string | null> = ref(null);
 const audio_url: Ref<string | null> = ref(null);
@@ -151,10 +148,11 @@ const handle_play_audio = (audio: Tts_Convert_with_name) => {
         full_file_url: audio.full_file_url,
     }
 
+    audiosStore.from_modal = true
     audio_to_play_hook.value = audio_to_play
 }
 
-const { audio_playing, audio_to_play: audio_to_play_hook, handle_player_action, is_audio_loading } = useAudioPlayer(null)
+const { audio_to_play: audio_to_play_hook, is_audio_loading } = useAudioPlayer(null, true)
 /* ----- Audio Player ----- */
 
 const { show_error_toast } = usePrimeVueToast();

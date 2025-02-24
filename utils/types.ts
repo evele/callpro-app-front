@@ -70,6 +70,7 @@ export type CallerIDFetchAPIRsponse = APIResponseSuccess & {
 export type ContactSelectedGroup = { 
   group_name: string, 
   group_id: string, 
+  group_code: string,
   is_custom: boolean 
 }
 
@@ -319,6 +320,12 @@ export type MoveNumberToGroup = AddNumberToGroup & {
 
 export type SendNumberToTrash = {
   number_ids: string[]; 
+}
+
+export type GroupToDelete = {
+  group_id: string;
+  numbers_to_trash: boolean;
+  rest_of_user_groups: string[];
 }
 
 /* ----- Packages ----- */

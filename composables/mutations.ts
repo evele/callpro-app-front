@@ -149,6 +149,17 @@ export const useAddNumberToGroup = () => {
   })
 }
 
+export const useDeleteUserGroup = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: GroupToDelete) => deleteUserGroup(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+    }
+  })
+}
+
 export const useSendNumberToTrash = () => {
   const queryClient = useQueryClient()
   return useMutation({

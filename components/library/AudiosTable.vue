@@ -14,28 +14,29 @@
             </Button>
         </div>
 
-        <section>
-            <ProgressBar v-if="isFetching || isPendingDelete" mode="indeterminate" style="height: 6px"></ProgressBar>
+        <section class="flex flex-col">
+            <ProgressBar v-if="isLoading || isPendingDelete" mode="indeterminate" style="height: 6px"></ProgressBar>
             <DataTable
-                :value="search.length ? filtered_audios : user_audios"
+                :value="search.length ? filtered_audios : userAudios"
                 dataKey="id" 
                 class="audios-table"
                 v-model:selection="audio_to_play"
-                :selectionMode="is_audio_loading ? undefined : 'single'"
+                :selectionMode="isAudioLoading ? undefined : 'single'"
                 :rowClass="rowClass"
+                @update:selection="handle_update_audio_to_play"
             >
                 <Column field="position" header="#" class="text-center">
                     <template #body="slotProps">
                         <div class="w-3 mx-auto">
                             <ProgressSpinner 
-                                v-if="is_audio_loading && audio_to_play?.id === slotProps.data.id" 
+                                v-if="isAudioLoading && audio_to_play?.id === slotProps.data.id" 
                                 class="w-5 h-5" 
                                 strokeWidth="8" 
                                 fill="transparent" 
                                 animationDuration=".5s" 
                                 aria-label="Loading audio" 
                             />
-                            <PlayFilledSVG v-else-if="!is_audio_loading && audio_to_play?.id === slotProps.data.id" class="play-icon" />
+                            <PlayFilledSVG v-else-if="!isAudioLoading && audio_to_play?.id === slotProps.data.id" class="play-icon" />
                             <span v-else class="font-bold">{{ slotProps.data.position }}</span>
                         </div>
                     </template>
@@ -70,9 +71,16 @@
 
                 <template #empty>
                     <p v-if="search.length">No matching records found</p>
-                    <p v-if="!user_audios.length">{{ isFetching ? 'Loading Audios' : 'You have no audios yet' }}</p>
+                    <p v-if="!userAudios.length">{{ isLoading ? 'Loading Audios' : 'You have no audios yet' }}</p>
                 </template>
             </DataTable>
+
+            <Button v-if="!props.showOlder"
+                type="button" 
+                class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end transition-all hover:bg-[#e6e2e2] hover:shadow-lg"
+                label="Show older audios..."
+                @click="emit('update:showOlder', true)"
+            />
         </section>
 
         <Dialog v-model:visible="show_edit_audio" modal header="Edit Audio Information" class="pb-6 max-w-96 w-full">
@@ -94,17 +102,36 @@
 
         <Toast />
     </div>
-    <AudioPlayer :current-audio="audio_playing" @action="handle_player_action" />
 </template>
 
 <script setup lang="ts">
     import type { QueryObserverResult } from '@tanstack/vue-query'
 
-    const toast = useToast();
-    const show_older = ref(false)
-    const selected_audio_file_name = ref('')
+    const props = withDefaults(
+        defineProps<{
+            userAudios: ProcessedAudio[];
+            audioToPlay: Audio | null;
+            isAudioLoading: boolean;
+            isLoading: boolean;
+            showOlder: boolean;
+        }>(),
+        {
+            userAudios: () => [],
+            audioToPlay: null,
+            isAudioLoading: false,
+            isLoading: false
+        }
+    );
 
-    const { data: allAudiosData, isFetching, isSuccess } = useFetchGetAllAudios(show_older)
+    const emit = defineEmits<{
+        (event: 'update:audioToPlay', audio: ProcessedAudio | null): void;
+        (event: 'update:showOlder', showOlder: boolean): void;
+    }>();
+
+    const toast = useToast();
+    const selected_audio_file_name = ref('')
+    const audio_to_play = ref<Audio | null>(props.audioToPlay)
+    
     const { mutate: saveAudio, isPending: isPendingSave } = useSaveAudio()
     const { mutate: deleteAudio, isPending: isPendingDelete } = useDeleteAudio()
     const { refetch: download_audio_bro } = useDownloadAudio(selected_audio_file_name)
@@ -115,30 +142,8 @@
     const confirmationModal = ref()
     const search = ref('')
 
-    const user_audios = computed((): ProcessedAudio[] => {
-        if(allAudiosData.value && allAudiosData.value.result) {
-            return allAudiosData.value.audios.map((audio: Audio, index: number) => {
-                return {
-                    ...audio,
-                    position: index + 1,
-                    created_at: new Date(audio.created_at).toLocaleDateString('en-US', {
-                        day: 'numeric', month: 'short', year: 'numeric'
-                    }),
-                    last_used: new Date(audio.last_used).toLocaleDateString('en-US', {
-                        day: 'numeric', month: 'short', year: 'numeric'
-                    })
-                }
-            })
-        }
-        return []
-    })
-
-    /* ----- Audio Player ----- */
-    const { audio_playing, audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(user_audios)
-    /* ----- Audio Player ----- */
-
     const filtered_audios = computed((): ProcessedAudio[] => {
-        return user_audios.value.filter((audio: ProcessedAudio) => {
+        return props.userAudios.filter((audio: ProcessedAudio) => {
             return audio.name.toLowerCase().includes(search.value.toLowerCase())
         })
     })
@@ -146,14 +151,22 @@
     const show_error_toast = (title: string, error: string) => toast.add({ severity: 'error', summary: title, detail: error, life: 3000 })
     const show_success_toast = (title: string, message: string) => toast.add({ severity: 'success', summary: title, detail: message, life: 3000 })
 
+    watch(() => props.audioToPlay, (newValue: Audio | null) => {
+        audio_to_play.value = newValue
+    })
+
+    const handle_update_audio_to_play = (audio: ProcessedAudio | null) => {
+        emit('update:audioToPlay', audio)
+    }
+
     const confirm_delete = (audio_id: number) => {
-        selected_audio.value = user_audios.value.find((audio: Audio) => audio.id === audio_id) ?? null
+        selected_audio.value = props.userAudios.find((audio: Audio) => audio.id === audio_id) ?? null
         if(!selected_audio.value) return
         confirmationModal.value?.open()
     };
 
     const download_audio = (audio_id: number) => {
-        selected_audio.value = user_audios.value.find((audio: Audio) => audio.id === audio_id) ?? null
+        selected_audio.value = props.userAudios.find((audio: Audio) => audio.id === audio_id) ?? null
         
         if(!selected_audio.value) {
             console.error('Audio file not found or invalid URL');
@@ -173,7 +186,7 @@
     }
 
     const edit_audio = (audio_id: number) => {
-        selected_audio.value = user_audios.value.find((audio: Audio) => audio.id === audio_id) ?? null
+        selected_audio.value = props.userAudios.find((audio: Audio) => audio.id === audio_id) ?? null
         if (selected_audio.value) {
             audio_name.value = selected_audio.value.name
             show_edit_audio.value = true
@@ -235,7 +248,7 @@
     }
 
     const rowClass = (data: any) => {
-        return [{ '!bg-[#D0BCFF]': audio_to_play.value && audio_to_play.value?.id === data.id }];
+        return [{ '!bg-[#D0BCFF]': audio_to_play && audio_to_play.value?.id === data.id }];
     };
 </script>
 
