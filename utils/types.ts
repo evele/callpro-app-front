@@ -307,9 +307,15 @@ export type SystemGroup = {
 
 export type CustomGroup = {
   id: string;
-  group_code: StringOrNumberOrNull;
+  group_code: StringOrNull;
   group_name: string;
   count: number;
+}
+
+export type SelectedGroupToEdit = {
+  groupID: string
+  groupName: string
+  launchID: string
 }
 
 export type AddNumberToGroup = {
@@ -319,6 +325,10 @@ export type AddNumberToGroup = {
 
 export type MoveNumberToGroup = AddNumberToGroup & {
   current_group_id: string;
+}
+
+export type RemoveNumberFromGroup = NumberIdArray & {
+  group_id: string;
 }
 
 export type SendNumberToTrash = {

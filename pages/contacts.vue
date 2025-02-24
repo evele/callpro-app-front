@@ -39,9 +39,10 @@
 
             <ContactsGroupsPanel 
                 :selected-groups="selected_groups" 
+                :system-groups="system_groups"
                 @selectedGroup="handle_group_selection" 
-                :system-groups="system_groups" 
                 @update:table="handle_update_table" 
+                @openContactsModal="handle_open_contacts_modal_from_groups_panel"
             />
         </div>
     </div>
@@ -61,7 +62,7 @@
 <script setup lang="ts">
     const modalContacts = ref()
     const selected_groups = ref<ContactSelectedGroup[]>([{ group_name: 'All', group_id: CONTACTS_ALL, is_custom: false, group_code:'' }])
-    const selected_group_to_edit = reactive({
+    const selected_group_to_edit = reactive<SelectedGroupToEdit>({
             groupID: '',
             groupName: '',
             launchID: ''
@@ -144,10 +145,15 @@
     }
 
     /* ----- Contacts Groups Panel ----- */
-    const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean, group_code:string) => {
+    const handle_group_selection = (button_name: string, button_group_id: string, is_custom: boolean, group_code:StringOrNull) => {
         contactsTableRef.value?.reset_selected_contacts()
-        selected_groups.value = [{ group_name: button_name, group_id: button_group_id, is_custom, group_code }]
+        selected_groups.value = [{ group_name: button_name, group_id: button_group_id, is_custom, group_code: group_code || '' }]
         is_custom_group.value = is_custom
+    }
+
+    const handle_open_contacts_modal_from_groups_panel = (selected_group: SelectedGroupToEdit) => {
+        Object.assign(selected_group_to_edit, selected_group);
+        open_contacts_modal('new_group')
     }
 
     /* ----- Contacts Table ----- */

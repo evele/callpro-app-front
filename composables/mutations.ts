@@ -161,6 +161,18 @@ export const useAddNumberToGroup = () => {
   })
 }
 
+export const useRemoveNumberFromGroup = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: RemoveNumberFromGroup) => RemoveNumberfromGroup(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['system_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['custom_groups'] })
+      queryClient.invalidateQueries({ queryKey: ['all_contacts'] })
+    }
+  })
+}
+
 export const useDeleteUserGroup = () => {
   const queryClient = useQueryClient()
   return useMutation({
