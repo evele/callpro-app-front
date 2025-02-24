@@ -66,17 +66,7 @@
         </Transition>
     </div>
 
-    <Dialog v-model:visible="visible" pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-full max-w-[32rem] p-8" pt:mask:class="bg-white bg-opacity-70">
-        <template #container>
-            <div class="flex flex-col justify-center items-center gap-4">
-                <div class="relative">
-                    <CircleEmptySVG class="w-[72px] h-[72px] text-[#009951]" />
-                    <CheckSVG class="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[50px] h-[50px] text-[#009951]" />
-                </div>
-                <span class="text-black text-lg leading-none">Ready!</span>
-            </div>
-        </template>
-    </Dialog>
+    <MessageReady :is-visible="show_ready_message" />
 
     <ConfirmationModal ref="confirmationModal" title="Change Timezone" max-width="680px" @confirm="handle_confirmation_modal">
         <p class="text-lg font-semibold">Scheduled broadcasts will be send with new time zone. Are you sure you want to change it?</p>
@@ -93,7 +83,7 @@
     const { mutate: updateGeneralSettings, isPending: is_saving_general_settings } = useUpdateGeneralSettings()
 
     const toast = useToast()
-    const visible = ref(false)
+    const show_ready_message = ref(false)
     const selected_tab = ref('voice')
     const confirmationModal = ref();
 
@@ -173,8 +163,8 @@
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
                     show_save_voice_settings_button.value = false
-                    visible.value = true
-                    setTimeout(() => visible.value = false, 2000)
+                    show_ready_message.value = true
+                    setTimeout(() => show_ready_message.value = false, 2000)
                 } else {
                     toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving voice settings', life: 3000 })
                 }
@@ -236,8 +226,8 @@
                 if(response.result) {
                     show_save_text_settings_button.value = false
                     text_settings_mounted.value = false
-                    visible.value = true
-                    setTimeout(() => visible.value = false, 2000)
+                    show_ready_message.value = true
+                    setTimeout(() => show_ready_message.value = false, 2000)
                 } else {
                     toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving text settings', life: 3000 })
                 }
@@ -297,8 +287,8 @@
                 if(response.result) {
                     show_save_general_settings_button.value = false
                     general_settings_mounted.value = false
-                    visible.value = true
-                    setTimeout(() => visible.value = false, 2000)
+                    show_ready_message.value = true
+                    setTimeout(() => show_ready_message.value = false, 2000)
                 } else {
                     toast.add({ severity: 'error', summary: 'Error', detail: 'Something failed while saving general settings', life: 3000 })
                 }

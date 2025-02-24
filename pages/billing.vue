@@ -37,6 +37,10 @@
         <MainPanel :selected_type="selected_type" />
         <ContainerRight @update:selected_type="handle_select_type" />
     </div>
+
+    <section v-if="section_to_show === 'checkout_form'" class="p-6">
+        <CheckoutSection />
+    </section>
 </template>
 
 <script setup lang="ts">
@@ -47,8 +51,8 @@
 
     const selected_tab = ref('billing')
 
-    type SectionToShow = 'main' | 'buy_credits'
-    const section_to_show = ref<SectionToShow>('buy_credits')
+    type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
+    const section_to_show = ref<SectionToShow>('checkout_form')
 
     const selected_type = ref<SelectedBillingType>('credit')
 
