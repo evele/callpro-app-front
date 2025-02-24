@@ -49,13 +49,13 @@ const formatted_step = computed<FormattedStep | null>(() => {
     const formatted_step = {
         ...props.step,
         discount: false,
-        original_price: 100 * Number(parseFloat(props.step.regular_price).toFixed(0)),
+        original_price: Number((100 * parseFloat(props.step.regular_price)).toFixed(0)),
         discount_percent: 0
     }
 
     if(props.step.price != props.step.regular_price) {
         formatted_step.discount = true
-        formatted_step.original_price = 100 * Number(parseFloat(props.step.regular_price).toFixed(0))
+        formatted_step.original_price = Number((100 * parseFloat(props.step.regular_price)).toFixed(0))
         formatted_step.discount_percent = Math.round((1 - (Number(props.step.price) / Number(props.step.regular_price))) * 100);
     }
 
