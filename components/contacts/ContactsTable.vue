@@ -259,7 +259,7 @@
         customGroups: CustomGroup[]
     }>(), {
         selectedGroups: (): ContactSelectedGroup[] => [],
-    }
+    })
 
     const updatedSelectedGroups = computed(() => props.selectedGroups)
     const updatedSelectedGroupsID = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))

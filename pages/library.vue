@@ -8,7 +8,9 @@
                     :audio-to-play="audio_to_play"
                     :is-audio-loading="is_audio_loading"
                     :is-loading="isFetching"
-                    @update:audioToPlay="handle_update_audio_to_play" 
+                    :show-older="show_older"
+                    @update:audioToPlay="handle_update_audio_to_play"
+                    @update:showOlder="handle_show_older_audios"
                 />
             </template>  
         </Card>
@@ -52,6 +54,8 @@
     const handle_update_audio_to_play = (audio: ProcessedAudio | null) => {
         audio_to_play.value = audio
     }
+
+    const handle_show_older_audios = (value: boolean) => show_older.value = value
     /* ----- Audio Player ----- */
 </script>
 
