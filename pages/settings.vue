@@ -1,4 +1,8 @@
 <template>
+    <section class="bg-white py-1 pl-8">
+        <p class="text-2xl font-semibold">Settings</p>
+    </section>
+
     <div class="bg-white rounded-2xl mt-4 mb-6 mx-6 relative shadow-lg">
         <Tabs v-model:value="selected_tab">
             <div class="flex justify-between py-7 px-12 border-b">
