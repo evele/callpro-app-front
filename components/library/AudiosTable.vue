@@ -14,7 +14,7 @@
             </Button>
         </div>
 
-        <section>
+        <section class="flex flex-col">
             <ProgressBar v-if="isLoading || isPendingDelete" mode="indeterminate" style="height: 6px"></ProgressBar>
             <DataTable
                 :value="search.length ? filtered_audios : userAudios"
@@ -74,6 +74,13 @@
                     <p v-if="!userAudios.length">{{ isLoading ? 'Loading Audios' : 'You have no audios yet' }}</p>
                 </template>
             </DataTable>
+
+            <Button v-if="!props.showOlder"
+                type="button" 
+                class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end transition-all hover:bg-[#e6e2e2] hover:shadow-lg"
+                label="Show older audios..."
+                @click="emit('update:showOlder', true)"
+            />
         </section>
 
         <Dialog v-model:visible="show_edit_audio" modal header="Edit Audio Information" class="pb-6 max-w-96 w-full">
@@ -106,6 +113,7 @@
             audioToPlay: Audio | null;
             isAudioLoading: boolean;
             isLoading: boolean;
+            showOlder: boolean;
         }>(),
         {
             userAudios: () => [],
@@ -115,7 +123,10 @@
         }
     );
 
-    const emit = defineEmits(['update:audioToPlay'])
+    const emit = defineEmits<{
+        (event: 'update:audioToPlay', audio: ProcessedAudio | null): void;
+        (event: 'update:showOlder', showOlder: boolean): void;
+    }>();
 
     const toast = useToast();
     const selected_audio_file_name = ref('')
@@ -144,7 +155,7 @@
         audio_to_play.value = newValue
     })
 
-    const handle_update_audio_to_play = (audio: Audio | null) => {
+    const handle_update_audio_to_play = (audio: ProcessedAudio | null) => {
         emit('update:audioToPlay', audio)
     }
 
