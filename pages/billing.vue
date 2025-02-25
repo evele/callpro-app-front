@@ -26,9 +26,13 @@
 
                     <Transition>
                         <Button v-if="show_save_btn" class="h-9 ml-auto bg-primary hover:bg-[#6750A4] transition-colors" 
-                            @click="save_cc_card_as_default"
+                            @click="save_cc_card_as_default" :disabled="isSavingDefaultCard"
                         >
-                            Save as default
+                            <div class="flex items-center gap-2" v-if="isSavingDefaultCard">
+                                <ProgressSpinner strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner" animationDuration=".5s" aria-label="Saving" />
+                                Saving...
+                            </div>
+                            <span v-else>Save as default</span>
                         </Button>
                     </Transition>
                 </div>
@@ -54,7 +58,8 @@
                         <CreditCardsPanel 
                             :user-cards-data="user_cards_data" 
                             :is-loading="isLoadingUserCards"
-                            @selected-card="handle_card_selection"
+                            :selected-card="selected_card"
+                            @update:selected-card="handle_card_selection"
                         />
                     </TabPanel>
                 </TabPanels>
@@ -70,6 +75,8 @@
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
         <CheckoutSection />
     </section>
+
+    <Toast />
 </template>
 
 <script setup lang="ts">
@@ -78,6 +85,7 @@
     const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
     const { mutate: saveDefaultCard, isPending: isSavingDefaultCard } = useSaveDefaultCard()
+    const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
@@ -130,7 +138,30 @@
     }
 
     const save_cc_card_as_default = () => {
-        console.log('Save as default:', selected_card.value)
+        if(!selected_card?.value?.id) {
+            show_error_toast('Error', 'Card ID not found')
+            return
+        }
+        if(selected_card.value.expiry_state === ExpiryState.EXPIRED) {
+            show_error_toast('Error', 'Cannot set an expired card as default')
+            return
+        }
+
+        const data_to_send = { card_id: selected_card.value.id }
+
+        saveDefaultCard(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_success_toast('Success', 'Card set as default')
+                    setTimeout(() => selected_card.value = null, 1000)
+                } else {
+                    show_error_toast('Error', response.error || 'Failed to set card as default')
+                }  
+            },
+            onError: () => {
+                show_error_toast('Error', 'Failed to set card as default')
+            }
+        })
     }
 </script>
 
@@ -153,6 +184,12 @@
                     display: none;
                 }
             }
+        }
+    }
+
+    :deep(.light-spinner) {
+        .p-progressspinner-circle {
+            stroke: white!important;
         }
     }
 
