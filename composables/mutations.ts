@@ -36,6 +36,17 @@ export const useUploadAudio = () => {
   })
 }
 
+/* ----- Billing ----- */
+export const useSaveBillingSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SaveBillingSettingsData) => saveBillingSettings(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_billing_settings'] })
+    },
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()

@@ -40,22 +40,22 @@
             </template>
         </PlanCardSummary>
                 
-        <PanelRecap />
+        <PanelRecap :selected-type="selected_type" />
     </aside>
 </template>
 
 <script setup lang="ts">
     const props = defineProps<{
-        selected_type: SelectedBillingType
+        selectedType: SelectedBillingType
     }>()
 
     const emit = defineEmits<{
-        'update:selected_type': [value: SelectedBillingType]
+        'update:selectedType': [value: SelectedBillingType]
     }>()
 
-    const selected_type = computed<SelectedBillingType>(() => props.selected_type)
+    const selected_type = computed<SelectedBillingType>(() => props.selectedType)
 
     const handle_selected_type = (select_type: SelectedBillingType) => {
-        emit('update:selected_type', select_type)
+        emit('update:selectedType', select_type)
     }
 </script>

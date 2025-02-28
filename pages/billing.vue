@@ -64,8 +64,8 @@
     </div>
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
-        <MainPanel :selected_type="selected_type" />
-        <ContainerRight :selected_type="selected_type" @update:selected_type="handle_select_type" />
+        <MainPanel :selected-type="selected_type" :user-billing-settings="billing_settings_data" @update:sectionToShow="handle_section_to_show" />
+        <ContainerRight :selected-type="selected_type" @update:selectedType="handle_select_type" />
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
@@ -78,12 +78,12 @@
     const { data: userCardsData, isLoading: isLoadingUserCards } = useFetchUserCards()
     const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
+    const { data: BillingSettingsData, isLoading: isLoadingBillingSettings } = useFetchUserBillingSettings()
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
 
-    type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-    const section_to_show = ref<SectionToShow>('main')
+    const section_to_show = ref<BillingSectionToShow>('main')
 
     const selected_type = ref<SelectedBillingType>('credit')
 
@@ -107,6 +107,11 @@
     const invoices_data = computed(() => {
         if(!invoicesData?.value?.result) return []
         return invoicesData.value.invoices
+    })
+
+    const billing_settings_data = computed(() => {
+        if(!BillingSettingsData?.value?.result) return null
+        return BillingSettingsData.value.billing_settings
     })
 
     const handle_select_type = (type: SelectedBillingType) => {
@@ -133,6 +138,8 @@
     const save_cc_card_as_default = () => {
         console.log('Save as default:', selected_card.value)
     }
+
+    const handle_section_to_show = (section: BillingSectionToShow) => section_to_show.value = section
 </script>
 
 <style scoped lang="scss">
