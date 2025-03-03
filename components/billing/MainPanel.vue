@@ -6,7 +6,7 @@
             </Button>
             <h4 class="text-dark-3 text-lg font-semibold">{{ title_text }}</h4>
             <div v-show="props.selectedType === 'credit'" class="flex-grow"></div>
-            <AutoRecharge v-if="props.selectedType === 'credit'" :user-billing-settings="props.userBillingSettings" />
+            <AutoRecharge v-if="props.selectedType === 'credit'" :user-billing-settings="props.userBillingSettings" :packages-steps="packages_steps" />
         </div>
 
         <div class="flex flex-col justify-between h-full pb-8">
@@ -20,7 +20,7 @@
                 <PlanCard v-for="plan in monthly_groups_plans" :key="plan.id" :plan="plan" @click="handle_select_plan(plan)"  />
             </section>
 
-            <InsertCreditsManually v-if="props.selectedType === 'credit'" />
+            <InsertCreditsManually v-if="props.selectedType === 'credit'" :packages-steps="packages_steps" />
         </div>
     </div>
 </template>
@@ -59,6 +59,18 @@
     })
 
     const handle_select_plan = (plan: MonthlyGroupPlan) => {
+        billingStore.setReferenceStepId(null)
         billingStore.selectUnselectPlan(plan)
+        const selected_plan = billingStore.selected_plan
+        if(selected_plan) {
+            const pack_info = Number(selected_plan.price) || 0
+            const discount = 0
+            const subtotal = pack_info
+            const total = subtotal
+            const recap_data = { pack_info, discount, subtotal, total }
+            billingStore.setRecapData(recap_data)
+        } else {
+            billingStore.setRecapData(null)
+        }
     }
 </script>

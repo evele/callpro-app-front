@@ -64,6 +64,6 @@ export async function saveBillingSettings(data:SaveBillingSettingsData):Promise<
   return await fetchWrapper.post(SAVE_BILLING_SETTINGS_URL,data) as APIResponseSuccess | APIResponseError
 }
 
-export async function getUserBillingSettings():Promise<UserBillingSettingsData | APIResponseError>{
-  return await fetchWrapper.get(GET_USER_BILLING_SETTINGS_URL) as UserBillingSettingsData | APIResponseError
+export async function getUserBillingSettings():Promise<APIResponseBillingSettings | APIResponseError>{
+  return await fetchWrapper.get(GET_USER_BILLING_SETTINGS_URL) as APIResponseBillingSettings | APIResponseError
 }

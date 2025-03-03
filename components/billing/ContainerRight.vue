@@ -53,9 +53,12 @@
         'update:selectedType': [value: SelectedBillingType]
     }>()
 
+    const billingStore = useBillingStore()
+
     const selected_type = computed<SelectedBillingType>(() => props.selectedType)
 
     const handle_selected_type = (select_type: SelectedBillingType) => {
+        billingStore.resetStore()
         emit('update:selectedType', select_type)
     }
 </script>

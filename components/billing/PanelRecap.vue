@@ -34,32 +34,9 @@
 
     const billingStore = useBillingStore()
 
-    type RecapData = {
-        pack_info: number
-        discount: number
-        subtotal: number
-        total: number
-    }
+    const recap_data = computed<RecapData>(() => billingStore.recap_data)
 
-    const credit_recap_data = computed<RecapData>(() => {
-        const step = billingStore.selected_step
-        const pack_info = step ? Number(step.floor) * Number(step.regular_price) : 0
-        const discount = step?.discount ? Number(pack_info) - Number(step.Total) : 0
-        const subtotal = Number(pack_info) - Number(discount)
-        const total = subtotal
-        return { pack_info, discount, subtotal, total }
+    const disabled_next = computed(() => {
+        return billingStore.selected_step === null && billingStore.selected_plan === null && billingStore.reference_step_id === null
     })
-
-    const plan_recap_data = computed<RecapData>(() => {
-        const plan = billingStore.selected_plan
-        const pack_info = plan ? Number(plan.price) : 0
-        const discount = 0
-        const subtotal = pack_info
-        const total = subtotal
-        return { pack_info, discount, subtotal, total }
-    })
-
-    const recap_data = computed<RecapData>(() => props.selectedType === 'credit' ? credit_recap_data.value : plan_recap_data.value)
-
-    const disabled_next = computed(() => true)
 </script>

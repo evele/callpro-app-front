@@ -770,6 +770,14 @@ export type UserBillingSettingsData = {
 export type APIResponseBillingSettings = APIResponseSuccess & { billing_settings: UserBillingSettingsData }
 
 export type SaveBillingSettingsData = {
+  enabled: boolean;
   recharge_value: NumberOrNull;
   recharge_minimum: NumberOrNull;
+}
+
+export type RecapData = {
+  pack_info: number
+  discount: number
+  subtotal: number
+  total: number
 }

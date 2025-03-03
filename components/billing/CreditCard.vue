@@ -41,28 +41,39 @@ const props = defineProps<{
 
 const billingStore = useBillingStore()
 
-const is_selected = computed(() => billingStore.selected_step?.id === props.step.id)
+const is_selected = computed(() => billingStore.reference_step_id === props.step?.id || billingStore.selected_step?.id === props.step?.id)
 
-const formatted_step = computed<FormattedStep | null>(() => {
-    if(!props.step) return null
-
+const formatted_step = computed<FormattedStep>(() => {
     const formatted_step = {
         ...props.step,
         discount: false,
-        original_price: Number((100 * parseFloat(props.step.regular_price)).toFixed(0)),
+        original_price: Number((100 * parseFloat(props.step?.regular_price)).toFixed(0)),
         discount_percent: 0
     }
 
-    if(props.step.price != props.step.regular_price) {
+    if(props.step.price != props.step?.regular_price) {
         formatted_step.discount = true
-        formatted_step.original_price = Number((100 * parseFloat(props.step.regular_price)).toFixed(0))
-        formatted_step.discount_percent = Math.round((1 - (Number(props.step.price) / Number(props.step.regular_price))) * 100);
+        formatted_step.original_price = Number((100 * parseFloat(props.step?.regular_price)).toFixed(0))
+        formatted_step.discount_percent = Math.round((1 - (Number(props.step?.price) / Number(props.step?.regular_price))) * 100);
     }
 
     return formatted_step
 })
 
 const handle_select_step = () => {
+    billingStore.setReferenceStepId(null)
     billingStore.selectUnselectStep(formatted_step.value)
+    const step = billingStore.selected_step
+
+    if(step) {
+        const pack_info = Number(step.floor) * Number(step.regular_price) || 0
+        const discount = step.discount ? Number(pack_info) - Number(step.Total) : 0
+        const subtotal = Number(pack_info) - Number(discount)
+        const total = subtotal
+        const recap_data = { pack_info, discount, subtotal, total }
+        billingStore.setRecapData(recap_data)
+    } else {
+        billingStore.setRecapData(null)
+    }
 }
 </script>

@@ -71,6 +71,8 @@
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
         <CheckoutSection />
     </section>
+
+    <Toast />
 </template>
 
 <script setup lang="ts">
@@ -78,7 +80,9 @@
     const { data: userCardsData, isLoading: isLoadingUserCards } = useFetchUserCards()
     const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
-    const { data: BillingSettingsData, isLoading: isLoadingBillingSettings } = useFetchUserBillingSettings()
+    const { data: billingSettingsData, isLoading: isLoadingBillingSettings } = useFetchUserBillingSettings()
+
+    const billingStore = useBillingStore()
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
@@ -110,8 +114,8 @@
     })
 
     const billing_settings_data = computed(() => {
-        if(!BillingSettingsData?.value?.result) return null
-        return BillingSettingsData.value.billing_settings
+        if(!billingSettingsData?.value?.result) return null
+        return billingSettingsData.value.billing_settings
     })
 
     const handle_select_type = (type: SelectedBillingType) => {
@@ -139,7 +143,14 @@
         console.log('Save as default:', selected_card.value)
     }
 
-    const handle_section_to_show = (section: BillingSectionToShow) => section_to_show.value = section
+    const handle_section_to_show = (section: BillingSectionToShow) => {
+        section_to_show.value = section
+        if(section_to_show.value === 'main') {
+            billingStore.resetStore()
+        }
+    }
+
+    onBeforeUnmount(() => billingStore.resetStore())
 </script>
 
 <style scoped lang="scss">
