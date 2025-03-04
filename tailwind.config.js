@@ -51,6 +51,7 @@ module.exports = {
           'light-purple': '#E8DEF8',
           'light-purple-2': "#D0BCFF",
           'light-purple-3': '#EDD9FF',
+          'yellow-credits': "#E8ED5F",
         },
         boxShadow: {
           'popover': '0px -4px 4px 0px rgba(0, 0, 0, 0.25), 0px 4px 4px 0px rgba(0, 0, 0, 0.25)',
