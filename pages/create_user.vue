@@ -1,111 +1,183 @@
 <template>
-    <div class="bg-[#E6E0E9] flex items-center py-4 justify-center min-h-screen px-4">
-        <Card class="max-w-[850px] w-full gap-7">
-            <!-- Bloque de logo y texto -->
+    <div class="bg-card-background flex items-center py-4 justify-center min-h-screen px-4">
+        <Card class="max-w-[850px] w-full gap-7 rounded-[30px] shadow-lg">
+
             <template #header>
                 <div class="mt-14 grid grid-cols-1 place-items-center">
                     <img alt="user header" src="@/assets/png/thecallpro.png"
                         class="w-[196] flex-shrink-0 bg-cover bg-center" />
-                    <p class="text-xl text-[#4F378B]  mt-4">Create your web account</p>
+                    <p class="text-xl text-dark-primary-container mt-4 font-medium">Create your web account</p>
                 </div>
             </template>
 
             <template #content>
-                <!-- <div class=" w-full grid sm:grid-cols-1 "> -->
+                <div v-show="success" class="flex items-center gap-6 w-full justify-center mb-4">
+                    <VerifiedSVG class="text-green-positive-secondary w-8 h-8" />
+                    <p class="text-dark-3">You have successfully registered!</p>
+                </div>
+
                 <form @keydown.enter.prevent="register" @submit.prevent
                     class="new-contact-form flex flex-col gap-10 md:px-6">
-                    <!-- Primer bloque: Nombre -->
+
                     <div class="form-block">
-                        <div class="input-group">
-                            <label for="firstName">First Name</label>
-                            <InputText id="firstName" class="flex w-full px-4 py-3 border mt-1"
-                                autocomplete="off" placeholder="Enter name" v-model="firstName" />
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="firstName" class="text-dark-3">First Name</label>
+                            <InputText 
+                                id="firstName"
+                                class="w-full py-3 border h-10 placeholder-grey-7"
+                                placeholder="Enter First Name" 
+                                v-model="firstName"
+                                :invalid="first_name_error.length > 0"
+                            />
+                            <span v-show="first_name_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ first_name_error }}
+                            </span> 
                         </div>
 
-                        <div class="input-group">
-                            <label for="lastName">Last Name</label>
-                            <InputText id="lastName" class="flex w-full px-4 py-3 border mt-1"
-                                autocomplete="off" placeholder="Enter name" v-model="lastName" />
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="lastName" class="text-dark-3">Last Name</label>
+                            <InputText 
+                                id="lastName"
+                                class="w-full py-3 border h-10 placeholder-grey-7"
+                                placeholder="Enter Last Name" 
+                                v-model="lastName"
+                                :invalid="last_name_error.length > 0"
+                            />
+                            <span v-show="last_name_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ last_name_error }}
+                            </span> 
                         </div>
                     </div>
-                    <!-- Segundo bloque: Dirección y Teléfono -->
-                    <div class="form-block">
-                        <div class="input-group">
-                            <label for="address">Address</label>
-                            <InputText id="address" class="flex w-full px-4 py-3 border mt-1" autocomplete="off"
-                                placeholder="Enter address" v-model="address" />
-                        </div>
 
+                    <div class="form-block">
                         <div class="input-group">
                             <label for="phone">Phone Number</label>
-                            <InputText id="phone" class="flex w-full px-4 py-3 border mt-1" autocomplete="off"
-                                placeholder="Enter phone number" v-model="phone" />
-                        </div>
-                    </div>
-                    <!-- Tercer bloque: Email y Contraseña -->
-                    <div class="form-block">
-                        <div class="flex flex-col items-start gap-1 w-full">
-                            <label for="email">Email</label>
-                            <InputText id="email" class="flex w-full px-4 py-3 border" autocomplete="off"
-                                placeholder="Enter your email" v-model="email" />
-                            <span v-if="duplicate_email" class="text-red-500">There's already an account with this email. <NuxtLink class="font-bold text-primary" to="login">Sign in</NuxtLink></span>
-                        </div>
-                        <div class="flex flex-col items-start gap-1 w-full">
-                            <label for="password">Password</label>
-                            <InputText id="password" type="password" class="flex w-full px-4 py-3 border "
-                                autocomplete="off" placeholder="Enter your password" v-model="password" />
-                        </div>
-                    </div>
-                    <!-- Cuarto bloque: Confirmación de contraseña y Zona horaria -->
-                    <div class="form-block">
-                        <div class="flex flex-col items-start gap-1 w-full">
-                            <label for="confirmPassword">Confirm
-                                Password</label>
-                            <InputText id="confirmPassword" type="password"
-                                class="flex w-full px-4 py-3 border" autocomplete="off"
-                                placeholder="Confirm your password" v-model="confirmPassword" />
+                            <PhoneInput id="phone" class="mt-2 h-10" :placeholder="'Enter Phone number'" :model-value="phone" @update:modelValue="(v: string) => phone = v" 
+                                :number-error="phone_error" :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" />
                         </div>
 
-                        <div class="flex flex-col items-start gap-1 w-full">
-                            <label for="timezone">Timezone</label>
-                            <Select id="timezone" v-model="timezone" :options="timezones" optionLabel="name" optionValue="code" placeholder="Select a timezone"
-                                class="w-full py-[5px] border border-[#d9d9d9]"
-                            ></Select>
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="email" class="text-dark-3">Email</label>
+                            <InputText 
+                                id="email"
+                                class="w-full py-3 border h-10 placeholder-grey-7"
+                                autocomplete="off" 
+                                placeholder="Enter your email" 
+                                v-model="email"
+                                :invalid="duplicate_email || email_error.length > 0"
+                            />
+                            <span v-show="duplicate_email" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                There's already an account with this email. <NuxtLink class="font-bold text-primary" to="login">Sign in</NuxtLink>
+                            </span>
+                            <span v-show="email_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ email_error }}
+                            </span> 
                         </div>
                     </div>
-                    <!-- Bloque de Checkboxes -->
+
+                    <div class="form-block">
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="password" class="text-dark-3">Password</label>
+                            <Password  
+                                id="password" 
+                                type="password"
+                                class="w-full"
+                                placeholder="Enter your password"
+                                toggleMask
+                                :feedback="false"
+                                v-model="password"
+                                :invalid="password_error.length > 0"
+                            />
+                            <span v-show="password_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ password_error }}
+                            </span>             
+                        </div>
+
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="confirmPassword" class="text-dark-3">Confirm Password</label>
+                            <Password  
+                                id="confirmPassword" 
+                                type="password"
+                                class="w-full"
+                                placeholder="Confirm your password"
+                                toggleMask
+                                :feedback="false"
+                                v-model="confirmPassword"
+                                :invalid="confirm_password_error.length > 0"
+                            />
+                            <span v-show="confirm_password_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ confirm_password_error }}
+                            </span>             
+                        </div>
+                    </div>
+
+                    <div class="form-block">
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="address" class="text-dark-3">Address</label>
+                            <InputText 
+                                id="address"
+                                class="w-full py-3 border h-10 placeholder-grey-7"
+                                placeholder="Enter Adress" 
+                                v-model="address"
+                                :invalid="address_error.length > 0"
+                            />
+                            <span v-show="address_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ address_error }}
+                            </span> 
+                        </div>
+
+                        <div class="flex flex-col items-start gap-2 w-full relative">
+                            <label for="timezone" class="text-dark-3">Timezone</label>
+                            <Select 
+                                id="timezone" 
+                                v-model="timezone" 
+                                :options="timezones" 
+                                optionLabel="name" 
+                                optionValue="code" 
+                                placeholder="Select a timezone"
+                                class="w-full border border-grey-8"
+                                :class="{'placeholder-color': timezone !== null}"
+                                :invalid="timezone_error.length > 0"
+                            ></Select>
+                            <span v-show="timezone_error.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                                {{ timezone_error }}
+                            </span> 
+                        </div>
+                    </div>
+
                     <div class="form-block mt-4 my-7">
                         <div class="flex flex-col items-start gap-8 w-full">
                             <div class="flex items-center gap-2">
                                 <Checkbox inputId="agree-to-terms" v-model="agreeToTerms" :binary="true" />
-                                <label for="agree-to-terms" class="text-xs text-[#4F378B]">
+                                <label for="agree-to-terms" class="text-sm text-dark-primary-container font-medium mt-[2px]">
                                     Agree to Terms of Service / Privacy Policy
                                 </label>
                             </div>
-                            <div class="flex items-center gap-2">
-                                <Checkbox inputId="not-robot" v-model="notRobot" :binary="true" />
-                                <label for="not-robot" class="text-xs gap-2">
-                                    No soy un robot
-                                </label>
+                            <div class="flex items-center gap-2 bg-[#F4F0EF] rounded p-4">
+                                <Transition name="fade" mode="out-in">
+                                    <div v-if="!notRobot" class="w-8 h-8 flex justify-center items-center">
+                                        <Checkbox inputId="not-robot" v-model="notRobot" :binary="true" />
+                                    </div>
+                                    <VerifiedSVG v-else class="text-green-positive-secondary w-8 h-8" />
+                                </Transition>
+                                <label for="not-robot" class="text-sm font-medium gap-2 mt-[2px]">No soy un robot</label>
+                                <CaptchaSVG class="ml-8" />
                             </div>
                         </div>
-
                     </div>
                 </form>
-                <!-- </div> -->
             </template>
 
             <template #footer>
-                <!-- Bloque de Botones -->
-                    <div class="new-contact-form my-4">
+                    <div class="new-contact-form mb-4">
                         <div class="form-block flex flex-row justify-center items-center gap-[50px]">
                             <router-link to="/login" class="w-full max-w-80">
-                                <Button type="button" class="text-current bg-white w-full py-2 px-4">
+                                <Button type="button" class="text-current bg-white w-full py-2 px-4 font-medium">
                                     Take me to Login
                                 </Button>
                             </router-link>
 
-                            <Button type="button" class="w-full max-w-80 py-2 px-4" :disabled="!canRegister || isPending" @click.prevent="register">
+                            <Button type="button" class="w-full max-w-80 py-2 px-4" :disabled="disabled_btn || isPending" @click.prevent="register">
                                 {{ isPending ? 'Saving...' : 'Register' }}
                             </Button>
                         </div>
@@ -142,12 +214,28 @@ const notRobot = ref(false);
 const ivr_bind = ref(false)
 const root_id = ref<string | null>(null)
 
-const canRegister = computed(() => {
-    return agreeToTerms.value && notRobot.value && firstName.value && lastName.value && timezone.value && password.value && confirmPassword.value && password.value === confirmPassword.value;
+const disabled_btn = computed(() => {
+    if(agreeToTerms.value && notRobot.value && firstName.value && lastName.value && timezone.value && 
+        password.value && confirmPassword.value  && !has_phone_number_error.value) {
+        return false;
+    }
+    return true;
 });
 
 const isPending = ref(false);
+const success = ref(false);
+
+const first_name_error = ref('');
+const last_name_error = ref('');
 const duplicate_email = ref(false)
+const email_error = ref('');
+const form_action = ref('')
+const phone_error = ref('');
+const has_phone_number_error = ref(false)
+const password_error = ref('');
+const confirm_password_error = ref('');
+const address_error = ref('');
+const timezone_error = ref('');
 
 const authStore = useAuthStore();
 onMounted(() => {
@@ -162,10 +250,113 @@ onBeforeUnmount(() => {
     authStore.root_id = null
 })
 
+const validate_form = () => {
+    let valid = true;
+
+    if (!firstName.value) {
+        first_name_error.value = 'First name is required';
+        valid = false;
+    } else {
+        first_name_error.value = '';
+    }
+
+    if (!lastName.value) {
+        last_name_error.value = 'Last name is required';
+        valid = false;
+    } else {
+        last_name_error.value = '';
+    }
+
+    if(has_phone_number_error.value) {
+        phone_error.value = 'Phone number is required.'
+        valid = false;
+    } else {
+        phone_error.value = ''
+    }
+
+    if (!email.value) {
+        email_error.value = 'Email is required';
+        valid = false;
+    } else {
+        email_error.value = '';
+    }
+
+    if (!password.value) {
+        password_error.value = 'Password is required';
+        valid = false;
+    } else {
+        password_error.value = '';
+    }
+
+    if(password.value.length < 8) {
+        password_error.value = 'Password must be at least 8 characters long';
+        valid = false;
+    } else {
+        password_error.value = '';
+    }
+
+    if (!confirmPassword.value) {
+        confirm_password_error.value = 'Confirm password is required';
+        valid = false;
+    } else {
+        confirm_password_error.value = '';
+    }
+
+    if (password.value !== confirmPassword.value) {
+        confirm_password_error.value = 'Passwords do not match';
+        valid = false;
+    } else {
+        confirm_password_error.value = '';
+    }
+
+    if (!address.value) {
+        address_error.value = 'Address is required';
+        valid = false;
+    } else {
+        address_error.value = '';
+    }
+
+    if (!timezone.value) {
+        timezone_error.value = 'Timezone is required';
+        valid = false;
+    } else {
+        timezone_error.value = '';
+    }
+
+    if(!agreeToTerms.value) {
+        show_error_toast('Error', 'You must agree to the terms of service and privacy policy');
+        valid = false;
+    }
+
+    if(!notRobot.value) {
+        show_error_toast('Error', 'You must confirm you are not a robot');
+        valid = false;
+    }
+
+    return valid;
+}
+
+const reset_form = () => {
+    firstName.value = '';
+    lastName.value = '';
+    address.value = '';
+    phone.value = '';
+    email.value = '';
+    password.value = '';
+    confirmPassword.value = '';
+    timezone.value = null;
+    agreeToTerms.value = false;
+    notRobot.value = false;
+    ivr_bind.value = false;
+    root_id.value = null;
+}
+
 async function register() {
     duplicate_email.value = false
-    if(timezone.value === null) {
-        show_error_toast('Error', 'Please select a timezone');
+    success.value = false;
+
+    if(!validate_form()) {
+        show_error_toast('Error', 'You have some errors in the form');
         return;
     }
 
@@ -177,7 +368,7 @@ async function register() {
         email: email.value,
         password: password.value,
         confirmPassword: confirmPassword.value,
-        timezone: timezone.value,
+        timezone: timezone.value ?? '1',
         agreeToTerms: agreeToTerms.value ? '1' : '0',
         notRobot: notRobot.value ? '1' : '0',
         ivr_bind: ivr_bind.value,
@@ -189,11 +380,30 @@ async function register() {
         const response: APIResponseSuccess & { message: string } | APIResponseError = await authStore.registerUser(dataToSend)
 
         if (response.result) {
+            success.value = true;
             show_success_toast('Success', 'User registered successfully');
+            form_action.value = 'clear'
+            reset_form();
         } else {
-            if(response.validation_error?.email === 'duplicated_email') {
-                duplicate_email.value = true
+            if(response.validation_error) {
+                const errors = response.validation_error;
+                
+                if(errors.firstName) first_name_error.value = errors.firstName;
+                if(errors.lastName) last_name_error.value = errors.lastName;
+                if(errors.phone) phone_error.value = errors.phone;
+                if(errors.email) {
+                    if(errors.email === 'duplicated_email') {
+                        duplicate_email.value = true
+                    } else {
+                        email_error.value = errors.email
+                    }
+                }
+                if(errors.password) password_error.value = errors.password;
+                if(errors.confirmPassword) confirm_password_error.value = errors.confirmPassword;
+                if(errors.address) address_error.value = errors.address;
+                if(errors.timezone) timezone_error.value = errors.timezone;
             }
+            
             show_error_toast('Error', response.error || 'Something failed while trying to register');
         }
     } catch (error) {
@@ -203,7 +413,6 @@ async function register() {
 }
 </script>
 <style scoped lang="scss">
-
 .new-contact-form {
     width: 100%;
     gap: 24px;
@@ -225,5 +434,41 @@ async function register() {
     }
 }
 
+:deep(.p-checkbox) {
+    width: 16px;
+    height: 16px;
+    border: none;
+    .p-checkbox-input, .p-checkbox-box {
+        width: 16px;
+        height: 16px;
+        border: 1.8px solid #757575;
+        border-radius: 4px;
+    }
+}
+:deep(.p-password) {
+    .p-password-input {
+        width: 100%;
+        &::placeholder {
+            color: #B3B3B3
+        }
+    }
+    svg {
+        color: #653494;
+    }
+}
+:deep(.p-select) {
+    .placeholder-color {
+        color: #B3B3B3;
+    }
+}
 
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
