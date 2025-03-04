@@ -24,6 +24,7 @@ module.exports = {
           'dark-2': '#1D1B20',
           'dark-3': '#1E1E1E',
           'dark-4': '#383838',
+          'dark-5': '#2C2C2C',
           'dark-blue': '#1D192B',
           'secondary-hover': '#5B7906',
           'grey-main': '#49454F',
