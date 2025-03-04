@@ -733,6 +733,7 @@ export type UserCurrentPlanData = {
   numbers: NumberOrNull;
   payment_history_id: NumberOrNull;
   pending_downgrade_package_id: NumberOrNull;
+  pending_downgrade_package_type: StringOrNull;
   price: NumberOrNull;
   root_user_id: number;
 }
@@ -750,4 +751,10 @@ export type CC_CARD = {
   status: ZeroOrOne;
   time_stamp: string;
   user_id: number;
+}
+
+export type PendingDowngradeData = {
+  now: boolean,
+  package_type: string,
+  package_id: number
 }

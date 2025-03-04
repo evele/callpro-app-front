@@ -65,12 +65,18 @@
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
         <MainPanel :selected_type="selected_type" />
-        <ContainerRight :selected_type="selected_type" @update:selected_type="handle_select_type" />
+        <ContainerRight 
+            :selected_type="selected_type" 
+            :user-plan-and-balance="user_plan_and_balance"
+            @update:selected_type="handle_select_type" 
+        />
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
         <CheckoutSection />
     </section>
+
+    <Toast />
 </template>
 
 <script setup lang="ts">

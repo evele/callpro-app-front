@@ -1,7 +1,7 @@
 <template>
     <CardOptionContainer type="plan">
         <template #chip-icon>
-            <div class="w-fit h-[30px] rounded-lg bg-white border flex items-center gap-2 px-1 border-primary">
+            <div class="w-20 h-[30px] rounded-lg bg-white border flex items-center justify-center gap-2 px-1 border-primary">
                 <UserSVG class="w-4 h-4 text-primary" />
                 <span class="text-dark-3 font-semibold leading-0 mt-[1px]">{{ props.plan.numbers }}</span>
             </div>

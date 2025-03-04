@@ -22,6 +22,8 @@ export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print
 export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
 export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
 export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
+export const SET_PENDING_DOWNGRADE_URL = "/billing/set_pending_downgrade"
+export const CANCEL_DOWNGRADE_URL = "/billing/cancel_downgrade"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"

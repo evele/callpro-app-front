@@ -59,3 +59,11 @@ type UserCardsResponse = APIResponseSuccess & {
 export async function getUserCards():Promise<UserCardsResponse | APIResponseError>{
   return await fetchWrapper.get(GET_USER_CC_CARDS_URL) as UserCardsResponse | APIResponseError
 }
+
+export async function setPendingDowngrade(data: PendingDowngradeData):Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(SET_PENDING_DOWNGRADE_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+export async function cancelDowngrade():Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(CANCEL_DOWNGRADE_URL) as APIResponseSuccess | APIResponseError
+}
