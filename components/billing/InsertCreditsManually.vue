@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
     const props = defineProps<{
-        packagesSteps: PackageStepWithID[]
+        packagesSteps: PackageStep[]
     }>()
 
     const price = ref<number | null>(null)
@@ -48,9 +48,9 @@
             return
         }
 
-        const filtered_steps = props.packagesSteps.filter((step: PackageStepWithID) => Number(step.floor) <= value)
+        const filtered_steps = props.packagesSteps.filter((step: PackageStep) => Number(step.floor) <= value)
 
-        const right_step: PackageStepWithID | undefined = filtered_steps.reduce((highest: PackageStepWithID, step: PackageStepWithID) => {
+        const right_step: PackageStep | undefined = filtered_steps.reduce((highest: PackageStep, step: PackageStep) => {
             return Number(step.floor) > Number(highest.floor) ? step : highest;
         }, filtered_steps[0]);
 

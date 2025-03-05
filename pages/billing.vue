@@ -12,7 +12,7 @@
             @update:selected_type="handle_select_type"
         />
 
-        <div class="bg-white rounded-2xl relative shadow-lg" :class="{'mt-4': !hide_cards }">
+        <div class="bg-white rounded-2xl relative shadow-lg transition-all duration-300 ease-in-out" :class="{'mt-4': !hide_cards }">
             <Tabs v-model:value="selected_tab">
                 <div class="flex justify-between pt-7 pb-3 pl-10 pr-12 h-[90px]" :class="{'border-b pb-7': hide_cards }">
                     <TabList class="flex items-center">
@@ -65,11 +65,11 @@
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
         <MainPanel :selected-type="selected_type" :user-billing-settings="billing_settings_data" @update:sectionToShow="handle_section_to_show" />
-        <ContainerRight :selected-type="selected_type" @update:selectedType="handle_select_type" />
+        <ContainerRight :selected-type="selected_type" @update:selectedType="handle_select_type" @update:sectionToShow="handle_section_to_show" />
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
-        <CheckoutSection />
+        <CheckoutSection @update:sectionToShow="handle_section_to_show" />
     </section>
 
     <Toast />
