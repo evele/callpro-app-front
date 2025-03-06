@@ -64,7 +64,11 @@
     </div>
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
-        <MainPanel :selected_type="selected_type" />
+        <MainPanel 
+            :selected-type="selected_type" 
+            :user-billing-settings="billing_settings_data" 
+            @update:sectionToShow="handle_section_to_show" 
+        />
         <ContainerRight 
             :selected_type="selected_type" 
             :user-plan-and-balance="user_plan_and_balance"
@@ -84,12 +88,14 @@
     const { data: userCardsData, isLoading: isLoadingUserCards } = useFetchUserCards()
     const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
+    const { data: billingSettingsData, isLoading: isLoadingBillingSettings } = useFetchUserBillingSettings()
+
+    const billingStore = useBillingStore()
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
 
-    type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-    const section_to_show = ref<SectionToShow>('main')
+    const section_to_show = ref<BillingSectionToShow>('main')
 
     const selected_type = ref<SelectedBillingType>('credit')
 
@@ -113,6 +119,11 @@
     const invoices_data = computed(() => {
         if(!invoicesData?.value?.result) return []
         return invoicesData.value.invoices
+    })
+
+    const billing_settings_data = computed(() => {
+        if(!billingSettingsData?.value?.result) return null
+        return billingSettingsData.value.billing_settings
     })
 
     const handle_select_type = (type: SelectedBillingType) => {
@@ -139,6 +150,15 @@
     const save_cc_card_as_default = () => {
         console.log('Save as default:', selected_card.value)
     }
+
+    const handle_section_to_show = (section: BillingSectionToShow) => {
+        section_to_show.value = section
+        if(section_to_show.value === 'main') {
+            billingStore.resetStore()
+        }
+    }
+
+    onBeforeUnmount(() => billingStore.resetStore())
 </script>
 
 <style scoped lang="scss">

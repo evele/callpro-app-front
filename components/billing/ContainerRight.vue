@@ -41,7 +41,7 @@
             </template>
         </PlanCardSummary>
                 
-        <PanelRecap />
+        <PanelRecap :selected-type="selected_type" />
     </aside>
 
     <ConfirmationPurchase 
@@ -64,20 +64,21 @@
     const { mutate: cancelDowngrade, isPending: isCancelDowngrade } = useCancelDowngrade()
 
     const props = defineProps<{
-        selected_type: SelectedBillingType
+        selectedType: SelectedBillingType
         userPlanAndBalance: { user_current_plan: UserCurrentPlanData, balance_data: NumberOrNull } | null
     }>()
 
     const emit = defineEmits<{
-        'update:selected_type': [value: SelectedBillingType]
+        'update:selectedType': [value: SelectedBillingType]
     }>()
 
+    const billingStore = useBillingStore()
     const { show_error_toast } = usePrimeVueToast();
 
     const show_confirmation_modal = ref(false)
     const show_ready_message = ref(false)
 
-    const selected_type = computed<SelectedBillingType>(() => props.selected_type)
+    const selected_type = computed<SelectedBillingType>(() => props.selectedType)
 
     const current_plan = computed(() => {
         if(!props.userPlanAndBalance) return null
@@ -87,7 +88,8 @@
     const is_monthly_plan = computed(() => current_plan.value?.current_package_type === PackageType.GROUPS_PLAN)
 
     const handle_selected_type = (select_type: SelectedBillingType) => {
-        emit('update:selected_type', select_type)
+        billingStore.resetStore()
+        emit('update:selectedType', select_type)
     }
 
     /* ----- Cancel plan ----- */

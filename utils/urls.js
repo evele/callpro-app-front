@@ -22,6 +22,7 @@ export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print
 export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
 export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
 export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
+export const GET_USER_BILLING_SETTINGS_URL = "/billing/get_billing_settings"
 export const SET_PENDING_DOWNGRADE_URL = "/billing/set_pending_downgrade"
 export const CANCEL_DOWNGRADE_URL = "/billing/cancel_downgrade"
 
@@ -86,6 +87,7 @@ export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
 export const UPDATE_VOICE_SETTINGS_URL = "/settings/save_audio_settings"
 export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
 export const UPDATE_GENERAL_SETTINGS_URL = "/settings/save_general_settings"
+export const SAVE_BILLING_SETTINGS_URL = "/settings/save_billing_settings"
 
 /* ----- SMS Store ----- */
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"

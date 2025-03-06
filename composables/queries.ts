@@ -120,6 +120,13 @@ export const useFetchUserCards = () => {
   })
 }
 
+export const useFetchUserBillingSettings = () => {
+  return useQuery({
+    queryKey: ['user_billing_settings'],
+    queryFn: () => getUserBillingSettings(),
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({
