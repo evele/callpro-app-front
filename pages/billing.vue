@@ -70,7 +70,7 @@
             @update:sectionToShow="handle_section_to_show" 
         />
         <ContainerRight 
-            :selected_type="selected_type" 
+            :selected-type="selected_type" 
             :user-plan-and-balance="user_plan_and_balance"
             @update:selected_type="handle_select_type" 
         />
