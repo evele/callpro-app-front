@@ -17,15 +17,15 @@
           <CollapseSVG v-else class="min-w-5 min-h-5 text-dark-5 cursor-pointer hover:scale-110 transition-transform" @click="toggle_collapse" />
         </div>
         <ul class="flex flex-col p-0 items-center gap-[18px]">
-          <NavLink v-for="link in LINKS" :key="link.name" :name="link.name" :route="link.route" :icon="link.icon" :is-collapsed="collapse" />
+          <NavLink v-for="link in LINKS" :key="link.name" :name="link.name" :route="link.route" :icon="link.icon" :is-collapsed="collapse" v-tooltip.right="collapse?link.name:''" />
         </ul>
       </div>
       
       <div class="p-4">
         <Divider class="!h-[2.5px] bg-[#DED8E1] rounded-full"/>
         <ul class="flex flex-col p-0 items-center gap-4">
-          <NavLink name="Settings" route="settings" :icon="SettingsSVG" :is-collapsed="collapse" />
-          <NavLink name="Logout" :icon="LogoutSVG" :is-collapsed="collapse" />
+          <NavLink name="Settings" route="settings" :icon="SettingsSVG" :is-collapsed="collapse" v-tooltip.right="collapse?'Settings':''" />
+          <NavLink name="Logout" :icon="LogoutSVG" :is-collapsed="collapse" v-tooltip.right="collapse?'Logout':''" />
         </ul>
       </div>
     </div>
