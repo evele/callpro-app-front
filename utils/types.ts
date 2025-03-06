@@ -15,6 +15,7 @@ export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 'upload';
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
+export type BillingSectionToShow = 'main' | 'buy_credits' | 'checkout_form'
 export type FilterOption = { id: string, name: string, count: number }
 
 export type APIResponseError = {
@@ -83,6 +84,9 @@ export type AllContactsQueryParams = {
   filter: string,
 }
 
+export type NumberIdObject = { number_id: string }
+export type NumberIdArray = { number_ids: string[] }
+
 // Interface for a phone number and its associated groups
 export type PhoneNumber = {
   number_id: string; // Unique identifier for the number
@@ -128,7 +132,7 @@ export type ContactDNC = {
 export type ContactGroup = {
   name: string;
   id: NumberOrNull;
-  phone_launch_id: NumberOrNull;
+  phone_launch_id: StringOrNumber;
 };
 
 export type ReceivedNumberGroups = { number_groups: StringOrNull }
@@ -304,18 +308,28 @@ export type SystemGroup = {
 
 export type CustomGroup = {
   id: string;
-  group_code: StringOrNumberOrNull;
+  group_code: StringOrNull;
   group_name: string;
   count: number;
 }
 
+export type SelectedGroupToEdit = {
+  groupID: string
+  groupName: string
+  launchID: string
+}
+
 export type AddNumberToGroup = {
-  number_id: { number_id: string }[];
+  number_id: NumberIdObject[];
   groups: string[];
 }
 
 export type MoveNumberToGroup = AddNumberToGroup & {
   current_group_id: string;
+}
+
+export type RemoveNumberFromGroup = NumberIdArray & {
+  group_id: string;
 }
 
 export type SendNumberToTrash = {
@@ -331,19 +345,27 @@ export type GroupToDelete = {
 /* ----- Packages ----- */
 export type PackageStep = {
   package_id: number;
-  price: number;
+  price: string;
   price_cents: number;
-  regular_price: number;
-  total: number;
+  regular_price: string;
+  Total: number;
   floor: number;
+}
+
+export type PackageStepWithID = PackageStep & { id: string }
+
+export type FormattedStep = PackageStepWithID & {
+  discount: boolean
+  original_price: number
+  discount_percent: number
 }
 
 export type MonthlyGroupPlan = {
   id: number;
   ivr_input: NumberOrNull;
-  name: StringOrNumber;
+  name: string;
   numbers: number;
-  price: number;
+  price: string;
   public: ZeroOrOne;
   status: ZeroOrOne;
   term: number;
@@ -737,4 +759,25 @@ export type CC_CARD = {
   status: ZeroOrOne;
   time_stamp: string;
   user_id: number;
+}
+
+export type UserBillingSettingsData = {
+  recharge_minimum: StringOrNull;
+  recharge_value: StringOrNull;
+  root_user_id: number;
+}
+
+export type APIResponseBillingSettings = APIResponseSuccess & { billing_settings: UserBillingSettingsData }
+
+export type SaveBillingSettingsData = {
+  enabled: boolean;
+  recharge_value: NumberOrNull;
+  recharge_minimum: NumberOrNull;
+}
+
+export type RecapData = {
+  pack_info: number
+  discount: number
+  subtotal: number
+  total: number
 }

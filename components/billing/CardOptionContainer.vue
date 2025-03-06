@@ -1,5 +1,8 @@
 <template>
-    <div class="h-[196px] flex flex-col justify-between rounded-xl p-3 pb-5" :class="type">
+    <div 
+        class="h-[196px] flex flex-col justify-between rounded-xl p-3 pb-5 hover:cursor-pointer hover:scale-110 transition-transform hover:shadow-2xl" 
+        :class="[props.type, props.isSelected ? 'border-selected' : '']"
+    >
         <slot name="chip-icon" />
         <slot name="card-content" />
     </div>
@@ -7,8 +10,9 @@
 
 <script setup lang="ts">
     const props = defineProps<{
-        type: SelectedBillingType
-    }>()
+        type: SelectedBillingType,
+        isSelected: boolean
+    }>()  
 </script>
 
 <style scoped lang="scss">
@@ -19,8 +23,15 @@
         color: #FFF;
     }
     .plan {
-        border: 0.3px solid rgba(101, 52, 148, 0.60);
-        background: radial-gradient(273.33% 318.02% at -68.84% -32.65%, #9747FF 0%, #F7F2FA 50.75%, #F7F2FA 100%);
+        border: 0.3px solid rgba(101, 52, 148, 0.10);
+        background: radial-gradient(273.33% 318.02% at -68.84% -32.65%, #9747FF 0%, #F7F2FA 60.75%, #F7F2FA 100%);
         width: 146px;
+    }
+    .selected-card-bg {
+        box-shadow: 0px 0px 2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .border-selected {
+        border: none;
+        outline: 6px solid rgba(101, 52, 148, 0.6);
     }
 </style>

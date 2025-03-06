@@ -1,5 +1,5 @@
 <template>
-    <aside class="flex flex-col justify-center gap-4">
+    <aside class="flex flex-col justify-center gap-4 self-start">
         <PlanCardSummary v-show="selected_type === 'credit'">
             <template #content>
                 <div class="flex gap-6 w-full justify-center items-center">
@@ -40,17 +40,25 @@
             </template>
         </PlanCardSummary>
                 
-        <PanelRecap />
+        <PanelRecap :selected-type="selected_type" />
     </aside>
 </template>
 
 <script setup lang="ts">
-    const selected_type = ref<SelectedBillingType>('credit')
+    const props = defineProps<{
+        selectedType: SelectedBillingType
+    }>()
 
-    const emit = defineEmits(['update:selected_type'])
+    const emit = defineEmits<{
+        'update:selectedType': [value: SelectedBillingType]
+    }>()
+
+    const billingStore = useBillingStore()
+
+    const selected_type = computed<SelectedBillingType>(() => props.selectedType)
 
     const handle_selected_type = (select_type: SelectedBillingType) => {
-        selected_type.value = select_type 
-        emit('update:selected_type', selected_type.value)
+        billingStore.resetStore()
+        emit('update:selectedType', select_type)
     }
 </script>

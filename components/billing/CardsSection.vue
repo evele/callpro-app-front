@@ -24,11 +24,13 @@
                     type="button" 
                     label="Change to Credits" 
                     class="bg-white tracking-wide leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100"
+                    @click="handle_select_credits"
                 />
                 <Button 
                     type="button"
                     label="Upgrade plan"
                     class="leading-[10px] tracking-wide font-semibold text-xs h-[28px]"
+                    @click="handle_select_plan"
                 />
             </template>
         </BillingCardContainer>
@@ -38,7 +40,7 @@
                 <div class="flex pl-6 w-full justify-between items-center">
                     <CreditsCoinsSVG />
                     <div class="w-[60%]">
-                        <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data }}</span>credits</p>
+                        <p class="flex items-center gap-3"><span class="font-semibold text-2xl">{{ balance_data ?? 0 }}</span>credits</p>
                     </div>
                 </div>
             </template>
@@ -48,11 +50,13 @@
                     type="button" 
                     label="Select UMP" 
                     class="bg-white tracking-wide w-28 leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100"
+                    @click="handle_select_plan"
                 />
                 <Button 
                     type="button"
                     label="Add more credits"
                     class="leading-[10px] tracking-wide font-semibold text-xs h-[28px]"
+                    @click="handle_select_credits"
                 />
             </template>
         </BillingCardContainer>
@@ -101,7 +105,11 @@
         isLoading: boolean
     }>()
 
-    const emit = defineEmits(['hide-cards'])
+    const emit = defineEmits<{
+        'update:selected_type': [value: SelectedBillingType],
+        'hide-cards': [value: boolean]
+    }>()
+
     const { getCardIcon } = useCreditCards()
 
     const current_plan = computed(() => {
@@ -123,6 +131,10 @@
         if(!default_cc_card) return CardType.UNKNOWN
         return default_cc_card.value?.card_type
     })
+
+    const handle_select_credits = () => emit('update:selected_type', 'credit')
+    const handle_select_plan = () => emit('update:selected_type', 'plan')
+
 </script>
 
 <style scoped lang="scss">

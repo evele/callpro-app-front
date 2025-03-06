@@ -9,6 +9,7 @@
             :user-cards-data="user_cards_data"
             :is-loading="is_loading_data"
             @hide-cards="handle_hide_cards"
+            @update:selected_type="handle_select_type"
         />
 
         <div class="bg-white rounded-2xl relative shadow-lg" :class="{'mt-4': !hide_cards }">
@@ -68,8 +69,8 @@
     </div>
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
-        <MainPanel :selected_type="selected_type" />
-        <ContainerRight @update:selected_type="handle_select_type" />
+        <MainPanel :selected-type="selected_type" :user-billing-settings="billing_settings_data" @update:sectionToShow="handle_section_to_show" />
+        <ContainerRight :selected-type="selected_type" @update:selectedType="handle_select_type" />
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
@@ -84,17 +85,16 @@
     const { data: userCardsData, isLoading: isLoadingUserCards } = useFetchUserCards()
     const { data: billingHistoryData, isLoading: isLoadingBillingHistory } = useFetchBillingHistory()
     const { data: invoicesData, isLoading: isLoadingInvoices } = useFetchInvoices()
+    const { data: billingSettingsData, isLoading: isLoadingBillingSettings } = useFetchUserBillingSettings()
     const { mutate: saveDefaultCard, isPending: isSavingDefaultCard } = useSaveDefaultCard()
+
+    const billingStore = useBillingStore()
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
-
-    type SectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-    const section_to_show = ref<SectionToShow>('main')
-
+    const section_to_show = ref<BillingSectionToShow>('main')
     const selected_type = ref<SelectedBillingType>('credit')
-
     const hide_cards = ref(false)
 
     const user_plan_and_balance = computed(() => {
@@ -117,8 +117,14 @@
         return invoicesData.value.invoices
     })
 
+    const billing_settings_data = computed(() => {
+        if(!billingSettingsData?.value?.result) return null
+        return billingSettingsData.value.billing_settings
+    })
+
     const handle_select_type = (type: SelectedBillingType) => {
         selected_type.value = type
+        section_to_show.value = 'buy_credits'
     }
 
     const is_loading_data = computed(() => isLoadingUserPlan.value || isLoadingUserCards.value)
@@ -163,6 +169,15 @@
             }
         })
     }
+
+    const handle_section_to_show = (section: BillingSectionToShow) => {
+        section_to_show.value = section
+        if(section_to_show.value === 'main') {
+            billingStore.resetStore()
+        }
+    }
+
+    onBeforeUnmount(() => billingStore.resetStore())
 </script>
 
 <style scoped lang="scss">

@@ -177,3 +177,13 @@ type RemoveNumberFromDNCData = {
 export async function removeNumberFromDNC(data: RemoveNumberFromDNCData): Promise<APIResponseSuccess | APIResponseError> {
     return await fetchWrapper.post(REMOVE_NUMBER_FROM_DNC_URL, data) as APIResponseSuccess | APIResponseError
 }
+
+/* ----- Delete contact forever ----- */
+export async function deleteContactForever(data: NumberIdArray): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(DELETE_CONTACT_FOREVER_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Restore contact ----- */
+export async function restoreContact(data: NumberIdArray): Promise<APIResponseSuccess | APIResponseError> {
+    return await fetchWrapper.post(RESTORE_CONTACT_URL, data) as APIResponseSuccess | APIResponseError
+}

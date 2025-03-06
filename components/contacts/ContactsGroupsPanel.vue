@@ -53,8 +53,6 @@
         </div>
     </section>
 
-    <ModalContacts ref="modalContacts" :selected-group="selectedGroups[0].group_id" :group-to-edit="selected_group_to_edit" />
-
     <ConfirmationModal 
         ref="confirmationModal" 
         title="Delete Group" 
@@ -82,22 +80,40 @@ import AllSVG from "@/components/svgs/AllSVG.vue";
 import UnassginedSVG from "@/components/svgs/UnassignedSVG.vue";
 import TrashSVG from "@/components/svgs/TrashSVG.vue";
 
-const props = defineProps({
-    selectedGroups: { type: Array as PropType<ContactSelectedGroup[]>, required: true, default: [] },
+const props = withDefaults(defineProps<{
+    selectedGroups: ContactSelectedGroup[]
+    systemGroups: SystemGroup | null
+}>(), {
+    selectedGroups: (): ContactSelectedGroup[] => [],
 })
 
-const emit = defineEmits(['selectedGroup', 'update:table'])
+type GroupID = 'all' | 'unassigned' | 'trash'
+type DefaultGroupButton = {
+    text: string
+    value: StringOrNumber
+    icon: object
+    group_id: GroupID
+}
 
-const defaultGroupsButtons = [
-    { text: 'ALL', value: Math.floor(Math.random() * 100), icon: AllSVG, group_id: CONTACTS_ALL },
-    { text: 'Unassigned', value: Math.floor(Math.random() * 100), icon: UnassginedSVG, group_id: UNASSIGNED },
-    { text: 'Trash', value: Math.floor(Math.random() * 100), icon: TrashSVG, group_id: TRASH }
-];
+const emit = defineEmits<{
+  (event: 'selectedGroup', button_name: string, button_group_id: string, is_custom: boolean, group_code: StringOrNull): void;
+  (event: 'update:table'): void;
+  (event: 'openContactsModal', group: SelectedGroupToEdit): void;
+}>();
+
+const system_groups = computed<SystemGroup | null>(() => props.systemGroups)
+const defaultGroupsButtons = computed<DefaultGroupButton[]>(() => {
+    return [
+        { text: 'ALL', value: system_groups.value?.not_trash ?? '-', icon: AllSVG, group_id: CONTACTS_ALL },
+        { text: 'Unassigned', value: system_groups.value?.unassigned ?? '-', icon: UnassginedSVG, group_id: UNASSIGNED },
+        { text: 'Trash', value: system_groups.value?.trash ?? '-', icon: TrashSVG, group_id: TRASH }
+    ]
+})
 
 const active_buttons = computed(() => props.selectedGroups.map((group: ContactSelectedGroup) => group.group_id))
 
-const setActiveButton = (button_name: string, button_group_id: string, group_code: StringOrNumberOrNull) => {
-    const is_custom = !defaultGroupsButtons.some(button => button.group_id === button_group_id)
+const setActiveButton = (button_name: string, button_group_id: string, group_code: StringOrNull) => {
+    const is_custom = !defaultGroupsButtons.value.some((button: DefaultGroupButton) => button.group_id === button_group_id)
 
     emit('selectedGroup', button_name, button_group_id, is_custom, group_code);
 };
@@ -112,11 +128,7 @@ const custom_groups = computed(() => {
 
 const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
-
-// TODO: probably want to move ModalContacts out of here. Its already in the contacts component
-const modalContacts = ref();
-
-const selected_group_to_edit = reactive({
+const selected_group_to_edit = reactive<SelectedGroupToEdit>({
     groupID: '',
     groupName: '',
     launchID: ''
@@ -128,7 +140,7 @@ const openEditDialog = (group: CustomGroup) => {
         groupName: group.group_name,
         launchID: group.group_code
     });
-    modalContacts.value.open('new_group')
+    emit('openContactsModal', selected_group_to_edit)
 };
 
 const confirmationModal = ref()

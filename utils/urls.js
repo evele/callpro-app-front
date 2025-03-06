@@ -23,6 +23,7 @@ export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
 export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
 export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
 export const SAVE_DEFAULT_CC_CARD_URL = "/billing/change_default_card"
+export const GET_USER_BILLING_SETTINGS_URL = "/billing/get_billing_settings"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
@@ -55,6 +56,8 @@ export const ADD_DNC_CONTACT_URL = "/contacts/insert_dnc"
 export const SEND_CONTACT_TO_TRASH_URL = "/contacts/delete_numbers_contacts"
 export const SEND_NUMBER_TO_TRASH_URL = "/contacts/delete_numbers_contacts"  // TODO: check if should be the same
 export const REMOVE_NUMBER_FROM_DNC_URL = "/contacts/remove_number_from_dnc"
+export const DELETE_CONTACT_FOREVER_URL = "/contacts/delete_contact_forever"
+export const RESTORE_CONTACT_URL = "/contacts/undo_delete_numbers_list"
 
 /* ----- Dashboard Store ----- */
 export const GET_BROADCAST_LIST_URL = "/broadcast/get_broadcast_list"
@@ -68,6 +71,7 @@ export const GET_CUSTOM_GROUPS_URL = "/contacts/get_custom_groups"
 export const SAVE_GROUP_CONTACTS_URL = "/contacts/create_edit_groups_contacts"
 export const MOVE_NUMBER_TO_GROUP_URL = "/contacts/move_number_to_group"
 export const ADD_NUMBER_TO_GROUP_URL = "/contacts/add_number_to_group"
+export const REMOVE_NUMBER_FROM_GROUP_URL = "/contacts/remove_contacts_from_group"
 export const DELETE_USER_GROUP_URL = "/contacts/delete_group"
 
 /* ---- General Store ----*/
@@ -82,6 +86,7 @@ export const GET_SETTINGS_DATA_URL = "/settings/get_settings_data"
 export const UPDATE_VOICE_SETTINGS_URL = "/settings/save_audio_settings"
 export const UPDATE_TEXT_SETTINGS_URL = "/settings/save_text_settings"
 export const UPDATE_GENERAL_SETTINGS_URL = "/settings/save_general_settings"
+export const SAVE_BILLING_SETTINGS_URL = "/settings/save_billing_settings"
 
 /* ----- SMS Store ----- */
 export const GET_UNREAD_MESSAGES_URL = "/sms/get_unread_messages"

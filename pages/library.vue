@@ -1,4 +1,8 @@
 <template>
+    <section class="bg-white py-1 pl-8">
+        <p class="text-2xl font-semibold">Library</p>
+    </section>
+
     <div class="p-6 mb-10">       
         <Card class="bg-white">
             <template #content>

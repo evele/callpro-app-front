@@ -1,3 +1,8 @@
+/* ----- Save Group ----- */
+export async function saveGroupContacts(data: ContactGroup): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(SAVE_GROUP_CONTACTS_URL, data) as APIResponseSuccess | APIResponseError
+}
+
 /* ----- System Groups ----- */
 type SystemGroupsAPIResponse = {
     result: true,
@@ -27,6 +32,11 @@ export async function moveNumberToGroups(data: MoveNumberToGroup): Promise<APIRe
 /* ----- Add Number To Group ----- */
 export async function addNumberToGroups(data: AddNumberToGroup): Promise<APIResponseSuccess | APIResponseError>{    
     return await fetchWrapper.post(ADD_NUMBER_TO_GROUP_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Remove Number from Group ----- */
+export async function RemoveNumberfromGroup(data: RemoveNumberFromGroup): Promise<APIResponseSuccess | APIResponseError>{    
+    return await fetchWrapper.post(REMOVE_NUMBER_FROM_GROUP_URL, data) as APIResponseSuccess | APIResponseError
 }
 
 /* ----- Delete Group ----- */
