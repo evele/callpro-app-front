@@ -1,6 +1,6 @@
 <template>
     <div class="bg-white p-6 rounded-2xl shadow-md mt-4 px-16">
-        <Paycard :value-fields="valueFields" :hasRandomBackgrounds="false" @get-type="changeType" :isCardNumberMasked="isCardNumberMasked" />
+        <Paycard :value-fields="valueFields" @get-type="changeType" :isCardNumberMasked="isCardNumberMasked" :current-focus="currentFocus" />
         
         <form class="flex flex-col gap-6 mt-10 mx-16">
             <div class="flex gap-10 items-center">
@@ -39,7 +39,8 @@
                         :options="monthsOptions" 
                         placeholder="Card Month"
                         class="w-full border border-grey-8"
-                        data-card-field 
+                        data-card-field
+                        @focus="changeFocus(inputFields.cardMonth)"
                     ></Select>
                 </div>
             
@@ -50,6 +51,7 @@
                     placeholder="Card Year"
                     class="w-1/3 border border-grey-8 self-end"
                     data-card-field 
+                    @focus="changeFocus(inputFields.cardYear)"
                 ></Select>
             
                 <div class="flex flex-col items-start gap-2 w-1/3">
@@ -85,17 +87,32 @@ const inputFields = reactive({
     cardCvv: 'v-card-cvv'
 })
 
-const changeType = (type) => {
+const currentFocus = ref<string | null>('v-card-month')
+
+const changeType = (type: CardType) => {
     console.log(type)
 }
 
-const changeCvv = (e) => {
-  valueFields.cardCvv = e.target.value
+const changeCvv = (e: InputEvent) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/\D/g, '');
+    if(target.value.length > 4) {
+        target.value = target.value.slice(0, 4)
+    }
+    valueFields.cardCvv = target.value
 }
 
+const changeFocus = (field: string) => {
+    currentFocus.value = field
+    console.log(currentFocus.value)
+}
+
+const maxLengthAmex = 17
+const maxLengthDiners = 16
+const maxLengthOthers = 19
+
 const minCardYear = new Date().getFullYear()
-const mainCardNumber = ref('')
-const cardNumberMaxLength = ref(19)
+const cardNumberMaxLength = ref(maxLengthOthers)
 const isCardNumberMasked = ref(false)
 
 const minCardMonth = computed(() => {
@@ -111,28 +128,52 @@ watch(() => valueFields.cardMonth, (newVal: string) => {
     }
 })
 
-const changeNumber = (e) => {
-    console.log(e)
-    valueFields.cardNumber = e.target.value
-    const value = valueFields.cardNumber.replace(/\D/g, '')
-    // american express, 15 digits
-    if ((/^3[47]\d{0,13}$/).test(value)) {
-        valueFields.cardNumber = value.replace(/(\d{4})/, '$1 ').replace(/(\d{4}) (\d{6})/, '$1 $2 ')
-        cardNumberMaxLength.value = 17
-    } else if ((/^3(?:0[0-5]|[68]\d)\d{0,11}$/).test(value)) { // diner's club, 14 digits
-        valueFields.cardNumber = value.replace(/(\d{4})/, '$1 ').replace(/(\d{4}) (\d{6})/, '$1 $2 ')
-        cardNumberMaxLength.value = 16
-    } else if (/^62[0-9]\d*/.test(value)) {
-        valueFields.cardNumber = value.replace(/(\d{6})/, '$1 ').replace(/(\d{6}) (\d{7})/, '$1 $2 ').replace(/(\d{6}) (\d{7}) (\d{6})/, '$1 $2 $3 ').replace(/(\d{5}) (\d{5}) (\d{5}) (\d{4})/, '$1 $2 $3 $4')
-        cardNumberMaxLength.value = 21
-    } else if ((/^\d{0,16}$/).test(value)) { // regular cc number, 16 digits
-        valueFields.cardNumber = value.replace(/(\d{4})/, '$1 ').replace(/(\d{4}) (\d{4})/, '$1 $2 ').replace(/(\d{4}) (\d{4}) (\d{4})/, '$1 $2 $3 ')
-        cardNumberMaxLength.value = 19
+const changeNumber = (e: InputEvent) => {
+    const target = e.target as HTMLInputElement;
+    target.value = target.value.replace(/\D/g, '');
+    valueFields.cardNumber = target.value
+
+    const cardPatterns: Record<CardType, RegExp> = {
+        [CardType.VISA]: /^4/,
+        [CardType.MASTERCARD]: /^5[1-5]|^22[2-9]|^2[3-7]/,
+        [CardType.AMERICAN_EXPRESS]: /^3[47]/,
+        [CardType.DISCOVER]: /^6011|^64[4-9]|^65/,
+        [CardType.JCB]: /^35/,
+        [CardType.DINERS_CLUB]: /^3(0[0-5]|[68])/,
+        [CardType.UNKNOWN]: /.*/, // Fallback to avoid undefined
+    };
+
+    const value = valueFields.cardNumber;
+
+    if (cardPatterns[CardType.AMERICAN_EXPRESS].test(value)) {
+        cardNumberMaxLength.value = maxLengthAmex;
+    } else if (cardPatterns[CardType.DINERS_CLUB].test(value)) {
+        cardNumberMaxLength.value = maxLengthDiners;
+    } else {
+        cardNumberMaxLength.value = maxLengthOthers;
     }
-    // if (e.inputType == 'deleteContentBackward') {
-    //     const lastChar = valueFields.cardNumber.substring(valueFields.cardNumber.length, valueFields.cardNumber.length - 1)
-    //     if (lastChar == ' ') { valueFields.cardNumber = valueFields.cardNumber.substring(0, valueFields.cardNumber.length - 1) }
-    // }
+
+    const trimmedValue = value.slice(0, cardNumberMaxLength.value);
+
+    if (cardNumberMaxLength.value === maxLengthAmex) { // American Express
+        valueFields.cardNumber = trimmedValue
+            .replace(/(\d{4})/, '$1 ')
+            .replace(/(\d{4}) (\d{6})/, '$1 $2 ');
+    } else if (cardNumberMaxLength.value === maxLengthDiners) { // Diner's Club
+        valueFields.cardNumber = trimmedValue
+            .replace(/(\d{4})/, '$1 ')
+            .replace(/(\d{4}) (\d{6})/, '$1 $2 ');
+    } else { // Rest of the cards
+        valueFields.cardNumber = trimmedValue
+            .replace(/(\d{4})/, '$1 ')
+            .replace(/(\d{4}) (\d{4})/, '$1 $2 ')
+            .replace(/(\d{4}) (\d{4}) (\d{4})/, '$1 $2 $3 ');
+    }
+
+    if (e.inputType == 'deleteContentBackward') {
+        const lastChar = valueFields.cardNumber.substring(valueFields.cardNumber.length, valueFields.cardNumber.length - 1)
+        if (lastChar == ' ') { valueFields.cardNumber = valueFields.cardNumber.substring(0, valueFields.cardNumber.length - 1) }
+      }
 }
 
 const generateMonths = (n: number) => {
@@ -147,29 +188,4 @@ const monthsOptions = computed(() => {
     }
     return months
 })
-
-const toggleMask = () => {
-    isCardNumberMasked.value = !isCardNumberMasked.value
-
-    if (isCardNumberMasked.value) {
-    maskCardNumber()
-    } else {
-    unMaskCardNumber()
-    }
-}
-
-const maskCardNumber = () => {
-    mainCardNumber.value = valueFields.cardNumber
-    const arr = valueFields.cardNumber.split('')
-    arr.forEach((element, index) => {
-    if (index > 4 && index < 14 && element.trim() !== '') {
-        arr[index] = '*'
-    }
-    })
-    valueFields.cardNumber = arr.join('')
-}
-
-const unMaskCardNumber = () => {
-    valueFields.cardNumber = mainCardNumber.value
-}
 </script>

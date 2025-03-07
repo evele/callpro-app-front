@@ -6,7 +6,7 @@
     >
       <div class="card-item__side -front">
         <div
-          :class="{ '-active': focusElementStyle }"
+          :class="{ '-active': focusElementStyle !== null }"
           :style="focusElementStyle"
           class="card-item__focus"
           ref="focusElement"
@@ -28,10 +28,11 @@
             />
             <div class="card-item__type">
               <transition name="slide-fade-up">
-                <MastercardSVG
-                  v-if="cardType"
-                  :key="cardType"
-                  class="card-item__typeImg"
+                <component 
+                  v-if="cardType" 
+                  :is="getCardIcon(cardType)" 
+                  :key="cardType" 
+                  class="card-item__typeImg" 
                 />
                 <!-- <img
                   v-if="cardType"
@@ -48,6 +49,8 @@
             :ref="inputFields.cardNumber"
             aria-label="Card number"
             class="card-item__number"
+            :class="textStyle"
+            id="cardNumber"
           >
             <span v-for="(n, $index) in currentPlaceholder" :key="$index">
               <transition name="slide-fade-up">
@@ -76,16 +79,18 @@
               </transition>
             </span>
           </label>
-          <div class="card-item__content">
+          <div class="card-item__content" :class="textStyle">
             <label
               :for="inputFields.cardName"
               :ref="inputFields.cardName"
               aria-label="Card name"
               class="card-item__info"
+              :class="textStyle"
+              id="cardName"
             >
-              <div class="card-item__holder">
+              <!-- <div class="card-item__holder">
                 {{ labels.cardHolder || "Card Holder" }}
-              </div>
+              </div> -->
               <transition name="slide-fade-up">
                 <div
                   v-if="valueFields.cardName.length"
@@ -109,13 +114,7 @@
                 </div>
               </transition>
             </label>
-            <div class="card-item__date" ref="cardDate">
-              <label
-                :for="inputFields.cardMonth"
-                class="card-item__dateTitle"
-                aria-label="Expiration date"
-                >{{ labels.cardExpires || "Expires" }}</label
-              >
+            <div class="card-item__date" ref="cardDate" id="cardDate">
               <label
                 :for="inputFields.cardMonth"
                 class="card-item__dateItem"
@@ -161,23 +160,18 @@
         <div class="card-item__band"></div>
         <div class="card-item__cvv">
           <label :for="inputFields.cardCvv" aria-label="Card CVV">
-            <div class="card-item__cvvTitle">{{ labels.cardCvv }}</div>
+            <div class="card-item__cvvTitle" :class="textStyle">{{ labels.cardCvv }}</div>
             <div class="card-item__cvvBand">
               <span>{{ valueFields.cardCvv }}</span>
             </div>
           </label>
           <div class="card-item__type">
-            <MastercardSVG
-                v-if="cardType"
-                :key="cardType"
-                class="card-item__typeImg"
+            <component 
+              v-if="cardType" 
+              :is="getCardIcon(cardType)" 
+              :key="cardType" 
+              class="card-item__typeImg" 
             />
-            <!-- <img
-              v-if="cardType"
-              :src="getCreditCardImage"
-              class="card-item__typeImg"
-              alt="Dark bar image"
-            /> -->
           </div>
         </div>
       </div>
@@ -185,8 +179,9 @@
   </template>
   
   <script setup lang="ts">
-    import MastercardSVG from '@/components/svgs/MastercardSVG.vue';
-    import cardBg from '@/assets/png/random-card.jpg';
+    import randomBg from '@/assets/png/random-card.jpg';
+    import mastercardBg from '@/assets/png/mastercard-bg.png';
+    import visaBg from '@/assets/png/visa-bg.png';
     import chip from '@/assets/png/chip.png';
 
     const props = withDefaults(defineProps<{
@@ -194,9 +189,8 @@
         inputFields?: object,
         labels?: object,
         isCardNumberMasked?: boolean,
-        hasRandomBackgrounds?: boolean,
-        backgroundImage?: string | number,
-        setType?: string
+        setType?: CardType
+        currentFocus?: string | null
     }>(), {
         inputFields: () => ({
             cardNumber: 'v-card-number',
@@ -214,135 +208,74 @@
             cardCvv: 'CVV'
         }),
         isCardNumberMasked: true,
-        hasRandomBackgrounds: true,
-        backgroundImage: '',
-        setType: ''
+        setType: CardType.UNKNOWN,
+        currentFocus: null
     })
 
     const emit = defineEmits<{
         'get-type': [value: string],
     }>()
 
+    const { getCardIcon } = useCreditCards()
 
     const defaultPlaceholder = '#### #### #### ####';
     const focusElementStyle = ref(null);
-    const currentFocus = ref(null);
+    const currentFocus = ref(props.currentFocus);
     const isFocused = ref(false);
     const isCardFlipped = ref(false);
     const amexCardPlaceholder = '#### ###### #####';
-    const fifteenCardPlaceholder = '#### #### #### ###';
     const dinersCardPlaceholder = '#### ###### ####';
-    const unionPayCardPlaceholder = '###### ####### ######';
     const defaultCardPlaceholder = defaultPlaceholder;
     const currentPlaceholder = ref(defaultPlaceholder);
 
-    const cardType = computed(() => {
-        const acceptedTypes = [
-            'visaelectron',
-            'visa',
-            'elo',
-            'amex',
-            'mastercard',
-            'discover',
-            'unionpay',
-            'troy',
-            'dinersclub',
-            'jcb',
-            'laser',
-            'dankort',
-            'uatp',
-            'mir',
-            'hipercard',
-            'aura',
-            'maestro',
-        ];
-        const setType = props.setType?.toLowerCase()?.replace(/ /g, '');
-        if (setType?.length && acceptedTypes.includes(setType)) return setType;
+    const cardType = computed<CardType>(() => {
+      const acceptedTypes = Object.values(CardType).filter(type => type !== CardType.UNKNOWN);
 
-        const number = props.valueFields.cardNumber.replace(/\s+/g, '');
+      const setType = props.setType?.toLowerCase()?.replace(/ /g, '');
+      const matchedType = acceptedTypes.find(type => type.toLowerCase() === setType);
+      if (matchedType) return matchedType;
 
-        if (number.match(/^4(026|17500|405|508|844|91[37])/)) {
-            return 'visaelectron';
-        }
-        if (number.match(/^4\d{12}(\d{3})?$/)) return 'visa';
-        if (
-            number.match(
-            /^((509091)|(636368)|(636297)|(504175)|(438935)|(40117[8-9])|(45763[1-2])|(457393)|(431274)|(50990[0-2])|(5099[7-9][0-9])|(50996[4-9])|(509[1-8][0-9][0-9])|(5090(0[0-2]|0[4-9]|1[2-9]|[24589][0-9]|3[1-9]|6[0-46-9]|7[0-24-9]))|(5067(0[0-24-8]|1[0-24-9]|2[014-9]|3[0-379]|4[0-9]|5[0-3]|6[0-5]|7[0-8]))|(6504(0[5-9]|1[0-9]|2[0-9]|3[0-9]))|(6504(8[5-9]|9[0-9])|6505(0[0-9]|1[0-9]|2[0-9]|3[0-8]))|(6505(4[1-9]|5[0-9]|6[0-9]|7[0-9]|8[0-9]|9[0-8]))|(6507(0[0-9]|1[0-8]))|(65072[0-7])|(6509(0[1-9]|1[0-9]|20))|(6516(5[2-9]|6[0-9]|7[0-9]))|(6550(0[0-9]|1[0-9]))|(6550(2[1-9]|3[0-9]|4[0-9]|5[0-8])))/
-            )
-        ) {
-            return 'elo';
-        }
-        if (number.match(/^3[47]\d{13}$/)) return 'amex';
-        if (number.match(/^(5[1-5]\d{4}|677189)\d{10}$/)) return 'mastercard';
-        if (number.match(/^6(?:011|5[0-9]{2})[0-9]{12}$/)) return 'discover';
-        if (number.match(/^62[0-9]\d{14,17}$/)) return 'unionpay';
-        if (number.match(/^9792\d{12}$/)) return 'troy';
-        if (number.match(/^3(0[0-5]|[68]\d)\d{11,16}/)) return 'dinersclub';
-        if (number.match(/(?:2131|1800|35[0-9]{3})[0-9]{11}$/)) return 'jcb';
-        if (number.match(/^(6304|6706|6709|6771)[0-9]{12,15}$/)) return 'laser';
-        if (number.match(/^5019\d{12}$/)) return 'dankort';
-        if (number.match(/^1\d{14}$/)) return 'uatp';
-        if (number.match(/^220[0-4]\d{12}$/)) return 'mir';
-        if (number.match(/^(606282\d{10}(\d{3})?)|(3841\d{15})$/)) {
-            return 'hipercard';
-        }
-        if (number.match(/^((?!504175))^((?!5067))(^50[0-9])/)) return 'aura';
-        if (number.match(/(?:5[0678]\d\d|6304|6390|67\d\d)\d{8,15}$/)) {
-            return 'maestro';
-        }
+      const number = props.valueFields.cardNumber.replace(/\s+/g, '');
+      const bin = number.slice(0, 6);
 
-        return '';
+      const cardPatterns: Record<CardType, RegExp> = {
+          [CardType.VISA]: /^4/,
+          [CardType.MASTERCARD]: /^5[1-5]|^22[2-9]|^2[3-7]/,
+          [CardType.AMERICAN_EXPRESS]: /^3[47]/,
+          [CardType.DISCOVER]: /^6011|^64[4-9]|^65/,
+          [CardType.JCB]: /^35/,
+          [CardType.DINERS_CLUB]: /^3(0[0-5]|[68])/,
+          [CardType.UNKNOWN]: /.*/, // Fallback to avoid undefined
+      };
+
+
+      for (const [type, pattern] of Object.entries(cardPatterns)) {
+          if (pattern.test(bin)) return type as CardType;
+      }
+
+      return CardType.UNKNOWN;
     });
 
-    const jcbCardPlaceholder = computed(() => {
-        const number = props.valueFields.cardNumber.replace(/\s+/g, '');
-        return number.startsWith('2131') || number.startsWith('1800')
-            ? fifteenCardPlaceholder
-            : defaultPlaceholder;
-    });
+    const textStyle = computed(() => {
+      if(cardType.value === CardType.MASTERCARD) return 'text-black'
+      if(cardType.value === CardType.VISA) return 'text-black'
+      if(cardType.value !== CardType.UNKNOWN) return 'text-white'
 
-    const getCreditCardImage = computed(() => {
-        const path = cardBg;
-        return path.default || path;
-    });
-
-    const imageCover = computed(() => {
-        return !props.hasRandomBackgrounds && parseInt(props.backgroundImage)
-            ? 'Image cover'
-            : '';
-    });
-
-    const isBackgroundImageFromAssets = computed(() => {
-        const numberImage = parseInt(props.backgroundImage);
-        return (
-            Number.isFinite(numberImage) &&
-            parseInt(numberImage) < 26 &&
-            parseInt(numberImage) > 0
-        );
+      return 'text-white'
     });
 
     const currentCardBackground = computed(() => {
-        const numberImage = parseInt(props.backgroundImage);
+        if(cardType.value === CardType.MASTERCARD) return mastercardBg;
+        if(cardType.value === CardType.VISA) return visaBg;
+        if(cardType.value !== CardType.UNKNOWN) return randomBg;
 
-        if (isBackgroundImageFromAssets.value) {
-            const path = cardBg;
-            return path.default || path;
-        }
-
-        if (props.backgroundImage && !Number.isFinite(numberImage)) {
-            return props.backgroundImage;
-        }
-
-        if (props.hasRandomBackgrounds) {
-            const random = Math.floor(Math.random() * 25 + 1);
-            const path = cardBg;
-            return path.default || path;
-        }
-
-        return cardBg;
+        return null;
     });
 
+    const imageCover = computed(() => currentCardBackground.value ? 'Image cover' : '');
+
     watch(currentFocus, () => {
+      console.log('hola', currentFocus.value);
         if (currentFocus.value) {
             changeFocus();
         } else {
@@ -363,18 +296,20 @@
         destroy();
     });
 
-    function addOrRemoveFieldListeners(event = 'addEventListener') {
+    function addOrRemoveFieldListeners(event: 'addEventListener' | 'removeEventListener' = 'addEventListener') {
         const fields = document.querySelectorAll('[data-card-field]');
         fields.forEach((element) => {
+            console.log(element[event])
             element[event]('focus', () => {
             isFocused.value = true;
-            if (
-                element.id === props.inputFields.cardYear ||
-                element.id === props.inputFields.cardMonth
-            ) {
+            if (element.id === props.inputFields.cardYear || element.id === props.inputFields.cardMonth) {
                 currentFocus.value = 'cardDate';
+            } else if(element.id === props.inputFields.cardName) {
+                currentFocus.value = 'cardName';
+            } else if(element.id === props.inputFields.cardNumber) {
+                currentFocus.value = 'cardNumber';
             } else {
-                currentFocus.value = element.id;
+                currentFocus.value = null;
             }
             isCardFlipped.value = element.id === props.inputFields.cardCvv;
             });
@@ -400,19 +335,27 @@
     }
 
     function changeFocus() {
-        const target = currentFocus.value;
-        console.log(target, focusElementStyle.value);
-        focusElementStyle.value = target
-            ? {
-                width: `${target.offsetWidth}px`,
-                height: `${target.offsetHeight}px`,
-                transform: `translateX(${target.offsetLeft}px) translateY(${target.offsetTop}px)`,
-            }
-            : null;
+        const target = document.getElementById(currentFocus.value);
+        const card = document.querySelector('.card-item');
+
+        if (!target || !card) return;
+
+        const cardRect = card.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+
+        const left = targetRect.left - cardRect.left + card.scrollLeft;
+        const top = targetRect.top - cardRect.top + card.scrollTop;
+
+        focusElementStyle.value = {
+            width: `${targetRect.width}px`,
+            height: `${targetRect.height}px`,
+            transform: `translate(${left}px, ${top}px)`,
+        };
     }
 
-    function getIsNumberMasked(index, n) {
-        const numbers = cardType.value === 'amex' ? 13 : 14;
+
+    function getIsNumberMasked(index: number, n: string) {
+        const numbers = cardType.value === CardType.AMERICAN_EXPRESS ? 13 : 14;
         return (
             index < numbers &&
             props.valueFields.cardNumber.length > index &&
@@ -422,16 +365,17 @@
     }
 
     function changePlaceholder() {
-        const cardsPlaceholder = {
-            amex: amexCardPlaceholder,
-            dinersclub: dinersCardPlaceholder,
-            jcb: jcbCardPlaceholder.value,
-            uatp: fifteenCardPlaceholder,
-            unionpay: unionPayCardPlaceholder,
+        const cardPlaceholders: Record<CardType, string> = {
+          [CardType.VISA]: defaultPlaceholder,
+          [CardType.MASTERCARD]: defaultPlaceholder,
+          [CardType.AMERICAN_EXPRESS]: amexCardPlaceholder,
+          [CardType.DISCOVER]: defaultPlaceholder,
+          [CardType.JCB]: defaultPlaceholder,
+          [CardType.DINERS_CLUB]: dinersCardPlaceholder,
+          [CardType.UNKNOWN]: defaultPlaceholder,
         };
 
-        currentPlaceholder.value =
-            cardsPlaceholder[cardType.value] || defaultCardPlaceholder;
+        currentPlaceholder.value = cardPlaceholders[cardType.value as CardType] || defaultCardPlaceholder;
         nextTick(() => {
             changeFocus();
         });
