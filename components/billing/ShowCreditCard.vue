@@ -13,25 +13,25 @@
                     <p class="font-semibold text-black mr-4">{{ card_type }} ending in {{ props.creditCard.last_four }}</p>
                     <Tag v-if="is_default"
                         value="Default" 
-                        class="border border-green-positive-primary bg-white text-green-positive-primary rounded-2xl py-1 px-1 text-[10px] leading-[10px]"
+                        class="border-2 border-green-positive-primary bg-white text-green-positive-primary rounded-[9px] py-1 pt-[5px] px-3 text-[10px] leading-[10px]"
                     />
                     <Tag v-if="props.creditCard.expiry_state === ExpiryState.EXPIRED"
                         value="Expired" 
-                        class="border border-danger-2 bg-white text-danger-2 rounded-2xl py-1 px-1 text-[10px] leading-[10px]"
+                        class="border-2 border-danger-2 bg-white text-danger-2 rounded-[9px] py-1 pt-[5px] px-3 text-[10px] leading-[10px]"
                     />
                     <Tag v-if="props.creditCard.expiry_state === ExpiryState.NEAR_TO_EXPIRE"
                         value="Near to expire" 
-                        class="border border-pending bg-white text-pending rounded-2xl py-1 px-1 text-[10px] leading-[10px]"
+                        class="border-2 border-pending bg-white text-pending rounded-[9px] pb-1 pt-[5px] px-3 text-[10px] leading-[10px]"
                     />
                 </div>
                 
                     
                 <div class="flex gap-2">
-                    <Button class="bg-[#E7E0EC] py-[2px] p-[3px] text-dark-3 border-none hover:bg-gray-300 hover:scale-110">
-                        <EditIconSVG class="w-[13px] h-[13px]" />
+                    <Button class="bg-[#E7E0EC] w-[18px] h-[18px] p-0 text-dark-3 border-none hover:bg-gray-300 hover:scale-110 rounded-lg">
+                        <EditIconSVG class="w-3 h-3" />
                     </Button>
-                    <Button class="bg-[#E7E0EC] p-[2px] text-dark-3 border-none hover:bg-gray-300 hover:scale-110">
-                        <TrashSVG class="w-4 h-4" />
+                    <Button class="bg-[#E7E0EC] w-[18px] h-[18px] p-0 text-dark-3 border-none hover:bg-gray-300 hover:scale-110 rounded-lg">
+                        <TrashSVG class="w-[14px] h-[14px]" />
                     </Button>
                 </div>
             </div>
