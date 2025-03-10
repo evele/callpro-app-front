@@ -41,6 +41,7 @@
                         class="w-full border border-grey-8"
                         data-card-field
                         @focus="changeFocus(inputFields.cardMonth)"
+                        @blur="changeFocus(null)"
                     ></Select>
                 </div>
             
@@ -52,6 +53,7 @@
                     class="w-1/3 border border-grey-8 self-end"
                     data-card-field 
                     @focus="changeFocus(inputFields.cardYear)"
+                    @blur="changeFocus(null)"
                 ></Select>
             
                 <div class="flex flex-col items-start gap-2 w-1/3">
@@ -87,13 +89,13 @@ const inputFields = reactive({
     cardCvv: 'v-card-cvv'
 })
 
-const currentFocus = ref<string | null>('v-card-month')
+const currentFocus = ref<string | null>(null)
 
 const changeType = (type: CardType) => {
     console.log(type)
 }
 
-const changeCvv = (e: InputEvent) => {
+const changeCvv = (e: Event) => {
     const target = e.target as HTMLInputElement;
     target.value = target.value.replace(/\D/g, '');
     if(target.value.length > 4) {
@@ -102,10 +104,14 @@ const changeCvv = (e: InputEvent) => {
     valueFields.cardCvv = target.value
 }
 
-const changeFocus = (field: string) => {
-    currentFocus.value = field
-    console.log(currentFocus.value)
-}
+let timeout: ReturnType<typeof setTimeout> | null = null;
+const changeFocus = (field: StringOrNull) => {
+  if (timeout) clearTimeout(timeout);
+  
+  timeout = setTimeout(() => {
+    currentFocus.value = field;
+  }, 300);
+};
 
 const maxLengthAmex = 17
 const maxLengthDiners = 16
@@ -128,7 +134,8 @@ watch(() => valueFields.cardMonth, (newVal: string) => {
     }
 })
 
-const changeNumber = (e: InputEvent) => {
+const changeNumber = (e: Event) => {
+    const inputEvent = e as InputEvent;
     const target = e.target as HTMLInputElement;
     target.value = target.value.replace(/\D/g, '');
     valueFields.cardNumber = target.value
@@ -170,10 +177,10 @@ const changeNumber = (e: InputEvent) => {
             .replace(/(\d{4}) (\d{4}) (\d{4})/, '$1 $2 $3 ');
     }
 
-    if (e.inputType == 'deleteContentBackward') {
+    if (inputEvent.inputType == 'deleteContentBackward') {
         const lastChar = valueFields.cardNumber.substring(valueFields.cardNumber.length, valueFields.cardNumber.length - 1)
         if (lastChar == ' ') { valueFields.cardNumber = valueFields.cardNumber.substring(0, valueFields.cardNumber.length - 1) }
-      }
+    }
 }
 
 const generateMonths = (n: number) => {

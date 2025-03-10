@@ -34,13 +34,6 @@
                   :key="cardType" 
                   class="card-item__typeImg" 
                 />
-                <!-- <img
-                  v-if="cardType"
-                  :src="getCreditCardImage"
-                  :key="cardType"
-                  :alt="`${cardType} brand image`"
-                  class="card-item__typeImg"
-                /> -->
               </transition>
             </div>
           </div>
@@ -88,9 +81,6 @@
               :class="textStyle"
               id="cardName"
             >
-              <!-- <div class="card-item__holder">
-                {{ labels.cardHolder || "Card Holder" }}
-              </div> -->
               <transition name="slide-fade-up">
                 <div
                   v-if="valueFields.cardName.length"
@@ -179,15 +169,46 @@
   </template>
   
   <script setup lang="ts">
-    import randomBg from '@/assets/png/random-card.jpg';
+    import randomBg from '@/assets/png/random-card.png';
     import mastercardBg from '@/assets/png/mastercard-bg.png';
     import visaBg from '@/assets/png/visa-bg.png';
     import chip from '@/assets/png/chip.png';
 
+    type ValueFields = {
+        cardName: string,
+        cardNumber: string,
+        cardMonth: string,
+        cardYear: string,
+        cardCvv: string
+    }
+
+    type InputFields = {
+        cardNumber: 'v-card-number',
+        cardName: 'v-card-name',
+        cardMonth: 'v-card-month',
+        cardYear: 'v-card-year',
+        cardCvv: 'v-card-cvv'
+    }
+
+    type Labels = {
+        cardName: 'Full Name',
+        cardHolder: 'Card Holder',
+        cardMonth: 'MM',
+        cardYear: 'YY',
+        cardExpires: 'Expires',
+        cardCvv: 'CVV'
+    }
+
+    type FocusStyle = {
+        width: string,
+        height: string,
+        transform: string
+    }
+
     const props = withDefaults(defineProps<{
-        valueFields: object,
-        inputFields?: object,
-        labels?: object,
+        valueFields: ValueFields,
+        inputFields?: InputFields,
+        labels?: Labels,
         isCardNumberMasked?: boolean,
         setType?: CardType
         currentFocus?: string | null
@@ -213,16 +234,18 @@
     })
 
     const emit = defineEmits<{
-        'get-type': [value: string],
+        'get-type': [value: CardType],
     }>()
 
     const { getCardIcon } = useCreditCards()
 
     const defaultPlaceholder = '#### #### #### ####';
-    const focusElementStyle = ref(null);
+    const focusElementStyle = ref<FocusStyle | null>(null);
     const currentFocus = ref(props.currentFocus);
+    const forcedCurrentFocus = computed(() => props.currentFocus);
     const isFocused = ref(false);
     const isCardFlipped = ref(false);
+    const wasCardFlipped = ref(false);
     const amexCardPlaceholder = '#### ###### #####';
     const dinersCardPlaceholder = '#### ###### ####';
     const defaultCardPlaceholder = defaultPlaceholder;
@@ -275,7 +298,6 @@
     const imageCover = computed(() => currentCardBackground.value ? 'Image cover' : '');
 
     watch(currentFocus, () => {
-      console.log('hola', currentFocus.value);
         if (currentFocus.value) {
             changeFocus();
         } else {
@@ -283,58 +305,76 @@
         }
     });
 
-    watch(cardType, (val: string) => {
+    watch(forcedCurrentFocus, () => {
+        if(forcedCurrentFocus.value) {
+          changeFocusDebounced('cardDate');
+          isFocused.value = true;
+        } else {
+          if(currentFocus.value === 'cardDate') {
+            currentFocus.value = null;
+            isFocused.value = false;
+          }
+        }
+    });
+
+    watch(cardType, (val: CardType) => {
         emit('get-type', val);
         changePlaceholder();
     });
 
-    onMounted(() => {
-        init();
-    });
+    const changeFocusDebounced = (focus: string) => {
+      if(wasCardFlipped.value) {
+        setTimeout(() => {
+            currentFocus.value = focus;
+        }, 700);
+        wasCardFlipped.value = false;
+      } else {
+        currentFocus.value = focus;
+      }
+    }
 
-    onBeforeUnmount(() => {
-        destroy();
+    watch(() => isCardFlipped.value, (newVal: boolean) => {
+        if(newVal) {
+            wasCardFlipped.value = true;
+        }
     });
 
     function addOrRemoveFieldListeners(event: 'addEventListener' | 'removeEventListener' = 'addEventListener') {
         const fields = document.querySelectorAll('[data-card-field]');
         fields.forEach((element) => {
-            console.log(element[event])
             element[event]('focus', () => {
-            isFocused.value = true;
-            if (element.id === props.inputFields.cardYear || element.id === props.inputFields.cardMonth) {
-                currentFocus.value = 'cardDate';
-            } else if(element.id === props.inputFields.cardName) {
-                currentFocus.value = 'cardName';
-            } else if(element.id === props.inputFields.cardNumber) {
-                currentFocus.value = 'cardNumber';
-            } else {
+              isFocused.value = true;
+              if(element.id === props.inputFields.cardName) {
+                changeFocusDebounced('cardName');
+              } else if(element.id === props.inputFields.cardNumber) {
+                changeFocusDebounced('cardNumber');
+              } else {
                 currentFocus.value = null;
-            }
-            isCardFlipped.value = element.id === props.inputFields.cardCvv;
+              }
+              isCardFlipped.value = element.id === props.inputFields.cardCvv;
             });
+
             element[event]('blur', () => {
-            isCardFlipped.value = !element.id === props.inputFields.cardCvv;
-            const timeout = setTimeout(() => {
-                if (!isFocused.value) {
-                currentFocus.value = null;
-                }
-                clearTimeout(timeout);
-            }, 300);
-            isFocused.value = false;
+              isCardFlipped.value = false
+              const timeout = setTimeout(() => {
+                  if (!isFocused.value) {
+                  currentFocus.value = null;
+                  }
+                  clearTimeout(timeout);
+              }, 300);
+              isFocused.value = false;
             });
         });
     }
 
-    function init() {
-        addOrRemoveFieldListeners();
-    }
+    const init = () => addOrRemoveFieldListeners()
+    const destroy = () => addOrRemoveFieldListeners('removeEventListener')
 
-    function destroy() {
-        addOrRemoveFieldListeners('removeEventListener');
-    }
+    onMounted(() => init());
+    onBeforeUnmount(() => destroy());
 
     function changeFocus() {
+        if(!currentFocus.value) return;
         const target = document.getElementById(currentFocus.value);
         const card = document.querySelector('.card-item');
 
