@@ -37,7 +37,7 @@
     watch(() => billingStore.selected_step, (step: FormattedStep | null) => {
         if(step) {
             price.value = Number(step.Total)
-            manual_credits.value = step.floor
+            manual_credits.value = Number(step.floor)
         } else {
             if(!billingStore.reference_step_id && !is_focusing.value) {
                 price.value = null
