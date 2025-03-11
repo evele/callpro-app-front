@@ -8,7 +8,7 @@ type BillingState = {
 };
 
 type BillingActions = {
-  selectUnselectStep(step: FormattedStep): void;
+  selectUnselectStep(step: FormattedStep | null): void;
   selectUnselectPlan(plan: MonthlyGroupPlan): void;
   setReferenceStepId(id: string | null): void;
   setRecapData(data: RecapData | null): void;
@@ -32,8 +32,8 @@ export const useBillingStore = defineStore<"BillingStore", BillingState, {}, Bil
     }
   },
   actions: {
-    selectUnselectStep(step: FormattedStep) {
-      if(this.selected_step?.id === step.id) {
+    selectUnselectStep(step: FormattedStep | null) {
+      if(!step || this.selected_step?.id === step.id) {
         this.selected_step = null;
         return;
       }

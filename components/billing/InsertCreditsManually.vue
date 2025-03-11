@@ -4,7 +4,7 @@
             <p class="text-dark-3 font-semibold">$ {{ price?.toFixed(2) }}</p>
         </div>
 
-        <div class="w-[180px] h-[52px] rounded-lg border-2 border-grey-main bg-white mx-auto mt-7 flex items-center overflow-hidden">
+        <div class="w-[180px] h-[52px] rounded-lg border-2 border-grey-main bg-white mx-auto mt-9 flex items-center overflow-hidden">
             <div class="w-11 flex justify-end">
                 <CoinSVG class="w-7 h-7" />
             </div>
@@ -14,9 +14,12 @@
                 fluid
                 placeholder="0"
                 class="w-[130px] h-[48px] placeholder:text-grey-7 font-semibold text-[28px] border-none rounded-1"
-                @input="handle_manual_credits" 
+                @input="handle_manual_credits"
+                @focus="is_focusing = true"
+                @blur="is_focusing = false"
             />
         </div>
+        <p class="text-black text-sm font-medium text-center mt-2">Insert credits manually</p>
     </div>
 </template>
 
@@ -27,16 +30,19 @@
 
     const price = ref<number | null>(null)
     const manual_credits = ref<number | null>(null)
+    const is_focusing = ref<boolean>(false)
 
     const billingStore = useBillingStore()
 
     watch(() => billingStore.selected_step, (step: FormattedStep | null) => {
         if(step) {
             price.value = Number(step.Total)
-            manual_credits.value = Number(step.floor)
+            manual_credits.value = step.floor
         } else {
-            price.value = null
-            manual_credits.value = null
+            if(!billingStore.reference_step_id && !is_focusing.value) {
+                price.value = null
+                manual_credits.value = null
+            }
         }
     })
 
@@ -70,7 +76,9 @@
             billingStore.setReferenceStepId(right_step.id)
             billingStore.setRecapData(recap_data) 
         } else {
+            price.value = null
             billingStore.setReferenceStepId(null)
+            billingStore.selectUnselectStep(null)
             billingStore.setRecapData(null)
         }
     }
