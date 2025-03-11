@@ -36,6 +36,47 @@ export const useUploadAudio = () => {
   })
 }
 
+/* ----- Billing ----- */
+export const useSaveDefaultCard = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:{ card_id: number }) => saveDefaultCard(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_cc_cards'] })
+    },
+  }) 
+}
+
+export const useSaveBillingSettings = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SaveBillingSettingsData) => saveBillingSettings(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_billing_settings'] })
+    },
+  })
+}
+
+export const useSetPendingDowngrade = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: PendingDowngradeData) => setPendingDowngrade(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_billing_data'] })
+    },
+  }) 
+}
+
+export const useCancelDowngrade = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: () => cancelDowngrade(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_billing_data'] })
+    },
+  }) 
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()

@@ -1,46 +1,51 @@
 <template>
-    <div class="bg-[#E6E0E9] flex items-center justify-center min-h-screen">
-        <Card class="w-full max-w-[850px] flex flex-col items-center justify-center font-normal gap-8">
+    <div class="bg-card-background flex items-center justify-center min-h-screen">
+        <Card class="w-full max-w-[850px] flex flex-col items-center justify-center font-normal gap-8 rounded-[30px] shadow-lg">
             <!-- Bloque de logo y texto -->
             <template #header>
                 <div class="mt-14 flex flex-col items-center">
                     <img alt="user header" src="@/assets/png/thecallpro.png"
                         class="w-[196px] bg-cover bg-center" />
-                    <p v-if="current_step === 1" class="text-xl font-semibold text-[#4f378b] mt-6">Log in to your Phone Launch Account</p>
-                    <p v-else class="text-xl font-semibold text-[#4f378b] mt-6">Verify your phone launch account.</p>
+                    <p v-if="current_step === 1" class="text-xl font-semibold text-dark-primary-container mt-6">Log in to your Phone Launch Account</p>
+                    <p v-else class="text-xl font-semibold text-dark-primary-container mt-6">Verify your phone launch account.</p>
                 </div>
             </template>
             <template #content>
                 <!-- First step form -->
                 <form v-if="current_step === 1" @keydown.enter.prevent="next"
-                    class="flex flex-col gap-6 w-full max-w-[520px] sm:w-[90vw] mx-auto">
+                    class="flex flex-col gap-8 w-full max-w-[520px] sm:w-[90vw] mx-auto">
 
-                    <div class="relative flex flex-col items-start gap-2 w-full">
-                        <label for="phonelaunch">Phone Launch Account</label>
+                    <div class="flex flex-col items-start gap-2 w-full relative">
+                        <label for="phonelaunch" class="text-dark-3">Phone Launch Account</label>
                         <InputNumber 
                             v-model="phone_launch_number" 
                             inputId="phonelaunch"
-                            class="flex w-full rounded-[1.875rem]"
+                            class="w-full"
                             placeholder="Enter Phone Launch Account number"
                             :useGrouping="false"
                             fluid
                             :invalid="number_error_message.length > 0"
                         />
-                        <p class="text-red-500 absolute left-0 top-full">{{ number_error_message }}</p>
+                        <span v-show="number_error_message.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                            {{ number_error_message }}
+                        </span>
                     </div>
 
-                    <div class="relative flex flex-col items-start gap-2 w-full">
-                        <label for="pin">Pin Number</label>
-                        <Password 
-                            v-model="phone_launch_password"
-                            inputId="pin"
-                            class="flex w-full border rounded-[1.875rem]"
+                    <div class="flex flex-col items-start gap-2 w-full relative">
+                        <label for="pin" class="text-dark-3">Pin Number</label>
+                        <Password
+                            id="pin" 
+                            type="password"
+                            class="w-full"
                             placeholder="Enter Pin number"
-                            :feedback="false"
                             toggleMask
+                            :feedback="false"
+                            v-model="phone_launch_password"
                             :invalid="password_error_message.length > 0"
                         />
-                        <p class="text-red-500 absolute left-0 top-full">{{ password_error_message }}</p>
+                        <span v-show="password_error_message.length" class="text-danger text-sm absolute mt-1 left-0 top-full">
+                            {{ password_error_message }}
+                        </span>             
                     </div>
                 </form>
 
@@ -51,16 +56,16 @@
                         <InputNumber 
                             v-model="confirmation_code" 
                             inputId="confirmationCode"
-                            class="flex w-full rounded-[1.875rem]"
+                            class="w-full"
                             placeholder="Enter Confirmation Code"
                             :useGrouping="false"
                             fluid
                             :invalid="confirmation_code_error_message.length > 0"
                         />
-                        <p class="text-red-500">{{ confirmation_code_error_message }}</p>
+                        <p class="text-danger text-sm">{{ confirmation_code_error_message }}</p>
                         <div class="mx-auto text-xs font-semibold flex items-center gap-2">
                             <span>Didn't recieve?</span>
-                            <Button @click="handle_resend_code" class="text-[#4f378b] flex items-center gap-1 bg-transparent border-none p-0 text-xs">
+                            <Button @click="handle_resend_code" class="text-dark-primary-container flex items-center gap-1 bg-transparent border-none p-0 text-xs">
                                 <RenewSVG v-if="!is_sending_new_code" class="h-4 w-4" />
                                 {{ is_sending_new_code ? 'Sending a new code...' : 'Resend Code'}}
                             </Button>
@@ -70,7 +75,7 @@
             </template>
 
             <template #footer>
-                <div class="flex flex-col gap-4 mt-10">
+                <div class="flex flex-col gap-4 mt-14">
                     <Button type="button" 
                         class="flex justify-center items-center py-2 w-[300px] mx-auto font-bold"
                         :disabled="is_loading || is_sending_new_code" @click="next">
@@ -83,7 +88,7 @@
                     <div
                         class="flex justify-center items-start gap-1.5 w-full max-w-[600px] mx-auto text-xs font-semibold gap-4 mt-4 mb-10">
                         <span>Do you already have an account?</span>
-                        <router-link to="/login" class="text-[#4f378b]">
+                        <router-link to="/login" class="text-dark-primary-container">
                             Take me to Login
                         </router-link>
                     </div>
@@ -163,7 +168,15 @@
             root_id.value = response.root_id
             current_step.value = 2
         } else {
-            show_error_toast('Error', "Something went wrong, please check your credentials and try again.")
+            if(response.validation_error) {
+                if(response.validation_error.user) {
+                    number_error_message.value = response.validation_error.user
+                }
+                if(response.validation_error.password) {
+                    password_error_message.value = response.validation_error.password
+                }
+            }
+            show_error_toast('Error', response.error || "Something went wrong, please check your credentials and try again.")
         }
     }
 
@@ -219,16 +232,22 @@
     :deep(.p-inputnumber) {
         .p-inputtext {
             width: 100%;
-            padding: 12px 16px;
+            &::placeholder {
+                color: #B3B3B3
+            }
         }
     }
     :deep(.p-password) {
         .p-password-input {
             width: 100%;
-            padding: 13px 16px;
+            &::placeholder {
+                color: #B3B3B3
+            }
+        }
+        svg {
+            color: #653494;
         }
     }
-
     :deep(.light-spinner) {
         .p-progressspinner-circle {
             stroke: white!important;

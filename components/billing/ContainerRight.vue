@@ -14,7 +14,7 @@
                 <Button 
                     type="button" 
                     label="Change to Plan" 
-                    class="bg-white tracking-wide leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100 mx-auto"
+                    class="bg-white tracking-wide leading-[10px] h-[28px] mt-6 font-semibold border text-dark-3 text-xs hover:bg-gray-100 mx-auto"
                     @click="handle_selected_type('plan')"
                 />
             </template>
@@ -22,40 +22,101 @@
 
         <PlanCardSummary v-show="selected_type === 'plan'">
             <template #content>
-                <div class="flex gap-6 w-full justify-center items-center">
-                    <UserSVG class="text-primary" />
-                    <div class="text-center">
-                        <p class="font-semibold text-2xl">2000</p>
-                        <p class="text-xs text-grey-4">numbers</p>
+                <div class="flex flex-col w-full justify-center items-center">
+                    <div class="flex items-center gap-6" :class="{ 'mb-9': !is_monthly_plan }">
+                        <UserSVG class="text-primary" />
+                        <p v-if="is_monthly_plan" class="font-semibold text-2xl">{{ current_plan?.numbers }}</p>
+                        <p v-else class="font-semibold text-2xl text-grey-4">0</p>
                     </div>
+                    <p v-if="is_monthly_plan" class="text-xs text-grey-4 mt-4">Expires: {{ format_timestamp(current_plan?.end_date ?? '', false) }}</p>
                 </div>
             </template>
-            <template #footer>
+            <template v-if="is_monthly_plan && current_plan?.pending_downgrade_package_type == null" #footer>
                 <Button 
                     type="button" 
-                    label="Change to Credits" 
-                    class="bg-white tracking-wide leading-[10px] h-[28px] font-semibold border text-dark-3 text-xs hover:bg-gray-100 mx-auto"
-                    @click="handle_selected_type('credit')" 
+                    label="Cancel" 
+                    class="bg-white tracking-wide leading-[10px] h-[28px] w-[120px] font-semibold border text-dark-3 text-xs hover:bg-gray-100 mx-auto"
+                    @click="open_confirm" 
                 />
             </template>
         </PlanCardSummary>
                 
-        <PanelRecap />
+        <PanelRecap :selected-type="selected_type" />
     </aside>
+
+    <ConfirmationPurchase 
+        :is-visible="show_confirmation_modal" 
+        @close="show_confirmation_modal = false" 
+        @cancel="handle_set_pending_downgrade(true)" 
+        @confirm="handle_set_pending_downgrade(false)" 
+        title="Confirm your cancelation" 
+        message="Are you sure you want to cancel your Unlimited Monthly Plan"
+        cancel-text="Cancel now" 
+        confirm-text="Cancel when expires"
+        :is-processing-confirm="isDowngrading && !is_cancel_now"
+        :is-processing-cancel="isDowngrading && is_cancel_now"
+    />
+    <MessageReady :is-visible="show_ready_message" />
 </template>
 
 <script setup lang="ts">
+    const { mutate: setPendingDowngrade, isPending: isDowngrading } = useSetPendingDowngrade()
+    const { mutate: cancelDowngrade, isPending: isCancelDowngrade } = useCancelDowngrade()
+
     const props = defineProps<{
-        selected_type: SelectedBillingType
+        selectedType: SelectedBillingType
+        userPlanAndBalance: { user_current_plan: UserCurrentPlanData, balance_data: NumberOrNull } | null
     }>()
 
     const emit = defineEmits<{
-        'update:selected_type': [value: SelectedBillingType]
+        'update:selectedType': [value: SelectedBillingType]
     }>()
 
-    const selected_type = computed<SelectedBillingType>(() => props.selected_type)
+    const billingStore = useBillingStore()
+    const { show_error_toast } = usePrimeVueToast();
+
+    const show_confirmation_modal = ref(false)
+    const show_ready_message = ref(false)
+
+    const selected_type = computed<SelectedBillingType>(() => props.selectedType)
+
+    const current_plan = computed(() => {
+        if(!props.userPlanAndBalance) return null
+        return props.userPlanAndBalance.user_current_plan
+    })
+
+    const is_monthly_plan = computed(() => current_plan.value?.current_package_type === PackageType.GROUPS_PLAN)
 
     const handle_selected_type = (select_type: SelectedBillingType) => {
-        emit('update:selected_type', select_type)
+        billingStore.resetStore()
+        emit('update:selectedType', select_type)
+    }
+
+    /* ----- Cancel plan ----- */
+    const is_cancel_now = ref(false)
+    const open_confirm = () => show_confirmation_modal.value = true
+
+    const handle_set_pending_downgrade = (now: boolean) => {
+        is_cancel_now.value = now
+        const data_to_send: PendingDowngradeData = {
+            now,
+            package_type: PackageType.FREE_PLAN,
+            package_id: 0
+        }
+
+        setPendingDowngrade(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_confirmation_modal.value = false
+                    show_ready_message.value = true
+                    setTimeout(() => {
+                        show_ready_message.value = false
+                    }, 2000)
+                } else {
+                    show_error_toast('Error', response.error || 'Something went wrong while downgrading user plan.')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something went wrong while downgrading user plan.')
+        })
     }
 </script>
