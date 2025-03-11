@@ -344,6 +344,7 @@ export type GroupToDelete = {
 
 /* ----- Packages ----- */
 export type PackageStep = {
+  id: number;
   package_id: number;
   price: string;
   price_cents: number;
@@ -352,9 +353,7 @@ export type PackageStep = {
   floor: number;
 }
 
-export type PackageStepWithID = PackageStep & { id: string }
-
-export type FormattedStep = PackageStepWithID & {
+export type FormattedStep = PackageStep & {
   discount: boolean
   original_price: number
   discount_percent: number

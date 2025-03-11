@@ -4,29 +4,38 @@
             <div class="flex gap-6 justify-between mb-6">
                 <div class="flex flex-col w-full max-w-[500px] gap-10">
                     <div class="flex items-center gap-5">
-                        <Button 
-                            type="button" 
-                            class="bg-primary border-none rounded-full p-0 h-[17px] w-[17px] bg-gradient-to-b from-[#9747FF] to-[#532CB5] hover:scale-110 transition-transform" 
-                            @click="open_modal"
-                            raised
-                        >
-                            <PlusSVG class="w-[14px] h-[14px] text-white" />
+                        <Button type="button" class="text-dark-3 bg-transparent rounded-full p-0 w-6 h-6 shadow-md border-grey-14 hover:bg-gray-200" @click="emit('update:sectionToShow', 'buy_credits')">
+                            <ArrowLeftSVG class="w-[7px] h-[7px]" />
                         </Button>
                         <p class="text-dark-3 text-xl font-medium">Select a card</p>
                     </div>
                     
-                    <div>
-                        <label for="card-select" class="text-dark-3 text-sm font-medium">Card Number</label>
-                        <Select 
-                            id="card-select"
-                            v-model="selected_card" 
-                            :options="card_options" 
-                            optionLabel="text" 
-                            optionValue="value" 
-                            class="w-full text-sm py-[2px] mt-[6px]"
-                            :class="{'placeholder-color': !selected_card}"
-                            placeholder="XXXX XXXX XXXX XXXX" 
-                        />
+                    <div class="flex flex-col gap-4">
+                        <div>
+                            <label for="card-select" class="text-dark-3 text-sm font-medium">Card Number</label>
+                            <Select 
+                                id="card-select"
+                                v-model="selected_card" 
+                                :options="card_options" 
+                                optionLabel="text" 
+                                optionValue="value" 
+                                class="w-full text-sm py-[2px] mt-[6px]"
+                                :class="{'placeholder-color': !selected_card}"
+                                placeholder="XXXX XXXX XXXX XXXX" 
+                            />
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <Button 
+                                type="button" 
+                                class="bg-primary border-none rounded-full p-0 h-[14px] w-[14px] bg-gradient-to-b from-[#9747FF] to-[#532CB5] hover:scale-110 transition-transform" 
+                                @click="open_modal"
+                                raised
+                            >
+                                <PlusSVG class="w-[12px] h-[12px] text-white" />
+                            </Button>
+                            <p class="text-dark-3 text-xs font-semibold">Add new card</p>
+                        </div>
                     </div>
 
                     <div>
@@ -51,8 +60,8 @@
                             <h4 class="font-semibold text-lg">Recap</h4>
 
                             <ul class="font-semibold mt-8">
-                                <li class="flex items-center justify-between text-sm">Credit Pack <span>{{ format_price(6250) }}</span></li>
-                                <li class="mt-4 flex items-center justify-between text-sm">Discount <span>{{ format_price(4750) }}</span></li>
+                                <li class="flex items-center justify-between text-sm">Credit Pack <span>{{ format_price(recap_data.pack_info) }}</span></li>
+                                <li class="mt-4 flex items-center justify-between text-sm">Discount <span>{{ format_price(recap_data.discount) }}</span></li>
                                 <li class="mt-4 flex items-center justify-between text-sm">Promo Code <span>{{ format_price(0) }}</span></li>
                             </ul>
 
@@ -60,7 +69,7 @@
 
                             <div class="flex justify-between font-semibold text-sm">
                                 <p>Total</p>
-                                <p>{{ format_price(6250 - 4750) }}</p>
+                                <p>{{ format_price(recap_data.total) }}</p>
                             </div>
                         </div>
 
@@ -100,6 +109,13 @@
 </template>
 
 <script setup lang="ts">
+const billingStore = useBillingStore()
+
+const emit = defineEmits<{
+    (event: 'update:sectionToShow', value: BillingSectionToShow): void
+}>()
+
+const recap_data = computed<RecapData>(() => billingStore.recap_data)
 
 const show_confirmation_modal = ref(false)
 const show_ready_message = ref(false)
