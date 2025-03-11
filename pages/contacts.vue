@@ -3,8 +3,8 @@
         <p v-if="selected_groups.length > 3" class="text-2xl font-semibold">{{ selected_groups.length }} groups selected</p>
         <div v-else v-for="(group, index) in selected_groups" :key="group.group_id" class="flex gap-3 items-center">
             <p class="text-2xl font-semibold">{{ group.group_name }} {{ selected_groups.length > 1 && index < selected_groups.length - 1 && !group.is_custom ? ',' : '' }}
-                <span v-if="group.is_custom" class="text-[#939091] text-[21px] font-light italic ml-1">
-                    {{ group.group_code ? 'ID ' + group.group_code : null }}
+                <span v-if="group.is_custom" class="text-[#939091] text-xl font-light italic ml-1">
+                    {{ group.group_code ? 'ID: ' + group.group_code : null }}
                 </span>
                 <Button v-else @click="open_contacts_modal(CONTACT)" icon="pi" variant="text" raised rounded aria-label="Bookmark" class="ml-5 bg-light-purple border-none w-6 h-6 hover:scale-125 transition-transform hover:bg-light-purple-2">
                     <PlusSVG class="w-4 h-4 text-dark-3" />
