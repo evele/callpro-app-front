@@ -198,7 +198,7 @@
         }
     }
 
-    const validate_number = () => {
+    const validate_number = (saving: boolean = false) => {
         let is_invalid = false
 
         if(contact_numbers.value.some((number: ContactNumber ) => number.number === format_number_to_send(contact.numbers.number) && number.id !== contact.numbers.id)) {
@@ -207,12 +207,16 @@
             return is_invalid
         }
 
-        if(!contact.numbers.number || has_phone_number_error.value) {
-            if(!contact.numbers.number) {
-                number_error.value = 'The Number field is required.'
+        const is_last_position = current_position.value === contact_numbers.value.length
+        if(saving && is_last_position && contact_numbers.value.length > 0) {
+            if(has_phone_number_error.value) is_invalid = true
+        } else {
+            if(!contact.numbers.number || has_phone_number_error.value) {
+                if(!contact.numbers.number) number_error.value = 'The Number field is required.'
+                is_invalid = true
             }
-            is_invalid = true
         }
+        
         return is_invalid
     }
 
@@ -347,7 +351,7 @@
     const show_add_new_btn = computed(() => !contact_numbers.value.length || !is_in_previous_position.value)
 
     const save_contact = () => {
-        if(validate_number()) return
+        if(validate_number(true)) return
 
         let numbers_to_send = []
         if(is_in_previous_position.value) {
@@ -360,7 +364,11 @@
             }
             numbers_to_send = [...contact_numbers.value]
         } else {
-            numbers_to_send = [...contact_numbers.value, contact.numbers]
+            if(contact.numbers.number) {
+                numbers_to_send = [...contact_numbers.value, contact.numbers]
+            } else {
+                numbers_to_send = [...contact_numbers.value]
+            }
         }
 
         if(numbers_to_delete.value.length > 0) {

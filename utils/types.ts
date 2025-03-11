@@ -16,7 +16,7 @@ export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 'upload';
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type BillingSectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-export type FilterOption = { id: string, name: string, count: number }
+export type FilterOption = { id: string, name: string, count: number, code?: StringOrNull }
 
 export type APIResponseError = {
   result: false,
