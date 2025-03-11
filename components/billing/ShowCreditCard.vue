@@ -27,12 +27,17 @@
                 
                     
                 <div class="flex gap-2">
-                    <Button class="bg-[#E7E0EC] py-[2px] p-[3px] text-dark-3 border-none hover:bg-gray-300 hover:scale-110">
-                        <EditIconSVG class="w-[13px] h-[13px]" />
-                    </Button>
-                    <Button class="bg-[#E7E0EC] p-[2px] text-dark-3 border-none hover:bg-gray-300 hover:scale-110">
-                        <TrashSVG class="w-4 h-4" />
-                    </Button>
+                    <IconButton>
+                        <template #icon>
+                            <EditIconSVG class="w-4 h-4" />
+                        </template>
+                    </IconButton>
+
+                    <IconButton>
+                        <template #icon>
+                            <TrashSVG class="w-4 h-4" />
+                        </template>
+                    </IconButton>
                 </div>
             </div>
         </div>

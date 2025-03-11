@@ -6,10 +6,10 @@
                 <span v-if="group.is_custom" class="text-[#939091] text-[21px] font-light italic ml-1">
                     {{ group.group_code ? 'ID ' + group.group_code : null }}
                 </span>
-                <Button v-else @click="open_contacts_modal(CONTACT)" icon="pi" variant="text" raised rounded aria-label="Bookmark" class="ml-5 bg-light-purple border-none w-6 h-6 hover:scale-125 transition-transform hover:bg-light-purple-2">
-                    <PlusSVG class="w-4 h-4 text-dark-3" />
-                </Button>
             </p>
+            <Button v-if="!group.is_custom" @click="open_contacts_modal(CONTACT)" icon="pi" variant="text" raised rounded aria-label="Bookmark" class="ml-2 bg-light-purple border-none w-6 h-6 hover:scale-125 transition-transform hover:bg-light-purple-2">
+                <PlusSVG class="w-3 h-3 text-dark-3" />
+            </Button>
             <Button v-if="group.is_custom" @click="open_edit_group" class="rounded-full p-0 bg-[#E8DEF8] w-6 h-6 border-none shadow-md hover:scale-125 transition-transform hover:bg-light-purple-2">
                 <EditIconSVG class="text-dark-3 w-4 h-4" />
             </Button>

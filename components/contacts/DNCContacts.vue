@@ -104,7 +104,7 @@
 
         <form @submit.prevent class="flex justify-end items-center gap-4 w-full">
             <div class="flex gap-4">
-                <PhoneInput :model-value="new_number" @update:modelValue="(v: string) => new_number = v" 
+                <PhoneInput class="h-10" :model-value="new_number" @update:modelValue="(v: string) => new_number = v" 
                     :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val"   
                 />
                 
@@ -116,8 +116,8 @@
                         />
                         Adding
                     </div>
-                    <div class="flex items-center gap-2" v-else>
-                        <PlusSVG class="w-6 h-6" />
+                    <div class="flex items-center gap-3" v-else>
+                        <PlusSVG class="w-3 h-3" />
                         <span class="text-sm">Add</span>
                     </div>
                 </Button>

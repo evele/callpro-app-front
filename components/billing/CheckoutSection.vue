@@ -6,11 +6,11 @@
                     <div class="flex items-center gap-5">
                         <Button 
                             type="button" 
-                            class="bg-primary border-none rounded-full p-0 h-[17px] w-[17px] bg-gradient-to-b from-[#9747FF] to-[#532CB5] hover:scale-110 transition-transform" 
+                            class="bg-primary border-none rounded-full p-0 h-[16px] w-[16px] bg-gradient-to-b from-[#9747FF] to-[#532CB5] hover:scale-110 transition-transform" 
                             @click="open_modal"
                             raised
                         >
-                            <PlusSVG class="w-[14px] h-[14px] text-white" />
+                            <PlusSVG class="w-[8px] h-[8px] text-white" />
                         </Button>
                         <p class="text-dark-3 text-xl font-medium">Select a card</p>
                     </div>

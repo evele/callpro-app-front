@@ -81,14 +81,17 @@
                     <div class="text-[#1D1B20] relative w-fit">
                         <span @click.stop="handle_select_by_name(slotProps.data.id, true)">{{ slotProps.data.name }}</span>
                         <div v-show="Object.keys(expandedRows) == slotProps.data.id" class="absolute -top-[2px] -right-20 flex gap-2">
-                            <Button class="bg-gray-200 py-[2px] px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white" 
-                                @click="handle_edit_contact(slotProps.data.id)"
-                            >
-                                <EditIconSVG class="w-3 h-4" />
-                            </Button>
-                            <Button class="bg-gray-200 py-1 px-[6px] border-none text-black hover:bg-[#9884cf] hover:text-white">
-                                <TrashSVG class="w-4 h-4" />
-                            </Button>
+                            <IconButton bg-color="bg-gray-200" styles="hover:bg-[#9884cf] hover:text-white" @click="handle_edit_contact(slotProps.data.id)">
+                                <template #icon>
+                                    <EditIconSVG class="w-4 h-4" />
+                                </template>
+                            </IconButton>
+                            
+                            <IconButton bg-color="bg-gray-200" styles="hover:bg-[#9884cf] hover:text-white">
+                                <template #icon>
+                                    <TrashSVG class="w-4 h-4" />
+                                </template>
+                            </IconButton>
                         </div>
                     </div>
                 </template>
