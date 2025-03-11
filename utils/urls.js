@@ -24,6 +24,8 @@ export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance
 export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
 export const SAVE_DEFAULT_CC_CARD_URL = "/billing/change_default_card"
 export const GET_USER_BILLING_SETTINGS_URL = "/billing/get_billing_settings"
+export const SET_PENDING_DOWNGRADE_URL = "/billing/set_pending_downgrade"
+export const CANCEL_DOWNGRADE_URL = "/billing/cancel_downgrade"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"

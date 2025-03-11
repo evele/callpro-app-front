@@ -1,7 +1,7 @@
 <template>
     <CardOptionContainer type="plan" :is-selected="is_selected">
         <template #chip-icon>
-            <div class="w-fit h-[30px] rounded-lg bg-white border flex items-center gap-2 px-1 border-primary">
+            <div class="w-20 h-[30px] rounded-lg bg-white border-2 flex items-center justify-center gap-2 px-1 border-primary">
                 <UserSVG class="w-4 h-4 text-primary" />
                 <span class="text-dark-3 font-semibold leading-0 mt-[1px]">{{ props.plan.numbers }}</span>
             </div>
@@ -11,7 +11,7 @@
             <div class="flex flex-col gap-1">
                 <p class="text-3xl font-semibold" :class="{ 'text-selected': is_selected }">{{ format_price(Number(props.plan.price), 0) }}</p>
 
-                <Divider class="bg-dark-4 h-[3px] rounded-full" />
+                <div class="bg-dark-4 h-[2px] my-4 rounded-full" />
 
                 <p class="text-xs text-dark-4 h-4 font-medium" :class="{ 'text-selected': is_selected }">62% discount</p>
             </div>

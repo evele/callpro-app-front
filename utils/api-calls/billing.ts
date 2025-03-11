@@ -74,3 +74,11 @@ export async function saveBillingSettings(data:SaveBillingSettingsData):Promise<
 export async function getUserBillingSettings():Promise<APIResponseBillingSettings | APIResponseError>{
   return await fetchWrapper.get(GET_USER_BILLING_SETTINGS_URL) as APIResponseBillingSettings | APIResponseError
 }
+
+export async function setPendingDowngrade(data: PendingDowngradeData):Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(SET_PENDING_DOWNGRADE_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+export async function cancelDowngrade():Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(CANCEL_DOWNGRADE_URL) as APIResponseSuccess | APIResponseError
+}

@@ -69,8 +69,16 @@
     </div>
 
     <div v-if="section_to_show === 'buy_credits'" class="p-6 flex gap-4">
-        <MainPanel :selected-type="selected_type" :user-billing-settings="billing_settings_data" @update:sectionToShow="handle_section_to_show" />
-        <ContainerRight :selected-type="selected_type" @update:selectedType="handle_select_type" />
+        <MainPanel 
+            :selected-type="selected_type" 
+            :user-billing-settings="billing_settings_data" 
+            @update:sectionToShow="handle_section_to_show" 
+        />
+        <ContainerRight 
+            :selected-type="selected_type" 
+            :user-plan-and-balance="user_plan_and_balance"
+            @update:selected_type="handle_select_type" 
+        />
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
