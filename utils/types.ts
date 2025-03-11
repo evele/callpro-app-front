@@ -16,7 +16,7 @@ export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 'upload';
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type BillingSectionToShow = 'main' | 'buy_credits' | 'checkout_form'
-export type FilterOption = { id: string, name: string, count: number }
+export type FilterOption = { id: string, name: string, count: number, code?: StringOrNull }
 
 export type APIResponseError = {
   result: false,
@@ -741,6 +741,7 @@ export type UserCurrentPlanData = {
   numbers: NumberOrNull;
   payment_history_id: NumberOrNull;
   pending_downgrade_package_id: NumberOrNull;
+  pending_downgrade_package_type: StringOrNull;
   price: NumberOrNull;
   root_user_id: number;
 }
@@ -779,4 +780,10 @@ export type RecapData = {
   discount: number
   subtotal: number
   total: number
+}
+
+export type PendingDowngradeData = {
+  now: boolean,
+  package_type: string,
+  package_id: number
 }

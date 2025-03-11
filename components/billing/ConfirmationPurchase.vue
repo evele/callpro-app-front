@@ -12,7 +12,7 @@
 
             <footer class="flex justify-end gap-4 font-medium px-8 pb-6 mt-6">
                 <Button 
-                    @click="close_confirm"
+                    @click="handle_cancel"
                     :disabled="props.isProcessingConfirm || props.isProcessingCancel"
                     class="bg-[#F5F5F5] border border-grey-14 text-dark-3 rounded-lg w-fit h-10 sm:max-w-[300px] hover:bg-[#E5E5E5]"
                 >
@@ -59,8 +59,9 @@
 
     const show_confirm = computed(() => props.isVisible)
 
-    const emit = defineEmits(['confirm', 'close'])
+    const emit = defineEmits(['close', 'cancel', 'confirm'])
     const close_confirm = () =>  emit('close')
+    const handle_cancel = () =>  emit('cancel')
     const handle_confirm = () => emit('confirm')
 </script>
 <style scoped lang="scss">
