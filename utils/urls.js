@@ -22,6 +22,7 @@ export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print
 export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
 export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
 export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"
+export const SAVE_DEFAULT_CC_CARD_URL = "/billing/change_default_card"
 export const GET_USER_BILLING_SETTINGS_URL = "/billing/get_billing_settings"
 
 /* ----- Broadcasts Store ----- */

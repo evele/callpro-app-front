@@ -60,6 +60,13 @@ export async function getUserCards():Promise<UserCardsResponse | APIResponseErro
   return await fetchWrapper.get(GET_USER_CC_CARDS_URL) as UserCardsResponse | APIResponseError
 }
 
+
+/* ----- SAVE DEFAULT CC CARD ----- */
+export async function saveDefaultCard(data:{ card_id: number }):Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(SAVE_DEFAULT_CC_CARD_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- BILLING SETTINGS ----- */
 export async function saveBillingSettings(data:SaveBillingSettingsData):Promise<APIResponseSuccess | APIResponseError>{
   return await fetchWrapper.post(SAVE_BILLING_SETTINGS_URL,data) as APIResponseSuccess | APIResponseError
 }
