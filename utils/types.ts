@@ -787,3 +787,33 @@ export type PendingDowngradeData = {
   package_type: string,
   package_id: number
 }
+
+type InvoiceData = {
+  item_desc: string;
+  number: number;
+  date: string;
+  amount: number;
+  first_name: string;
+  last_name: string;
+  account_no: string;
+  address: string;
+  email: string;
+  quantity: number;
+  cc_last_four: string;
+};
+
+type InvoiceCoupon = {
+  id: number;
+  coupon_amount: number;
+  coupon_details: CouponDetails;
+};
+
+export type InvoicesInfo = {
+  invoice_data: InvoiceData;
+  invoice_coupon: InvoiceCoupon[];
+  invoice_id: number;
+}
+
+export type InvoicesDataResponse = APIResponseSuccess & {
+  invoices_info: InvoicesInfo[];
+}

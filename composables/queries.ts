@@ -88,14 +88,14 @@ export const useFetchInvoices = () => {
   })
 }
 
-export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
+export const useFetchInvoicesToPrint = (invoices_ids:Ref<number[]>, enabled: boolean) => {
   const dataToSend = computed(()=> ({
-    trx_id: invoice_id.value
+    trx_ids: invoices_ids.value
   }))
-  //{ trx_id: invoice_id } // TODO: maybe will need to use computed
   return useQuery({
-    queryKey: ['invoices', dataToSend],
-    queryFn: () => getInvoiceDataToPrint(dataToSend.value),      
+    queryKey: ['invoices_to_print', dataToSend],
+    queryFn: () => getInvoicesDataToPrint(dataToSend.value),
+    enabled   
   })
 }
 
