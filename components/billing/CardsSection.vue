@@ -132,8 +132,8 @@
         return default_cc_card.value?.card_type
     })
 
-    const handle_select_credits = () => emit('update:selected_type', 'credit')
-    const handle_select_plan = () => emit('update:selected_type', 'plan')
+    const handle_select_credits = () => emit('update:selected_type', CREDIT)
+    const handle_select_plan = () => emit('update:selected_type', PLAN)
 
 </script>
 

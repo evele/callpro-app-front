@@ -76,10 +76,19 @@
             v-show="props.showSeeMore"
             type="button" 
             class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform"
-            @click="emit('hide-cards', false)"
+            @click="emit('hide-cards', true)"
         >
             See more
             <ArrowRightSVG class="w-4 h-4" />
+        </Button>
+        <Button 
+            v-show="!props.showSeeMore"
+            type="button" 
+            class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform"
+            @click="emit('hide-cards', false)"
+        >
+            <ArrowLeftSVG class="w-3 h-3" />
+            Go to main
         </Button>
     </div>
 </template>
@@ -91,7 +100,9 @@
         showSeeMore: boolean
     }>()
 
-    const emit = defineEmits(['hide-cards'])
+    const emit = defineEmits<{
+        (event: 'hide-cards', value: boolean): void
+    }>()
 
     const search = ref('')
 

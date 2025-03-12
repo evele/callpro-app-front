@@ -4,7 +4,7 @@
             <div class="flex gap-6 justify-between mb-6">
                 <div class="flex flex-col w-full max-w-[500px] gap-10">
                     <div class="flex items-center gap-5">
-                        <Button type="button" class="text-dark-3 bg-transparent rounded-full p-0 w-6 h-6 shadow-md border-grey-14 hover:bg-gray-200" @click="emit('update:sectionToShow', 'buy_credits')">
+                        <Button type="button" class="text-dark-3 bg-transparent rounded-full p-0 w-6 h-6 shadow-md border-grey-14 hover:bg-gray-200" @click="emit('update:sectionToShow', B_BUY_CREDITS)">
                             <ArrowLeftSVG class="w-[7px] h-[7px]" />
                         </Button>
                         <p class="text-dark-3 text-xl font-medium">Select a card</p>
