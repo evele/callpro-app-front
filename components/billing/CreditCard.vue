@@ -36,7 +36,7 @@
 <script setup lang="ts">
 
 const props = defineProps<{
-    step: PackageStepWithID
+    step: PackageStep
 }>()
 
 const billingStore = useBillingStore()

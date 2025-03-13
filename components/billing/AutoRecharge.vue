@@ -63,7 +63,7 @@
 
     const props = defineProps<{
         userBillingSettings: UserBillingSettingsData | null
-        packagesSteps: PackageStepWithID[]
+        packagesSteps: PackageStep[]
     }>()
 
     const enabled = ref(false)
@@ -84,7 +84,7 @@
 
     const lower_step_floor = computed(() => {
         if(!props.packagesSteps?.length) return null
-        return props.packagesSteps.reduce((lowest: PackageStepWithID, step: PackageStepWithID) => {
+        return props.packagesSteps.reduce((lowest: PackageStep, step: PackageStep) => {
             return Number(step.floor) < Number(lowest.floor) ? step : lowest;
         }, props.packagesSteps[0]);
     })

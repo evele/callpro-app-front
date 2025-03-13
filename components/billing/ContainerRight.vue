@@ -41,7 +41,7 @@
             </template>
         </PlanCardSummary>
                 
-        <PanelRecap :selected-type="selected_type" />
+        <PanelRecap :selected-type="selected_type" @update:sectionToShow="emit('update:sectionToShow', $event)" />
     </aside>
 
     <ConfirmationPurchase 
@@ -70,6 +70,7 @@
 
     const emit = defineEmits<{
         'update:selectedType': [value: SelectedBillingType]
+        'update:sectionToShow': [value: BillingSectionToShow]
     }>()
 
     const billingStore = useBillingStore()

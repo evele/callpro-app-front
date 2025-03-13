@@ -40,17 +40,13 @@
 
     const billingStore = useBillingStore()
 
-    const temp_random_id = () => `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     const title_text = computed(() => props.selectedType === 'credit' ? 'Buy credits' : 'Unlimited Monthly Plans')
 
     const array_of_ten = ref(Array.from({ length: 10 }))
 
-    const packages_steps = computed<PackageStepWithID[]>(() => {
+    const packages_steps = computed(() => {
         if(!PS_Data?.value?.result) return []
-        return PS_Data.value.steps.map((step: any) => ({
-            ...step,
-            id: temp_random_id(),
-        }))
+        return PS_Data.value.steps
     })
 
     const monthly_groups_plans = computed(() => {
