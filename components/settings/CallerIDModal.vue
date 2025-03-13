@@ -86,12 +86,12 @@
                 />
                 
                 <label for="ext" class="text-sm font-semibold text-[#1D1B20]">Ext.</label>
-                <InputMask 
-                    v-model="new_ext"
-                    mask="999"
+                <InputText 
+                    id="ext"
+                    :value="new_ext"
+                    @input="handle_change_ext"
+                    class="w-[58px] py-2 px-3 text-center rounded-[10px] placeholder-grey-7 transition-colors"
                     placeholder="xxx"
-                    class="w-[58px] py-2 px-3 text-center rounded-[10px] transition-colors"
-                    fluid 
                 />
                 
                 <Button @click="add_new_number" :class="[ add_is_pending ? 'w-32' : 'w-24']" class="bg-[#1D192B] border-none rounded-xl text-white hover:bg-[#322F35] disabled:bg-[#848287]"
@@ -113,7 +113,7 @@
 
         <footer class="flex justify-center w-full font-bold mt-[38px] mb-10">
             <Button @click="handle_close_modal" class="w-[300px]" :disabled="add_is_pending || disable_all">
-                Save
+                Close
             </Button>
         </footer>
     </Dialog>
@@ -200,6 +200,13 @@
             selected_caller_id.value = caller_id_numbers.value.find((item: CallerIDExt) => item.id === selected_caller_id.value?.id) || null
         }
     })
+
+    const handle_change_ext = (e: Event) => {
+        const target = e.target as HTMLInputElement;
+        target.value = target.value.replace(/\D/g, '');
+        if(target.value.length > 3) target.value = target.value.slice(0, 3)
+        new_ext.value = target.value
+    }
 
     // Add new Number
     const add_new_number = () => {
