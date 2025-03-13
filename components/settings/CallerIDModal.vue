@@ -113,7 +113,7 @@
 
         <footer class="flex justify-center w-full font-bold mt-[38px] mb-10">
             <Button @click="handle_close_modal" class="w-[300px]" :disabled="add_is_pending || disable_all">
-                Save
+                Close
             </Button>
         </footer>
     </Dialog>
