@@ -792,7 +792,7 @@ type InvoiceData = {
   item_desc: string;
   number: number;
   date: string;
-  amount: number;
+  amount: string;
   first_name: string;
   last_name: string;
   account_no: string;

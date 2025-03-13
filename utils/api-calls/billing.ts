@@ -6,7 +6,7 @@ export async function getUserInvoices():Promise<APIResponseInvoices | APIRespons
   return await fetchWrapper.get(GET_USER_INVOICES_DATA_URL) as APIResponseInvoices | APIResponseError
 }
 
-export async function getInvoicesDataToPrint(data:{trx_ids: number[]}):Promise<InvoicesDataResponse | APIResponseError>{
+export async function getInvoicesDataToPrint(data:{trx_ids: string[]}):Promise<InvoicesDataResponse | APIResponseError>{
   return await fetchWrapper.post(GET_INVOICES_DATA_TO_PRINT_URL,data) as InvoicesDataResponse  | APIResponseError
 }
 

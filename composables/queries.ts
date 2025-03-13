@@ -88,7 +88,7 @@ export const useFetchInvoices = () => {
   })
 }
 
-export const useFetchInvoicesToPrint = (invoices_ids:Ref<number[]>, enabled: boolean) => {
+export const useFetchInvoicesToPrint = (invoices_ids:Ref<string[]>, enabled: boolean) => {
   const dataToSend = computed(()=> ({
     trx_ids: invoices_ids.value
   }))
