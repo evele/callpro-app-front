@@ -103,7 +103,7 @@
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
 
-    const section_to_show = ref<BillingSectionToShow>('checkout_form')
+    const section_to_show = ref<BillingSectionToShow>('main')
     const selected_type = ref<SelectedBillingType>('credit')
     const hide_cards = ref(false)
 
