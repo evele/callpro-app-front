@@ -4,7 +4,7 @@
             <p class="text-dark-3 font-semibold">$ {{ price?.toFixed(2) }}</p>
         </div>
 
-        <div class="w-[180px] h-[52px] rounded-lg border-2 border-grey-main bg-white mx-auto mt-9 flex items-center overflow-hidden">
+        <div class="w-[210px] h-[52px] rounded-lg border-2 border-grey-main bg-white mx-auto mt-9 flex items-center overflow-hidden">
             <div class="w-11 flex justify-end">
                 <CoinSVG class="w-7 h-7" />
             </div>
@@ -13,10 +13,11 @@
                 inputId="integeronly" 
                 fluid
                 placeholder="0"
-                class="w-[130px] h-[48px] placeholder:text-grey-7 font-semibold text-[28px] border-none rounded-1"
+                class="w-[160px] h-[48px] placeholder:text-grey-7 font-semibold text-[28px] border-none rounded-1"
                 @input="handle_manual_credits"
                 @focus="is_focusing = true"
                 @blur="is_focusing = false"
+                :max="9999999"
             />
         </div>
         <p class="text-black text-sm font-medium text-center mt-2">Insert credits manually</p>
@@ -47,6 +48,10 @@
     })
 
     const handle_manual_credits = (e: any) => {
+        if (e.value>9999999) {
+            manual_credits.value = 9999999
+            return
+        }
         const value = e.value
         if(value === null || !props.packagesSteps?.length) {
             price.value = null
