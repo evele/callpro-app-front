@@ -83,6 +83,8 @@
     </div>
 
     <section v-if="section_to_show === 'checkout_form'" class="p-6">
+        <!-- <CheckoutSection /> -->
+        <TestCard />
         <CheckoutSection @update:sectionToShow="handle_section_to_show" />
     </section>
 
@@ -102,6 +104,7 @@
 
     const selected_tab = ref('billing')
     const selected_card = ref<CC_CARD | null>(null)
+
     const section_to_show = ref<BillingSectionToShow>('main')
     const selected_type = ref<SelectedBillingType>('credit')
     const hide_cards = ref(false)
