@@ -1,40 +1,11 @@
 <template>
-  <p>Logged IN :D</p>
-  
+  <section class="bg-white py-1 pl-8">
+    <p class="text-2xl font-semibold">New voice broadcast</p>
+  </section>
 
-  <h2 style="margin: 2rem 0 0 10px">Voice Broadcasts</h2>
-  <ul class="tab-style">
-    <li v-for="option in tab_options" :key="option" class="tab-style__li" 
-      :class="[ selected_tab === option ? 'selected-tab' : '' ]" @click="selected_tab = option">
-      {{ option }}
-    </li>
-  </ul>
-
-  <div class="filter-container">
-    <div style="width: 75px;">
-      <Select v-model="selected_items_per_page" :options="select_options" optionLabel="name" class="p-2 is-flex is-justify-content-space-between is-fullwidth has-background-white has-text-grey-darker">
-        <template #option="slotProps">
-          <div class="has-background-white">
-            <span class="p-2 has-text-grey-darker">{{ slotProps.option.name }}</span>
-          </div>
-        </template>
-      </Select>
-    </div>
-
-    <div>
-      <label for="search" style="margin-right: 6px;">Search:</label>
-      <input type="text" name="search" id="search" placeholder="Search..." @input="debounceSearch">
-    </div>
+  <div class="px-6">
+    <BroadcastLayout />
   </div>
-
-  <p v-if="isLoading">Loading broadcasts...</p>
-  <p v-if="isError">{{ error?.message }}</p>
-  <ul v-if="isSuccess && data && 'broadcast_list' in data">
-    <li v-for="broadcast in data?.broadcast_list" :key="broadcast?.broadcast_id" style="margin: 10px 0;">
-      <span style="font-weight: 600; margin-right: 6px;">Broadcast name:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.name }}</span> 
-      <span style="font-weight: 600; margin-right: 6px;">Broadcast ID:</span><span style="margin-right: 10px; color: blue;"> {{ broadcast.broadcast_id }}</span> 
-    </li>
-  </ul>
 </template>
 <script setup lang="ts">
 import {useGeneralStore} from "@/stores"
