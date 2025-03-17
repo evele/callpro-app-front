@@ -32,7 +32,7 @@
                                 @click="open_modal"
                                 raised
                             >
-                                <PlusSVG class="w-[12px] h-[12px] text-white" />
+                                <PlusSVG class="w-2 h-2 text-white" />
                             </Button>
                             <p class="text-dark-3 text-xs font-semibold">Add new card</p>
                         </div>
