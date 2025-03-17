@@ -3,6 +3,7 @@ import { defineStore } from "pinia"
 interface GeneralState {
   timezones: Timezone[];
   area_codes: AreaCodes[];
+  user_timezone: Timezone | null;
 }
 
 export const useGeneralStore = defineStore("GeneralStore", {
@@ -19,7 +20,8 @@ export const useGeneralStore = defineStore("GeneralStore", {
         { zones_id: "8", country_initials: "US", zone: "America/Adak", offset: "GMT-09:00", display: "Hawaii" },
         { zones_id: "9", country_initials: "UK", zone: "Europe/London", offset: "GMT+01:00", display: "United Kingdom" }
       ],
-      area_codes: JSON.parse(localStorage.getItem("area_codes") ?? "{}")       
+      area_codes: JSON.parse(localStorage.getItem("area_codes") ?? "{}"),
+      user_timezone: null     
     }
   },
   actions: {
@@ -29,6 +31,12 @@ export const useGeneralStore = defineStore("GeneralStore", {
         this.timezones  = response.timezones,        
         this.area_codes = response.area_codes
         localStorage.setItem("area_codes", JSON.stringify(response.area_codes))
+      }
+    },
+    async getUserTimezone():Promise<void>{
+      const response = await getUserTimezone()  
+      if(response.result) {
+        this.user_timezone  = response.user_timezone
       }
     }
   },

@@ -78,6 +78,7 @@ export const DELETE_USER_GROUP_URL = "/contacts/delete_group"
 
 /* ---- General Store ----*/
 export const GET_AREA_CODES_AND_TIMEZONES_URL = "/general/get_area_codes_and_timezones"
+export const GET_USER_TIMEZONE_URL = "/general/get_user_timezone"
 
 /* ----- Packages Store ----- */
 export const GET_PACKAGE_STEPS_URL = "/packages/get_package_steps_prices"
