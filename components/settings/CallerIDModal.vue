@@ -11,7 +11,7 @@
         <div class="flex justify-between w-full mb-7 mt-1">
             <div class="flex items-center gap-4">
                 <Button v-show="show_verify_btn" @click="handle_verify_number" :disabled="disable_resend_btn || disable_all"
-                    class="rounded-md h-9 pl-2 bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white"
+                    class="rounded-md h-9 pl-2 bg-white border-grey-main shadow-lg text-grey-main hover:bg-gray-200 disabled:bg-white"
                 >
                     <ProgressSpinner v-if="verify_is_pending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Deleting number" />
                     <CheckSVG v-else class="w-7 h-7" />
@@ -19,7 +19,7 @@
                 </Button>
 
                 <Button v-show="!show_verify_btn" @click="handle_verify_number" :disabled="disable_resend_btn || disable_all"
-                    class="rounded-md h-9 bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white"
+                    class="rounded-md h-9 bg-white border-grey-main shadow-lg text-grey-main hover:bg-gray-200 disabled:bg-white"
                 >
                     <ProgressSpinner v-if="verify_is_pending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Deleting number" />
                     <CallOutSVG v-else class="w-4 h-4" />
@@ -27,7 +27,7 @@
                 </Button>
 
                 <Button @click="handle_delete_number" :disabled="disable_action_btn || disable_all"
-                    class="rounded-md h-9 bg-white border-[#49454F] shadow-lg text-[#49454F] hover:bg-gray-200 disabled:bg-white"
+                    class="rounded-md h-9 bg-white border-grey-main shadow-lg text-grey-main hover:bg-gray-200 disabled:bg-white"
                 >
                     <ProgressSpinner v-if="delete_is_pending" class="w-5 h-5" strokeWidth="8" fill="transparent" animationDuration=".5s" aria-label="Deleting number" />
                     <TrashSVG v-else class="w-5 h-5" />
@@ -85,7 +85,7 @@
                     :form-action="form_action" @hasError="(val: boolean) => has_phone_number_error = val" :border-radius="'rounded-[10px]'"
                 />
                 
-                <label for="ext" class="text-sm font-semibold text-[#1D1B20]">Ext.</label>
+                <label for="ext" class="text-sm font-semibold text-dark-2">Ext.</label>
                 <InputMask 
                     v-model="new_ext"
                     mask="999"
@@ -94,7 +94,7 @@
                     fluid 
                 />
                 
-                <Button @click="add_new_number" :class="[ add_is_pending ? 'w-32' : 'w-24']" class="bg-[#1D192B] border-none rounded-xl text-white hover:bg-[#322F35] disabled:bg-[#848287]"
+                <Button @click="add_new_number" :class="[ add_is_pending ? 'w-32' : 'w-24']" class="bg-dark-blue h-[42px] border-none rounded-xl text-white hover:bg-[#322F35] disabled:bg-[#848287]"
                     :disabled="disabled_add_new_btn || add_is_pending || disable_all">
                     <div class="flex items-center gap-2" v-if="add_is_pending">
                         <ProgressSpinner strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner"
@@ -102,8 +102,8 @@
                         />
                         Adding
                     </div>
-                    <div class="flex items-center gap-2" v-else>
-                        <PlusSVG class="w-6 h-6" />
+                    <div class="flex items-center gap-3" v-else>
+                        <PlusSVG class="w-3 h-3" />
                         <span class="text-sm">Add</span>
                     </div>
                 </Button>

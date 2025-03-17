@@ -11,7 +11,7 @@
         <div class="flex justify-between w-full mb-10">
             <IconField>
                 <InputIcon>
-                    <SearchSVG class="text-[#757575]" />
+                    <SearchSVG class="text-grey-secondary" />
                 </InputIcon>
                 <InputText v-model="search" placeholder="Search by Name" class="max-w-56" />
             </IconField>
@@ -21,7 +21,7 @@
                     @click="handle_open_submodal('upload')"
                     class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg"
                 >
-                    <UploadAudioSVG class="text-[#757575] w-5 h-5" />
+                    <UploadAudioSVG class="text-grey-secondary w-5 h-5" />
                     <span class="font-semibold text-sm">Upload audio file</span>
                 </Button>
 
@@ -29,7 +29,7 @@
                     @click="handle_open_submodal('tts')"
                     class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg"
                 >
-                    <TextSVG class="text-[#757575] w-5 h-5" />
+                    <TextSVG class="text-grey-secondary w-5 h-5" />
                     <span class="font-semibold text-sm">Add new TTS</span>
                 </Button>
             </div>
@@ -39,7 +39,7 @@
         <div v-if="user_audios" class="w-full max-h-[320px] overflow-y-auto rounded-tl-xl rounded-tr-xl">
             <table class="w-full text-gray-700 border border-gray-200 border-collapse">
                 <thead class="sticky -top-[1px] z-[100] bg-[#e9e9e9]">
-                    <tr class="bg-[#e9e9e9] h-[38px] text-[#1D1B20] font-medium border-b border-gray-300">
+                    <tr class="bg-[#e9e9e9] h-[38px] text-dark-2 font-medium border-b border-gray-300">
                         <th class="px-8 w-20"></th>
                         <th class="px-4 text-left text-sm font-medium">Name</th>
                         <th class="px-4 text-center text-sm font-medium">Play</th>
@@ -70,26 +70,25 @@
                                 animationDuration=".5s" 
                                 aria-label="Loading audio" 
                             />
-                            <Button 
+                            <IconButton 
                                 v-else
                                 type="button"
-                                class="bg-primary p-0 hover:scale-110 transition-transform" 
+                                bg-color="bg-primary" 
                                 @click.stop="handle_play_audio(audio)"
                                 :disabled="is_audio_loading"
                             >
-                                <PlaySVG class="w-7 h-7 text-white" />
-                            </Button>
+                                <template #icon>
+                                    <PlaySVG class="w-4 h-4 text-white" />
+                                </template>
+                            </IconButton>
                         </td>
 
                         <td class="text-center">
-                            <Button
-                                @click.stop="handle_open_edit_audio_modal(audio)"
-                                class="w-7 h-7 bg-[#e7e0ec] rounded-full text-[#1D1B20] border-none hover:scale-110 transition-transform"
-                            >
+                            <IconButton @click.stop="handle_open_edit_audio_modal(audio)">
                                 <template #icon>
-                                    <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
+                                    <EditIconSVG class="w-4 h-4" />
                                 </template>
-                            </Button>
+                            </IconButton>
                         </td>
                     </tr>
                     <tr v-else>

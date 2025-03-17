@@ -3,13 +3,13 @@
         <div class="flex justify-between w-full">
             <IconField>
                 <InputIcon>
-                    <SearchSVG class="text-[#757575]" />
+                    <SearchSVG class="text-grey-secondary" />
                 </InputIcon>
                 <InputText v-model="search" placeholder="Search by Name or Type" />
             </IconField>
 
             <Button class="bg-transparent flex items-center py-2 px-3 rounded-9 gap-3 text-black hover:bg-[#e6e2e2] border-none hover:shadow-lg">
-                <SortBySVG class="text-[#757575]" />
+                <SortBySVG class="text-grey-secondary" />
                 <span class="font-semibold">Sort by</span>
             </Button>
         </div>
@@ -56,15 +56,29 @@
                 <Column field="" header="" class="text-center max-w-32">
                     <template #body="slotProps">
                         <div class="flex justify-center w-fit mx-auto gap-2">
-                            <Button class="bg-[#E7E0EC] p-1 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="download_audio(slotProps.data.id)">
-                                <DownloadSVG />
-                            </Button>
-                            <Button class="bg-[#E7E0EC] py-1 px-2 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="edit_audio(slotProps.data.id)">
-                                <EditIconSVG />
-                            </Button>
-                            <Button class="bg-[#E7E0EC] p-1 text-[#1E1E1E] border-none hover:bg-[#c0a8f7]" @click.prevent="confirm_delete(slotProps.data.id)">
-                                <TrashSVG />
-                            </Button>
+                            <IconButton styles="hover:bg-[#c0a8f7]" 
+                                @click.prevent="download_audio(slotProps.data.id)"
+                            >
+                                <template #icon>
+                                    <DownloadSVG />
+                                </template>
+                            </IconButton>
+
+                            <IconButton styles="hover:bg-[#c0a8f7]" 
+                                @click.prevent="edit_audio(slotProps.data.id)"
+                            >
+                                <template #icon>
+                                    <EditIconSVG class="w-4 h-4" />
+                                </template>
+                            </IconButton>
+
+                            <IconButton styles="hover:bg-[#c0a8f7]"
+                                @click.prevent="confirm_delete(slotProps.data.id)"
+                            >
+                                <template #icon>
+                                    <TrashSVG class="w-4 h-4" />
+                                </template>
+                            </IconButton>
                         </div>
                     </template>
                 </Column>

@@ -22,9 +22,9 @@
                     @update:modelValue="handle_caller_id_selection"
                     @update:error="handle_caller_id_number_error"
                 />
-                <Button type="button" @click="handle_open_caller_id_modal" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2">
+                <Button type="button" @click="handle_open_caller_id_modal" class="w-5 h-5 absolute -right-8 top-1/2 transform -translate-y-1/2 hover:scale-110 transition-transform">
                     <template #icon>
-                        <PlusSVG class="w-[14px] h-[14px]" />
+                        <PlusSVG class="w-[10px] h-[10px]" />
                     </template>
                 </Button>
             </div>
@@ -45,13 +45,11 @@
             <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected?.name}}</p>
             <div class="flex items-center gap-2">
                 <span v-if="static_intro_error" class="text-red-500">{{ static_intro_error_message }}</span>
-                <Button @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected?.id)" 
-                    class="w-7 h-7 bg-[#e7e0ec] rounded-full] text-[#1D1B20] border-none hover:scale-110 transition-transform"
-                >
+                <IconButton @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected?.id)">
                     <template #icon>
-                        <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
+                        <EditIconSVG class="w-4 h-4" />
                     </template>
-                </Button>
+                </IconButton>
             </div>
         </div>
     </SettingSection>
