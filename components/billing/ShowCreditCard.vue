@@ -13,15 +13,15 @@
                     <p class="font-semibold text-black mr-4">{{ card_type }} ending in {{ props.creditCard.last_four }}</p>
                     <Tag v-if="is_default"
                         value="Default" 
-                        class="border border-green-positive-primary bg-white text-green-positive-primary rounded-2xl py-1 px-1 text-[10px] leading-[10px]"
+                        class="border-2 border-green-positive-primary bg-white text-green-positive-primary rounded-lg py-1 pt-[5px] px-3 text-[10px] leading-[10px]"
                     />
                     <Tag v-if="props.creditCard.expiry_state === ExpiryState.EXPIRED"
                         value="Expired" 
-                        class="border border-danger-2 bg-white text-danger-2 rounded-2xl py-1 px-1 text-[10px] leading-[10px]"
+                        class="border-2 border-danger-2 bg-white text-danger-2 rounded-lg py-1 pt-[5px] px-3 text-[10px] leading-[10px]"
                     />
                     <Tag v-if="props.creditCard.expiry_state === ExpiryState.NEAR_TO_EXPIRE"
                         value="Near to expire" 
-                        class="border border-pending bg-white text-pending rounded-2xl py-1 px-1 text-[10px] leading-[10px]"
+                        class="border-2 border-pending bg-white text-pending rounded-lg pb-1 pt-[5px] px-3 text-[10px] leading-[10px]"
                     />
                 </div>
                 

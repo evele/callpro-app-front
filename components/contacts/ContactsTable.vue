@@ -232,21 +232,13 @@
                         <span class="font-semibold">Upload file</span>
                     </Button>
 
-                    <Button type="button" :class="action_button_style" @click="download_contacts">
+                    <Button v-show="formatted_contacts.length" type="button" :class="action_button_style" @click="download_contacts">
                         <DownloadSVG class="text-[#757575]" />
                         <span class="font-semibold">Download list</span>
                     </Button>
                 </div>
             </template>
         </DataTable>
-
-        <Button v-show="!formatted_contacts.length" type="button" class="absolute bottom-6 left-6"  
-            :class="action_button_style" @click="emit('uploadFile', 'upload')"
-        >
-            <UploadSVG class="w-5 h-5 text-[#757575]" />
-            <span class="font-semibold">Upload file</span>
-        </Button>
-
     </div>
 </template>
 
@@ -586,7 +578,7 @@
     })
 
     const FILTERS_CUSTOM_GROUPS = computed(() => {
-        return custom_groups.value.filter((group: CustomGroup) => group.id !== updatedSelectedGroupsID.value[0]).map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count }))
+        return custom_groups.value.filter((group: CustomGroup) => group.id !== updatedSelectedGroupsID.value[0]).map((group: CustomGroup) => ({ id: group.id, name: group.group_name, count: group.count, code: group.group_code }))
     })
 
     const handleUpdateFilters = (selected_filters: string[]) => {
@@ -598,7 +590,8 @@
                 return {
                     group_name: current_filter.name,
                     group_id: current_filter.id,
-                    is_custom: !SYSTEM_GROUPS.includes(current_filter.id)
+                    is_custom: !SYSTEM_GROUPS.includes(current_filter.id),
+                    group_code: current_filter.code ?? null
                 }
             }
         })

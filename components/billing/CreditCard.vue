@@ -1,7 +1,7 @@
 <template>
     <CardOptionContainer type="credit" :is-selected="is_selected" @click="handle_select_step">
         <template #chip-icon>
-            <div class="min-w-20 w-fit h-[30px] rounded-lg bg-white border flex items-center gap-2 px-1 border-grey-main">
+            <div class="min-w-20 w-fit h-[30px] rounded-lg bg-white border-2 flex items-center gap-2 px-1 border-grey-main">
                 <CoinSVG />
                 <span class="text-dark-3 font-semibold leading-0 mt-[1px]">{{ formatted_step?.floor }}</span>
             </div>
@@ -22,7 +22,7 @@
                     
                 </div>
 
-                <Divider class="bg-[#E8DEF8] h-[2px] rounded-full" />
+                <div class="bg-[#E8DEF8] h-[2px] my-4 rounded-full" />
 
                 <p v-if="formatted_step?.discount" class="text-xs h-4 font-medium" :class="[ is_selected ? 'text-yellow-credits' : 'text-light-purple-3' ]">
                     {{ formatted_step?.discount_percent }}% discount
@@ -36,7 +36,7 @@
 <script setup lang="ts">
 
 const props = defineProps<{
-    step: PackageStepWithID
+    step: PackageStep
 }>()
 
 const billingStore = useBillingStore()
