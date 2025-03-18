@@ -18,7 +18,7 @@ export const RESEND_IVR_CODE_URL = "/jwtauth/resend_code"
 
 /* ----- Billing Store ----- */
 export const GET_USER_INVOICES_DATA_URL = "/billing/get_user_invoices_data"
-export const GET_INVOICE_DATA_TO_PRINT_URL = "/billing/get_invoice_data_to_print"
+export const GET_INVOICES_DATA_TO_PRINT_URL = "/billing/get_invoices_data_to_print"
 export const GET_BILLING_HISTORY_URL = "/billing/get_user_billing_history"
 export const GET_USER_PLAN_AND_BALANCE_URL = "/billing/get_user_plan_and_balance"
 export const GET_USER_CC_CARDS_URL = "/billing/get_user_cc_cards"

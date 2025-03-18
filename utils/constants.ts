@@ -38,6 +38,17 @@ export const PACKAGES_STEPS = 'packages_steps'
 export const ON = 'On'
 export const OFF = 'Off'
 
+/* ---- PAGE Billing ----- */
+export const TAB_BILLING = 'billing'
+export const TAB_INVOICES = 'invoices'
+export const TAB_PAYMENTS = 'payments'
+
+export const CREDIT = 'credit'
+export const PLAN = 'plan'
+
+export const B_MAIN = 'main'
+export const B_BUY_CREDITS = 'buy_credits'
+export const B_CHECKOUT_FORM = 'checkout_form'
 
 
 

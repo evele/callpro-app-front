@@ -2,7 +2,7 @@
     <div>
         <span v-if="isLoading">Loading...</span>
         <span v-else-if="isError">Error: {{ error?.message }}</span>
-        <div v-if="isSuccess && data && 'invoice_data' in data">
+        <div v-if="isSuccess && invoice_data">
             <div class="print-btn-container">
                 <PrintPdfButton
                     elementId="print-invoice-pdf" 
@@ -18,11 +18,11 @@
                     <p>(845) 378-1500</p>
 
                     <h1 class="heading">Invoice</h1>
-                    <p>{{ data?.invoice_data?.date.slice(0,10) }}</p>
+                    <p>{{ invoice_data?.invoice_data?.date.slice(0,10) }}</p>
                     <h3>Invoice for:</h3>
-                    <p>Name: {{ data?.invoice_data?.last_name + ' ' + data?.invoice_data?.first_name }}</p>
-                    <p>Ivr: {{ data?.invoice_data?.account_no }}</p>
-                    <p>Address: {{ data?.invoice_data?.address }}</p>
+                    <p>Name: {{ invoice_data?.invoice_data?.last_name + ' ' + invoice_data?.invoice_data?.first_name }}</p>
+                    <p>Ivr: {{ invoice_data?.invoice_data?.account_no }}</p>
+                    <p>Address: {{ invoice_data?.invoice_data?.address }}</p>
                 </div>
             </section>
         </div>
@@ -35,10 +35,15 @@
     const route = useRoute();
     const invoice_id = computed(() => {
         const idParam = route.params.id;
-        return Number(idParam);
+        return Array.isArray(idParam) ? idParam : [idParam];
     });
 
-    const { data, error, isLoading, isError, isSuccess } = useFetchInvoiceToPrint(invoice_id)
+    const { data, error, isLoading, isError, isSuccess } = useFetchInvoicesToPrint(invoice_id, true)
+
+    const invoice_data = computed(() => {
+        if(!data?.value?.result) return null
+        return data?.value?.invoices_info[0]
+    })
 </script>
 
 <style scoped>
