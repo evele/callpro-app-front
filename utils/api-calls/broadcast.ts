@@ -45,3 +45,18 @@ export async function getBroadcastHeader(data:{ broadcast_id: number }):Promise<
 export async function getBroadcastDetail(data:BroadcastDetailParams):Promise<BroadcastDetailResponse | APIResponseError>{
     return await fetchWrapper.post(GET_BROADCAST_DETAIL_URL, data) as BroadcastDetailResponse | APIResponseError
 }
+
+type CheckSelectedStartTimeParams = {
+    time_to_check: string;
+}
+
+type CheckSelectedStartTimeResponse = APIResponseSuccess & {
+    check: boolean;
+    next_month: boolean;
+    suggested_start: string;
+    time: number;
+}
+
+export async function checkSelectedStartTime(data: CheckSelectedStartTimeParams):Promise<CheckSelectedStartTimeResponse | APIResponseError>{
+    return await fetchWrapper.post(CHECK_SELECTED_START_TIME_URL, data) as CheckSelectedStartTimeResponse | APIResponseError
+}

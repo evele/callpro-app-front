@@ -16,7 +16,19 @@
                         </div>
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary' ]"  
+                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary' ]"
+                            v-tooltip.rigth="{
+                                value: error?.step_error === 'title' ? error?.message : '',
+                                pt: {
+                                    arrow: {
+                                        style: {
+                                            marginLeft: '1rem',
+                                            paddingLeft: '0.5rem',
+                                        }
+                                    },
+                                    text: '!bg-primary !text-white !font-medium'
+                                }
+                            }"
                         >
                             Title
                         </span>
@@ -118,7 +130,7 @@
 
 <script setup lang="ts">
 const broadcastStore = useBroadcastStore();
-const { current_step, completed_steps } = storeToRefs(broadcastStore)
+const { current_step, completed_steps, error } = storeToRefs(broadcastStore)
 
 const get_step_class = (value: number) => {
     if(current_step.value === value) {

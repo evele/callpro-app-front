@@ -30,6 +30,7 @@ export const CANCEL_DOWNGRADE_URL = "/billing/cancel_downgrade"
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
 export const GET_BROADCAST_DETAIL_URL = "/broadcast/get_broadcast_detail"
+export const CHECK_SELECTED_START_TIME_URL = "/broadcast/check_time"
 
 /* ----- Caller ID Store ----- */
 export const GET_CALLER_ID_NUMBERS_URL = "/caller_id/get_caller_id_numbers"
