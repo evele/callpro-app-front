@@ -1,5 +1,5 @@
 <template>
-    <div :key="temp_key" class="flex flex-col gap-6 max-h-[600px] overflow-y-auto">
+    <div :key="temp_key" class="flex flex-col gap-6 max-h-[600px] overflow-y-auto overflow-x-hidden pb-2">
         <ShowCreditCard 
             v-for="card in props.userCardsData" 
             :credit-card="card"
@@ -12,6 +12,15 @@
             @click="emit('update:section-to-show','checkout_form')">
             <PlusRoundedSVG class="w-10 h-10 mr-4" />
             Add new card
+        </Button>
+
+        <Button
+            type="button" 
+            class="mt-4 text-purple-main bg-transparent border-none text-sm font-medium w-fit self-end hover:scale-110 transition-transform"
+            @click="emit('hide-cards', false, TAB_BILLING)"
+        >
+            <ArrowLeftSVG class="w-3 h-3" />
+            Go to main
         </Button>
     </div>
 </template>
@@ -27,6 +36,10 @@
     const temp_key = ref(0)
     watch(() => props.userCardsData, () => temp_key.value++, { deep: true })
 
-    const emit = defineEmits(['update:selected-card','update:section-to-show'])
+    /* const emit = defineEmits(['update:selected-card','update:section-to-show']) */
     
+    const emit = defineEmits<{
+        (event: 'update:selected-card', value: CC_CARD): void
+        (event: 'hide-cards', value: boolean, tab: string): void
+    }>()
 </script>

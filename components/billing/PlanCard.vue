@@ -1,5 +1,5 @@
 <template>
-    <CardOptionContainer type="plan" :is-selected="is_selected">
+    <CardOptionContainer :type="PLAN" :is-selected="is_selected">
         <template #chip-icon>
             <div class="w-20 h-[30px] rounded-lg bg-white border-2 flex items-center justify-center gap-2 px-1 border-primary">
                 <UserSVG class="w-4 h-4 text-primary" />

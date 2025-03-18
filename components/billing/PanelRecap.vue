@@ -5,7 +5,7 @@
 
             <ul class="font-semibold text-dark-3 mt-10">
                 <li class="flex items-center justify-between">
-                    {{ props.selectedType === 'credit' ? 'Credit Pack' : 'Unlimited Plan'}} <span class="text-grey-5">{{ format_price(recap_data.pack_info) }}</span>
+                    {{ props.selectedType === CREDIT ? 'Credit Pack' : 'Unlimited Plan'}} <span class="text-grey-5">{{ format_price(recap_data.pack_info) }}</span>
                 </li>
                 <li class="mt-3 flex items-center justify-between">Discount <span class="text-grey-5">{{ format_price(recap_data.discount) }}</span></li>
                 <li class="mt-3 flex items-center justify-between">Subtotal <span class="text-grey-5">{{ format_price(recap_data.subtotal) }}</span></li>
@@ -45,6 +45,6 @@
     })
 
     const handle_go_next = () => {
-        emit('update:sectionToShow', 'checkout_form')
+        emit('update:sectionToShow', B_CHECKOUT_FORM)
     }
 </script>
