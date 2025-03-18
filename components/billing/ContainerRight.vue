@@ -1,6 +1,6 @@
 <template>
     <aside class="flex flex-col justify-center gap-4 self-start">
-        <PlanCardSummary v-show="selected_type === 'credit'">
+        <PlanCardSummary v-show="selected_type === CREDIT">
             <template #content>
                 <div class="flex gap-6 w-full justify-center items-center">
                     <CreditsCoinsSVG />
@@ -15,12 +15,12 @@
                     type="button" 
                     label="Change to Plan" 
                     class="bg-white tracking-wide leading-[10px] h-[28px] mt-6 font-semibold border text-dark-3 text-xs hover:bg-gray-100 mx-auto"
-                    @click="handle_selected_type('plan')"
+                    @click="handle_selected_type(PLAN)"
                 />
             </template>
         </PlanCardSummary>
 
-        <PlanCardSummary v-show="selected_type === 'plan'">
+        <PlanCardSummary v-show="selected_type === PLAN">
             <template #content>
                 <div class="flex flex-col w-full justify-center items-center">
                     <div class="flex items-center gap-6" :class="{ 'mb-9': !is_monthly_plan }">
