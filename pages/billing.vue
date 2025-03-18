@@ -61,6 +61,7 @@
                             :is-loading="isLoadingUserCards"
                             :selected-card="selected_card"
                             @update:selected-card="handle_card_selection"
+                            @update:sectionToShow="handle_section_to_show"
                         />
                     </TabPanel>
                 </TabPanels>

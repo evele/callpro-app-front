@@ -8,7 +8,8 @@
             @click="emit('update:selected-card', card)"
         />
 
-        <Button class="bg-white text-dark-3 border border-dashed border-[#9E9AA0] font-semibold min-h-[122px] rounded-md text-lg hover:bg-gray-200">
+        <Button class="bg-white text-dark-3 border border-dashed border-[#9E9AA0] font-semibold min-h-[122px] rounded-md text-lg hover:bg-gray-200"
+            @click="emit('update:section-to-show','checkout_form')">
             <PlusRoundedSVG class="w-10 h-10 mr-4" />
             Add new card
         </Button>
@@ -26,5 +27,6 @@
     const temp_key = ref(0)
     watch(() => props.userCardsData, () => temp_key.value++, { deep: true })
 
-    const emit = defineEmits(['update:selected-card'])
+    const emit = defineEmits(['update:selected-card','update:section-to-show'])
+    
 </script>
