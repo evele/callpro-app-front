@@ -761,6 +761,14 @@ export type CC_CARD = {
   user_id: number;
 }
 
+export type New_CC = {
+  number: number; 
+  enc_card: string; 
+  cc_name: string; 
+  expiry: string; 
+  cvv: number;
+}
+
 export type UserBillingSettingsData = {
   recharge_minimum: StringOrNull;
   recharge_value: StringOrNull;

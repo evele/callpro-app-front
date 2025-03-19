@@ -63,6 +63,7 @@
                             :is-loading="isLoadingUserCards"
                             :selected-card="selected_card"
                             @hide-cards="handle_hide_cards"
+                            @add-card="handle_card_form"
                         />
                     </TabPanel>
                 </TabPanels>
@@ -88,6 +89,7 @@
         <TestCard />
         <!-- <CheckoutSection @update:sectionToShow="handle_section_to_show" /> -->
     </section>
+    <AddCardForm :isVisible="show_card_form" @cancel="handle_card_form"/>
 
     <Toast />
 </template>
@@ -152,10 +154,6 @@
         return selected_tab.value === TAB_PAYMENTS && selected_card.value.is_default !== '1' && selected_card.value.expiry_state !== ExpiryState.EXPIRED
     })
 
-    const handle_card_selection = (card: CC_CARD) => {
-        selected_card.value = card
-    }
-
     const save_cc_card_as_default = () => {
         if(!selected_card?.value?.id) {
             show_error_toast('Error', 'Card ID not found')
@@ -188,6 +186,13 @@
         if(section_to_show.value === B_MAIN) {
             billingStore.resetStore()
         }
+    }
+
+    const show_card_form = ref(false)
+
+    const handle_card_form = (should_show:boolean) => {
+        console.log('its called',should_show)
+        show_card_form.value = should_show
     }
 
     onBeforeUnmount(() => billingStore.resetStore())
