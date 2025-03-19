@@ -6,7 +6,7 @@
                     id="broadcast-name"
                     class="py-3 border h-10 placeholder-grey-7 max-w-[294px] w-full"
                     placeholder="Enter your broadcast name" 
-                    v-model="first_step_data.broadcast_name"
+                    v-model="first_step_data.name"
                     @input="broadcastStore.clearErrorMessage"
                 />
         </div>

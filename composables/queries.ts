@@ -35,6 +35,13 @@ export const useFetchCheckSelectedStartTime = (time_to_check:Ref<string>) => {
     enabled: false   
   })
 }
+
+export const useFetchGetLastDraftID = () => {
+  return useQuery({
+    queryKey: ['last_draft_id'],
+    queryFn: () => getLastDraftID()
+  })
+}
   
 /* ----- Dashboard ----- */
 export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {

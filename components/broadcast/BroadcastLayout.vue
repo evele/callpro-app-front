@@ -6,9 +6,11 @@
 
             <Transition name="fade" mode="out-in">
                 <Button
-                    v-if="current_step === 1"
+                    v-if="current_step === 1 && !has_loaded_draft"
                     type="button" 
-                    class="bg-transparent text-dark-3 hover:bg-dark-3 hover:text-white border-grey-14 font-bold h-10"
+                    class="bg-transparent text-dark-3 hover:bg-dark-3 hover:text-white border-grey-14 font-bold h-10 disabled:bg-transparent disabled:text-dark-3"
+                    :disabled="is_saving_draft || !last_draft_id"
+                    @click="broadcastStore.loadLastDraft(last_draft_id)"
                 >
                     <UploadAudioSVG class="w-4 h-4" />
                     Load last draft
@@ -18,6 +20,7 @@
                     v-else
                     type="button" 
                     class="bg-transparent text-dark-3 hover:bg-dark-3 hover:text-white border-grey-14 font-bold h-10"
+                    :disabled="is_saving_draft"
                 >
                     <RotateSVG class="w-4 h-4" />
                     Reset broadcast
@@ -42,29 +45,54 @@
                 <Button v-if="current_step === 1" @click="toggle_advanced_features" class="bg-transparent border-none w-fit underline text-primary text-sm hover:text-primary/80">
                     Show advanced features
                 </Button>
-                <Button v-if="current_step > 1" @click="broadcastStore.goPrevStep" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[200px] hover:bg-dark-3 hover:text-white">
+                <Button v-if="current_step > 1" @click="broadcastStore.goPrevStep" :disabled="is_saving_draft"
+                    class="bg-[#F5F5F5] border text-black w-full sm:max-w-[200px] hover:bg-dark-3 hover:text-white">
                     <ArrowLeftSVG class="w-4 h-4 mr-[6px]" />
                     Go back
                 </Button>
-                <Button v-if="current_step > 1" @click="handle_save_draf" class="bg-[#F5F5F5] border text-black w-full sm:max-w-[200px] hover:bg-dark-3 hover:text-white">
+                <Button v-if="current_step > 1" @click="handle_save_draf" :disabled="is_saving_draft"
+                    class="bg-[#F5F5F5] border text-black w-full sm:max-w-[200px] hover:bg-dark-3 hover:text-white">
                     Save draft
                 </Button>
-                <Button v-if="current_step < 5" @click="broadcastStore.goNextStep" class="bg-[#653494] border-white text-white w-full sm:max-w-[200px] hover:bg-[#4A1D6E]">
+                <Button v-if="current_step < 5" @click="broadcastStore.goNextStep" :disabled="is_saving_draft"
+                    class="bg-[#653494] border-white text-white w-full sm:max-w-[200px] hover:bg-[#4A1D6E]">
                     Next
-                    <ArrowRightSVG class="w-5 h-5 ml-[6px]" />
+                    <ProgressSpinner v-if="is_saving_draft" strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner ml-3 mr-0" animationDuration=".5s" aria-label="saving draft" />
+                    <ArrowRightSVG v-else class="w-5 h-5 ml-[6px]" />
                 </Button>
-                <Button v-if="current_step === 5" @click="handle_confirm_broadcast" class="bg-[#653494] border-white text-white w-full sm:max-w-[200px] hover:bg-[#4A1D6E]">
+                <Button v-if="current_step === 5" @click="handle_confirm_broadcast" :disabled="is_saving_draft"
+                    class="bg-[#653494] border-white text-white w-full sm:max-w-[200px] hover:bg-[#4A1D6E]">
                     Confirm broadcast
                 </Button>
             </footer>
         </div>
     </div>
+
+    <Toast />
+
+    <Dialog v-model:visible="is_loading_draft" :draggable="false" :closable="false"
+            pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-[300px]" pt:mask:class="bg-white bg-opacity-40 backdrop-blur-[1px]"
+        >
+            <template #container>
+                <div class="flex items-center gap-6 p-10">
+                    <p class="font-bold text-xl text-grey-main">Loading draft...</p>
+                    <ProgressSpinner strokeWidth="6" fill="transparent" class="h-10 w-10 dark-spinner" animationDuration=".5s" aria-label="Loading broadcast" />
+                </div>
+            </template>
+        </Dialog>
 </template>
 
 <script setup lang="ts">
     const broadcastStore = useBroadcastStore();
-    const { current_step } = storeToRefs(broadcastStore)
+    const { current_step, toast_error, is_saving_draft, is_loading_draft, has_loaded_draft } = storeToRefs(broadcastStore)
     const show_advanced_features = ref<boolean>(false)
+    const { show_error_toast } = usePrimeVueToast();
+    const { data: lastDraftID } = useFetchGetLastDraftID()
+
+    const last_draft_id = computed(() => {
+        if(!lastDraftID?.value?.result) return null
+        return lastDraftID?.value?.draft_id
+    })
 
     const current_step_title = computed(() => {
         switch (current_step.value) {
@@ -95,6 +123,10 @@
     const handle_confirm_broadcast = () => {
         console.log('confirm broadcast')
     }
+
+    watch(() => toast_error.value, (newVal: { state: boolean, message: string }) => {
+        if (newVal.state) show_error_toast('Error', newVal.message)
+    })
 </script>
 
 <style scoped lang="scss">
@@ -123,5 +155,17 @@
     .fade-enter-from,
     .fade-leave-to {
         opacity: 0;
+    }
+
+    :deep(.light-spinner) {
+        .p-progressspinner-circle {
+            stroke: white!important;
+        }
+    }
+
+    :deep(.dark-spinner) {
+        .p-progressspinner-circle {
+            stroke: #49454F!important;
+        }
     }
 </style>

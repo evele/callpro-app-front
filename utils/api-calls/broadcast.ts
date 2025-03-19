@@ -60,3 +60,27 @@ type CheckSelectedStartTimeResponse = APIResponseSuccess & {
 export async function checkSelectedStartTime(data: CheckSelectedStartTimeParams):Promise<CheckSelectedStartTimeResponse | APIResponseError>{
     return await fetchWrapper.post(CHECK_SELECTED_START_TIME_URL, data) as CheckSelectedStartTimeResponse | APIResponseError
 }
+
+/* ----- Broadcast Draft ----- */
+type saveBroadcastDraftResponse = APIResponseSuccess & { draft_id: number }
+
+export async function saveBroadcastDraft(data: DraftToSave):Promise<saveBroadcastDraftResponse | APIResponseError>{
+    return await fetchWrapper.post(SAVE_BROADCAST_DRAFT_URL, data) as saveBroadcastDraftResponse | APIResponseError
+}
+
+/* ----- Get last draft ID ----- */
+type getLastDraftIdResponse = APIResponseSuccess & { draft_id: NumberOrNull }
+
+export async function getLastDraftID():Promise<getLastDraftIdResponse | APIResponseError>{
+    return await fetchWrapper.get(GET_LAST_DRAFT_ID_URL) as getLastDraftIdResponse | APIResponseError
+}
+
+/* ----- Get Broadcast ----- */
+type getBroadcastParams = { broadcast_id: number }
+type getBroadcastResponse = APIResponseSuccess & { 
+    broadcast_data: { broadcast: Broadcast } | null 
+}
+
+export async function getBroadcast(data: getBroadcastParams):Promise<getBroadcastResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_BROADCAST_URL, data) as getBroadcastResponse | APIResponseError
+}
