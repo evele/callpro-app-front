@@ -86,10 +86,9 @@
     </div>
 
     <section v-if="section_to_show === B_CHECKOUT_FORM" class="p-6">
-        <TestCard />
-        <!-- <CheckoutSection @update:sectionToShow="handle_section_to_show" /> -->
+        <CheckoutSection @update:sectionToShow="handle_section_to_show" /> 
     </section>
-    <AddCardForm :isVisible="show_card_form" @cancel="handle_card_form"/>
+    <AddCardForm :isVisible="show_card_form" @cancel    ="handle_card_form"/>
 
     <Toast />
 </template>

@@ -6,30 +6,33 @@
             <header class="w-full flex items-center justify-between px-8 pt-6 mb-2">
                 <h2 class="font-bold text-2xl text-dark-3">{{ props.title }}</h2>
             </header>
+            <Paycard :value-fields="valueFields" @get-type="changeType" :isCardNumberMasked="isCardNumberMasked" :current-focus="currentFocus" />
 
             <form ref="cardForm" @submit.prevent class="js-card-form new-contact-form flex px-4 flex-col gap-5 sm:gap-6" data-encryptedfields="encrypted-form">
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
-                        <label for="number" class="text-dark-3">Number</label>
-                        <InputText id="number"  type="text" placeholder="**** **** **** ****" class="w-full mt-1" />
+                        <label for="number" class="text-dark-3">Card Number</label>
+                        <InputText id="number" v-model="cc_number" type="text" placeholder="#### #### #### ####" class="w-full mt-1" />
                         <input  class="w-full mt-1" id="enc-number" v-model="cc_number" type="text" data-encryptedfields="cc" placeholder="**** **** **** ****">
                         <input ref="xCardNumRef" name="xCardNum" type="hidden" v-model="encryptedValue" />
-
+                        
                     </div>
                     
+                </div>
+                <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
-                        <label for="cc-name" class="text-dark-3">Full Name</label>
-                        <InputText  type="text" id="cc-name" name="checkout-cc-name" v-model="cc_name"  placeholder="Johh Doe" class="w-full mt-1" />
+                        <label :for="inputFields.cardName" class="text-dark-3">Full Name</label>
+                        <InputText  :id="inputFields.cardName" v-model="valueFields.cardName" type="text"  placeholder="Johh Doe" class="w-full mt-1" data-card-field />
                     </div>
                 </div>
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
                         <label for="expiry" class="text-dark-3">Expiry</label>
-                        <input  type="text" id="expiry" name="checkout-cc-expiry" v-model="expiry" placeholder="0119" class="w-full mt-1" />
+                        <InputMask  :id="inputFields.cardMonth" name="checkout-cc-expiry" v-model="valueFields.cardMonth" mask="99 / 99" placeholder="MM / YY" class="w-full mt-1" />
                     </div>
                     <div class="w-full">
                         <label for="cvv" class="text-dark-3">CVV</label>
-                        <input  type="text"  id="cvv" data-encryptedfields="cvv"  v-model="cvv" placeholder="***" class="w-full mt-1" />
+                        <InputMask :id="inputFields.cardCvv" v-model="valueFields.cardCvv" mask="999?9" placeholder="***" class="w-full mt-1" />
                     </div>
                 </div>
             </form>
@@ -101,22 +104,7 @@
 </template>
 
 <script setup lang="ts">
-    /*
-    declare global {
-        interface Window {
-            EncryptedFields: any;
-        }
-    }
-            
-    useHead({
-        script: [
-            { src: 'https://cdn.cardknox.com/js/v1/encryptedfields.js', async: true, defer: true }
-        ]
-    }) 
-
-
-    // const cardForm = ref<HTMLFormElement | null>(null)
-    */
+  
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
     const { mutate: addNewCard, isPending: isAddingCard } = useAddNewCard()
@@ -142,52 +130,38 @@
 
     const emit = defineEmits(['close', 'cancel', 'confirm'])
     const handle_cancel = () =>  emit('cancel',false)
-    /*
-    const cc_number = ref("")
-    const cc_enc_number = ref("")
-    const full_name = ref("")
-    const expiry = ref("")
-    const cvv = ref("")
 
-    // const handle_confirm = () => emit('confirm')
+    /* -- */
+    const valueFields = reactive({
+        cardName: "",
+        cardNumber: "",
+        cardMonth: "",
+        cardYear: "",
+        cardCvv: ""
+    })
 
-    const cardForm = ref<HTMLFormElement | null>(null)
-    const xCardNumRef = ref<HTMLInputElement | null>(null)
-    const xCardNum = ref("")
+    const inputFields = reactive({
+        cardNumber: 'v-card-number',
+        cardName: 'v-card-name',
+        cardMonth: 'v-card-month',
+        cardYear: 'v-card-year',
+        cardCvv: 'v-card-cvv'
+    })
 
-    // Función para generar manualmente el xCardNum
-    const handle_confirm = async () => {
-        if (window.EncryptedFields && cardForm.value) {
-            // Se invoca la función del plugin que genera el xCardNum.
-            window.EncryptedFields.generateXCardNum();
-            
-            // Esperamos a que el DOM se actualice (Vue sincroniza Virtual DOM -> DOM real)
-            await nextTick();
-            
-            // Accedemos al input oculto mediante el ref
-            const inputEl = xCardNumRef.value;
-            if (inputEl) {
-            // Actualizamos la variable reactiva
-            xCardNum.value = inputEl.value;
-            console.log("xCardNum generated:", xCardNum.value);
-            
-            // Emitimos el evento de confirmación con el valor generado
-            emit('confirm', { 
-                xCardNum: xCardNum.value,
-                cc_number: cc_number.value,
-                full_name: full_name.value,
-                expiry: expiry.value,
-                cvv: cvv.value 
-            });
-            }
-        }
-    }*/ 
-    // import { ref } from 'vue'
-    // import { useCardEncryption } from '~/composables/useCardEncryption'
+    const currentFocus = ref<string | null>(null)
 
+    const isCardNumberMasked = ref(false)
+    
+    const changeType = (type: CardType) => {
+        console.log(type)
+    }
+
+    /* -- */
+
+
+  
     const cc_number = ref('')
-    const cc_name = ref('')
-    const cvv = ref('')
+
     const expiry = ref('')
     const encryptedValue = ref('')
 
@@ -195,15 +169,15 @@
 
     function handle_confirm() {
     // Aquí se llama a la función para obtener el valor encriptado
-    encryptedValue.value = encryptCardData(cc_number.value, cvv.value)
+    encryptedValue.value = encryptCardData(cc_number.value, valueFields.cardCvv)
     // Luego puedes enviar el formulario o realizar otras acciones
     console.log('Valor encriptado:', encryptedValue.value)
 
     const data_to_send: New_CC = {
         number: Number(cc_number.value),
-        cc_name: cc_name.value,
+        cc_name: valueFields.cardName,
         expiry: expiry.value,
-        cvv: Number(cvv.value),
+        cvv: Number(valueFields.cardCvv),
         enc_card: encryptedValue.value,
 
     }

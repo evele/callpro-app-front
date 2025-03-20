@@ -119,7 +119,7 @@
                   <span v-else key="2">{{ labels.cardMonth || "MM" }}</span>
                 </transition>
               </label>
-              /
+              / 
               <label
                 :for="inputFields.cardYear"
                 class="card-item__dateItem"
