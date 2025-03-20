@@ -840,6 +840,7 @@ export type BroadcastData = {
 export type DraftToSave = {
   broadcast_id?: NumberOrNull;
   draft_step: number;
+  update_step: boolean;
   draft_data: null | FirstStepData | SecondStepData | ThirdStepData;
 }
 

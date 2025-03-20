@@ -71,7 +71,7 @@
 <script setup lang="ts">
 const generalStore = useGeneralStore();
 const broadcastStore = useBroadcastStore();
-const { second_step_data } = storeToRefs(broadcastStore)
+const { second_step_data, show_suggested_start } = storeToRefs(broadcastStore)
 const router = useRouter()
 
 const time_options = [
@@ -79,12 +79,16 @@ const time_options = [
     { name: 'Another Time', code: 'another' },
 ]
 
+// With query params included, to show the correct tab in settings page
 const go_to_settings = () => {
     router.push({  name: 'settings', query: { tab: 'general' } })
 }
 
 const handle_select_change = () => {
-    broadcastStore.second_step_data.start_time = null
+    if(broadcastStore.second_step_data.start_time_selected === 'now') {
+        broadcastStore.second_step_data.start_time = null
+        handle_check_time()
+    }
     broadcastStore.clearErrorMessage
 }
 
@@ -93,25 +97,9 @@ const minimum_time = computed(() => {
     if (!user_tz) return new Date();
 
     const now = new Date();
-    const now_user_timezone = new Date(now.toLocaleString('en-US'));
+    const now_user_timezone = new Date(now.toLocaleString('en-US', { timeZone: user_tz }));
     return now_user_timezone;
 })
-
-// Transform to this format "YYYY-MM-DD HH:MM AM/PM"
-const format_start_time_to_db = (selected_time: string) => {
-    const date = new Date(selected_time);
-    
-    const year = new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(date);
-    const month = new Intl.DateTimeFormat('en-US', { month: '2-digit' }).format(date);
-    const day = new Intl.DateTimeFormat('en-US', { day: '2-digit' }).format(date);
-    const time = new Intl.DateTimeFormat('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-    }).format(date).replace(',', '');
-
-    return `${year}-${month}-${day} ${time}`;
-}
 
 const format_start_time_to_view = (dateString: string) => {
     const date = new Date(dateString);
@@ -133,27 +121,31 @@ const suggested_start_time = ref('')
 const handle_confirm_modal = () => {
     if(!ignore_time_guard.value) {
         broadcastStore.second_step_data.start_time = suggested_start_time.value
+        broadcastStore.second_step_data.start_time_selected = 'another'
     }
     confirmationModal.value = false
     ignore_time_guard.value = false
+    suggested_start_time.value = ''
 }
-
-const selected_time = computed(() => format_start_time_to_db(broadcastStore?.second_step_data?.start_time) ?? '')
-const { refetch: checkTime } = useFetchCheckSelectedStartTime(selected_time)
 
 const handle_check_time = async () => {
-    if(!broadcastStore?.second_step_data?.start_time) return
-    try {
-        const response = await checkTime()
-        if(!response.data?.check) {
-            suggested_start_time.value = response.data.suggested_start
-            confirmationModal.value = true
-        }
-    } catch (error) {
-        console.log(error)
+    const data = broadcastStore.second_step_data
+    if(data?.start_time_selected !== 'now' && !data?.start_time) return
+    
+    const response = await broadcastStore.checkStartTime()
+    if(response.check === false) {
+        suggested_start_time.value = response.suggested_start
+        confirmationModal.value = true
     }
-
 }
+
+onMounted(() => {
+    if(show_suggested_start.value.show) {
+        suggested_start_time.value = show_suggested_start.value.suggested_start
+        confirmationModal.value = true
+    }
+    broadcastStore.show_suggested_start.value = { show: false, suggested_start: '' }
+})
 </script>
 
 <style scoped lang="scss">

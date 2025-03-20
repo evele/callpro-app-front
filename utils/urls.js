@@ -34,6 +34,7 @@ export const CHECK_SELECTED_START_TIME_URL = "/broadcast/check_time"
 export const SAVE_BROADCAST_DRAFT_URL = "/broadcast/save_broadcast_draft"
 export const GET_LAST_DRAFT_ID_URL = "/broadcast/get_last_draft_id"
 export const GET_BROADCAST_URL = "/broadcast/get_broadcast"
+export const DELETE_DRAFT_URL = "/broadcast/delete_draft"
 
 /* ----- Caller ID Store ----- */
 export const GET_CALLER_ID_NUMBERS_URL = "/caller_id/get_caller_id_numbers"

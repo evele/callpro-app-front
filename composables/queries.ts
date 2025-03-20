@@ -27,15 +27,6 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
   })
 }
 
-export const useFetchCheckSelectedStartTime = (time_to_check:Ref<string>) => {
-  const dataToSend = computed(() => ({ time_to_check: time_to_check.value }))
-  return useQuery({
-    queryKey: ['check_selected_start_time', dataToSend],
-    queryFn: () => checkSelectedStartTime(dataToSend.value),
-    enabled: false   
-  })
-}
-
 export const useFetchGetLastDraftID = () => {
   return useQuery({
     queryKey: ['last_draft_id'],

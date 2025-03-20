@@ -11,9 +11,11 @@ type BroadcastState = {
     third_step_data: null;
     error: { step_error: string, message: string } | null;
     toast_error: { state: boolean, message: string };
-    is_saving_draft: boolean;
+    is_saving_draft: { state: boolean, from : string };
     is_loading_draft: boolean;
     has_loaded_draft: boolean;
+    is_resetting_draft: boolean;
+    show_suggested_start: { show: boolean, suggested_start: string };
 };
 
 type BroadcastActions = {
@@ -25,9 +27,12 @@ type BroadcastActions = {
     validateFirstStep: () => boolean;
     validateSecondStep: () => boolean;
     clearErrorMessage: () => void;
-    prepare_data_to_save: () => void;
-    save_step_draft: () => void;
+    prepareDataToSave: () => void;
+    saveStepDraft: (from: 'step' | 'general') => void;
+    saveBroadcastDraft: () => boolean;
     loadLastDraft: (broadcast_id: number) => void;
+    deleteDraft: () => Promise<void>;
+    checkStartTime: () => Promise<{ check: boolean | 'error', suggested_start?: string }>;
 }
 
 export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {}, BroadcastActions>("BroadcastStore", {
@@ -41,15 +46,17 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                 second_step_data: null,
                 third_step_data: null,
             },
-            draft_to_save: { broadcast_id: null, draft_step: 1, draft_data: null },
+            draft_to_save: { broadcast_id: null, draft_step: 1, update_step: true, draft_data: null },
             first_step_data: { name: '', broadcast_advanced: [] },
             second_step_data: { start_time_selected: null, start_time: null },
             third_step_data: null,
             error: null,
             toast_error: { state: false, message: '' },
-            is_saving_draft: false,
+            is_saving_draft: { state: false, from : ''},
             is_loading_draft: false,
             has_loaded_draft: false,
+            is_resetting_draft: false,
+            show_suggested_start: { show: false, suggested_start: '' },
         }
     },
     actions: {
@@ -61,8 +68,8 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
         },
         async goNextStep() { // To navigate when next button is clicked
             if (this.current_step >= 5 || !this.validateSteps()) return
-            this.prepare_data_to_save();
-            const draft_ok = await this.save_step_draft();
+            this.prepareDataToSave();
+            const draft_ok = await this.saveStepDraft('step');
             if(!draft_ok) return
             this.current_step++;
             if (this.current_step > this.completed_steps) this.completed_steps = this.current_step;
@@ -71,8 +78,8 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             if(step === this.current_step) return
             if(step > this.current_step) { // Validate and save only when navigating forward
                 if(!this.validateSteps()) return
-                this.prepare_data_to_save();
-                const draft_ok = await this.save_step_draft();
+                this.prepareDataToSave();
+                const draft_ok = await this.saveStepDraft('step');
                 if(!draft_ok) return
             }
             this.current_step = step;
@@ -80,16 +87,18 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
         resetBroascast() { // To reset the broadcast form
             this.current_step = 1;
             this.completed_steps = 1;
+            this.broadcast_id = null;
             this.broadcast_data = {
                 first_step_data: null,
                 second_step_data: null,
                 third_step_data: null,
             }
-            this.draft_to_save = { broadcast_id: null, draft_step: 1, draft_data: null };
+            this.draft_to_save = { broadcast_id: null, draft_step: 1, update_step: true, draft_data: null };
             this.first_step_data = { name: '', broadcast_advanced: [] };
             this.second_step_data = { start_time_selected: null, start_time: null };
             this.third_step_data = null;
             this.error = null;
+            this.show_suggested_start = { show: false, suggested_start: '' };
         },
         validateSteps() { // To validate the form data when navigating between steps
             switch (this.current_step) {
@@ -111,7 +120,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             }
             if(this.first_step_data.name.length > 40) {
                 isValid = false;
-                this.error_message = { step_error: 'title', message: 'Broadcast name should not be more than 40 characters' };
+                this.error = { step_error: 'title', message: 'Broadcast name should not be more than 40 characters' };
                 return isValid;
             }
 
@@ -126,7 +135,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                 (this.second_step_data.start_time_selected === 'another' && this.second_step_data.start_time === null)
             ) {
                 isValid = false;
-                this.error_message = { step_error: 'time', message: 'Start date is mandatory' };
+                this.error = { step_error: 'time', message: 'Start date is mandatory' };
                 return isValid;
             }
 
@@ -134,17 +143,23 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             return isValid;
         },
         clearErrorMessage() {
-            this.error_message = null;
+            this.error = null;
         },
-        prepare_data_to_save() { // Assign the current step data to the draft broadcast to save
+        prepareDataToSave() { // Assign the current step data to the draft broadcast to save
             this.draft_to_save.broadcast_id = this.broadcast_id;
             this.draft_to_save.draft_step = this.current_step;
+            if(this.current_step < this.completed_steps) {
+                this.draft_to_save.update_step = false
+            }
             switch (this.current_step) {
                 case 1:
                     this.broadcast_data.first_step_data = this.first_step_data;
                     this.draft_to_save.draft_data = this.first_step_data;
                     break;
                 case 2:
+                    if(this.second_step_data.start_time_selected === 'another') {
+                        this.second_step_data.start_time = format_start_time_to_db(this.second_step_data.start_time);
+                    }
                     this.broadcast_data.second_step_data = this.second_step_data;
                     this.draft_to_save.draft_data = this.second_step_data;
                     break;
@@ -152,10 +167,10 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                     break;
             }
         },
-        async save_step_draft(): Promise<false | number> {
-            this.is_saving_draft = true;
+        async saveStepDraft(from: 'step' | 'general'): Promise<false | number> {
+            this.is_saving_draft = { state: true, from };
             const response = await saveBroadcastDraft(this.draft_to_save);
-            this.is_saving_draft = false
+            this.is_saving_draft = { state: false, from: '' };
             if(!response.result) {
                 this.toast_error = { state: true, message: 'There was an error saving the draft, please try again.' }; // To activate the toast error message
                 setTimeout(() => this.toast_error = { state: false, message: '' }, 500);
@@ -164,7 +179,13 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             this.broadcast_id = response.draft_id;
             return response.draft_id
         },
-        async loadLastDraft(broadcast_id): Promise<void> {
+        async saveBroadcastDraft() {
+            this.prepareDataToSave();
+            const draft_ok = await this.saveStepDraft('general');
+            if(!draft_ok) return false
+            return true
+        },
+        async loadLastDraft(broadcast_id: number): Promise<void> {
             const data = { broadcast_id };
             this.is_loading_draft = true;
             const response = await getBroadcast(data)
@@ -183,7 +204,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
 
             this.first_step_data.name = broadcast.name;
             this.broadcast_data.first_step_data = this.first_step_data;
-            //TODO: Need to check and load the advanced data too
+            //TODO: Need to check and load the advanced data in the future
 
             if(broadcast.draft_step > 1) {
                 if(broadcast.start_time) {
@@ -194,7 +215,47 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                     this.second_step_data.start_time = null;
                 }
                 this.broadcast_data.second_step_data = this.second_step_data;
+                const response = await this.checkStartTime()
+                if(response.check === false) {
+                    this.current_step = 2
+                    this.show_suggested_start = { show: true, suggested_start: response.suggested_start }
+                }
             }
+        },
+        async deleteDraft(): Promise<void> {
+            if(this.broadcast_id === null) {
+                this.resetBroascast();
+                return
+            }
+
+            const data = { broadcast_id: this.broadcast_id };
+            this.is_resetting_draft = true;
+            const response = await deleteDraft(data);
+            this.is_resetting_draft = false;
+            if(!response.result) {
+                this.toast_error = { state: true, message: 'Something failed while deleting the draft' };
+                setTimeout(() => this.toast_error = { state: false, message: '' }, 500);
+                return
+            }
+            this.resetBroascast();
+        },
+        async checkStartTime(): Promise<{ check: boolean | 'error', suggested_start?: string }> {
+            let time = 'now'
+            if(this.second_step_data.start_time) {
+                time = format_start_time_to_db(this.second_step_data.start_time)
+            }
+            try {
+                const data = { time_to_check: time }
+                const response = await checkSelectedStartTime(data)
+                if(!response.check) {
+                    return { check: response.check, suggested_start: response.suggested_start }
+                }
+                return { check: true }
+            } catch (error) {
+                console.log(error)
+                return { check: 'error' }
+            }
+        
         }
     }
 })

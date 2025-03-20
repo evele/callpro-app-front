@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded-2xl mt-4 mb-6 shadow-lg container">
+    <div class="bg-white rounded-2xl mt-4 mb-6 shadow-lg container" id="papapa">
         <!----- Header section ----->
         <div class="header h-24 border-b border-grey-6 flex items-center justify-between px-10 flex-wrap">
             <h3 class="text-[22px] font-semibold text-black">{{ current_step_title }}</h3>
@@ -9,7 +9,7 @@
                     v-if="current_step === 1 && !has_loaded_draft"
                     type="button" 
                     class="bg-transparent text-dark-3 hover:bg-dark-3 hover:text-white border-grey-14 font-bold h-10 disabled:bg-transparent disabled:text-dark-3"
-                    :disabled="is_saving_draft || !last_draft_id"
+                    :disabled="is_saving_draft.state || !last_draft_id"
                     @click="broadcastStore.loadLastDraft(last_draft_id)"
                 >
                     <UploadAudioSVG class="w-4 h-4" />
@@ -19,11 +19,21 @@
                 <Button 
                     v-else
                     type="button" 
-                    class="bg-transparent text-dark-3 hover:bg-dark-3 hover:text-white border-grey-14 font-bold h-10"
-                    :disabled="is_saving_draft"
+                    class="bg-transparent text-dark-3 hover:bg-dark-3 hover:text-white border-grey-14 font-bold h-10 disabled:bg-transparent disabled:text-dark-3"
+                    :disabled="is_saving_draft.state || is_resetting_draft"
+                    @click="broadcastStore.deleteDraft"
                 >
-                    <RotateSVG class="w-4 h-4" />
-                    Reset broadcast
+                    <div v-if="is_resetting_draft" class="flex items-center gap-2">
+                        Resetting...
+                        <ProgressSpinner strokeWidth="8" fill="transparent" 
+                            class="h-5 w-5 dark-spinner ml-3 mr-0" animationDuration=".5s" aria-label="saving draft" 
+                        />
+                    </div>
+                    <div v-else class="flex items-center gap-3">
+                        <RotateSVG class="w-4 h-4" />
+                        Reset broadcast
+                    </div>
+                   
                 </Button>
             </Transition>
         </div>
@@ -45,22 +55,30 @@
                 <Button v-if="current_step === 1" @click="toggle_advanced_features" class="bg-transparent border-none w-fit underline text-primary text-sm hover:text-primary/80">
                     Show advanced features
                 </Button>
-                <Button v-if="current_step > 1" @click="broadcastStore.goPrevStep" :disabled="is_saving_draft"
+                <Button v-if="current_step > 1" @click="broadcastStore.goPrevStep" :disabled="is_saving_draft.state"
                     class="bg-[#F5F5F5] border text-black w-full sm:max-w-[200px] hover:bg-dark-3 hover:text-white">
                     <ArrowLeftSVG class="w-4 h-4 mr-[6px]" />
                     Go back
                 </Button>
-                <Button v-if="current_step > 1" @click="handle_save_draf" :disabled="is_saving_draft"
+                <Button v-if="current_step > 1" @click="handle_save_draft" :disabled="is_saving_draft.state"
                     class="bg-[#F5F5F5] border text-black w-full sm:max-w-[200px] hover:bg-dark-3 hover:text-white">
-                    Save draft
+                    <div v-if="is_saving_draft.from === 'general'" class="flex items-center gap-3">
+                        Saving
+                        <ProgressSpinner strokeWidth="8" fill="transparent" 
+                            class="h-5 w-5 dark-spinner ml-3 mr-0" animationDuration=".5s" aria-label="saving draft" 
+                        />
+                    </div>
+                    <span v-else>Save draft</span>
                 </Button>
-                <Button v-if="current_step < 5" @click="broadcastStore.goNextStep" :disabled="is_saving_draft"
+                <Button v-if="current_step < 5" @click="broadcastStore.goNextStep" :disabled="is_saving_draft.state"
                     class="bg-[#653494] border-white text-white w-full sm:max-w-[200px] hover:bg-[#4A1D6E]">
                     Next
-                    <ProgressSpinner v-if="is_saving_draft" strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner ml-3 mr-0" animationDuration=".5s" aria-label="saving draft" />
+                    <ProgressSpinner v-if="is_saving_draft.from === 'step'" strokeWidth="8" fill="transparent" 
+                        class="h-5 w-5 light-spinner ml-3 mr-0" animationDuration=".5s" aria-label="saving draft" 
+                    />
                     <ArrowRightSVG v-else class="w-5 h-5 ml-[6px]" />
                 </Button>
-                <Button v-if="current_step === 5" @click="handle_confirm_broadcast" :disabled="is_saving_draft"
+                <Button v-if="current_step === 5" @click="handle_confirm_broadcast" :disabled="is_saving_draft.state"
                     class="bg-[#653494] border-white text-white w-full sm:max-w-[200px] hover:bg-[#4A1D6E]">
                     Confirm broadcast
                 </Button>
@@ -71,23 +89,25 @@
     <Toast />
 
     <Dialog v-model:visible="is_loading_draft" :draggable="false" :closable="false"
-            pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-[300px]" pt:mask:class="bg-white bg-opacity-40 backdrop-blur-[1px]"
-        >
-            <template #container>
-                <div class="flex items-center gap-6 p-10">
-                    <p class="font-bold text-xl text-grey-main">Loading draft...</p>
-                    <ProgressSpinner strokeWidth="6" fill="transparent" class="h-10 w-10 dark-spinner" animationDuration=".5s" aria-label="Loading broadcast" />
-                </div>
-            </template>
-        </Dialog>
+        pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-[300px]" pt:mask:class="bg-white bg-opacity-40 backdrop-blur-[1px]"
+    >
+        <template #container>
+            <div class="flex items-center gap-6 p-10">
+                <p class="font-bold text-xl text-grey-main">Loading draft...</p>
+                <ProgressSpinner strokeWidth="6" fill="transparent" class="h-10 w-10 dark-spinner" animationDuration=".5s" aria-label="Loading broadcast" />
+            </div>
+        </template>
+    </Dialog>
+    <MessageReady :is-visible="show_ready_message" message="Draft Saved!" />
 </template>
 
 <script setup lang="ts">
     const broadcastStore = useBroadcastStore();
-    const { current_step, toast_error, is_saving_draft, is_loading_draft, has_loaded_draft } = storeToRefs(broadcastStore)
+    const { current_step, toast_error, is_saving_draft, is_loading_draft, has_loaded_draft, is_resetting_draft } = storeToRefs(broadcastStore)
     const show_advanced_features = ref<boolean>(false)
     const { show_error_toast } = usePrimeVueToast();
     const { data: lastDraftID } = useFetchGetLastDraftID()
+    const show_ready_message = ref<boolean>(false)
 
     const last_draft_id = computed(() => {
         if(!lastDraftID?.value?.result) return null
@@ -111,8 +131,12 @@
         }
     })
 
-    const handle_save_draf = () => {
-        console.log('Save draft')
+    const handle_save_draft = async () => {
+        const success = await broadcastStore.saveBroadcastDraft()
+        if(success) {
+            show_ready_message.value = true
+            setTimeout(() => show_ready_message.value = false, 2500)
+        }
     }
 
     const toggle_advanced_features = () => {

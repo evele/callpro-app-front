@@ -62,25 +62,32 @@ export async function checkSelectedStartTime(data: CheckSelectedStartTimeParams)
 }
 
 /* ----- Broadcast Draft ----- */
-type saveBroadcastDraftResponse = APIResponseSuccess & { draft_id: number }
+type SaveBroadcastDraftResponse = APIResponseSuccess & { draft_id: number }
 
-export async function saveBroadcastDraft(data: DraftToSave):Promise<saveBroadcastDraftResponse | APIResponseError>{
-    return await fetchWrapper.post(SAVE_BROADCAST_DRAFT_URL, data) as saveBroadcastDraftResponse | APIResponseError
+export async function saveBroadcastDraft(data: DraftToSave):Promise<SaveBroadcastDraftResponse | APIResponseError>{
+    return await fetchWrapper.post(SAVE_BROADCAST_DRAFT_URL, data) as SaveBroadcastDraftResponse | APIResponseError
 }
 
 /* ----- Get last draft ID ----- */
-type getLastDraftIdResponse = APIResponseSuccess & { draft_id: NumberOrNull }
+type GetLastDraftIdResponse = APIResponseSuccess & { draft_id: NumberOrNull }
 
-export async function getLastDraftID():Promise<getLastDraftIdResponse | APIResponseError>{
-    return await fetchWrapper.get(GET_LAST_DRAFT_ID_URL) as getLastDraftIdResponse | APIResponseError
+export async function getLastDraftID():Promise<GetLastDraftIdResponse | APIResponseError>{
+    return await fetchWrapper.get(GET_LAST_DRAFT_ID_URL) as GetLastDraftIdResponse | APIResponseError
 }
 
 /* ----- Get Broadcast ----- */
-type getBroadcastParams = { broadcast_id: number }
-type getBroadcastResponse = APIResponseSuccess & { 
+type GetBroadcastParams = { broadcast_id: number }
+type GetBroadcastResponse = APIResponseSuccess & { 
     broadcast_data: { broadcast: Broadcast } | null 
 }
 
-export async function getBroadcast(data: getBroadcastParams):Promise<getBroadcastResponse | APIResponseError>{
-    return await fetchWrapper.post(GET_BROADCAST_URL, data) as getBroadcastResponse | APIResponseError
+export async function getBroadcast(data: GetBroadcastParams):Promise<GetBroadcastResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_BROADCAST_URL, data) as GetBroadcastResponse | APIResponseError
+}
+
+/* ----- Delete Draft ----- */
+type DeleteDraftParams = { broadcast_id: number }
+
+export async function deleteDraft(data: DeleteDraftParams):Promise<APIResponseSuccess | APIResponseError>{
+    return await fetchWrapper.post(DELETE_DRAFT_URL, data) as APIResponseSuccess | APIResponseError
 }

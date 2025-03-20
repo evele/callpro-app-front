@@ -3,7 +3,7 @@
     <Stepper v-model:value="current_step" class="basis-[40rem] relative" linear>
         <StepList>
             <Step v-slot="{ value }" asChild :value="1">
-                <div class="flex flex-col items-center">
+                <div ref="divRef" class="flex flex-col items-center relative">
                     <Button 
                         class="bg-transparent border-none rounded-none px-1 py-[2px] text-grey-secondary hover:text-gray-700"
                         @click="broadcastStore.goToStep(value)"
@@ -17,22 +17,13 @@
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
                             :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary' ]"
-                            v-tooltip.rigth="{
-                                value: error?.step_error === 'title' ? error?.message : '',
-                                pt: {
-                                    arrow: {
-                                        style: {
-                                            marginLeft: '1rem',
-                                            paddingLeft: '0.5rem',
-                                        }
-                                    },
-                                    text: '!bg-primary !text-white !font-medium'
-                                }
-                            }"
                         >
                             Title
                         </span>
                     </Button>
+                    <Transition>
+                        <TooltipError v-if="error?.step_error === 'title'" :message="error?.message" :target="divRef" />
+                    </Transition>
                 </div>
             </Step>
             <Step v-slot="{ value }" asChild :value="2">
@@ -141,6 +132,8 @@ const get_step_class = (value: number) => {
         return 'bg-white text-grey-secondary border-grey-5';
     }
 }
+
+const divRef = ref(null);
 </script>
 
 <style scoped lang="scss">
@@ -148,5 +141,15 @@ const get_step_class = (value: number) => {
         flex-direction: column;
         align-items: flex-start;
         gap: 36px;
+    }
+
+    .v-enter-active,
+    .v-leave-active {
+        transition: opacity 0.5s ease;
+    }
+
+    .v-enter-from,
+    .v-leave-to {
+        opacity: 0;
     }
 </style>
