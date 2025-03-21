@@ -28,9 +28,9 @@ type BroadcastActions = {
     validateSecondStep: () => boolean;
     clearErrorMessage: () => void;
     prepareDataToSave: () => void;
-    saveStepDraft: (from: 'step' | 'general') => void;
-    saveBroadcastDraft: () => boolean;
-    loadLastDraft: (broadcast_id: number) => void;
+    saveStepDraft: (from: 'step' | 'general') => Promise<false | number>;
+    saveBroadcastDraft: () => Promise<boolean>;
+    loadLastDraft: (broadcast_id: NumberOrNull) => void;
     deleteDraft: () => Promise<void>;
     checkStartTime: () => Promise<{ check: boolean | 'error', suggested_start?: string }>;
 }
@@ -107,7 +107,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                 case 2:
                     return this.validateSecondStep();
                 default:
-                    break;
+                    return true;
             }
         },
         validateFirstStep() {
@@ -146,6 +146,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             this.error = null;
         },
         prepareDataToSave() { // Assign the current step data to the draft broadcast to save
+            this.draft_to_save.draft_data = null;
             this.draft_to_save.broadcast_id = this.broadcast_id;
             this.draft_to_save.draft_step = this.current_step;
             if(this.current_step < this.completed_steps) {
@@ -158,7 +159,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                     break;
                 case 2:
                     if(this.second_step_data.start_time_selected === 'another') {
-                        this.second_step_data.start_time = format_start_time_to_db(this.second_step_data.start_time);
+                        this.second_step_data.start_time = format_start_time_to_db(this.second_step_data.start_time ?? '');
                     }
                     this.broadcast_data.second_step_data = this.second_step_data;
                     this.draft_to_save.draft_data = this.second_step_data;
@@ -172,21 +173,24 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             const response = await saveBroadcastDraft(this.draft_to_save);
             this.is_saving_draft = { state: false, from: '' };
             if(!response.result) {
-                this.toast_error = { state: true, message: 'There was an error saving the draft, please try again.' }; // To activate the toast error message
+                console.log(response)
+                this.toast_error = { state: true, message: response.error ?? 'There was an error saving the draft, please try again.' }; // To activate the toast error message
                 setTimeout(() => this.toast_error = { state: false, message: '' }, 500);
                 return false
             }
             this.broadcast_id = response.draft_id;
             return response.draft_id
         },
-        async saveBroadcastDraft() {
+        async saveBroadcastDraft(): Promise<boolean> {
             this.prepareDataToSave();
             const draft_ok = await this.saveStepDraft('general');
             if(!draft_ok) return false
             return true
         },
-        async loadLastDraft(broadcast_id: number): Promise<void> {
+        async loadLastDraft(broadcast_id: NumberOrNull): Promise<void> {
+            if(!broadcast_id) return
             const data = { broadcast_id };
+
             this.is_loading_draft = true;
             const response = await getBroadcast(data)
             this.is_loading_draft = false;
@@ -218,7 +222,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
                 const response = await this.checkStartTime()
                 if(response.check === false) {
                     this.current_step = 2
-                    this.show_suggested_start = { show: true, suggested_start: response.suggested_start }
+                    this.show_suggested_start = { show: true, suggested_start: response.suggested_start ?? '' }
                 }
             }
         },
@@ -247,7 +251,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             try {
                 const data = { time_to_check: time }
                 const response = await checkSelectedStartTime(data)
-                if(!response.check) {
+                if(response.result && response.check === false) {
                     return { check: response.check, suggested_start: response.suggested_start }
                 }
                 return { check: true }

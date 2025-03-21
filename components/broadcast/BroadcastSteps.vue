@@ -3,10 +3,10 @@
     <Stepper v-model:value="current_step" class="basis-[40rem] relative" linear>
         <StepList>
             <Step v-slot="{ value }" asChild :value="1">
-                <div ref="divRef" class="flex flex-col items-center relative">
+                <div class="flex flex-col items-center relative" id="step-1">
                     <Button 
                         class="bg-transparent border-none rounded-none px-1 py-[2px] text-grey-secondary hover:text-gray-700"
-                        @click="broadcastStore.goToStep(value)"
+                        @click="broadcastStore.goToStep(Number(value))"
                     >
                         <div 
                             class="rounded-lg border-2 w-10 h-10 flex items-center justify-center z-10 transition-colors duration-300"
@@ -22,15 +22,15 @@
                         </span>
                     </Button>
                     <Transition>
-                        <TooltipError v-if="error?.step_error === 'title'" :message="error?.message" :target="divRef" />
+                        <TooltipError v-if="error?.step_error === 'title'" :message="error?.message" :target="stepId" />
                     </Transition>
                 </div>
             </Step>
             <Step v-slot="{ value }" asChild :value="2">
-                <div class="flex flex-col items-center">
+                <div class="flex flex-col items-center relative" id="step-2">
                     <Button 
                         class="bg-transparent border-none rounded-none px-1 py-[2px] text-grey-secondary hover:text-gray-700 disabled:opacity-100" 
-                        @click="broadcastStore.goToStep(value)"
+                        @click="broadcastStore.goToStep(Number(value))"
                         :disabled="completed_steps < Number(value)"
                     >
                     <div 
@@ -46,13 +46,16 @@
                             Time
                         </span>
                     </Button>
+                    <Transition>
+                        <TooltipError v-if="error?.step_error === 'time'" :message="error?.message" :target="stepId" />
+                    </Transition>
                 </div>
             </Step>
             <Step v-slot="{ value }" asChild :value="3">
                 <div class="flex flex-col items-center">
                     <Button 
                         class="bg-transparent border-none rounded-none px-1 py-[2px] text-grey-secondary hover:text-gray-700 disabled:opacity-100" 
-                        @click="broadcastStore.goToStep(value)"
+                        @click="broadcastStore.goToStep(Number(value))"
                         :disabled="completed_steps < Number(value)"
                     >
                     <div 
@@ -74,7 +77,7 @@
                 <div class="flex flex-col items-center">
                     <Button 
                         class="bg-transparent border-none rounded-none px-1 py-[2px] text-grey-secondary hover:text-gray-700 disabled:opacity-100" 
-                        @click="broadcastStore.goToStep(value)"
+                        @click="broadcastStore.goToStep(Number(value))"
                         :disabled="completed_steps < Number(value)"
                     >
                     <div 
@@ -96,7 +99,7 @@
                 <div class="flex flex-col items-center">
                     <Button 
                         class="bg-transparent border-none rounded-none px-1 py-[2px] text-grey-secondary hover:text-gray-700 disabled:opacity-100" 
-                        @click="broadcastStore.goToStep(value)"
+                        @click="broadcastStore.goToStep(Number(value))"
                         :disabled="completed_steps < Number(value)"
                     >
                     <div 
@@ -133,7 +136,7 @@ const get_step_class = (value: number) => {
     }
 }
 
-const divRef = ref(null);
+const stepId = computed(() => `step-${current_step.value}`);
 </script>
 
 <style scoped lang="scss">

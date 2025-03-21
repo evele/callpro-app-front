@@ -20,7 +20,7 @@
                 <label for="broadcast-time" class="text-lg text-dark-3 font-medium">Choose start time</label>
                 <DatePicker 
                     id="broadcast-time" 
-                    v-model="second_step_data.start_time" 
+                    v-model="parsedStartTime" 
                     showTime 
                     hourFormat="12" 
                     placeholder="Choose"
@@ -79,6 +79,13 @@ const time_options = [
     { name: 'Another Time', code: 'another' },
 ]
 
+const parsedStartTime = computed({
+    get: () => second_step_data.value.start_time ? new Date(second_step_data.value.start_time) : null,
+    set: (value: Date | null) => {
+        second_step_data.value.start_time = value ? value.toISOString() : null
+    }
+})
+
 // With query params included, to show the correct tab in settings page
 const go_to_settings = () => {
     router.push({  name: 'settings', query: { tab: 'general' } })
@@ -89,7 +96,7 @@ const handle_select_change = () => {
         broadcastStore.second_step_data.start_time = null
         handle_check_time()
     }
-    broadcastStore.clearErrorMessage
+    broadcastStore.clearErrorMessage()
 }
 
 const minimum_time = computed(() => {
@@ -131,10 +138,10 @@ const handle_confirm_modal = () => {
 const handle_check_time = async () => {
     const data = broadcastStore.second_step_data
     if(data?.start_time_selected !== 'now' && !data?.start_time) return
-    
+    broadcastStore.clearErrorMessage()
     const response = await broadcastStore.checkStartTime()
     if(response.check === false) {
-        suggested_start_time.value = response.suggested_start
+        suggested_start_time.value = response.suggested_start ? response.suggested_start : ''
         confirmationModal.value = true
     }
 }
@@ -144,7 +151,7 @@ onMounted(() => {
         suggested_start_time.value = show_suggested_start.value.suggested_start
         confirmationModal.value = true
     }
-    broadcastStore.show_suggested_start.value = { show: false, suggested_start: '' }
+    broadcastStore.show_suggested_start = { show: false, suggested_start: '' }
 })
 </script>
 

@@ -109,7 +109,7 @@
     const { data: lastDraftID } = useFetchGetLastDraftID()
     const show_ready_message = ref<boolean>(false)
 
-    const last_draft_id = computed(() => {
+    const last_draft_id = computed<NumberOrNull>(() => {
         if(!lastDraftID?.value?.result) return null
         return lastDraftID?.value?.draft_id
     })
