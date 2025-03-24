@@ -11,8 +11,11 @@
 import {useGeneralStore} from "@/stores"
   const generalStore = useGeneralStore()
   
-  onMounted(() => {
-    generalStore.getUserAreaCodesAndTimezonesData()
+  onMounted(async () => {
+    await Promise.all([
+      generalStore.getUserAreaCodesAndTimezonesData(),
+      generalStore.getUserTimezone()
+    ])
   })
 
   const tab_options: DashboardState[] = [COMPLETED, ACTIVE, DRAFT]

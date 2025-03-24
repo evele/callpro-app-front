@@ -2,7 +2,7 @@
     <div class="grid-container">
         <MainHeader class="item1" />
         <Navbar class="item2"></Navbar>
-        <main class="item3">
+        <main class="item3" id="main-component">
             <slot></slot>
         </main>  
     </div>

@@ -26,6 +26,13 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
     queryFn: () => getBroadcastDetail(dataToSend.value)    
   })
 }
+
+export const useFetchGetLastDraftID = () => {
+  return useQuery({
+    queryKey: ['last_draft_id'],
+    queryFn: () => getLastDraftID()
+  })
+}
   
 /* ----- Dashboard ----- */
 export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
