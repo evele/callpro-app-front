@@ -118,18 +118,15 @@
                   >
                   <span v-else key="2">{{ labels.cardMonth || "MM" }}</span>
                 </transition>
-              </label>
-              / 
+              </label>/
               <label
                 :for="inputFields.cardYear"
                 class="card-item__dateItem"
                 aria-label="Card year"
               >
                 <transition name="slide-fade-up">
-                  <span v-if="valueFields.cardYear" :key="valueFields.cardYear">{{
-                    String(valueFields.cardYear).slice(2, 4)
-                  }}</span>
-                  <span v-else key="2">{{ labels.cardYear || "YY" }}</span>
+                  <span v-if="valueFields.cardYear" :key="valueFields.cardYear">&nbsp;{{ valueFields.cardYear }}</span>
+                  <span v-else key="2">&nbsp;{{ labels.cardYear || "YY" }}</span>
                 </transition>
               </label>
             </div>

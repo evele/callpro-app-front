@@ -1,23 +1,21 @@
 <template>
     <Dialog v-model:visible="show_confirm" :draggable="false" :closable="false"
-        pt:root:class="!border rounded-lg border-[#D9D9D9] !bg-white w-full max-w-[580px]" pt:mask:class="bg-white bg-opacity-70 backdrop-blur-[2px]"
-    >
+        pt:root:class="!border rounded-[30px] border-[#D9D9D9] !bg-white w-full max-w-[580px]" pt:mask:class="bg-white bg-opacity-70 backdrop-blur-[2px]"
+    >   
         <template #container>
-            <header class="w-full flex items-center justify-between px-8 pt-6 mb-2">
+            <div class="w-full flex items-center justify-between px-8 py-9 rounded-t-xl mb-2 bg-gradient-to-br from-neutral-700 to-neutral-400">
                 <h2 class="font-bold text-2xl text-dark-3">{{ props.title }}</h2>
-            </header>
-            <Paycard :value-fields="valueFields" @get-type="changeType" :isCardNumberMasked="isCardNumberMasked" :current-focus="currentFocus" />
-
+                <Paycard :value-fields="valueFields" @get-type="changeType" :isCardNumberMasked="isCardNumberMasked" :current-focus="currentFocus" />
+            </div>
+            <div>
+            <p class="py-8 pl-9 text-Dark-3 text-lg font-semibold leading-relaxed">Add new card</p>
+            <divider class="m-0"/>
             <form ref="cardForm" @submit.prevent class="js-card-form new-contact-form flex px-4 flex-col gap-5 sm:gap-6" data-encryptedfields="encrypted-form">
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
-                        <label for="number" class="text-dark-3">Card Number</label>
-                        <InputText id="number" v-model="cc_number" type="text" placeholder="#### #### #### ####" class="w-full mt-1" />
-                        <input  class="w-full mt-1" id="enc-number" v-model="cc_number" type="text" data-encryptedfields="cc" placeholder="**** **** **** ****">
-                        <input ref="xCardNumRef" name="xCardNum" type="hidden" v-model="encryptedValue" />
-                        
+                        <label :for="inputFields.cardNumber" class="text-dark-3">Card Number</label>
+                        <InputMask :id="inputFields.cardNumber" v-model="valueFields.cardNumber" mask="9999 9999 9999 9999" placeholder="#### #### #### ####" class="w-full mt-1" data-card-field/>      
                     </div>
-                    
                 </div>
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
@@ -27,54 +25,17 @@
                 </div>
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
-                        <label for="expiry" class="text-dark-3">Expiry</label>
-                        <InputMask  :id="inputFields.cardMonth" name="checkout-cc-expiry" v-model="valueFields.cardMonth" mask="99 / 99" placeholder="MM / YY" class="w-full mt-1" />
+                        <label :for="inputFields.cardExpiry" class="text-dark-3">Expiry</label>
+                        <InputMask  :id="inputFields.cardExpiry" name="checkout-cc-expiry" v-model="valueFields.cardExpiry" @update:model-value="update_expiry" mask="99 / 99" placeholder="MM / YY" class="w-full mt-1" data-card-field/>
                     </div>
                     <div class="w-full">
-                        <label for="cvv" class="text-dark-3">CVV</label>
-                        <InputMask :id="inputFields.cardCvv" v-model="valueFields.cardCvv" mask="999?9" placeholder="***" class="w-full mt-1" />
+                        <label :for="inputFields.cardCvv" class="text-dark-3">CVV</label>
+                        <InputMask :id="inputFields.cardCvv" v-model="valueFields.cardCvv" mask="999?9" placeholder="***" class="w-full mt-1"  data-card-field/>
                     </div>
                 </div>
             </form>
-            
-            <!--
-            <form class='js-card-form' data-encryptedfields="encrypted-form">
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="form-material">
-                            <label for="number">Number</label>
-                            <input class="form-control" id="number" type="text" placeholder="**** **** **** ****">
-                            <input class="form-control hidden" id="enc-number" type="text" data-encryptedfields="cc" placeholder="**** **** **** ****">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-12">
-                        <div class="form-material">
-                            <label for="cc-name">Full Name</label>
-                            <input class="form-control" id="cc-name" name="checkout-cc-name" type="text" placeholder="JOHN DOE">
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <div class="col-xs-6">
-                        <div class="form-material">
-                            <label for="expiry">MMYY</label>
-                            <input class="form-control" id="expiry" name="checkout-cc-expiry" type="text" placeholder="0119">
-                        </div>
-                    </div>
-                    <div class="col-xs-6">
-                        <div class="form-material">
-                            <label for="cvv">CVC</label>
-                            <input class="form-control" id="cvv" data-encryptedfields="cvv" type="text" placeholder="***">
-                        </div>
-                    </div>
-                </div>
-
-            </form> 
-            -->
-
-            <footer class="flex justify-end gap-4 font-medium px-8 pb-6 mt-6">
+            </div>
+            <div class="flex justify-end gap-4 font-medium px-8 pb-6 mt-6">
                 <Button 
                     @click="handle_cancel"
                     :disabled="props.isProcessingConfirm || props.isProcessingCancel"
@@ -98,7 +59,7 @@
                     </div>
                     <span v-else>{{ props.confirmText }}</span>
                 </Button>
-            </footer>
+            </div>
         </template>
     </Dialog>
 </template>
@@ -118,8 +79,8 @@
         isProcessingConfirm?: boolean
         isProcessingCancel?: boolean 
     }>(), {
-        title: 'Confirm your purchase',
-        message: 'Are you sure you want to confirm this purchase?',
+        title: '',
+        message: '',
         cancelText: 'Cancel',
         confirmText: 'Confirm',
         isProcessingConfirm: false,
@@ -137,26 +98,33 @@
         cardNumber: "",
         cardMonth: "",
         cardYear: "",
+        cardExpiry: "",
         cardCvv: ""
     })
-
+    
     const inputFields = reactive({
         cardNumber: 'v-card-number',
         cardName: 'v-card-name',
         cardMonth: 'v-card-month',
         cardYear: 'v-card-year',
+        cardExpiry: 'v-card-expiry',
         cardCvv: 'v-card-cvv'
     })
+
+    
 
     const currentFocus = ref<string | null>(null)
 
     const isCardNumberMasked = ref(false)
     
     const changeType = (type: CardType) => {
-        console.log(type)
+        console.log(type) // TODO: ask Eduardo about this
     }
 
-    /* -- */
+    const update_expiry = () => {
+        valueFields.cardMonth = valueFields.cardExpiry.substring(0,2)
+        valueFields.cardYear = valueFields.cardExpiry.substring(5,7)
+    }
 
 
   
@@ -168,17 +136,13 @@
     const { encryptCardData } = useCardEncryption()
 
     function handle_confirm() {
-    // Aquí se llama a la función para obtener el valor encriptado
-    encryptedValue.value = encryptCardData(cc_number.value, valueFields.cardCvv)
-    // Luego puedes enviar el formulario o realizar otras acciones
-    console.log('Valor encriptado:', encryptedValue.value)
 
     const data_to_send: New_CC = {
-        number: Number(cc_number.value),
+        number: Number(valueFields.cardNumber.replace(/ /g, '')),
         cc_name: valueFields.cardName,
         expiry: expiry.value,
         cvv: Number(valueFields.cardCvv),
-        enc_card: encryptedValue.value,
+        enc_card: encryptCardData(valueFields.cardNumber.replace(/ /g, ''), valueFields.cardCvv),
 
     }
 
