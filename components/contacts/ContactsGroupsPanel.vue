@@ -1,9 +1,7 @@
 <template>
     <section class="container flex flex-col">
         <div>
-            <h4 class="groups-title">System Groups</h4>
-
-            <ul class="mt-3 flex flex-col default-groups-ul">
+            <ul class="flex flex-col default-groups-ul">
                 <li v-for="button in defaultGroupsButtons" :key="button.group_id">
                     <GroupButton :group-name="button.text" :contacts-count="button.value"
                         :active="active_buttons.includes(button.group_id)" @click="setActiveButton(button.text, button.group_id, '')">
@@ -22,7 +20,7 @@
             <ul class="user-group-container mt-4 flex flex-col">
                 <li v-if="isLoadingCG">Loading...</li>
                 <li v-if="isErrorCG">Error loading groups.</li>
-                <li class="flex justify-end" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
+                <li class="flex" v-for="group in isSuccessCG && CGData?.result ? CGData.custom_groups : []"
                     :key="group.id">
 
                     <Button class="user-group-btn flex justify-between items-center" @click="setActiveButton(group.group_name, group.id, group.group_code)"
@@ -241,7 +239,7 @@ const handle_cancel_modal = () => {
 }
 
 .user-group-btn {
-    width: 94%;
+    width: 100%;
     border-radius: 10px;
     height: 35px;
     border: none;

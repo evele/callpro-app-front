@@ -15,7 +15,7 @@
 <style scoped>
     .item1 { 
         grid-area: header; 
-        height:6.5rem;
+        height:90px;
         border-bottom: 2px solid #DED8E1;
         position: sticky;
         top: 0;
