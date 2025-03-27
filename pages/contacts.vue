@@ -1,5 +1,5 @@
 <template>
-    <section class="bg-white py-5 pl-8 flex gap-3 items-center flex-wrap">
+    <section class="bg-white py-4 pl-8 flex gap-3 items-center flex-wrap">
         <p v-if="selected_groups.length > 3" class="text-2xl font-semibold">{{ selected_groups.length }} groups selected</p>
         <div v-else v-for="(group, index) in selected_groups" :key="group.group_id" class="flex gap-3 items-center">
             <p class="text-xl font-semibold">{{ group.group_name }} {{ selected_groups.length > 1 && index < selected_groups.length - 1 && !group.is_custom ? ',' : '' }}
@@ -25,6 +25,7 @@
             :system-groups="system_groups"
             :custom-groups="custom_groups"
             @update:filters="handle_filters_selection"
+            @newContact="handle_contacts_action"
         />
         <div class="flex flex-col gap-4">
             <ContactsActions 
@@ -122,6 +123,7 @@
     }
 
     const handle_contacts_action = (action_id:ContactsModalSectionToShow) => {
+        console.log("handle_contacts_action",action_id)
         if (action_id == NEW_GROUP){
             Object.assign(selected_group_to_edit, {
             groupID: '',

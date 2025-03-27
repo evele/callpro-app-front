@@ -222,20 +222,13 @@ const handle_cancel_modal = () => {
     text-align: end;
 }
 
-.fake-button {
-    width: 100%;
-    height: 50px;
-    border-radius: 10px;
-    background-color: #F4F0EF;
-}
-
 .user-group-container {
     overflow-y: auto;
     gap: 5px;
     padding: 0;
     flex: 1 1 auto;
     min-height: 150px;
-    max-height: calc(100vh - 743px);
+    max-height: calc(100vh - 645px);
 }
 
 .user-group-btn {
@@ -257,18 +250,6 @@ const handle_cancel_modal = () => {
             font-weight: 400;
         }
     }
-}
-
-.bg-green {
-    background-color: #EBFFEE;
-}
-
-.bg-yellow {
-    background-color: #FFFBEB;
-}
-
-.bg-red {
-    background-color: #FEE9E7;
 }
 
 .add-new-btn {

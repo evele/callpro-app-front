@@ -30,11 +30,10 @@
                         </IconField>
 
                         <div class="flex gap-4">
-                            <FilterDropdown ref="filterDropdownRef" :filters-system="FILTERS_SYSTEM_GROUPS" :filters-custom="FILTERS_CUSTOM_GROUPS" @update:filters="handleUpdateFilters" />
-                            <Button :class="action_button_style">
-                                <SortBySVG class="text-[#757575]" />
-                                <span class="font-semibold">Sort by</span>
-                            </Button>
+                            <Button :class="action_button_style" @click="emit('newContact', CONTACT);">
+                                <PlusSVG class="w-[20px] h-[20px] text-[#757575] border-2 border-[#757575] rounded-full" />
+                                <span class="font-semibold">Add new contact</span>
+                            </Button>       
                         </div>
                     </div>
                     
@@ -270,8 +269,7 @@
     const indeterminate_contacts = ref<{ [key: string]: boolean }>({});
     const numbers_ids = ref<string[]>([])
 
-    const emit = defineEmits(['uploadFile', 'update:filters', 'update:contactToEdit'])
-    const filterDropdownRef = ref()
+    const emit = defineEmits(['newContact','uploadFile', 'update:filters', 'update:contactToEdit'])
 
     const query_params = computed<AllContactsQueryParams>(() => ({
         page: page.value,
@@ -384,7 +382,6 @@
         expandedRows.value = {};
         Object.keys(indeterminate_contacts.value).forEach((key) => indeterminate_contacts.value[key] = false);
         indeterminate_all.value = false;
-        filterDropdownRef.value.reset_selected_filters()
     }
 
     // Handle pagination

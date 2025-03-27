@@ -35,7 +35,7 @@
   .group-button {
     display: flex;
     width: 100%;
-    height: 50px;
+    height: 48px;
     padding: 12px;
     align-items: center;
     justify-content: left;
