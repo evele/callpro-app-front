@@ -10,13 +10,13 @@
                     >
                         <div 
                             class="rounded-lg border-2 w-10 h-10 flex items-center justify-center z-10 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-white bg-[#6750A4] border-grey-6' : 'bg-white text-grey-secondary border-grey-5' ]"    
+                            :class="[current_step === value ? 'text-white bg-light-primary border-grey-6' : 'bg-white text-grey-secondary border-grey-5' ]"    
                         >
                             <PenToolSVG class="h-5 w-5" />
                         </div>
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary' ]"
+                            :class="[current_step === value ? 'text-light-primary': 'text-grey-secondary' ]"
                         >
                             Title
                         </span>
@@ -41,7 +41,7 @@
                         </div>
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
+                            :class="[current_step === value ? 'text-light-primary': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
                         >
                             Time
                         </span>
@@ -66,7 +66,7 @@
                         </div>
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
+                            :class="[current_step === value ? 'text-light-primary': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
                         >
                             Numbers
                         </span>
@@ -88,7 +88,7 @@
                         </div>
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
+                            :class="[current_step === value ? 'text-light-primary': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
                         >
                             Select your Audio
                         </span>
@@ -110,7 +110,7 @@
                         </div>
                         <span 
                             class="font-semibold ml-2 transition-colors duration-300"
-                            :class="[current_step === value ? 'text-[#6750A4]': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
+                            :class="[current_step === value ? 'text-light-primary': 'text-grey-secondary', completed_steps < Number(value) ? 'opacity-50': '' ]"  
                         >
                             Confirmation
                         </span>
@@ -128,7 +128,7 @@ const { current_step, completed_steps, error } = storeToRefs(broadcastStore)
 
 const get_step_class = (value: number) => {
     if(current_step.value === value) {
-        return 'text-white bg-[#6750A4] border-grey-6';
+        return 'text-white bg-light-primary border-grey-6';
     } else if(completed_steps.value < value) {
         return 'bg-white border-grey-6 text-grey-6';
     } else {

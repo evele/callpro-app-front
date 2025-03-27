@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded-2xl mt-4 mb-6 shadow-lg container" id="papapa">
+    <div class="bg-white rounded-2xl mt-4 mb-6 shadow-lg container">
         <!----- Header section ----->
         <div class="header h-24 border-b border-grey-6 flex items-center justify-between px-10 flex-wrap">
             <h3 class="text-[22px] font-semibold text-black">{{ current_step_title }}</h3>
@@ -48,7 +48,8 @@
             <Transition name="fade" mode="out-in">
                 <TitleStep v-if="current_step === 1" />
                 <TimeStep v-else-if="current_step === 2" />
-                <div v-else >Under construction</div>
+                <NumbersStep v-else-if="current_step === 3" />
+                <div v-else>Under construction</div>
             </Transition>
 
             <footer class="flex flex-col w-full justify-between gap-4 sm:gap-6 font-bold mt-7 sm:flex-row">
