@@ -139,7 +139,7 @@
     const visible = ref(false)
     const new_number = ref('')
     const new_ext = ref('')
-    const form_action = ref('')
+    const form_action = ref<FormAction>('')
     const has_phone_number_error = ref(false)
     const confirmationModal = ref()
 

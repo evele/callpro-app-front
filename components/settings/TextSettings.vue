@@ -1,29 +1,29 @@
 <template>
     <SettingSection title="Text message caller ID" description="">
         <div class="flex justify-between gap-2 items-center">
-            <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="text_settings.text_caller_id_selected" :options="text_caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
+            <label class="font-medium w-48">Caller ID</label>
+            <Select v-model="text_settings.text_caller_id_selected" :options="text_caller_id_options" optionLabel="name" optionValue="code" class="w-[240px]" placeholder="Select" />
         </div>
         <div class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium w-48">Your Call Pro number</label>
-            <Select v-if="text_settings.text_caller_id_selected === '1'" v-model="selected_call_pro" :options="formatted_callpro_numbers" class="w-[294px]" placeholder="Select" :disabled="props.callProNumbers.length < 2" />
-            <Select v-else v-model="selected_toll_free" :options="formatted_tollfree_numbers" class="w-[294px]" placeholder="Select" :disabled="props.tollFreeNumbers.length < 2" />
+            <label class="font-medium w-48">Your Call Pro number</label>
+            <Select v-if="text_settings.text_caller_id_selected === '1'" v-model="selected_call_pro" :options="formatted_callpro_numbers" class="w-[240px]" placeholder="Select" :disabled="props.callProNumbers.length < 2" />
+            <Select v-else v-model="selected_toll_free" :options="formatted_tollfree_numbers" class="w-[240px]" placeholder="Select" :disabled="props.tollFreeNumbers.length < 2" />
         </div>
     </SettingSection>
     <Divider/>
 
     <SettingSection title="Chat" description="">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Chat</label>
-            <ToggleSwitch v-model="text_settings.chat" class="scale-125" />
+            <label class="font-medium">Chat</label>
+            <ToggleSwitch v-model="text_settings.chat" class="scale-110" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Offer Opt out response" description="Offer your recipients the chance to not receive future messages.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Opt out response</label>
-            <ToggleSwitch v-model="text_settings.sms_dnc" class="scale-125" />
+            <label class="font-medium">Opt out response</label>
+            <ToggleSwitch v-model="text_settings.sms_dnc" class="scale-110" />
         </div>
     </SettingSection>
     <Divider />
