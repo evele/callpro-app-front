@@ -46,18 +46,27 @@ export const date_time_to_string = (time:StringOrNull = null) => {
 }
 
 // Get the date in timestamp format and return it in 'MM/DD/YYYY | HH:MM AM/PM' format
-export const format_timestamp = (date_to_format: string) => {
+export const format_timestamp = (date_to_format: string, with_time: boolean = true) => {
     if(!date_to_format) return ''
     const date = new Date(date_to_format);
     
-    const formattedDate = new Intl.DateTimeFormat('en-US', {
+    let formattedDate;
+    if(with_time) {
+      formattedDate = new Intl.DateTimeFormat('en-US', {
         year: '2-digit',
         month: '2-digit',
         day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
         hour12: true
-    }).format(date).replace(',', ' |');
+      }).format(date).replace(',', ' |');
+    } else {
+      formattedDate = new Intl.DateTimeFormat('en-US', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(date).replace(',', ' |');
+    }
 
     return formattedDate
 }
@@ -122,3 +131,18 @@ export const format_price = (price: number, decimals: number = 2) => {
   return price.toLocaleString('en-US', { style: 'currency', currency: 'USD',  maximumFractionDigits: decimals })
 }
 
+// Transform to this format "YYYY-MM-DD HH:MM AM/PM"
+export const format_start_time_to_db = (selected_time: string) => {
+  const date = new Date(selected_time);
+  
+  const year = new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(date);
+  const month = new Intl.DateTimeFormat('en-US', { month: '2-digit' }).format(date);
+  const day = new Intl.DateTimeFormat('en-US', { day: '2-digit' }).format(date);
+  const time = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+  }).format(date).replace(',', '');
+
+  return `${year}-${month}-${day} ${time}`;
+}

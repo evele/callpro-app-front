@@ -3,7 +3,7 @@
         class="rounded-xl min-h-16 h-16 bg-white border-[#CAC4D0] hover:bg-[#6750A4] w-full h-full flex flex-col items-start justify-center pt-3 px-3 relative -space-y-2 hover:items-center hover:pt-2"
     >
         <div v-if="is_hovering" class="bg-white rounded-full p-2 absolute shadow-lg hover:scale-125 transition-transform">
-            <PlusSVG class="text-[#6750A4] w-5 h-5"/>
+            <PlusSVG class="text-[#6750A4] w-3 h-3"/>
         </div>
 
         <span v-if="!is_hovering" class="text-[#79747E] text-[10px] leading-none">{{ text }}</span>

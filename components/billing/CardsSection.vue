@@ -65,7 +65,7 @@
             <template #content>
                 <div class="flex pl-6 w-full justify-between items-center">
                     <div v-if="!card_type || card_type === CardType.UNKNOWN" class="w-[75px]"></div>
-                    <component v-else :is="getCardIcon(card_type)" class="w-[75px] border border-gray-200 rounded-xl" />
+                    <component v-else :is="getCardIcon(card_type)" class="w-[75px] h-8 border border-gray-200 rounded-xl" />
 
                     <p class="font-semibold text-lg flex flex-col">
                         {{ card_type }} ending in {{ default_cc_card?.last_four }}
@@ -132,8 +132,8 @@
         return default_cc_card.value?.card_type
     })
 
-    const handle_select_credits = () => emit('update:selected_type', 'credit')
-    const handle_select_plan = () => emit('update:selected_type', 'plan')
+    const handle_select_credits = () => emit('update:selected_type', CREDIT)
+    const handle_select_plan = () => emit('update:selected_type', PLAN)
 
 </script>
 

@@ -39,9 +39,9 @@
                     <td class="text-center">{{ code.date }}</td>
                     <td class="text-center w-24">
                         <Button @click="delete_code(code?.id)" :disabled="is_deleting"
-                            class="p-2 bg-gray-200 border-none text-black hover:bg-gray-300 hover:scale-105"
+                            class="p-0 bg-[#322F35] border-none text-white hover:scale-105 h-6 w-6 rounded-[10px]"
                         >
-                            <TrashSVG class="w-6 h-6" />
+                            <TrashSVG class="w-4 h-4" />
                         </Button>
                     </td>
                 </tr>

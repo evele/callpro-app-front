@@ -15,6 +15,7 @@ export type StringOrNumberOrNull = string | number | null;
 export type StateOption = 'ALL' | 'LIVE'| 'VM'| 'INVALID'| 'NA';
 export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 'upload';
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
+export type BillingSectionToShow = 'main' | 'buy_credits' | 'checkout_form'
 export type FilterOption = { id: string, name: string, count: number, code?: StringOrNull }
 
 export type APIResponseError = {
@@ -343,12 +344,19 @@ export type GroupToDelete = {
 
 /* ----- Packages ----- */
 export type PackageStep = {
+  id: number;
   package_id: number;
   price: string;
   price_cents: number;
   regular_price: string;
   Total: number;
   floor: number;
+}
+
+export type FormattedStep = PackageStep & {
+  discount: boolean
+  original_price: number
+  discount_percent: number
 }
 
 export type MonthlyGroupPlan = {
@@ -733,6 +741,7 @@ export type UserCurrentPlanData = {
   numbers: NumberOrNull;
   payment_history_id: NumberOrNull;
   pending_downgrade_package_id: NumberOrNull;
+  pending_downgrade_package_type: StringOrNull;
   price: NumberOrNull;
   root_user_id: number;
 }
@@ -749,5 +758,124 @@ export type CC_CARD = {
   number: string;
   status: ZeroOrOne;
   time_stamp: string;
+  user_id: number;
+}
+
+export type UserBillingSettingsData = {
+  recharge_minimum: StringOrNull;
+  recharge_value: StringOrNull;
+  root_user_id: number;
+}
+
+export type APIResponseBillingSettings = APIResponseSuccess & { billing_settings: UserBillingSettingsData }
+
+export type SaveBillingSettingsData = {
+  enabled: boolean;
+  recharge_value: NumberOrNull;
+  recharge_minimum: NumberOrNull;
+}
+
+export type RecapData = {
+  pack_info: number
+  discount: number
+  subtotal: number
+  total: number
+}
+
+export type PendingDowngradeData = {
+  now: boolean,
+  package_type: string,
+  package_id: number
+}
+
+type InvoiceData = {
+  item_desc: string;
+  number: number;
+  date: string;
+  amount: string;
+  first_name: string;
+  last_name: string;
+  account_no: string;
+  address: string;
+  email: string;
+  quantity: number;
+  cc_last_four: string;
+};
+
+type InvoiceCoupon = {
+  id: number;
+  coupon_amount: number;
+  coupon_details: CouponDetails;
+};
+
+export type InvoicesInfo = {
+  invoice_data: InvoiceData;
+  invoice_coupon: InvoiceCoupon[];
+  invoice_id: number;
+}
+
+export type InvoicesDataResponse = APIResponseSuccess & {
+  invoices_info: InvoicesInfo[];
+}
+
+/* ----- Broadcast ----- */
+export type FirstStepData = {
+  name: string;
+  broadcast_advanced: string[]; // isn't the correct type, but for now...
+}
+
+export type SecondStepData = {
+  start_time_selected: 'now' | 'another' | null;
+  start_time: string | null;
+}
+
+export type ThirdStepData = null
+
+export type BroadcastData = {
+  first_step_data: FirstStepData | null;
+  second_step_data: SecondStepData | null;
+  third_step_data: null;
+}
+
+export type DraftToSave = {
+  broadcast_id?: NumberOrNull;
+  draft_step: number;
+  update_step: boolean;
+  draft_data: null | FirstStepData | SecondStepData | ThirdStepData;
+}
+
+export type Broadcast ={
+  amd_detection: ZeroOrOne;
+  audio_src: string;
+  call_in_code: StringOrNull
+  broadcast_id: number;
+  call_speed: CallSpeed;
+  caller_id: string;
+  calls: StringOrNull;
+  created_at: string;
+  created_by: string;
+  detail_count: number;
+  draft_step: number;
+  email_on_finish: ZeroOrOne;
+  ended_at: StringOrNull;
+  feedback: NumberOrNull;
+  has_tts_merge: boolean;
+  id: number;
+  library_id: NumberOrNull;
+  name: string;
+  number_when_completed: string;
+  offer_dnc: ZeroOrOne;
+  ptc_input: NumberOrNull;
+  push_to_connect: StringOrNull
+  repeat: ZeroOrOne;
+  repeat_audio: StringOrNull;
+  resume_time: StringOrNull;
+  retries: '1' | '2' | '3' | '4';
+  schedule_multiple: ZeroOrOne;
+  soft_deleted: ZeroOrOne;
+  start_time: StringOrNull;
+  started_at: StringOrNull;
+  static_intro_library_id: StringOrNull;
+  status: string;
   user_id: number;
 }

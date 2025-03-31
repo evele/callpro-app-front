@@ -26,6 +26,13 @@ export const useFetchGetBroadcastDetail = (broadcast_id:Ref<number>, selected_ta
     queryFn: () => getBroadcastDetail(dataToSend.value)    
   })
 }
+
+export const useFetchGetLastDraftID = () => {
+  return useQuery({
+    queryKey: ['last_draft_id'],
+    queryFn: () => getLastDraftID()
+  })
+}
   
 /* ----- Dashboard ----- */
 export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {
@@ -88,14 +95,14 @@ export const useFetchInvoices = () => {
   })
 }
 
-export const useFetchInvoiceToPrint = (invoice_id:Ref<number>) => {
+export const useFetchInvoicesToPrint = (invoices_ids:Ref<string[]>, enabled: boolean) => {
   const dataToSend = computed(()=> ({
-    trx_id: invoice_id.value
+    trx_ids: invoices_ids.value
   }))
-  //{ trx_id: invoice_id } // TODO: maybe will need to use computed
   return useQuery({
-    queryKey: ['invoices', dataToSend],
-    queryFn: () => getInvoiceDataToPrint(dataToSend.value),      
+    queryKey: ['invoices_to_print', dataToSend],
+    queryFn: () => getInvoicesDataToPrint(dataToSend.value),
+    enabled   
   })
 }
 
@@ -117,6 +124,13 @@ export const useFetchUserCards = () => {
   return useQuery({
     queryKey: ['user_cc_cards'],
     queryFn: () => getUserCards(),
+  })
+}
+
+export const useFetchUserBillingSettings = () => {
+  return useQuery({
+    queryKey: ['user_billing_settings'],
+    queryFn: () => getUserBillingSettings(),
   })
 }
 
