@@ -1,17 +1,17 @@
 <template>
     <div v-if="uploading" class="flex items-center gap-14 pt-20 pb-11 m-auto max-w-xl">
         <div>
-            <Avatar v-if="uploadError" class="bg-white border border-2 border-danger w-24 h-24" shape="circle">
+            <Avatar v-if="uploadError" class="bg-white border-2 border-danger w-24 h-24" shape="circle">
                 <template #icon>
                     <CloseSVG class="text-danger w-10 h-10"/>
                 </template>
             </Avatar>
-            <Avatar v-else-if="uploadSuccess" class="bg-white border border-2 border-success w-24 h-24" shape="circle">
+            <Avatar v-else-if="uploadSuccess" class="bg-white border-2 border-success w-24 h-24" shape="circle">
                 <template #icon>
                     <CheckSVG class="text-success w-14 h-14"/>
                 </template>
             </Avatar>
-            <Avatar v-else class="bg-white border border-2 border-black w-24 h-24" shape="circle">
+            <Avatar v-else class="bg-white border-2 border-black w-24 h-24" shape="circle">
                 <template #icon>
                     <FileSVG class="text-black w-10 h-10"/>
                 </template>
@@ -31,9 +31,9 @@
         </div>
 
         <div>
-            <Avatar v-if="uploadError || uploadSuccess" class="bg-white border w-9 h-9 hover:cursor-pointer hover:bg-gray-100 transition-colors" shape="circle" @click="emit('clear');">
+            <Avatar v-if="uploadError || uploadSuccess" class="bg-white p-0 border w-9 h-9 hover:cursor-pointer hover:bg-gray-100 transition-colors" shape="circle" @click="emit('clear');">
                 <template #icon>
-                    <TrashSVG></TrashSVG>
+                    <TrashSVG class="w-4 h-4"></TrashSVG>
                 </template>
             </Avatar>
         </div>

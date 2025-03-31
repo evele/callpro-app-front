@@ -18,7 +18,7 @@ module.exports = {
           danger: '#C00F0C',
           'danger-1': '#EC221F',
           'danger-2': '#900B09',
-          'danger-light': '#fbd5d5', // Color más claro si lo necesitas
+          'danger-light': '#FEE9E7', // Color más claro si lo necesitas
           success: '#14AE5C',
           'success-light': '#d5fbd5',
           'light-2': '#F7F2FA',
@@ -37,6 +37,7 @@ module.exports = {
           'grey-7': '#B3B3B3',
           'grey-8': '#D9D9D9',
           'grey-9': '#5A5A5A',
+          'grey-10': '#E7E0EC',
           'grey-14': '#767676',
 
           verified: '#009951',

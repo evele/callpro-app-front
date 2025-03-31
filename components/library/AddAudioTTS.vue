@@ -38,7 +38,7 @@
                             />
                            
                             <!-- Botón CloseSVG para cancelar la edición -->
-                            <div @click="cancelEditing()" class="w-6 h-6 p-1 bg-[#e7e0ec] rounded-[10px] flex justify-center items-center cursor-pointer">
+                            <div @click="cancelEditing()" class="w-6 h-6 p-1 bg-grey-10 rounded-[10px] flex justify-center items-center cursor-pointer">
                                 <CloseSVG class="w-6 h-6" />
                             </div>
                         </div>
@@ -53,43 +53,29 @@
                     <div v-if="editingIndex !== index"
                         class="w-[138px] py-px justify-center items-center gap-3.5 flex">
                         <!-- play -->
-                        <Button 
-                            type="button" 
-                            class="w-6 h-6 bg-[#653494] rounded-[12px] justify-center items-center flex hover:scale-110 transition-transform"
-                            @click="handle_play_audio(audio)"
-                            :disabled="is_audio_loading"
-                        >
+                        <IconButton bg-color="bg-[#653494]" @click="handle_play_audio(audio)" :disabled="is_audio_loading">
                             <template #icon>
-                                <PlaySVG class="w-6 h-6 bg-[#653494] text-white rounded-[10px]" />
+                                <PlaySVG class="w-4 h-4 text-white" />
                             </template>
-                        </Button>
+                        </IconButton>
                         <!-- download -->
-                        <Button 
-                            type="button" 
-                            class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform"
-                            @click="handle_download_audio(audio.file_name)"    
-                        >
+                        <IconButton @click="handle_download_audio(audio.file_name)">
                             <template #icon>
-                                <DownloadSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
+                                <DownloadSVG class="w-5 h-5" />
                             </template>
-                        </Button>
+                        </IconButton>
                         <!-- edit -->
-                        <Button @click="startEditing(index, audio.name)" class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform">
+                        <IconButton @click="startEditing(index, audio.name)">
                             <template #icon>
-                                <EditIconSVG class="w-4 h-4 relative bg-[#e7e0ec] rounded-[10px]" />
+                                <EditIconSVG class="w-4 h-4" />
                             </template>
-                        </Button>
+                        </IconButton>
                         <!-- trash -->
-                        <Button 
-                            type="button"
-                            class="w-6 h-6 bg-[#e7e0ec] rounded-[12px] text-[#1D1B20] border-none hover:scale-110 transition-transform"
-                            @click="handle_delete(audio.file_name)" 
-                            :disabled="is_audio_loading"    
-                        >
+                        <IconButton bg-color="bg-[#322F35]" @click="handle_delete(audio.file_name)" :disabled="is_audio_loading">
                             <template #icon>
-                                <TrashSVG class="w-5 h-5 relative bg-[#e7e0ec] rounded-[10px]" />
+                                <TrashSVG class="w-4 h-4 text-white" />
                             </template>
-                        </Button>
+                        </IconButton>
                     </div>
                     <p v-show="is_audio_loading && audio_to_play_hook?.file_name == audio.file_name">Loading audio...</p>
                 </div>

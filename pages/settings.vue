@@ -41,7 +41,8 @@
                     />
                 </TabPanel>
                 <TabPanel value="text">
-                    <TextSettings v-if="!is_loading_did"
+                    <SettingsSkeleton v-if="isLoading || is_loading_did" />
+                    <TextSettings v-else
                         :text-settings="text_settings" 
                         :call-pro-numbers="call_pro_numbers"
                         :toll-free-numbers="toll_free_numbers"
@@ -49,7 +50,8 @@
                     />
                 </TabPanel>
                 <TabPanel value="general">
-                    <GeneralSettings 
+                    <SettingsSkeleton v-if="isLoading" />
+                    <GeneralSettings v-else
                         :general-settings="general_settings" 
                         @updateGeneralSettings="handle_update_general_settings" 
                     />
@@ -86,10 +88,20 @@
     const { mutate: updateTextSettings, isPending: is_saving_text_settings } = useUpdateTextSettings()
     const { mutate: updateGeneralSettings, isPending: is_saving_general_settings } = useUpdateGeneralSettings()
 
+    const route = useRoute()
     const toast = useToast()
     const show_ready_message = ref(false)
     const selected_tab = ref('voice')
     const confirmationModal = ref();
+
+    const tab_to_show = computed(() => Array.isArray(route.query?.tab) ? route.query?.tab[0] : route.query?.tab);
+
+    onMounted(() => {
+        const accepted_tabs = ['voice', 'text', 'general']
+        if(tab_to_show.value && accepted_tabs.includes(tab_to_show.value)) {
+            selected_tab.value = tab_to_show.value
+        }
+    })
 
     /* ----- Begin Voice Settings ----- */
     const voice_settings = computed((): VoiceSettingsWithAudio | null => {

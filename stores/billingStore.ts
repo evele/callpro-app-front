@@ -3,14 +3,14 @@ import { defineStore } from "pinia"
 type BillingState = {
   selected_step: FormattedStep | null;
   selected_plan: MonthlyGroupPlan | null;
-  reference_step_id: string | null;
+  reference_step_id: number | null;
   recap_data: RecapData;
 };
 
 type BillingActions = {
-  selectUnselectStep(step: FormattedStep): void;
+  selectUnselectStep(step: FormattedStep | null): void;
   selectUnselectPlan(plan: MonthlyGroupPlan): void;
-  setReferenceStepId(id: string | null): void;
+  setReferenceStepId(id: number | null): void;
   setRecapData(data: RecapData | null): void;
   resetStore(): void;
 }
@@ -32,8 +32,8 @@ export const useBillingStore = defineStore<"BillingStore", BillingState, {}, Bil
     }
   },
   actions: {
-    selectUnselectStep(step: FormattedStep) {
-      if(this.selected_step?.id === step.id) {
+    selectUnselectStep(step: FormattedStep | null) {
+      if(!step || this.selected_step?.id === step.id) {
         this.selected_step = null;
         return;
       }
@@ -48,7 +48,7 @@ export const useBillingStore = defineStore<"BillingStore", BillingState, {}, Bil
       this.selected_plan = plan;
       this.selected_step = null;
     },
-    setReferenceStepId(id: string | null) {
+    setReferenceStepId(id: number | null) {
       this.reference_step_id = id
       if(id !== null) {
         this.selected_step = null;

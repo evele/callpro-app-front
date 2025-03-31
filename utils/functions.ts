@@ -131,3 +131,18 @@ export const format_price = (price: number, decimals: number = 2) => {
   return price.toLocaleString('en-US', { style: 'currency', currency: 'USD',  maximumFractionDigits: decimals })
 }
 
+// Transform to this format "YYYY-MM-DD HH:MM AM/PM"
+export const format_start_time_to_db = (selected_time: string) => {
+  const date = new Date(selected_time);
+  
+  const year = new Intl.DateTimeFormat('en-US', { year: 'numeric' }).format(date);
+  const month = new Intl.DateTimeFormat('en-US', { month: '2-digit' }).format(date);
+  const day = new Intl.DateTimeFormat('en-US', { day: '2-digit' }).format(date);
+  const time = new Intl.DateTimeFormat('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true
+  }).format(date).replace(',', '');
+
+  return `${year}-${month}-${day} ${time}`;
+}
