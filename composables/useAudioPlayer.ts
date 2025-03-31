@@ -94,7 +94,7 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
         audio_to_play.value = user_audios.value[new_position]
     }
 
-    const handle_player_action = (action: string) => {
+    const handle_player_action = (action: PlayerActionTypes) => {
         reset_states()
         switch(action) {
             case 'loading':
@@ -115,6 +115,9 @@ export const useAudioPlayer = (user_audios: Ref<Audio[]> | Ref<ProcessedAudio[]>
                 break
             case 'next':
                 select_next_audio()
+                break
+            case 'close':
+                audio_to_play.value = null
                 break
             default:
                 break

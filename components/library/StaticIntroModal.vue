@@ -8,7 +8,7 @@
             <Divider class="absolute left-0 top-[75px]" />
         </template>
 
-        <div class="flex justify-between w-full mb-10">
+        <div class="flex justify-between w-full mb-6">
             <IconField>
                 <InputIcon>
                     <SearchSVG class="text-grey-secondary" />
@@ -35,73 +35,92 @@
             </div>
         </div>
 
-        <ProgressBar :class="[isFetching || isPendingSave ? 'opacity-1' : 'opacity-0']" mode="indeterminate" style="height: 6px"></ProgressBar>
-        <div v-if="user_audios" class="w-full max-h-[320px] overflow-y-auto rounded-tl-xl rounded-tr-xl">
-            <table class="w-full text-gray-700 border border-gray-200 border-collapse">
-                <thead class="sticky -top-[1px] z-[100] bg-[#e9e9e9]">
-                    <tr class="bg-[#e9e9e9] h-[38px] text-dark-2 font-medium border-b border-gray-300">
-                        <th class="px-8 w-20"></th>
-                        <th class="px-4 text-left text-sm font-medium">Name</th>
-                        <th class="px-4 text-center text-sm font-medium">Play</th>
-                        <th class="px-4 text-center text-sm font-medium">Edit</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <tr 
-                        v-if="user_audios.length"
-                        v-for="audio in user_audios"
-                        :key="audio.id"
-                        class="pt-4 pb-[15px] h-[70px] odd:bg-[#f4f4f4] even:bg-white cursor-pointer hover:bg-[#efe9f7]"
-                        :class="{ '!bg-[#ebddff]': selected_audio_id === audio.id }"
-                        @click="selected_audio_id = audio.id"
-                    >
-                        <td class="text-center">
-                            <RadioButton v-model="selected_audio_id" :inputId="'audio-' + audio.id" :name="'audio-' + audio.name" :value="audio.id" />
-                        </td>
+        <ProgressBar :class="[isFetching || isPendingSave ? 'opacity-1' : 'opacity-0']" mode="indeterminate" style="height: 6px;"></ProgressBar>
+        <DataTable 
+            :value="user_audios"
+            v-model:selection="selected_audio"
+            scrollable 
+            class="static-intro-table m-auto w-full min-h-[450px] h-full" 
+            paginator
+            :rows="5"
+            dataKey="id"
+            :rowClass="rowClass"
+            selectionMode="single"
+        >
+            <Column headerStyle="width: 3rem">
+                <template #body="slotProps">
+                    <RadioButton v-model="selected_audio" :inputId="'audio-' + slotProps.data.id" :name="'audio-' + slotProps.data.name" :value="slotProps.data" />                                
+                </template>
+            </Column>
 
-                        <td>{{ audio.name }}</td>
+            <Column field="name" header="Name" class="text-left">
+                <template #body="slotProps">
+                    <div class="text-[#1D1B20] relative w-fit">
+                        <span>{{ slotProps.data.name }}</span>
+                    </div>
+                </template>
+            </Column>
 
-                        <td class="text-center">
-                            <ProgressSpinner 
-                                v-if="is_audio_loading && audio_to_play?.id === audio.id" 
-                                class="w-5 h-5" 
-                                strokeWidth="8" 
-                                fill="transparent" 
-                                animationDuration=".5s" 
-                                aria-label="Loading audio" 
-                            />
-                            <IconButton 
-                                v-else
-                                type="button"
-                                bg-color="bg-primary" 
-                                @click.stop="handle_play_audio(audio)"
-                                :disabled="is_audio_loading"
-                            >
-                                <template #icon>
-                                    <PlaySVG class="w-4 h-4 text-white" />
-                                </template>
-                            </IconButton>
-                        </td>
+            <Column field="play" header="Play" class="text-left">
+                <template #body="slotProps">
+                    <div class="text-[#1D1B20] relative w-fit">
+                        <ProgressSpinner 
+                            v-if="is_audio_loading && audio_to_play?.id === slotProps.data.id" 
+                            class="w-5 h-5" 
+                            strokeWidth="8" 
+                            fill="transparent" 
+                            animationDuration=".5s" 
+                            aria-label="Loading audio" 
+                        />
+                        <IconButton 
+                            v-else
+                            type="button"
+                            bg-color="bg-primary" 
+                            @click.stop="handle_play_audio(slotProps.data)"
+                            :disabled="is_audio_loading"
+                        >
+                            <template #icon>
+                                <PlaySVG class="w-4 h-4 text-white" />
+                            </template>
+                        </IconButton>
+                    </div>
+                </template>
+            </Column>
 
-                        <td class="text-center">
-                            <IconButton @click.stop="handle_open_edit_audio_modal(audio)">
-                                <template #icon>
-                                    <EditIconSVG class="w-4 h-4" />
-                                </template>
-                            </IconButton>
-                        </td>
-                    </tr>
-                    <tr v-else>
-                        <td class="text-center" colspan="4">{{ isFetching ? 'Loading data...' : 'No audios found' }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <Column field="play" header="Play" class="text-left">
+                <template #body="slotProps">
+                    <div class="text-[#1D1B20] relative w-fit">
+                        <IconButton @click.stop="handle_open_edit_audio_modal(slotProps.data)">
+                            <template #icon>
+                                <EditIconSVG class="w-4 h-4" />
+                            </template>
+                        </IconButton>
+                    </div>
+                </template>
+            </Column>
+
+            <template #empty>
+                <tr v-if="isFetching">
+                    <td>
+                        Loading data...
+                    </td>
+                </tr>
+                <tr v-else>
+                    <td>
+                        No audios found
+                    </td>
+                </tr>
+            </template>
+
+            <template #paginatorstart>
+                <div></div>
+            </template>
+        </DataTable>
 
         <template #footer>
             <footer class="flex justify-center w-full font-bold mt-[38px]">
-                <Button @click="handle_save" class="w-[300px]" :disabled="!selected_audio_id">
-                    Save
+                <Button @click="handle_save" class="w-[300px]" :disabled="!selected_audio?.id">
+                    Ok
                 </Button>
             </footer>
         </template>
@@ -119,8 +138,6 @@
             <InputText type="text" id="audio-name" v-model="audio_name" placeholder="Enter Name" />
         </div>
     </ConfirmationModal>
-
-    <AudioPlayer v-if="visible" @action="handle_player_action" />
 
     <StaticIntroSubModal ref="staticIntroSubModal" :section-to-show="submodal_section_to_show" @update:audios="refetch" />
 </template>
@@ -155,25 +172,25 @@
     }
 
     /* ----- Audio Player ----- */
-    const { audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(user_audios, true)
+    const { audio_to_play, is_audio_loading } = useAudioPlayer(user_audios, true)
     /* ----- Audio Player ----- */
 
-    const selected_audio_id = ref<number | null>(null)
+    const selected_audio = ref<Audio | null>(null)
     const selected_audio_to_edit = ref<Audio | null>(null)
     const search = ref('')
     const confirmationModal = ref()
     const audio_name = ref('')
 
-    const open = (audio_id: number | undefined) => {
-        if(audio_id) {
-            selected_audio_id.value = audio_id
+    const open = (audio: Audio) => {
+        if(audio) {
+            selected_audio.value = audio
         }
         refetch()
         visible.value = true;
     }
 
     const close = () => {
-        selected_audio_id.value = null
+        selected_audio.value = null
         selected_audio_to_edit.value = null
         audio_name.value = ''
         search.value = ''
@@ -186,13 +203,11 @@
     }
 
     const handle_save = () => {
-        if(!selected_audio_id.value) {
+        if(!selected_audio.value?.id) {
             show_error_toast('Validation error', 'Please select an audio to save')
             return
         }
-
-        const selected_audio = user_audios.value.find((audio: Audio) => audio.id === selected_audio_id.value)
-        emit('update:selected-audio', selected_audio)
+        emit('update:selected-audio', selected_audio.value)
         close()
     }
 
@@ -261,4 +276,87 @@
         audiosStore.audio_playing = null
         staticIntroSubModal?.value?.open_modal()
     }
+
+    const rowClass = (audio: Audio) => {
+        return [{ '!bg-[#E9DDFF]': selected_audio?.value?.id === audio.id }];
+    };
 </script>
+
+<style lang="scss">
+.static-intro-table {
+    .p-datatable-table {
+        border-collapse: collapse;
+        width: 100%;
+        position: relative;
+    }
+
+    .p-datatable-thead, .p-datatable-header-cell {
+        background-color: #e9e9e9;
+        line-height: 28px;
+ 
+        &:first-child {
+            border-top-left-radius: 6px;
+        }
+        &:last-child {
+            border-top-right-radius: 6px;
+        }
+
+        th {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+    }
+
+    .p-datatable-tbody {
+
+        tr {
+            &:nth-child(even) {
+                background-color: rgba(121, 116, 126, 0.08);
+            }
+
+            height: 70px!important;
+            
+            &:hover {
+                cursor: pointer;
+                background-color: #efe9f7;
+            }
+            td {
+                height: 70px!important;
+            }
+        }
+    }
+
+    .p-datatable-paginator-bottom {
+        border: none;
+        position: absolute;
+        bottom: 0px;
+        width: 100%;
+
+        .p-paginator-first, .p-paginator-prev, .p-paginator-page, .p-paginator-next, .p-paginator-last {
+            background-color: transparent;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            height: 24px;
+            width: 24px;
+            min-width: 24px;
+
+            &:hover {
+                background-color: #e6e2e2;
+            }
+        }
+
+        .p-paginator-page-selected {
+            background-color: #2C2C2C;
+            color: white;
+            
+            &:hover {
+                background-color: #2C2C2C;
+            }
+        }
+    }
+}
+</style>

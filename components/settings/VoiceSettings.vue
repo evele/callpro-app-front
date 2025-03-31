@@ -1,18 +1,18 @@
 <template>
     <SettingSection title="Caller ID" description="Set the phone number that appears on the caller ID.">
         <div class="flex justify-between gap-2 items-center">
-            <label class="text-lg font-medium w-48">Caller ID</label>
-            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" @change="handle_select_change" />
+            <label class="font-medium w-48">Caller ID</label>
+            <Select v-model="voice_settings.caller_id_selected" :options="caller_id_options" optionLabel="name" optionValue="code" class="w-[240px]" placeholder="Select" @change="handle_select_change" />
         </div>
 
         <div v-if="voice_settings.caller_id_selected !== '3'" class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium w-48">Your CallPro Number</label>
-            <Select v-if="voice_settings.caller_id_selected === '1'" v-model="selected_call_pro" :options="formatted_callpro_numbers" class="w-[294px]" placeholder="Select" :disabled="props.callProNumbers.length < 2" />
-            <Select v-else v-model="selected_toll_free" :options="formatted_tollfree_numbers" class="w-[294px]" placeholder="Select" :disabled="props.tollFreeNumbers.length < 2" />
+            <label class="font-medium w-48">Your CallPro Number</label>
+            <Select v-if="voice_settings.caller_id_selected === '1'" v-model="selected_call_pro" :options="formatted_callpro_numbers" class="w-[240px]" placeholder="Select" :disabled="props.callProNumbers.length < 2" />
+            <Select v-else v-model="selected_toll_free" :options="formatted_tollfree_numbers" class="w-[240px]" placeholder="Select" :disabled="props.tollFreeNumbers.length < 2" />
         </div>
 
         <div v-else :key="voice_settings.caller_id_selected" class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium w-48">{{ cidConfirm == '1' ? 'Select Caller ID' : 'Enter Caller ID' }}</label>
+            <label class="font-medium w-48">{{ cidConfirm == '1' ? 'Select Caller ID' : 'Enter Caller ID' }}</label>
 
             <div v-if="cidConfirm == '1'" class="relative">
                 <CallerIDSelect
@@ -29,8 +29,8 @@
                 </Button>
             </div>
 
-            <PhoneInput v-else class="!w-[294px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
-                :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" 
+            <PhoneInput v-else class="!w-[240px]" :model-value="voice_settings.caller_id" @update:modelValue="(v: string) => voice_settings.caller_id = v" 
+                :number-error="caller_id_error_message" @hasError="(val: boolean) => caller_id_error = val" :allow-break-mask="true" 
             />
         </div>
     </SettingSection>
@@ -38,14 +38,35 @@
 
     <SettingSection title="Static Intro" description="Include a professional or personalized message as an intro to your voice broadcast.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Static audio introduction</label>
-            <ToggleSwitch v-model="voice_settings.static_intro" class="scale-125" />
+            <label class="font-medium">Static audio introduction</label>
+            <ToggleSwitch v-model="voice_settings.static_intro" class="scale-110" />
         </div>
         <div v-if="voice_settings.static_intro" class="flex justify-between items-center mt-7">
-            <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected?.name}}</p>
+            <div class="flex items-center gap-4">
+                <p class="text-lg underline italic">{{voice_settings.static_intro_audio_selected?.name}}</p>
+                <ProgressSpinner 
+                    v-if="props.isAudioLoading"
+                    class="w-5 h-5" 
+                    strokeWidth="8" 
+                    fill="transparent" 
+                    animationDuration=".5s" 
+                    aria-label="Loading audio"
+                />
+                <IconButton v-else
+                    type="button"
+                    bg-color="bg-primary" 
+                    @click.stop="handle_play_audio(voice_settings.static_intro_audio_selected ?? undefined)"
+                    :disabled="props.isAudioLoading"
+                >
+                    <template #icon>
+                        <PlaySVG class="w-4 h-4 text-white" />
+                    </template>
+                </IconButton>
+            </div>
+
             <div class="flex items-center gap-2">
                 <span v-if="static_intro_error" class="text-red-500">{{ static_intro_error_message }}</span>
-                <IconButton @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected?.id)">
+                <IconButton @click="handle_open_static_intro_modal(voice_settings.static_intro_audio_selected ?? undefined)">
                     <template #icon>
                         <EditIconSVG class="w-4 h-4" />
                     </template>
@@ -57,60 +78,60 @@
 
     <SettingSection title="Repeat" description="Give recipients of your message, the option to replay it.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Repeat</label>
-            <ToggleSwitch v-model="voice_settings.repeat" class="scale-125" />
+            <label class="font-medium">Repeat</label>
+            <ToggleSwitch v-model="voice_settings.repeat" class="scale-110" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Offer Do not Call response" description="Offer your recipients the chance to not receive future calls.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">DNC response</label>
-            <ToggleSwitch v-model="voice_settings.offer_dnc" class="scale-125" />
+            <label class="font-medium">DNC response</label>
+            <ToggleSwitch v-model="voice_settings.offer_dnc" class="scale-110" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Retries" description="The number of times the system have to call the recipient.">
         <div class="flex justify-between items-center gap-2">
-            <label class="text-lg font-medium">Number of Retries</label>
-            <Select v-model="voice_settings.retries" :options="retries_options" class="w-[294px]" placeholder="Select" />
+            <label class="font-medium">Number of Retries</label>
+            <Select v-model="voice_settings.retries" :options="retries_options" class="w-[128px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Call Speed" description="The number of calls the system have to call at once.">
         <div class="flex justify-between items-center gap-2">
-            <label class="text-lg font-medium max-w-48">Number of calls at once</label>
-            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
+            <label class="font-medium max-w-48">Number of calls at once</label>
+            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" optionValue="code" class="w-[128px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="AMD Detection" description="The system must detect if a machine answered the call. If it does, wait for the machine to stop playing the greeting.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Stop playing if detects machine</label>
-            <ToggleSwitch v-model="voice_settings.amd_detection" class="scale-125" />
+            <label class="font-medium">Stop playing if detects machine</label>
+            <ToggleSwitch v-model="voice_settings.amd_detection" class="scale-110" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Broadcast Confirmation Email" description="Receive an email when the broadcast is completed.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Receive an email</label>
-            <ToggleSwitch v-model="voice_settings.email_on_finish" class="scale-125" />
+            <label class="font-medium">Receive an email</label>
+            <ToggleSwitch v-model="voice_settings.email_on_finish" class="scale-110" />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Number when completed" description="Set a phone number to receive a call when the broadcast is completed.">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Number when completed</label>
-            <ToggleSwitch v-model="voice_settings.number_when_completed_status" class="scale-125" />
+            <label class="font-medium">Number when completed</label>
+            <ToggleSwitch v-model="voice_settings.number_when_completed_status" class="scale-110" />
         </div>
         <div v-if="voice_settings.number_when_completed_status" class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium w-48">Number To Send When Completed</label>
-            <PhoneInput class="!w-[294px]" :model-value="voice_settings.number_when_completed" @update:modelValue="(v: string) => voice_settings.number_when_completed = v" 
+            <label class="font-medium w-48">Number To Send When Completed</label>
+            <PhoneInput class="!w-[240px]" :model-value="voice_settings.number_when_completed" @update:modelValue="(v: string) => voice_settings.number_when_completed = v" 
                 :number-error="number_when_completed_error_message" @hasError="(val: boolean) => number_when_completed_error = val"    
             />
         </div>
@@ -127,11 +148,12 @@
         voiceSettings: { type: [Object, null] as PropType<VoiceSettingsWithAudio | null>, required: true, default: null },
         callProNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
         tollFreeNumbers: { type: Array as PropType<string[]>, required: true, default: [] },
-        cidConfirm: { type: String as PropType<'0' | '1'>, required: true, default: '0' }
+        cidConfirm: { type: String as PropType<'0' | '1'>, required: true, default: '0' },
+        isAudioLoading: { type: Boolean, required: false, default: false },
     })
 
     const { data: callerIDNumbers, isLoading: isLoadingCallerID, refetch: getCallerIDNumbers } = useFetchCallerIDNumbers(false)
-    const emit = defineEmits(['updateVoiceSettings', 'hasError'])
+    const emit = defineEmits(['updateVoiceSettings', 'hasError', 'update:audioToPlay'])
 
     const caller_id_empty = ref(false)
     const caller_id_error = ref(false)
@@ -294,8 +316,9 @@
 
     /* ----- Static Intro Section ----- */
     const staticIntroModalRef = ref()
-    const handle_open_static_intro_modal = (audio_id: number | undefined) => {
-        staticIntroModalRef.value?.open(audio_id)
+    const handle_open_static_intro_modal = (audio: Audio | undefined) => {
+        if(!audio) return
+        staticIntroModalRef.value?.open(audio)
     }
 
     const handle_audio_selection = (selected_audio: Audio) => {
@@ -330,5 +353,11 @@
             temp_selected_caller_id.value = ''
             voice_settings.caller_id = ''
         }
+    }
+
+    /* ----- Play Audio ----- */
+    const handle_play_audio = (audio: Audio | undefined) => {
+        if(!audio) return
+        emit('update:audioToPlay', audio)
     }
 </script>
