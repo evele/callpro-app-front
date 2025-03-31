@@ -148,7 +148,7 @@
 
     const selected_contacts = ref([])
     const new_number = ref('')
-    const form_action = ref('')
+    const form_action = ref<FormAction>('')
     const has_phone_number_error = ref(false)
 
     const emit = defineEmits(['close', 'success', 'error'])

@@ -1,35 +1,45 @@
 <template>
     <SettingSection title="Time zones" description="Set your time zone">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Time zone</label>
-            <Select v-model="general_settings.time_zone" :options="time_zones_options" optionLabel="name" optionValue="code" class="w-[294px]" placeholder="Select" />
+            <label class="font-medium">Time zone</label>
+            <Select v-model="general_settings.time_zone" :options="time_zones_options" optionLabel="name" optionValue="code" 
+                class="w-[294px]" placeholder="Select" @change="handle_update" 
+            />
         </div>
     </SettingSection>
     <Divider />
 
     <SettingSection title="Call Time Guard" description="Set a time when the system will not dial any calls (i.e.: At night, etc).">
         <div class="flex justify-between items-center">
-            <label class="text-lg font-medium">Set a time guard</label>
-            <ToggleSwitch v-model="general_settings.time_guard" class="scale-125" />
+            <label class="font-medium">Set a time guard</label>
+            <ToggleSwitch v-model="general_settings.time_guard" class="scale-110" @change="handle_update" />
         </div>
         
-        <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-7">
-            <label class="text-lg font-medium">Choose A Starting Time</label>
-            <DatePicker v-model="general_settings.call_window_start" hourFormat="12" :manualInput="false" showIcon timeOnly iconDisplay="input" class="w-[294px] flex items-center">
-                <template #inputicon="slotProps">
-                    <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
-                </template>
-            </DatePicker>
-        </div>
+        <Transition>
+            <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-7">
+                <label class="font-medium">Choose A Starting Time</label>
+                <DatePicker v-model="general_settings.call_window_start" hourFormat="12" showIcon timeOnly iconDisplay="input"
+                    class="w-[200px] flex items-center" @update:modelValue="handle_update"
+                >
+                    <template #inputicon="slotProps">
+                        <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
+                    </template>
+                </DatePicker>
+            </div>
+        </Transition>
 
-        <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-5">
-            <label class="text-lg font-medium">Choose An Ending Time</label>
-            <DatePicker v-model="general_settings.call_window_end" hourFormat="12" :manualInput="false" showIcon timeOnly iconDisplay="input" class="w-[294px] flex items-center">
-                <template #inputicon="slotProps">
-                    <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
-                </template>
-            </DatePicker>
-        </div>
+        <Transition>
+            <div v-if="general_settings.time_guard" class="flex justify-between items-center mt-5">
+                <label class="font-medium">Choose An Ending Time</label>
+                <DatePicker v-model="general_settings.call_window_end" hourFormat="12" showIcon timeOnly iconDisplay="input" 
+                    class="w-[200px] flex items-center" @update:modelValue="handle_update"
+                >
+                    <template #inputicon="slotProps">
+                        <ClockSVG class="text-[#334155] w-6" @click="slotProps.clickCallback" />
+                    </template>
+                </DatePicker>
+            </div>
+        </Transition>
     </SettingSection>
     <Divider />
 </template>
@@ -96,15 +106,15 @@
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     };
 
-    watch(general_settings, (updatedSettings: GeneralSettingsUI) => {
+    const handle_update = () => {
         const settings_to_save: GeneralSettings = {
-            call_window_start: format_time(updatedSettings.call_window_start),
-            call_window_end: format_time(updatedSettings.call_window_end),
-            time_guard: updatedSettings.time_guard ? '1' : '0',
-            time_zone: updatedSettings.time_zone ?? '1',
+            call_window_start: format_time(general_settings.call_window_start),
+            call_window_end: format_time(general_settings.call_window_end),
+            time_guard: general_settings.time_guard ? '1' : '0',
+            time_zone: general_settings.time_zone ?? '1',
         }
         emit('updateGeneralSettings', settings_to_save)
-    })
+    }
 </script>
 
 <style scoped lang="scss">
@@ -112,5 +122,17 @@
     .p-datepicker-input-icon-container {
         top: 40%;
     }
+}
+
+.v-enter-active {
+    transition: opacity 0.5s ease;
+}
+.v-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

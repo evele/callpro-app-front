@@ -17,6 +17,7 @@ export type ContactsModalSectionToShow = '' | 'contact' | 'new_group' | 'dnc' | 
 export type AudioLbryModalSectionToShow = '' | 'tts' | 'call_in' | 'upload';
 export type BillingSectionToShow = 'main' | 'buy_credits' | 'checkout_form'
 export type FilterOption = { id: string, name: string, count: number, code?: StringOrNull }
+export type FormAction = 'clear' | 'fill' | '' | undefined
 
 export type APIResponseError = {
   result: false,

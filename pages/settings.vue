@@ -36,8 +36,10 @@
                         :call-pro-numbers="call_pro_numbers"
                         :toll-free-numbers="toll_free_numbers"
                         :cid-confirm="user_admin_settings?.cid_confirm"
+                        :is-audio-loading="is_audio_loading"
                         @updateVoiceSettings="handle_update_voice_settings" 
-                        @hasError="handle_voice_settings_error" 
+                        @hasError="handle_voice_settings_error"
+                        @update:audioToPlay="handle_play_audio"
                     />
                 </TabPanel>
                 <TabPanel value="text">
@@ -61,7 +63,7 @@
 
         <Transition>
             <Button 
-                v-show="show_scroll_button && !isLoading" 
+                v-show="show_scroll_button && !isLoading && selected_tab === 'voice'" 
                 class="absolute -bottom-3 w-8 h-8 left-1/2 transform -translate-x-1/2 hover:scale-110 transition-transform" 
                 @click="scrollDown"
             >
@@ -78,29 +80,49 @@
         <p class="text-lg font-semibold">Scheduled broadcasts will be send with new time zone. Are you sure you want to change it?</p>
     </ConfirmationModal>
 
+    <ConfirmationModal 
+        ref="confirmationLeaveModal"
+        title="Confirm discard changes"
+        @cancel="handle_cancel_leave"
+        @confirm="handle_confirm_leave"
+    >
+        <p class="text-lg font-semibold">Your changes have not been saved. Discard changes?</p>
+    </ConfirmationModal>
+
     <Toast />
+
+    <AudioPlayer v-if="visible" @action="handle_player_action" />
 </template>
 
 <script setup lang="ts">
+    import { type RouteLocationNormalized } from 'vue-router'
     const { data: did_numbers, isLoading: is_loading_did } = useFetchDidAndTollFreeNumbers()
     const { data: settings, isLoading } = useFetchSettings()
     const { mutate: updateVoiceSettings, isPending: is_saving_voice_settings } = useUpdateVoiceSettings()
     const { mutate: updateTextSettings, isPending: is_saving_text_settings } = useUpdateTextSettings()
     const { mutate: updateGeneralSettings, isPending: is_saving_general_settings } = useUpdateGeneralSettings()
 
+    type SettingsTabs = 'voice' | 'text' | 'general'
+
     const route = useRoute()
+    const router = useRouter()
     const toast = useToast()
     const show_ready_message = ref(false)
-    const selected_tab = ref('voice')
+    const selected_tab = ref<SettingsTabs>('voice')
     const confirmationModal = ref();
+    const confirmationLeaveModal = ref();
 
     const tab_to_show = computed(() => Array.isArray(route.query?.tab) ? route.query?.tab[0] : route.query?.tab);
 
     onMounted(() => {
         const accepted_tabs = ['voice', 'text', 'general']
         if(tab_to_show.value && accepted_tabs.includes(tab_to_show.value)) {
-            selected_tab.value = tab_to_show.value
+            selected_tab.value = tab_to_show.value as SettingsTabs
         }
+    })
+
+    watch(selected_tab, (newVal: SettingsTabs) => {
+        if(newVal === 'voice') show_scroll_button.value = true
     })
 
     /* ----- Begin Voice Settings ----- */
@@ -264,12 +286,7 @@
     const show_save_general_settings_button = ref(false)
     const disabled_save_general_settings_button = computed(() => is_saving_general_settings.value || !show_save_general_settings_button.value)
 
-    const general_settings_mounted = ref(false)
     const handle_update_general_settings = (general_settings: GeneralSettings) => {
-        if(!general_settings_mounted.value) { // Prevents the first update (when settings are loaded) from being sent
-            general_settings_mounted.value = true
-            return;
-        }
         show_save_general_settings_button.value = true
         general_settings_formatted.value = general_settings
     }
@@ -302,7 +319,6 @@
             onSuccess: (response: APIResponseSuccess | APIResponseError) => {
                 if(response.result) {
                     show_save_general_settings_button.value = false
-                    general_settings_mounted.value = false
                     show_ready_message.value = true
                     setTimeout(() => show_ready_message.value = false, 2000)
                 } else {
@@ -334,7 +350,7 @@
 
     const handle_scroll = (event: Event) => {
         const target = event.target as HTMLElement;
-        const is_at_bottom = target.scrollHeight - target.scrollTop <= target.clientHeight;
+        const is_at_bottom = target.scrollHeight - target.scrollTop - 2 <= target.clientHeight;
         show_scroll_button.value = !is_at_bottom
     }
 
@@ -349,6 +365,37 @@
             }
         }
     };
+
+    const have_data_unsaved = computed(() => show_save_voice_settings_button.value || show_save_text_settings_button.value || show_save_general_settings_button.value)
+    const nextRoute = ref<RouteLocationNormalized | null>(null)
+    const can_leave = ref(false)
+    
+    const handle_confirm_leave = () => {
+        confirmationLeaveModal.value?.close()
+        can_leave.value = true
+        if(nextRoute?.value?.path) router.push(nextRoute.value.path)
+    }
+
+    const handle_cancel_leave = () => nextRoute.value = null
+
+    onBeforeRouteLeave((to: RouteLocationNormalized) => {
+        if (have_data_unsaved.value && !can_leave.value) {
+            confirmationLeaveModal.value?.open()
+            nextRoute.value = to;
+            return false;
+        }
+    });
+
+    /* ----- Audio Player ----- */
+    const visible = ref(true)
+
+    const handle_play_audio = (audio: Audio) => {
+        if(!audio) return
+        audio_to_play.value = audio
+    }
+
+    const { audio_to_play, handle_player_action, is_audio_loading } = useAudioPlayer(null, false)
+    /* ----- Audio Player ----- */
 </script>
 
 <style scoped lang="scss">

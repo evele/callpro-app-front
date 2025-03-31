@@ -92,7 +92,7 @@
     const queryClient = useQueryClient()
 
     const number_error = ref('');
-    const form_action = ref('')
+    const form_action = ref<FormAction>('')
     const has_phone_number_error = ref(false)
     const is_editing = ref(false)
 
