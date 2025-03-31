@@ -4,10 +4,17 @@ interface GeneralState {
   timezones: Timezone[];
   area_codes: AreaCodes[];
   user_timezone: Timezone | null;
+  is_navbar_collapsed: boolean;
 }
 
-export const useGeneralStore = defineStore("GeneralStore", {
-  state: ():GeneralState => {
+interface GeneralActions {
+  getUserAreaCodesAndTimezonesData: () => Promise<void>;
+  getUserTimezone: () => Promise<void>;
+  toggleCollapseNavbar: () => void;
+}
+
+export const useGeneralStore = defineStore<"GeneralStore", GeneralState, {}, GeneralActions>("GeneralStore", {
+  state: (): GeneralState => {
     return {
       timezones: [
         { zones_id: "1", country_initials: "CA", zone: "America/Moncton", offset: "GMT-03:00", display: "Atlantic Time (Canada)" },
@@ -21,7 +28,8 @@ export const useGeneralStore = defineStore("GeneralStore", {
         { zones_id: "9", country_initials: "UK", zone: "Europe/London", offset: "GMT+01:00", display: "United Kingdom" }
       ],
       area_codes: JSON.parse(localStorage.getItem("area_codes") ?? "{}"),
-      user_timezone: null     
+      user_timezone: null,
+      is_navbar_collapsed: false 
     }
   },
   actions: {
@@ -38,6 +46,9 @@ export const useGeneralStore = defineStore("GeneralStore", {
       if(response.result) {
         this.user_timezone  = response.user_timezone
       }
+    },
+    toggleCollapseNavbar(): void {
+      this.is_navbar_collapsed = !this.is_navbar_collapsed
     }
   },
 })
