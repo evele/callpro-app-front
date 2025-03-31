@@ -21,6 +21,9 @@ export default defineNuxtConfig({
             }
         }
       }
+    },
+    components : {
+      exclude: ['Form','FormField'],
     }
   },
   css: [
