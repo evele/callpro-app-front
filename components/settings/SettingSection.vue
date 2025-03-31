@@ -1,5 +1,5 @@
 <template>
-    <section class="flex w-full gap-20 p-3">
+    <section class="flex w-full gap-20 p-4">
         <div class="min-w-48 w-[25%]">
             <h3 class="text-[#4F378B] text-lg font-bold mb-2">{{ props.title }}</h3>
             <p class="text-[#757575] text-sm">{{ props.description}}</p>

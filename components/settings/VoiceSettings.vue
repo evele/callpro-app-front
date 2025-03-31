@@ -95,7 +95,7 @@
     <SettingSection title="Retries" description="The number of times the system have to call the recipient.">
         <div class="flex justify-between items-center gap-2">
             <label class="font-medium">Number of Retries</label>
-            <Select v-model="voice_settings.retries" :options="retries_options" class="w-[200px]" placeholder="Select" />
+            <Select v-model="voice_settings.retries" :options="retries_options" class="w-[128px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
@@ -103,7 +103,7 @@
     <SettingSection title="Call Speed" description="The number of calls the system have to call at once.">
         <div class="flex justify-between items-center gap-2">
             <label class="font-medium max-w-48">Number of calls at once</label>
-            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" optionValue="code" class="w-[200px]" placeholder="Select" />
+            <Select v-model="voice_settings.call_speed" :options="call_speed_options" optionLabel="name" optionValue="code" class="w-[128px]" placeholder="Select" />
         </div>
     </SettingSection>
     <Divider />
