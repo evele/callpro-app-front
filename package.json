@@ -25,6 +25,7 @@
 	},
 	"devDependencies": {
 		"@primevue/nuxt-module": "^4.x.x",
+		"@types/node": "^22.13.10",
 		"@vueuse/core": "^11.1.0",
 		"@vueuse/nuxt": "^11.1.0",
 		"autoprefixer": "^10.4.20",
