@@ -15,6 +15,7 @@
 		"@pinia/nuxt": "^0.5.1",
 		"@primevue/themes": "^4.x.x",
 		"@tanstack/vue-query": "^5.51.9",
+		"chart.js": "^4.4.8",
 		"html2canvas": "^1.4.1",
 		"jspdf": "^2.5.1",
 		"nuxt": "^3.12.2",
