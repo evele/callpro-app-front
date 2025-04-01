@@ -29,10 +29,6 @@ export default defineNuxtConfig({
   css: [
     '@/assets/css/main.css'
   ],
-  /*
-  plugins: [
-    { src: '~/plugins/encryptedfields.js', mode: 'client' }
-  ],*/
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -65,17 +61,6 @@ export default defineNuxtConfig({
       pathPrefix: false,
     },
   ],
-  /*
-  vite: {
-    resolve: {
-      alias: {
-        'jsencrypt': 'jsencrypt/bin/jsencrypt'
-      }
-    },
-    optimizeDeps: {
-      include: ['jsencrypt']
-    }
-  },*/
   typescript: {
     typeCheck: true,
     strict: true,
