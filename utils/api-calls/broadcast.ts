@@ -36,7 +36,7 @@ type BroadcastDetailResponse = {
     results_count: number;
     broadcast_details: BroadcastDetails[];
     state: StateOption;    
-  }
+}
 
 export async function getBroadcastHeader(data:{ broadcast_id: number }):Promise<BroadcastResponse | APIResponseError>{
     return await fetchWrapper.post(GET_BROADCAST_HEADER_URL,data) as BroadcastResponse | APIResponseError
@@ -76,18 +76,78 @@ export async function getLastDraftID():Promise<GetLastDraftIdResponse | APIRespo
 }
 
 /* ----- Get Broadcast ----- */
-type GetBroadcastParams = { broadcast_id: number }
 type GetBroadcastResponse = APIResponseSuccess & { 
     broadcast_data: { broadcast: Broadcast } | null 
 }
 
-export async function getBroadcast(data: GetBroadcastParams):Promise<GetBroadcastResponse | APIResponseError>{
+export async function getBroadcast(data: BroadcastIdParams):Promise<GetBroadcastResponse | APIResponseError>{
     return await fetchWrapper.post(GET_BROADCAST_URL, data) as GetBroadcastResponse | APIResponseError
 }
 
 /* ----- Delete Draft ----- */
-type DeleteDraftParams = { broadcast_id: number }
-
-export async function deleteDraft(data: DeleteDraftParams):Promise<APIResponseSuccess | APIResponseError>{
+export async function deleteDraft(data: BroadcastIdParams):Promise<APIResponseSuccess | APIResponseError>{
     return await fetchWrapper.post(DELETE_DRAFT_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Get total monthly numbers ----- */
+type GetTotalMonthlyNumbersParams = BroadcastIdParams & { 
+    tts_merge_enable: ZeroOrOne
+}
+type GetTotalMonthlyNumbersResponse = APIResponseSuccess & { 
+    total_contacts: number 
+    total_numbers: number 
+}
+
+export async function getTotalMonthlyNumbers(data: GetTotalMonthlyNumbersParams):Promise<GetTotalMonthlyNumbersResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_TOTAL_MONTHLY_NUMBERS_URL, data) as GetTotalMonthlyNumbersResponse | APIResponseError
+}
+
+/* ----- Save selected numbers contact ----- */
+type SaveSelectedNumbersContactParams = BroadcastIdParams & { 
+    numbers: string[]
+}
+
+export async function saveSelectedNumbersContact(data: SaveSelectedNumbersContactParams):Promise<APIResponseSuccess | APIResponseError>{
+    return await fetchWrapper.post(SAVE_SELECTED_NUMBERS_CONTACT_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Delete selected numbers contact ----- */
+type DeleteSelectedNumbersContactParams = BroadcastIdParams & { 
+    number_to_delete: string
+}
+
+export async function deleteSelectedNumbersContact(data: DeleteSelectedNumbersContactParams):Promise<APIResponseSuccess | APIResponseError>{
+    return await fetchWrapper.post(DELETE_SELECTED_NUMBERS_CONTACT_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Get group numbers selected ----- */
+type GetGroupNumbersSelectedResponse = APIResponseSuccess & { groups_selected: GroupSelected[] }
+
+export async function getGroupNumbersSelected(data: BroadcastIdParams):Promise<GetGroupNumbersSelectedResponse | APIResponseError>{
+    return await fetchWrapper.post(GROUP_NUMBERS_SELECTED_URL, data) as GetGroupNumbersSelectedResponse | APIResponseError
+}
+
+/* ----- Get all contacts and groups ----- */
+type GetAllContactsAndGroupsResponse = APIResponseSuccess & UserGroup[]
+
+export async function getAllContactsAndGroups():Promise<GetAllContactsAndGroupsResponse | APIResponseError>{
+    return await fetchWrapper.get(GET_ALL_CONTACTS_AND_GROUPS_URL) as GetAllContactsAndGroupsResponse | APIResponseError
+}
+
+/* ----- Get all contacts and groups ----- */
+export async function saveSelectedGroup(data: SaveSelectedGroupParams):Promise<APIResponseSuccess | APIResponseError>{
+    return await fetchWrapper.post(SAVE_SELECTED_GROUP_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Get credits needed ----- */
+type GetCreditsNeededParams = BroadcastIdParams & {
+    tts_merge_enable: ZeroOrOne
+}
+type GetCreditsNeededResponse = APIResponseSuccess & { 
+    remaining: number
+    total_price: number 
+}
+
+export async function getCreditsNeeded(data: GetCreditsNeededParams):Promise<GetCreditsNeededResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_CREDITS_NEEDED_URL, data) as GetCreditsNeededResponse | APIResponseError
 }

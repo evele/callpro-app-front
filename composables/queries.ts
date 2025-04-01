@@ -33,6 +33,34 @@ export const useFetchGetLastDraftID = () => {
     queryFn: () => getLastDraftID()
   })
 }
+
+export const useFetchGetAllContactsAndGroups = () => {
+  return useQuery({
+    queryKey: ['all_contacts_and_groups'],
+    queryFn: () => getAllContactsAndGroups()
+  })
+}
+
+export const useFetchGetGroupNumbersSelected = (broadcast_id: number) => {
+  const dataToSend = computed(() => ({ broadcast_id }))
+
+  return useQuery({
+    queryKey: ['group_numbers_selected', dataToSend],
+    queryFn: () => getGroupNumbersSelected(dataToSend.value)
+  })
+}
+
+export const useFetchGetTotalMonthlyNumbers = (broadcast_id: number, tts_merge_enable: Ref<ZeroOrOne>) => {
+  const dataToSend = computed(() => ({
+    broadcast_id,
+    tts_merge_enable: tts_merge_enable.value
+  }))
+
+  return useQuery({
+    queryKey: ['total_monthly_numbers', dataToSend],
+    queryFn: () => getTotalMonthlyNumbers(dataToSend.value), 
+  })
+}
   
 /* ----- Dashboard ----- */
 export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {

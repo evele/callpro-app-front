@@ -881,3 +881,20 @@ export type Broadcast ={
   status: string;
   user_id: number;
 }
+
+export type UserGroup = {
+  id: number | 'unassigned'
+  group_count: number
+  group_name: string
+  contact_list: {
+      contact_id: number
+      number_id: number
+  }
+}
+
+export type BroadcastIdParams = { broadcast_id: number }
+export type SaveSelectedGroupParams = BroadcastIdParams & { group_ids: number[] }
+export type GroupSelected = {
+  numbers_selected: number,
+  phone_number_group_id: number 
+}

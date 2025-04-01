@@ -35,6 +35,13 @@ export const SAVE_BROADCAST_DRAFT_URL = "/broadcast/save_broadcast_draft"
 export const GET_LAST_DRAFT_ID_URL = "/broadcast/get_last_draft_id"
 export const GET_BROADCAST_URL = "/broadcast/get_broadcast"
 export const DELETE_DRAFT_URL = "/broadcast/delete_draft"
+export const GET_TOTAL_MONTHLY_NUMBERS_URL = "/broadcast/get_total_monthly_numbers"
+export const SAVE_SELECTED_NUMBERS_CONTACT_URL = "/broadcast/save_selected_numbers_contact"
+export const DELETE_SELECTED_NUMBERS_CONTACT_URL = "/broadcast/delete_selected_numbers_contact"
+export const GROUP_NUMBERS_SELECTED_URL = "/broadcast/group_numbers_selected"
+export const GET_CREDITS_NEEDED_URL = "/broadcast/get_credits_needed"
+export const GET_ALL_CONTACTS_AND_GROUPS_URL = "/broadcast/get_all_contacts_and_groups"
+export const SAVE_SELECTED_GROUP_URL = "/broadcast/save_selected_group"
 
 /* ----- Caller ID Store ----- */
 export const GET_CALLER_ID_NUMBERS_URL = "/caller_id/get_caller_id_numbers"

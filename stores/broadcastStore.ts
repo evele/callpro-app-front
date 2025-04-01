@@ -38,8 +38,8 @@ type BroadcastActions = {
 export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {}, BroadcastActions>("BroadcastStore", {
     state: (): BroadcastState => {
         return {
-            current_step: 3,
-            completed_steps: 3,
+            current_step: 1,
+            completed_steps: 1,
             broadcast_id: null,
             broadcast_data: {
                 first_step_data: null,

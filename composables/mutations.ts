@@ -77,6 +77,18 @@ export const useCancelDowngrade = () => {
   }) 
 }
 
+
+/* ----- Broadcast ----- */
+export const useSaveSelectedGroup = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: SaveSelectedGroupParams) => saveSelectedGroup(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['group_numbers_selected'] })
+    },
+  }) 
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()
