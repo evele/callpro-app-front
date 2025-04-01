@@ -9,13 +9,14 @@
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
 		"type-check": "vue-tsc --noEmit",
-        "clean": "rm -rf .nuxt"
+		"clean": "rm -rf .nuxt"
 	},
 	"dependencies": {
 		"@pinia/nuxt": "^0.5.1",
 		"@primevue/themes": "^4.x.x",
 		"@tanstack/vue-query": "^5.51.9",
 		"html2canvas": "^1.4.1",
+		"jsencrypt": "^3.3.2",
 		"jspdf": "^2.5.1",
 		"nuxt": "^3.12.2",
 		"ohash": "^1.1.3",

@@ -1,11 +1,11 @@
 {
   "extends": "./.nuxt/tsconfig.json",
   "compilerOptions": {
-    "allowImportingTsExtensions":true
+    "allowImportingTsExtensions":true,
   },
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
   ]
   /*
     "noImplicitAny": true,          // Disallow implicit any types

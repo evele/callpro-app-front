@@ -118,18 +118,15 @@
                   >
                   <span v-else key="2">{{ labels.cardMonth || "MM" }}</span>
                 </transition>
-              </label>
-              /
+              </label>/
               <label
                 :for="inputFields.cardYear"
                 class="card-item__dateItem"
                 aria-label="Card year"
               >
                 <transition name="slide-fade-up">
-                  <span v-if="valueFields.cardYear" :key="valueFields.cardYear">{{
-                    String(valueFields.cardYear).slice(2, 4)
-                  }}</span>
-                  <span v-else key="2">{{ labels.cardYear || "YY" }}</span>
+                  <span v-if="valueFields.cardYear" :key="valueFields.cardYear">&nbsp;{{ valueFields.cardYear }}</span>
+                  <span v-else key="2">&nbsp;{{ labels.cardYear || "YY" }}</span>
                 </transition>
               </label>
             </div>
@@ -263,11 +260,13 @@
 
       const cardPatterns: Record<CardType, RegExp> = {
           [CardType.VISA]: /^4/,
-          [CardType.MASTERCARD]: /^5[1-5]|^22[2-9]|^2[3-7]/,
+          [CardType.MASTERCARD]: /^(?:5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d{2}|27[01]\d|2720)/,
           [CardType.AMERICAN_EXPRESS]: /^3[47]/,
           [CardType.DISCOVER]: /^6011|^64[4-9]|^65/,
           [CardType.JCB]: /^35/,
           [CardType.DINERS_CLUB]: /^3(0[0-5]|[68])/,
+          [CardType.MAESTRO]: /^(?:50(?:18|20|38)|5[6-9]|6\d)/,
+          [CardType.UNIONPAY]: /^62/,
           [CardType.UNKNOWN]: /.*/, // Fallback to avoid undefined
       };
 
@@ -412,6 +411,8 @@
           [CardType.DISCOVER]: defaultPlaceholder,
           [CardType.JCB]: defaultPlaceholder,
           [CardType.DINERS_CLUB]: dinersCardPlaceholder,
+          [CardType.MAESTRO]: defaultPlaceholder,
+          [CardType.UNIONPAY]: defaultPlaceholder,
           [CardType.UNKNOWN]: defaultPlaceholder,
         };
 

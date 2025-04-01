@@ -147,6 +147,8 @@ const changeNumber = (e: Event) => {
         [CardType.DISCOVER]: /^6011|^64[4-9]|^65/,
         [CardType.JCB]: /^35/,
         [CardType.DINERS_CLUB]: /^3(0[0-5]|[68])/,
+        [CardType.MAESTRO]: /^(?:50(?:18|20|38)|5[6-9]|6\d)/,
+        [CardType.UNIONPAY]: /^62/,
         [CardType.UNKNOWN]: /.*/, // Fallback to avoid undefined
     };
 

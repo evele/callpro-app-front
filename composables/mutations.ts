@@ -77,6 +77,16 @@ export const useCancelDowngrade = () => {
   }) 
 }
 
+export const useAddNewCard = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:New_CC) => addNewCard(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_cc_cards']})
+    }
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()

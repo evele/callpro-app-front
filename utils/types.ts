@@ -727,6 +727,8 @@ export enum CardType {
   DISCOVER = 'Discover',
   JCB = 'JCB',
   DINERS_CLUB = 'Diners Club',
+  MAESTRO = 'Maestro',
+  UNIONPAY = 'UnionPay',
   UNKNOWN = 'Unknown'
 }
 
@@ -761,6 +763,14 @@ export type CC_CARD = {
   status: ZeroOrOne;
   time_stamp: string;
   user_id: number;
+}
+
+export type New_CC = {
+  number: number; 
+  enc_card: string; 
+  cc_name: string; 
+  expiry: string; 
+  cvv: number;
 }
 
 export type UserBillingSettingsData = {
