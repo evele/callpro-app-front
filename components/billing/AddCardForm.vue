@@ -168,8 +168,6 @@
         } else if (year < currentYear || (year === currentYear && month < currentMonth)) {
             cardExpiryError.value = 'Expired card'
         }
-
-        console.log(cardExpiryError.value)
     })
 
     const maxLengthAmex = 17
