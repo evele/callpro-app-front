@@ -14,7 +14,18 @@
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
                         <label :for="inputFields.cardNumber" class="text-dark-3 text-sm">Card Number</label>
-                        <InputMask :id="inputFields.cardNumber" v-model="valueFields.cardNumber" mask="9999 9999 9999 9999" placeholder="#### #### #### ####" class="w-full mt-1 text-dark-3" data-card-field/>      
+                        <!-- 
+                            <InputMask :id="inputFields.cardNumber" v-model="valueFields.cardNumber" mask="9999 9999 9999 9999" placeholder="#### #### #### ####" class="w-full mt-1 text-dark-3" data-card-field/>      
+                            -->
+                        <InputText 
+                        :id="inputFields.cardNumber"
+                        :value="valueFields.cardNumber"
+                        @input="changeNumber"
+                        class="w-full mt-1 text-dark-3"
+                        placeholder="#### #### #### ####"
+                        data-card-field
+                        :maxlength="cardNumberMaxLength"
+                    />
                     </div>
                 </div>
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
@@ -31,7 +42,7 @@
                     </div>
                     <div class="w-full">
                         <label :for="inputFields.cardCvv" class="text-dark-3 text-sm">CVV</label>
-                        <InputMask :id="inputFields.cardCvv" v-model="valueFields.cardCvv" mask="999?9" placeholder="***" class="w-full mt-1 text-dark-3"  data-card-field/>
+                        <InputMask :id="inputFields.cardCvv" slot-char="*" v-model="valueFields.cardCvv" :mask="expiry_mask" placeholder="***" class="w-full mt-1 text-dark-3"  data-card-field/>
                     </div>
                 </div>
             </form>
@@ -117,9 +128,14 @@
     const currentFocus = ref<string | null>(null)
 
     const isCardNumberMasked = ref(false)
+
+    const expiry_mask = ref('999')
     
     const changeType = (type: CardType) => {
-        console.log(type) // TODO: ask Eduardo about this
+        expiry_mask.value = '999'
+        if (type == CardType.AMERICAN_EXPRESS){
+           expiry_mask.value = '9999'
+        } 
     }
 
 
@@ -155,6 +171,63 @@
 
         console.log(cardExpiryError.value)
     })
+
+    const maxLengthAmex = 17
+    const maxLengthDiners = 16
+    const maxLengthOthers = 19
+
+    const cardNumberMaxLength = ref(maxLengthOthers)
+
+    const changeNumber = (e: Event) => {
+        const inputEvent = e as InputEvent;
+        const target = e.target as HTMLInputElement;
+        target.value = target.value.replace(/\D/g, '');
+        valueFields.cardNumber = target.value
+
+        const cardPatterns: Record<CardType, RegExp> = {
+            [CardType.VISA]: /^4/,
+            [CardType.MASTERCARD]: /^(?:5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d{2}|27[01]\d|2720)/,
+            [CardType.AMERICAN_EXPRESS]: /^3[47]/,
+            [CardType.DISCOVER]: /^6011|^64[4-9]|^65/,
+            [CardType.JCB]: /^35/,
+            [CardType.DINERS_CLUB]: /^3(0[0-5]|[68])/,
+            [CardType.MAESTRO]: /^(?:50(?:18|20|38)|5[6-9]|6\d)/,
+            [CardType.UNIONPAY]: /^62/,
+            [CardType.UNKNOWN]: /.*/, // Fallback to avoid undefined
+        };
+
+        const value = valueFields.cardNumber;
+
+        if (cardPatterns[CardType.AMERICAN_EXPRESS].test(value)) {
+            cardNumberMaxLength.value = maxLengthAmex;
+        } else if (cardPatterns[CardType.DINERS_CLUB].test(value)) {
+            cardNumberMaxLength.value = maxLengthDiners;
+        } else {
+            cardNumberMaxLength.value = maxLengthOthers;
+        }
+
+        const trimmedValue = value.slice(0, cardNumberMaxLength.value);
+
+        if (cardNumberMaxLength.value === maxLengthAmex) { // American Express
+            valueFields.cardNumber = trimmedValue
+                .replace(/(\d{4})/, '$1 ')
+                .replace(/(\d{4}) (\d{6})/, '$1 $2 ');
+        } else if (cardNumberMaxLength.value === maxLengthDiners) { // Diner's Club
+            valueFields.cardNumber = trimmedValue
+                .replace(/(\d{4})/, '$1 ')
+                .replace(/(\d{4}) (\d{6})/, '$1 $2 ');
+        } else { // Rest of the cards
+            valueFields.cardNumber = trimmedValue
+                .replace(/(\d{4})/, '$1 ')
+                .replace(/(\d{4}) (\d{4})/, '$1 $2 ')
+                .replace(/(\d{4}) (\d{4}) (\d{4})/, '$1 $2 $3 ');
+        }
+
+        if (inputEvent.inputType == 'deleteContentBackward') {
+            const lastChar = valueFields.cardNumber.substring(valueFields.cardNumber.length, valueFields.cardNumber.length - 1)
+            if (lastChar == ' ') { valueFields.cardNumber = valueFields.cardNumber.substring(0, valueFields.cardNumber.length - 1) }
+        }
+    }
 
     const { encryptCardData } = useCardEncryption()
 

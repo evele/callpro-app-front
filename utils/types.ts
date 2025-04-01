@@ -725,6 +725,8 @@ export enum CardType {
   DISCOVER = 'Discover',
   JCB = 'JCB',
   DINERS_CLUB = 'Diners Club',
+  MAESTRO = 'Maestro',
+  UNIONPAY = 'UnionPay',
   UNKNOWN = 'Unknown'
 }
 
