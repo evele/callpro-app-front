@@ -61,6 +61,23 @@ export const useFetchGetTotalMonthlyNumbers = (broadcast_id: number, tts_merge_e
     queryFn: () => getTotalMonthlyNumbers(dataToSend.value), 
   })
 }
+
+export const useFetchGetBroadcastSelectedNumbers = (query_params:Ref<BSNQueryParams>) => {
+  const dataToSend = computed(() => ({
+    broadcast_id: query_params.value.broadcast_id,
+    start_limit: query_params.value.start_limit,
+    length_limit: query_params.value.length_limit,
+    search: query_params.value.search, 
+    order_column_index: query_params.value.order_column_index,
+    order_dir: query_params.value.order_dir,
+  }))
+
+  return useQuery({
+    queryKey: ['broadcast_selected_numbers', dataToSend],
+    queryFn: () => getBroadcastSelectedNumbers(dataToSend.value),
+    enabled: false
+  })
+}
   
 /* ----- Dashboard ----- */
 export const useFetchGetBroadcastList = (selected_tab:Ref<DashboardState>, show:Ref<ItemsPerPageOption>, search:Ref<string>) => {

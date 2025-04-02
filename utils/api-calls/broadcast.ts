@@ -93,10 +93,7 @@ export async function deleteDraft(data: BroadcastIdParams):Promise<APIResponseSu
 type GetTotalMonthlyNumbersParams = BroadcastIdParams & { 
     tts_merge_enable: ZeroOrOne
 }
-type GetTotalMonthlyNumbersResponse = APIResponseSuccess & { 
-    total_contacts: number 
-    total_numbers: number 
-}
+type GetTotalMonthlyNumbersResponse = APIResponseSuccess & TotalMonthlyNumbersData
 
 export async function getTotalMonthlyNumbers(data: GetTotalMonthlyNumbersParams):Promise<GetTotalMonthlyNumbersResponse | APIResponseError>{
     return await fetchWrapper.post(GET_TOTAL_MONTHLY_NUMBERS_URL, data) as GetTotalMonthlyNumbersResponse | APIResponseError
@@ -137,6 +134,15 @@ export async function getAllContactsAndGroups():Promise<GetAllContactsAndGroupsR
 /* ----- Get all contacts and groups ----- */
 export async function saveSelectedGroup(data: SaveSelectedGroupParams):Promise<APIResponseSuccess | APIResponseError>{
     return await fetchWrapper.post(SAVE_SELECTED_GROUP_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+/* ----- Get broadcast selected numbers ----- */
+type GetBSNParams = BroadcastIdParams & {
+    tts_merge_enable: ZeroOrOne
+}
+
+export async function getBroadcastSelectedNumbers(data: GetBSNParams):Promise<GetBSNResponse | APIResponseError>{
+    return await fetchWrapper.post(GET_BROADCAST_SELECTED_NUMBERS_URL, data) as GetBSNResponse | APIResponseError
 }
 
 /* ----- Get credits needed ----- */

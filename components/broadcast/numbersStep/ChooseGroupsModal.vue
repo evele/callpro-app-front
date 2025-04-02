@@ -111,7 +111,7 @@
     watch(
         () => ({ fetching_gt: isFetching.value, fetching_gns: isFetchingGNS.value }),
         ({ fetching_gt, fetching_gns }: { fetching_gt: boolean, fetching_gns: boolean}) => {
-            if(!fetching_gt && !fetching_gns) emit('update:data-loaded', false)
+            if(!fetching_gt && !fetching_gns) emit('update:data-loaded', true)
         }
     );
 
@@ -133,20 +133,6 @@
         },
         { immediate: true }
     );
-
-    // watchEffect(() => {
-    //     groups_data.value.forEach((group: UserGroupFormatted) => {
-    //         if(groups_numbers_selected.value.length) {
-    //             group.selected_qty = groups_numbers_selected.value.find((g: GroupSelected) => g.phone_number_group_id === group.id)?.numbers_selected || group.selected_qty
-    //             group.all_selected = group.selected_qty === group.group_count
-    //             group.disable_checkbox = group.all_selected
-    //         }
-    //         if(group.all_selected) {
-    //             selected_groups.value.push(group)
-    //         }
-    //         console.log('holaaa', selected_groups.value, groups_data.value)
-    //     });
-    // })
 
     const show_total_selected = (group: UserGroupFormatted) => {
         return selected_groups.value.some((g: UserGroupFormatted) => g.id === group.id) ? group.group_count : 0

@@ -42,6 +42,7 @@ export const GROUP_NUMBERS_SELECTED_URL = "/broadcast/group_numbers_selected"
 export const GET_CREDITS_NEEDED_URL = "/broadcast/get_credits_needed"
 export const GET_ALL_CONTACTS_AND_GROUPS_URL = "/broadcast/get_all_contacts_and_groups"
 export const SAVE_SELECTED_GROUP_URL = "/broadcast/save_selected_group"
+export const GET_BROADCAST_SELECTED_NUMBERS_URL = "/broadcast/get_broadcast_selected_numbers"
 
 /* ----- Caller ID Store ----- */
 export const GET_CALLER_ID_NUMBERS_URL = "/caller_id/get_caller_id_numbers"

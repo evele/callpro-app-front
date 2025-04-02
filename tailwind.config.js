@@ -22,6 +22,7 @@ module.exports = {
           'danger-light': '#FEE9E7', // Color más claro si lo necesitas
           success: '#14AE5C',
           'success-light': '#d5fbd5',
+          'light-1': '#F5F5F5',
           'light-2': '#F7F2FA',
           'dark-2': '#1D1B20',
           'dark-3': '#1E1E1E',

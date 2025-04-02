@@ -16,6 +16,7 @@ type BroadcastState = {
     has_loaded_draft: boolean;
     is_resetting_draft: boolean;
     show_suggested_start: { show: boolean, suggested_start: string };
+    show_contacts_table: boolean;
 };
 
 type BroadcastActions = {
@@ -57,6 +58,7 @@ export const useBroadcastStore = defineStore<"BroadcastStore", BroadcastState, {
             has_loaded_draft: false,
             is_resetting_draft: false,
             show_suggested_start: { show: false, suggested_start: '' },
+            show_contacts_table: false,
         }
     },
     actions: {

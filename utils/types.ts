@@ -19,6 +19,7 @@ export type BillingSectionToShow = 'main' | 'buy_credits' | 'checkout_form'
 export type FilterOption = { id: string, name: string, count: number, code?: StringOrNull }
 export type PlayerActionTypes = 'loading' | 'play' | 'pause' | 'error' | 'prev' | 'next' | 'close';
 export type FormAction = 'clear' | 'fill' | '' | undefined
+export type BroadcastNumbersBtnActions = 'contacts' | 'groups' | 'new' | 'upload' | 'clear'
 
 export type APIResponseError = {
   result: false,
@@ -897,4 +898,36 @@ export type SaveSelectedGroupParams = BroadcastIdParams & { group_ids: number[] 
 export type GroupSelected = {
   numbers_selected: number,
   phone_number_group_id: number 
+}
+
+export type BSNQueryParams = {
+  broadcast_id: number;
+  start_limit: number;
+  length_limit: number;
+  search: string;
+  order_column_index: number;
+  order_dir: 'asc' | 'desc';
+}
+
+export type BroadcastSelectedNumber = {
+  broadcast_id: number;
+  contacts_id: number;
+  contacts_phone_numbers_id: number;
+  dnc: ZeroOrOne;
+  first_name: string;
+  last_name: string;
+  number: string;
+  selected: ZeroOrOne;
+}
+
+export type TotalMonthlyNumbersData = {
+  total_contacts: number 
+  total_numbers: number 
+}
+
+export type GetBSNResponse = APIResponseSuccess & { 
+  array_contacts_id_map: { [key: number]: number }
+  numbers_data: BroadcastSelectedNumber[]
+  recordsFiltered: number
+  recordsTotal: number
 }
