@@ -78,6 +78,7 @@
                             bg-color="bg-primary" 
                             @click.stop="handle_play_audio(slotProps.data)"
                             :disabled="is_audio_loading"
+                            class="pl-[2px]"
                         >
                             <template #icon>
                                 <PlaySVG class="w-4 h-4 text-white" />

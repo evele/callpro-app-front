@@ -53,7 +53,7 @@
                     <div v-if="editingIndex !== index"
                         class="w-[138px] py-px justify-center items-center gap-3.5 flex">
                         <!-- play -->
-                        <IconButton bg-color="bg-[#653494]" @click="handle_play_audio(audio)" :disabled="is_audio_loading">
+                        <IconButton bg-color="bg-[#653494]" @click="handle_play_audio(audio)" :disabled="is_audio_loading" class="pl-[2px]">
                             <template #icon>
                                 <PlaySVG class="w-4 h-4 text-white" />
                             </template>
