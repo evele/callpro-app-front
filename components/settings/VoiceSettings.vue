@@ -57,6 +57,7 @@
                     bg-color="bg-primary" 
                     @click.stop="handle_play_audio(voice_settings.static_intro_audio_selected ?? undefined)"
                     :disabled="props.isAudioLoading"
+                    class="pl-[2px]"
                 >
                     <template #icon>
                         <PlaySVG class="w-4 h-4 text-white" />
