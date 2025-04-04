@@ -5,10 +5,18 @@
         <template #container>
             <div class="w-full flex items-center justify-between px-8 py-9 rounded-t-xl mb-2 bg-gradient-to-br from-neutral-700 to-neutral-400">
                 <h2 class="font-bold text-2xl text-dark-3">{{ props.title }}</h2>
-                <Paycard :value-fields="valueFields" @get-type="changeType" :isCardNumberMasked="isCardNumberMasked" :current-focus="currentFocus" />
+                <Paycard 
+                    :value-fields="valueFields" 
+                    @get-type="changeType" 
+                    :isCardNumberMasked="isCardNumberMasked" 
+                    :current-focus="currentFocus"
+                    :is-editing="is_editing"
+                    :encrypted-number="is_editing ? encrypted_cc_number : null"
+                    :set-type="is_editing ? props.cardToEdit?.card_type : CardType.UNKNOWN"
+                />
             </div>
             <div>
-            <p class="py-7 pl-9 text-Dark-3 text-lg font-semibold leading-relaxed">Add new card</p>
+            <p class="py-7 pl-9 text-Dark-3 text-lg font-semibold leading-relaxed">{{ modal_title }}</p>
             <divider class="m-0"/>
             <form ref="cardForm" @submit.prevent class="js-card-form new-contact-form flex px-8 py-6 flex-col gap-5 sm:gap-6" data-encryptedfields="encrypted-form">
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
@@ -18,26 +26,27 @@
                             <InputMask :id="inputFields.cardNumber" v-model="valueFields.cardNumber" mask="9999 9999 9999 9999" placeholder="#### #### #### ####" class="w-full mt-1 text-dark-3" data-card-field/>      
                             -->
                         <InputText 
-                        :id="inputFields.cardNumber"
-                        :value="valueFields.cardNumber"
-                        @input="changeNumber"
-                        class="w-full mt-1 text-dark-3"
-                        placeholder="#### #### #### ####"
-                        data-card-field
-                        :maxlength="cardNumberMaxLength"
-                    />
+                            :id="inputFields.cardNumber"
+                            :value="is_editing ? encrypted_cc_number : valueFields.cardNumber"
+                            @input="changeNumber"
+                            class="w-full mt-1 text-dark-3"
+                            placeholder="#### #### #### ####"
+                            data-card-field
+                            :maxlength="cardNumberMaxLength"
+                            :disabled="is_editing"
+                        />
                     </div>
                 </div>
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
                         <label :for="inputFields.cardName" class="text-dark-3 text-sm">Full Name</label>
-                        <InputText  :id="inputFields.cardName" v-model="valueFields.cardName" type="text"  placeholder="Johh Doe" class="w-full mt-1 text-dark-3" data-card-field />
+                        <InputText :id="inputFields.cardName" v-model="valueFields.cardName" type="text" placeholder="Johh Doe" class="w-full mt-1 text-dark-3" data-card-field :disabled="is_editing" />
                     </div>
                 </div>
                 <div class="flex flex-col justify-between gap-5 sm:flex-row sm:gap-10">
                     <div class="w-full">
                         <label :for="inputFields.cardExpiry" class="text-dark-3 text-sm">Expiry</label>
-                        <InputMask  :id="inputFields.cardExpiry" name="checkout-cc-expiry" v-model="valueFields.cardExpiry" mask="99 / 99" placeholder="MM / YY" class="w-full mt-1 text-dark-3" data-card-field/>
+                        <InputMask :id="inputFields.cardExpiry" name="checkout-cc-expiry" v-model="valueFields.cardExpiry" mask="99 / 99" placeholder="MM / YY" class="w-full mt-1 text-dark-3" data-card-field/>
                         <Message v-if="cardExpiryError" severity="error" class="mt-1 pl-4" size="small" variant="simple">{{ cardExpiryError }}</Message>
                     </div>
                     <div class="w-full">
@@ -50,26 +59,22 @@
             <div class="flex justify-between mt-9 gap-4 font-medium px-8 pb-6">
                 <Button 
                     @click="handle_cancel"
-                    :disabled="props.isProcessingConfirm || props.isProcessingCancel"
+                    :disabled="is_saving_card"
                     class="bg-[#F5F5F5] border border-grey-14 text-dark-3 h-10 w-full max-w-[300px] hover:bg-[#E5E5E5]"
                 >
-                    <div class="flex items-center gap-2" v-if="props.isProcessingCancel">
-                        <ProgressSpinner strokeWidth="8" fill="transparent" class="h-5 w-5 dark-spinner" animationDuration=".5s" aria-label="Processing" />
-                        Processing...
-                    </div>
-                    <span v-else>{{ props.cancelText }}</span>
+                    <span>Cancel</span>
                 </Button>
 
                 <Button 
                     @click="handle_confirm"
-                    :disabled="props.isProcessingConfirm || props.isProcessingCancel"
+                    :disabled="is_saving_card || disable_confirm"
                     class="bg-primary border-primary text-white w-full max-w-[300px] h-10 hover:bg-[#4A1D6E] disabled:bg-primary"
                 >
-                    <div class="flex items-center gap-2" v-if="props.isProcessingConfirm">
+                    <div class="flex items-center gap-2" v-if="is_saving_card">
                         <ProgressSpinner strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner" animationDuration=".5s" aria-label="Processing" />
                         Processing...
                     </div>
-                    <span v-else>{{ props.confirmText }}</span>
+                    <span v-else>Confirm</span>
                 </Button>
             </div>
         </template>
@@ -77,32 +82,43 @@
 </template>
 
 <script setup lang="ts">
-  
     const { show_success_toast, show_error_toast } = usePrimeVueToast();
-
     const { mutate: addNewCard, isPending: isAddingCard } = useAddNewCard()
+    const { mutate: editCard, isPending: isEditingCard } = useEditCard()
     
     const props = withDefaults(defineProps<{
         isVisible: boolean
-        title?: string
-        message?: string
-        cancelText?: string
-        confirmText?: string
-        isProcessingConfirm?: boolean
-        isProcessingCancel?: boolean 
+        cardToEdit?: CC_CARD | null
     }>(), {
-        title: '',
-        message: '',
-        cancelText: 'Cancel',
-        confirmText: 'Confirm',
-        isProcessingConfirm: false,
-        isProcessingCancel: false
+        cardToEdit: null
     })
 
     const show_confirm = computed(() => props.isVisible)
+    const is_editing = computed(() => props.cardToEdit !== null && props.cardToEdit !== undefined)
+    const modal_title = computed(() => is_editing.value ? 'Edit your card' : 'Add new card')
+    const encrypted_cc_number = ref('**** **** ****')
 
-    const emit = defineEmits(['close', 'cancel', 'confirm'])
-    const handle_cancel = () =>  emit('cancel',false)
+    const emit = defineEmits(['cancel', 'confirm'])
+
+    const handle_cancel = () => {
+        emit('cancel',false)
+        Object.assign(valueFields, {
+            cardName: "",
+            cardNumber: "",
+            cardMonth: "",
+            cardYear: "",
+            cardExpiry: "",
+            cardCvv: ""
+        })
+    }
+
+    const is_saving_card = computed(() => isAddingCard.value || isEditingCard.value)
+    const disable_confirm = computed(() => {
+        if(is_editing.value) {
+            return !valueFields.cardExpiry || valueFields.cardCvv.replace(/[^0-9]/g, '').length < 3 || cardExpiryError.value.length
+        }
+        return !valueFields.cardNumber || !valueFields.cardName || !valueFields.cardExpiry || valueFields.cardCvv.replace(/[^0-9]/g, '').length < 3 || cardExpiryError.value.length
+    })
 
     /* -- */
     const valueFields = reactive({
@@ -123,12 +139,8 @@
         cardCvv: 'v-card-cvv'
     })
 
-    
-
     const currentFocus = ref<string | null>(null)
-
     const isCardNumberMasked = ref(false)
-
     const expiry_mask = ref('999')
     
     const changeType = (type: CardType) => {
@@ -138,10 +150,16 @@
         } 
     }
 
-
     const cardExpiryError = ref('')
 
-    watch(() => valueFields.cardExpiry, (value) => {
+    watch(() => props.isVisible, (value: boolean) => {
+        if(value && props.cardToEdit) {
+            valueFields.cardName = props.cardToEdit.cc_name
+            encrypted_cc_number.value = `**** **** **** ${props.cardToEdit.last_four}`
+        }
+    })
+
+    watch(() => valueFields.cardExpiry, (value: string) => {
         cardExpiryError.value = ''
 
         const clean = value.replace(/\s/g, '')
@@ -229,7 +247,7 @@
 
     const { encryptCardData } = useCardEncryption()
 
-    function handle_confirm() {
+    function handle_add_card() {
 
         const data_to_send: New_CC = {
             number: Number(valueFields.cardNumber.replace(/ /g, '')),
@@ -237,20 +255,44 @@
             expiry: valueFields.cardExpiry,
             cvv: Number(valueFields.cardCvv),
             enc_card: encryptCardData(valueFields.cardNumber.replace(/ /g, ''), valueFields.cardCvv),
-
         }
 
         addNewCard(data_to_send, {
-                onSuccess: (response: APIResponseSuccess | APIResponseError) => {
-                    if(response.result) {
-                        show_success_toast('Success', 'Credit Card added successfully.')
-                    } else {
-                        show_error_toast('Error', response.error || 'Something went wrong while downgrading user plan.')
-                    }
-                },
-                onError: () => show_error_toast('Error', 'Something went wrong while downgrading user plan.')
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_success_toast('Success', 'Credit Card added successfully.')
+                    handle_cancel()
+                } else {
+                    show_error_toast('Error', response.error || 'Something went wrong while adding credit card.')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something went wrong while adding credit card.')
         })
     }
+
+    const handle_edit_card = () => {
+        if(!props.cardToEdit) return
+
+        const data_to_send: EditCardParams = {
+            card_id: props.cardToEdit.id,
+            expiry: valueFields.cardExpiry,
+            cvv: Number(valueFields.cardCvv),
+        }
+
+        editCard(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_success_toast('Success', 'Credit Card edited successfully.')
+                    handle_cancel()
+                } else {
+                    show_error_toast('Error', response.error || 'Something went wrong while editing credit card.')
+                }
+            },
+            onError: () => show_error_toast('Error', 'Something went wrong while editing credit card.')
+        })
+    }
+
+    const handle_confirm = () => is_editing.value ? handle_edit_card() : handle_add_card();
         
 </script>
 <style scoped lang="scss">

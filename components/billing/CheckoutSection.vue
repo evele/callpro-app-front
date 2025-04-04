@@ -29,7 +29,7 @@
                             <Button 
                                 type="button" 
                                 class="bg-primary border-none rounded-full p-0 h-[14px] w-[14px] bg-gradient-to-b from-[#9747FF] to-[#532CB5] hover:scale-110 transition-transform" 
-                                @click="open_modal"
+                                @click="emit('add-card',true)"
                                 raised
                             >
                                 <PlusSVG class="w-2 h-2 text-white" />
@@ -62,25 +62,40 @@
                             <ul class="font-semibold mt-8">
                                 <li class="flex items-center justify-between text-sm">Credit Pack <span>{{ format_price(recap_data.pack_info) }}</span></li>
                                 <li class="mt-4 flex items-center justify-between text-sm">Discount <span>{{ format_price(recap_data.discount) }}</span></li>
-                                <li class="mt-4 flex items-center justify-between text-sm">Promo Code <span>{{ format_price(0) }}</span></li>
+                                <li class="mt-4 flex items-center justify-between text-sm">Promo Code <span>{{ format_price(applied_coupon.discount_amount) }}</span></li>
                             </ul>
 
                             <Divider class="bg-grey-6 h-[2px] rounded-full" />
 
+                            <div v-show="applied_coupon.coupon" class="flex justify-between font-semibold text-sm mb-3">
+                                <p>Coupon: <span class="font-normal">{{ applied_coupon.coupon }}</span></p>
+                                <p>{{ applied_coupon.discount_display }} Off</p>
+                            </div>
+
                             <div class="flex justify-between font-semibold text-sm">
                                 <p>Total</p>
-                                <p>{{ format_price(recap_data.total) }}</p>
+                                <p v-if="applied_coupon.coupon">{{ format_price(applied_coupon.final_price) }}</p>
+                                <p v-else>{{ format_price(recap_data.total) }}</p>
                             </div>
                         </div>
 
-                        <div class="flex justify-end w-full items-center gap-4 mt-6">
+                        <div class="flex w-full items-center gap-4 mt-6">
                             <label for="promo-code" class="font-semibold text-sm text-dark-3">Promo Code</label>
                             <InputText 
                                 id="promo-code"
-                                class="w-32 py-3 border rounded-xl h-10 placeholder-grey-7"
+                                class="w-32 py-3 border rounded-xl h-9 placeholder-grey-7 text-sm"
                                 placeholder="Enter Code" 
-                                v-model="promo_code"
+                                v-model="coupon"
                             />
+                            <Button 
+                                type="button" 
+                                class="bg-black disabled:bg-[#322F35] text-white text-sm rounded-xl font-medium h-9 shadow-xl hover:bg-gray-900"
+                                :disabled="disable_apply_btn"
+                                @click="handle_apply_coupon"
+                            >
+                                <ProgressSpinner v-if="isFetching" strokeWidth="8" fill="transparent" class="h-5 w-5 light-spinner" animationDuration=".5s" aria-label="Applying coupon" />
+                                <span v-else>Apply</span>
+                            </Button>
                         </div>
                     </section>
                 </div>
@@ -110,12 +125,15 @@
 
 <script setup lang="ts">
 const billingStore = useBillingStore()
+const { show_success_toast, show_error_toast } = usePrimeVueToast();
 
 const emit = defineEmits<{
     (event: 'update:sectionToShow', value: BillingSectionToShow): void
+    (event: 'add-card', value: boolean): void
 }>()
 
 const recap_data = computed<RecapData>(() => billingStore.recap_data)
+const is_credit = computed(() => billingStore.selected_plan === null)
 
 const show_confirmation_modal = ref(false)
 const show_ready_message = ref(false)
@@ -128,11 +146,7 @@ const card_options = ref([
     { text: 'XXXX XXXX XXXX 5539', value: 3 },
 ])
 
-const promo_code = ref('')
-
-const open_modal = () => {
-    console.log('open modal')
-}
+const coupon = ref('')
 
 const open_confirm = () => {
     show_confirmation_modal.value = true
@@ -152,11 +166,68 @@ const handle_confirm = () => {
     }, 2000)
 }
 
+const disable_apply_btn = computed(() => !coupon.value || isFetching.value)
+
+const coupon_query_params = computed(() => {
+    let package_id
+    let package_type
+    if(is_credit.value) {
+        package_id = billingStore?.selected_step?.package_id
+        package_type = PackageType.PAUG_PLAN
+    } else {
+        package_id = billingStore?.selected_plan?.id
+        package_type = PackageType.GROUPS_PLAN
+    }
+    return {
+        coupon: coupon.value,
+        package_id: package_id,
+        package_type: package_type,
+        price: recap_data.value.total
+    }
+})
+
+type AppliedCoupon = {
+    coupon: string
+    discount_amount: number
+    discount_display: string
+    final_price: number
+}
+const applied_coupon: AppliedCoupon = reactive({
+    coupon: '',
+    discount_amount: 0,
+    discount_display: '',
+    final_price: 0,
+})
+
+const { isFetching, refetch: checkCoupon } = useFetchCheckCoupon(coupon_query_params)
+const handle_apply_coupon = async () => {
+    if (!coupon.value) return
+    
+    const res = await checkCoupon()
+    if(res?.data?.result) {
+        show_success_toast('Success', 'Coupon applied successfully!')
+        coupon.value = ''
+        const { couponCode, discountAmount, discountDisplay, finalPrice } = res.data.coupon_data
+        applied_coupon.coupon = couponCode
+        applied_coupon.discount_amount = discountAmount
+        applied_coupon.discount_display = discountDisplay
+        applied_coupon.final_price = finalPrice
+    } else {
+        show_error_toast('Error', res.data.error || 'Invalid Coupon Code!')
+    }
+}
+
 </script>
+
 <style scoped lang="scss">
 :deep(.placeholder-color) {
     .p-select-label.p-placeholder {
         color: #B3B3B3;
+    }
+}
+:deep(.light-spinner) {
+    .p-progressspinner-circle {
+        stroke: white!important;
     }
 }
 </style>

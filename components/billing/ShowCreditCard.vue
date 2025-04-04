@@ -27,15 +27,23 @@
                 
                     
                 <div class="flex gap-2">
-                    <IconButton>
+                    <IconButton @click="handle_edit_card" :disabled="props.isCheckingCardToDelete">
                         <template #icon>
                             <EditIconSVG class="w-4 h-4" />
                         </template>
                     </IconButton>
 
-                    <IconButton>
+                    <IconButton @click="handle_delete_card" :disabled="props.isCheckingCardToDelete">
                         <template #icon>
-                            <TrashSVG class="w-4 h-4" />
+                            <ProgressSpinner 
+                                v-if="show_spinner" 
+                                class="w-5 h-5 dark-spinner" 
+                                strokeWidth="8" 
+                                fill="transparent" 
+                                animationDuration=".5s" 
+                                aria-label="Checking card" 
+                            />
+                            <TrashSVG v-else class="w-4 h-4" />
                         </template>
                     </IconButton>
                 </div>
@@ -53,12 +61,19 @@
     const props = defineProps<{
         creditCard: CC_CARD
         isSelected: boolean
+        id_card_to_delete: NumberOrNull
+        isCheckingCardToDelete: boolean
     }>()
 
+    const emit = defineEmits<{
+        (event: 'delete-card', value: number): void
+        (event: 'edit-card', value: number): void
+    }>()
     const { getCardIcon } = useCreditCards()
 
     const card_type = computed(() => props?.creditCard?.card_type || CardType.UNKNOWN)
     const is_default = ref(props.creditCard.is_default == '1')
+    const show_spinner = computed(() => props.id_card_to_delete === props.creditCard.id && props.isCheckingCardToDelete)
 
     const border_style = computed(() => {
         if(props.isSelected) {
@@ -72,4 +87,15 @@
             return 'border-dashed border-[#9E9AA0]'
         }
     })
+
+    const handle_delete_card = () => emit('delete-card', props.creditCard.id)
+    const handle_edit_card = () => emit('edit-card', props.creditCard)
 </script>
+
+<style scoped lang="scss">
+    :deep(.dark-spinner) {
+        .p-progressspinner-circle {
+            stroke: #757575!important;
+        }
+    }
+</style>

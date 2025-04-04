@@ -134,6 +134,15 @@ export const useFetchUserBillingSettings = () => {
   })
 }
 
+export const useFetchCheckDeleteCard = (card_id: Ref<number | null>) => {
+  const dataToSend = computed(() => ({ card_id: card_id.value }))
+  return useQuery({
+    queryKey: ['check_delete_card', dataToSend],
+    queryFn: () => checkDeleteCard(dataToSend.value),
+    enabled: false,
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useFetchCallInCodes = () => {
   return useQuery({
@@ -166,6 +175,21 @@ export const useFetchChatContacts = (data:Ref<boolean>) => {
   return useQuery({
     queryKey: ['chat_contacts', dataToSend],
     queryFn: () => getChatContacts(dataToSend.value)
+  })
+}
+
+/* ----- Checkout ----- */
+export function useFetchCheckCoupon(params:Ref<CheckCouponParams>) {
+  const dataToSend = computed(() => ({
+    coupon: params.value.coupon,
+    package_id: params.value.package_id,
+    package_type: params.value.package_type,
+    price: params.value.price
+  }))
+  return useQuery({
+    queryKey: ['discount_coupon', dataToSend],
+    queryFn: () => checkCoupon(dataToSend.value),
+    enabled: false,
   })
 }
 

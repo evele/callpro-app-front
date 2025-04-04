@@ -27,6 +27,9 @@ export const GET_USER_BILLING_SETTINGS_URL = "/billing/get_billing_settings"
 export const SET_PENDING_DOWNGRADE_URL = "/billing/set_pending_downgrade"
 export const CANCEL_DOWNGRADE_URL = "/billing/cancel_downgrade"
 export const ADD_NEW_CARD_URL = "/billing/add_new_card"
+export const CHECK_DELETE_CARD_URL = "/billing/check_delete_card"
+export const DELETE_CARD_URL = "/billing/delete_card"
+export const EDIT_CARD_URL = "/billing/edit_card"
 
 /* ----- Broadcasts Store ----- */
 export const GET_BROADCAST_HEADER_URL = "/broadcast/get_broadcast_header"
@@ -48,6 +51,9 @@ export const DELETE_CALLER_ID_NUMBER_URL = "/caller_id/delete_caller_id_number"
 export const GET_USER_CALL_IN_CODES_URL = "/call_in_codes/get_user_call_in_codes"
 export const CREATE_CALL_IN_CODE_URL = "/call_in_codes/create_user_call_in_code"
 export const DELETE_CALL_IN_CODE_URL = "/call_in_codes/delete_user_call_in_code"
+
+/* ----- Checkout Store ----- */
+export const CHECK_COUPON_URL = "/checkout/check_coupon"
 
 /* ----- Contacts Store ----- */
 export const GET_CONTACT_URL = "/contacts/get_contact"

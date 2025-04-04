@@ -773,6 +773,12 @@ export type New_CC = {
   cvv: number;
 }
 
+export type EditCardParams = {
+  card_id: number;
+  expiry:string;
+  cvv:number;
+}
+
 export type UserBillingSettingsData = {
   recharge_minimum: StringOrNull;
   recharge_value: StringOrNull;
@@ -890,4 +896,12 @@ export type Broadcast ={
   static_intro_library_id: StringOrNull;
   status: string;
   user_id: number;
+}
+
+/* ----- CHECKOUT ----- */
+export type CheckCouponParams = {
+  coupon: string;
+  package_id: number;
+  package_type: PackageType;
+  price: number;
 }

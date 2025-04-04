@@ -87,6 +87,26 @@ export const useAddNewCard = () => {
   })
 }
 
+export const useDeleteCard = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:{card_id: number}) => deleteCard(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_cc_cards']})
+    }
+  })
+}
+
+export const useEditCard = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data:EditCardParams) => editCard(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user_cc_cards']})
+    }
+  })
+}
+
 /* ----- Call in codes ----- */
 export const useCreateCallInCode = () => {
   const queryClient = useQueryClient()

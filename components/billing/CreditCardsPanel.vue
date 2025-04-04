@@ -5,7 +5,11 @@
             :credit-card="card"
             :key="card.id" 
             :is-selected="props.selectedCard?.id === card.id"
-            @click="emit('update:selected-card', card)"
+            :id_card_to_delete="props.id_card_to_delete"
+            :isCheckingCardToDelete="props.isCheckingCardToDelete"
+            @click="handle_select_card(card)"
+            @delete-card="handle_delete_card"
+            @edit-card="handle_edit_card"
         />
 
         <Button class="bg-white text-dark-3 border border-dashed border-[#9E9AA0] font-semibold min-h-[122px] rounded-md text-lg hover:bg-gray-200"
@@ -30,6 +34,8 @@
         userCardsData: CC_CARD[]
         isLoading: boolean
         selectedCard: CC_CARD | null
+        id_card_to_delete: NumberOrNull
+        isCheckingCardToDelete: boolean
     }>()
 
     // force re-render the component when the userCardsData changes, to show the default card updated
@@ -42,5 +48,11 @@
         (event: 'update:selected-card', value: CC_CARD): void
         (event: 'hide-cards', value: boolean, tab: string): void
         (event: 'add-card', value: boolean): void
+        (event: 'delete-card', value: number): void
+        (event: 'edit-card', value: CC_CARD): void
     }>()
+
+    const handle_select_card = (card: CC_CARD) => emit('update:selected-card', card)
+    const handle_delete_card = (card_id: number) => emit('delete-card', card_id)
+    const handle_edit_card = (card: CC_CARD) => emit('edit-card', card)
 </script>

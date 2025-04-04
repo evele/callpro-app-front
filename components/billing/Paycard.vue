@@ -45,7 +45,8 @@
             :class="textStyle"
             id="cardNumber"
           >
-            <span v-for="(n, $index) in currentPlaceholder" :key="$index">
+            <div v-if="props.isEditing">{{ props.encryptedNumber }}</div>
+            <span v-else v-for="(n, $index) in currentPlaceholder" :key="$index">
               <transition name="slide-fade-up">
                 <div
                   v-if="getIsNumberMasked($index, n)"
@@ -208,7 +209,9 @@
         labels?: Labels,
         isCardNumberMasked?: boolean,
         setType?: CardType
-        currentFocus?: string | null
+        currentFocus?: string | null,
+        isEditing?: boolean,
+        encryptedNumber?: StringOrNull
     }>(), {
         inputFields: () => ({
             cardNumber: 'v-card-number',
@@ -227,7 +230,9 @@
         }),
         isCardNumberMasked: true,
         setType: CardType.UNKNOWN,
-        currentFocus: null
+        currentFocus: null,
+        isEditing: false,
+        encryptedNumber: null
     })
 
     const emit = defineEmits<{

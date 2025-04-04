@@ -62,8 +62,13 @@
                             :user-cards-data="user_cards_data" 
                             :is-loading="isLoadingUserCards"
                             :selected-card="selected_card"
+                            :id_card_to_delete="id_card_to_delete"
+                            :isCheckingCardToDelete="isCheckingCardToDelete"
                             @hide-cards="handle_hide_cards"
                             @add-card="handle_card_form"
+                            @delete-card="handle_delete_card"
+                            @edit-card="handle_edit_card"
+                            @update:selected-card="handle_select_card"
                         />
                     </TabPanel>
                 </TabPanels>
@@ -86,11 +91,27 @@
     </div>
 
     <section v-if="section_to_show === B_CHECKOUT_FORM" class="p-6">
-        <CheckoutSection @update:sectionToShow="handle_section_to_show" /> 
+        <CheckoutSection @update:sectionToShow="handle_section_to_show" @add-card="handle_card_form" /> 
     </section>
-    <AddCardForm :isVisible="show_card_form" @cancel    ="handle_card_form"/>
+    <AddCardForm :isVisible="show_card_form" :card-to-edit="card_to_edit" @cancel="handle_card_form" />
 
     <Toast />
+
+    <ConfirmationPurchase 
+        :is-visible="show_confirmation_modal" 
+        @close="close_confirm"
+        @cancel="close_confirm"
+        @confirm="handle_confirm" 
+        :title="confirmation_title" 
+        :message="confirmation_message"  
+        :isProcessingConfirm="isDeletingCard"
+    />
+
+    <WarningModal 
+        :isVisible="show_warning_modal" 
+        @close="show_warning_modal = false" 
+        :message="warning_message"
+    />
 </template>
 
 <script setup lang="ts">
@@ -108,6 +129,17 @@
     const selected_card = ref<CC_CARD | null>(null)
     const section_to_show = ref<BillingSectionToShow>(B_MAIN)
     const selected_type = ref<SelectedBillingType>(CREDIT)
+    const card_to_edit = ref<CC_CARD | null>(null)
+
+    const show_confirmation_modal = ref(false)
+    const confirmation_title = ref('')
+    const confirmation_message = ref('')
+    const show_warning_modal = ref(false)
+    const warning_message = ref('')
+
+    const handle_select_card = (card: CC_CARD) => {
+        selected_card.value = card
+    }
 
     const hide_cards = ref(false)
 
@@ -189,12 +221,64 @@
 
     const show_card_form = ref(false)
 
-    const handle_card_form = (should_show:boolean) => {
-        console.log('its called',should_show)
+    const handle_card_form = (should_show: boolean) => {
         show_card_form.value = should_show
+        if(!should_show) card_to_edit.value = null
     }
 
     onBeforeUnmount(() => billingStore.resetStore())
+
+    const id_card_to_delete = ref<NumberOrNull>(null)
+    
+    const { isFetching: isCheckingCardToDelete, refetch: checkCardToDelete } = useFetchCheckDeleteCard(id_card_to_delete)
+    const { mutate: deleteCard, isPending: isDeletingCard } = useDeleteCard()
+    const handle_delete_card = async (card_id: number) => {
+        if(!card_id) return
+        id_card_to_delete.value = card_id
+
+        const res = await checkCardToDelete()
+
+        if(res?.data?.result && res?.data?.check === true) {
+            confirmation_title.value = 'Delete card'
+            confirmation_message.value = 'Are you sure you want to delete this card?'
+            show_confirmation_modal.value = true
+        } else {
+            show_warning_modal.value = true
+            warning_message.value = res?.data?.error || 'Please change your default card before deleting this one'
+        }
+    }
+
+    const close_confirm = () => {
+        show_confirmation_modal.value = false
+        id_card_to_delete.value = null
+        confirmation_title.value = ''
+        confirmation_message.value = ''
+    }
+
+    const handle_confirm = async () => {
+        if(!id_card_to_delete.value) return
+
+        const data_to_send = { card_id: id_card_to_delete.value }
+        deleteCard(data_to_send, {
+            onSuccess: (response: APIResponseSuccess | APIResponseError) => {
+                if(response.result) {
+                    show_success_toast('Success', 'Card successfully deleted!')
+                    show_confirmation_modal.value = false
+                } else {
+                    show_error_toast('Error', response.error || 'Something failed while deleting the card.')
+                }  
+            },
+            onError: () => {
+                show_error_toast('Error', 'Something failed while deleting the card, please try again.')
+            }
+        })
+    }
+
+    const handle_edit_card = (card: CC_CARD) => {
+        if(!card) return
+        card_to_edit.value = card
+        handle_card_form(true)
+    }
 </script>
 
 <style scoped lang="scss">

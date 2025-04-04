@@ -39,6 +39,19 @@ export async function addNewCard(data:{number: number, enc_card: string, cc_name
   return await fetchWrapper.post(ADD_NEW_CARD_URL, data) as APIResponseSuccess | APIResponseError
 }
 
+type CheckDeleteCardResponse = APIResponseSuccess & { check: boolean | string }
+export async function checkDeleteCard(data:{card_id: number | null}):Promise<CheckDeleteCardResponse | APIResponseError>{
+  return await fetchWrapper.post(CHECK_DELETE_CARD_URL, data) as CheckDeleteCardResponse | APIResponseError
+}
+
+export async function deleteCard(data:{card_id: number}):Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(DELETE_CARD_URL, data) as APIResponseSuccess | APIResponseError
+}
+
+export async function editCard(data:EditCardParams):Promise<APIResponseSuccess | APIResponseError>{
+  return await fetchWrapper.post(EDIT_CARD_URL, data) as APIResponseSuccess | APIResponseError
+}
+
 /* ----- SAVE DEFAULT CC CARD ----- */
 export async function saveDefaultCard(data:{ card_id: number }):Promise<APIResponseSuccess | APIResponseError>{
   return await fetchWrapper.post(SAVE_DEFAULT_CC_CARD_URL, data) as APIResponseSuccess | APIResponseError
